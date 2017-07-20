@@ -1,0 +1,144 @@
+/*@import url(https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700);*/
+@font-face {
+    font-family: ProximaNova;
+    src: url(../fonts/proximanova_light_macroman/ProximaNova-Light-webfont.ttf);
+    font-weight: bold;
+}
+
+html, body {
+	min-height: 100%;
+	font-family: "ProximaNova","Avenir Next","Helvetica Neue",Arial,sans-serif,"Avenir Next","Helvetica Neue",Arial,sans-serif;
+    font-weight: 400;
+    overflow-x: hidden;
+    overflow-y: auto;
+    font-size: 13px;
+	color:#565656;
+	background-color: #fafafa;
+}
+.layout-boxed html, .layout-boxed body {
+	height: 100%
+}
+
+/* .content-wrapper, .right-side, .main-footer {
+	margin-left: 200px;
+	z-index: 820
+} */
+.layout-top-nav .content-wrapper, .layout-top-nav .right-side, .layout-top-nav .main-footer {
+	margin-left: 0
+}
+/* .content-wrapper, .right-side {
+	min-height: 100%;
+	z-index: 800
+} */
+/* .content {
+	min-height: 250px;
+	padding: 15px;
+	margin-right: auto;
+	margin-left: auto;
+	padding-left: 15px;
+	padding-right: 15px
+} */
+a, a:focus {
+	outline: none;
+	text-decoration: none;
+}
+.main-sidebar, .left-side {
+	background: #464646;
+	position: absolute;
+	top: 0;
+	left: 0;
+	min-height: 100%;
+	width: 200px;
+	z-index: 810;
+}
+.sidebar {
+	padding-bottom: 10px
+}
+.sidebar-form input:focus {
+	border-color: transparent
+}
+.sidebar-menu {
+	list-style: none;
+	margin: 0;
+	padding: 0
+}
+.sidebar-menu > li {
+	position: relative;
+	margin: 0;
+	padding: 0
+}
+.sidebar-menu > li > a {
+	padding: 12px 5px 12px 15px;
+	display: block;
+	color: #fff;
+}
+.sidebar-menu li.active > .treeview-menu {
+	display: block
+}
+.sidebar-menu .treeview-menu {
+	display: none;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	padding-left: 5px
+}
+.sidebar-menu .treeview-menu .treeview-menu {
+	padding-left: 20px
+}
+.sidebar-menu .treeview-menu > li {
+	margin: 0
+}
+.sidebar-menu .treeview-menu > li > a {
+	padding: 5px 5px 5px 15px;
+	display: block;
+	font-size: 14px;
+	color: #fff;
+}
+.sidebar-menu:hover {
+	overflow: visible;
+}
+.sidebar-menu li>a {
+	position: relative
+}
+.sidebar-menu li > a >.pull-right {
+	position: absolute;
+	top: 50%;
+	right: 10px;
+	margin-top: -7px
+}
+.sidebar-menu > li:hover > a, .sidebar-menu > li.active > a {
+	color: #fff;
+	background: rgba(0,0,0,0.2);
+}
+.treeview-menu > li.active > a, .treeview-menu > li > a:hover {
+	color: rgba(255,255,255,0.5);
+}
+.tab-content {
+	padding: 10px;
+	background-color: white;
+	/*border-style: none solid solid solid;
+	border-color: #ddd;
+	border-width: 0 1px 1px 1px;*/
+}
+
+
+.nav.nav-tabs > LI.active > a {
+    
+    border: 0px;
+    border-bottom: 3px solid #007cbb;
+    border-radius: 0;
+}
+
+.nav > li > a{
+	color: #000;
+	border: 0px transparent;
+	border-bottom: 3px transparent;
+	background: inherit;
+	}
+
+.nav>li>a:hover{
+	color: inherit;
+	border: 0px transparent;
+    border-bottom: 3px solid #007cbb;
+	background: transparent;
+}
