@@ -1,0 +1,7 @@
+<web-app>
+	<display-name>VCenter PlugIn</display-name>
+	<description>Solarflare vCenter Plugin Application</description>
+	<!-- <servlet> <servlet-name>LoggerServlet</servlet-name> <servlet-class>com.msys.vcp.config.InitLoggingServlet</servlet-class> 
+		<init-param> <param-name>log4j-properties</param-name> <param-value>WEB-INF/log4j.properties</param-value> 
+		</init-param> <load-on-startup>1</load-on-startup> </servlet> -->
+</web-app>

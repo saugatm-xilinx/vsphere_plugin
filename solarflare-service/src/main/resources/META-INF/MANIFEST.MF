@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-Vendor: VMware
 Bundle-Version: 1.0.0
-Tool: Bundlor 1.1.0.RELEASE
+Tool: Bundlor 1.0.0.RELEASE
 Bundle-Name: solarflare-service
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: com.msys.solarflare.solarflare-service
@@ -13,11 +13,42 @@ Import-Package: org.apache.commons.logging;version="1.1.1",
  com.vmware.vise.usersession;version="0",
  com.vmware.vise.security;version="0",
  com.vmware.vise.vim.data;version="0",
- com.vmware.vim25;version="6.5.0",
+ com.vmware.vim25;version="6.5.0.10000",
  com.google.gson;version="2.3.1",
  javax.servlet.http;version="3.0",
  javax.net.ssl;version="0",
  org.springframework.beans.factory.annotation;version="3.1.4",
  org.springframework.http;version="3.1.4",
  org.springframework.stereotype;version="3.1.4",
- org.springframework.web.bind.annotation;version="3.1.4"
+ org.springframework.web.bind.annotation;version="3.1.4",
+ org.springframework.web.multipart;version="3.1.4",
+ javax.security.auth;version="0",
+ javax.net;version="0",
+ javax.cim;version="2.1.1",
+ javax.wbem;version="2.1.1",
+ javax.wbem.client;version="2.1.1",
+ javax.wbem.listener;version="2.1.1",
+ org.sblim;version="2.1.1",
+ org.sblim.cimclient;version="2.1.1",
+ org.sblim.cimclient.discovery;version="2.1.1",
+ org.sblim.cimclient.internal;version="2.1.1",
+ org.sblim.cimclient.internal.cim;version="2.1.1",
+ org.sblim.cimclient.internal.cimxml;version="2.1.1",
+ org.sblim.cimclient.internal.cimxml.sax;version="2.1.1",
+ org.sblim.cimclient.internal.cimxml.sax.node;version="2.1.1",
+ org.sblim.cimclient.internal.discovery;version="2.1.1",
+ org.sblim.cimclient.internal.discovery.slp;version="2.1.1",
+ org.sblim.cimclient.internal.http;version="2.1.1",
+ org.sblim.cimclient.internal.http.io;version="2.1.1",
+ org.sblim.cimclient.internal.logging;version="2.1.1",
+ org.sblim.cimclient.internal.pullparser;version="2.1.1",
+ org.sblim.cimclient.internal.uri;version="2.1.1",
+ org.sblim.cimclient.internal.util;version="2.1.1",
+ org.sblim.cimclient.internal.wbem;version="2.1.1",
+ org.sblim.cimclient.internal.wbem.indications;version="2.1.1",
+ org.sblim.cimclient.internal.wbem.operations;version="2.1.1",
+ org.sblim.slp;version="2.1.1",
+ org.sblim.slp.internal;version="2.1.1",
+ org.sblim.slp.internal.msg;version="2.1.1",
+ org.sblim.slp.internal.sa;version="2.1.1",
+ org.sblim.slp.internal.ua;version="2.1.1"

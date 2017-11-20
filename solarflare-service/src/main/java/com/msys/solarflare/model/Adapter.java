@@ -14,6 +14,9 @@ public class Adapter implements Serializable {
 	private String versionController;
 	private String versionBootROM;
 	private String versionUEFIROM;
+	private String versionFirmware;
+	private boolean isLaterVersionAvailable;
+	
 	List<VMNIC> children;
 
 	public String getName() {
@@ -78,5 +81,25 @@ public class Adapter implements Serializable {
 	public void setChildren(List<VMNIC> children) {
 		this.children = children;
 	}
+
+    public boolean isLaterVersionAvailable()
+    {
+        return isLaterVersionAvailable;
+    }
+
+    public void setLaterVersionAvailable(boolean isLaterVersionAvailable)
+    {
+        this.isLaterVersionAvailable = isLaterVersionAvailable;
+    }
+
+    public String getVersionFirmware()
+    {
+        return versionFirmware;
+    }
+
+    public void setVersionFirmware(String versionFirmware)
+    {
+        this.versionFirmware = versionFirmware;
+    }
 
 }

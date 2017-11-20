@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.msys.solarflare.model.Host;
+import com.msys.solarflare.model.NicBootParamInfo;
 import com.msys.solarflare.services.HostAdapterService;
 
 /**
@@ -62,13 +63,19 @@ public class ServicesController {
 	@ResponseBody
 	public List<Host> hostAdapters() throws Exception {
 		_logger.info("hostAdapters called.");
-		return _hostAdapterService.getHostAdapters();
+		return null; // _hostAdapterService.getHostAdapters();
 	}
 
 	@RequestMapping(value = "/hostAdapters/{hostId}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Host> hostAdapters(@PathVariable String hostId) throws Exception {
-		return _hostAdapterService.getHostAdapters();
+		return null; //_hostAdapterService.getHostAdapters();
+	}
+
+	@RequestMapping(value = "/hostAdapters/{hostId}/nics/{nicId}/bootparams", method = RequestMethod.GET)
+	@ResponseBody
+	public NicBootParamInfo nicBootParams(@PathVariable String hostId, @PathVariable String nicId) throws Exception {
+		return _hostAdapterService.getNicParamInfo(hostId, nicId);
 	}
 
 	/**

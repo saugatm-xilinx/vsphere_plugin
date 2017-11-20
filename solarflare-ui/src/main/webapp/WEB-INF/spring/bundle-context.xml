@@ -38,6 +38,8 @@
 	<!-- Standard controller beans: you can modify them if necessary -->
 
 	<bean name="servicesController" class="com.msys.solarflare.mvc.ServicesController" />
+	
+	<bean name="hostAdapterController" class="com.msys.solarflare.mvc.HostAdapterController" />
 
 	<bean name="dataAccessController" class="com.msys.solarflare.mvc.DataAccessController" />
 

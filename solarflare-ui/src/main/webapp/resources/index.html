@@ -20,6 +20,10 @@
          <input type="text" ng-model="search" class="form-control input-sm" placeholder="Search">
          <i class="form-control-feedback glyphicon glyphicon-search"></i>
         </div>
+          <center ng-if="!treedata.length">
+              <img src="../assets/images/loading.gif" width="100px">
+              <h4>Loading...Please wait</h4>
+          </center>
         <treecontrol class="tree-light" tree-model="treedata" node-search="search" node-children="children" on-selection="showSelected(node)" selected-node="node2">
         <span>{{node.name}}</span> </treecontrol>
       </div>
@@ -29,8 +33,8 @@
     <div class="panel-right">
       <div class="container-fluid">
         <div class="">
-<!--           					{{selected.type}} -->
-          <section ng-if="selected.type=='HOST'"  ng-include="'sfmvc/views/hostDetails.html'"></section>
+            <section ng-if="!selected" ng-include="'sfmvc/views/landing.html'"></section>
+          <section ng-if="selected.type=='HOST'" ng-include="'sfmvc/views/hostDetails.html'"></section>
           <section ng-if="selected.type=='NIC'" ng-include="'sfmvc/views/nicDetails.html'"></section>
         </div>
       </div>

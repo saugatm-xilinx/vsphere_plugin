@@ -11,9 +11,17 @@
       http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
 	<bean name="HostAdapterService"
-		class="com.msys.solarflare.services.HostAdapterServiceImpl" />
-
+		class="com.msys.solarflare.services.HostAdapterServiceImpl">
+		<constructor-arg index="0" ref="userSessionService"/>
+	</bean>
+	
 	<bean name="SampleActionServiceImpl" class="com.msys.solarflare.services.SampleActionServiceImpl">
 		<constructor-arg index="0" ref="vimObjectReferenceService" />
 	</bean>
+	<!--  
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver" >
+		<property name="maxUploadSize" value="100000" />
+	</bean>
+	-->
 </beans>

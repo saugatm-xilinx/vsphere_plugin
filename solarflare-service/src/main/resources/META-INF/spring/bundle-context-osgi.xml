@@ -32,5 +32,4 @@
 	<osgi:reference id="vimObjectReferenceService"
 		interface="com.vmware.vise.vim.data.VimObjectReferenceService" />
 
-
 </beans>

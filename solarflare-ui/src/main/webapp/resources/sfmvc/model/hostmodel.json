@@ -1,0 +1,70 @@
+[
+    {
+        "Name": "Host 1",
+        "id": "h1",
+        "children": [
+            {
+                "Name": "Adaptor 1",
+                "id": "a1",
+                "children": [
+                    {
+                        "Name": "NIC 1",
+                        "id": "nic1",
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "Name": "Host 2",
+        "id": "h2",
+        "children": [
+            {
+                "Name": "Adaptor 1",
+                "id": "a1",
+                "children": [
+                    {
+                        "Name": "NIC 1",
+                        "id": "nic1",
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "Name": "Host 3",
+        "id": "h3",
+        "children": [
+            {
+                "Name": "Adaptor 1",
+                "id": "a1",
+                "children": [
+                    {
+                        "Name": "NIC 1",
+                        "id": "nic1",
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "Name": "Host 4",
+        "id": "h4",
+        "children": [
+            {
+                "Name": "Adaptor 1",
+                "id": "a1",
+                "children": [
+                    {
+                        "Name": "NIC 1",
+                        "id": "nic1",
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    }
+]

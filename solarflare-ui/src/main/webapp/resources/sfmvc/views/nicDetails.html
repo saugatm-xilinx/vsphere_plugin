@@ -1,0 +1,273 @@
+ <!-- content area starts-->
+            <div role="tabpanel">
+              <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#details" data-toggle="tab" role="tab" aria-controls="tab1">Details</a></li>
+                <li role="presentation"><a href="#boot" data-toggle="tab" role="tab" aria-controls="tab2">Boot Params</a></li>
+                <li role="presentation"><a href="#diagnostics" data-toggle="tab" role="tab" aria-controls="tab2">Diagnostics</a></li>
+                <li role="presentation"><a href="#configuration" data-toggle="tab" role="tab" aria-controls="tab2">Configuration</a></li>
+              </ul>
+              <div id="tabContent1" class="tab-content">
+                <div role="tabpanel" class="tab-pane fade in active" id="details">
+                  <div class="container-fluid">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <p></p>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>Drive Name</p>
+                      </div>
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p class="text-left">{{selected.driverName}}</p>
+                      </div>
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>Device Id</p>
+                      </div>
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>{{selected.deviceId}}</p>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>Driver Version</p>
+                      </div>
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>{{selected.driverVersion}}</p>
+                      </div>
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>Subsystem Device Id</p>
+                      </div>
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>{{selected.subSystemDeviceId}}</p>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>Mac Address</p>
+                      </div>
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>{{selected.macAddress}}</p>
+                      </div>
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>Vendor Id</p>
+                      </div>
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>{{selected.vendorId}}</p>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>Link Status</p>
+                      </div>
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>UP</p>
+                      </div>
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>Subsystem Vendor Id</p>
+                      </div>
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>{{selected.subSystemVendorId}}</p>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>Interface name</p>
+                      </div>
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>{{selected.interfaceName}}</p>
+                      </div>
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>PCI Function</p>
+                      </div>
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>{{selected.pciFunction}}</p>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>Port Speed</p>
+                      </div>
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>{{selected.portSpeed}}</p>
+                      </div>
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>Device Id</p>
+                      </div>
+                      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <p>{{selected.deviceId}}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                <div role="tabpanel" class="tab-pane fade" id="boot">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="pull-right">
+                        <!--   <button class="btn btn-success">Refresh</button>
+                        <button class="btn btn-primary">Help</button> -->
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Boot Image:</b>ROM
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Physical Function:</b>dswe
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Link Speed:</b>1.025.54vD
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">MSI:</b>1.755.54SB
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Link up delay:</b>abc.def.ghi.jk
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">No. of virtual :</b>abc.def.ghi.jk
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Banner delay:</b>Up
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">VF MSI:</b>Up
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Boot Skip:</b>some name
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Frameware:</b>vmnic-2
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Boot type:</b>speed
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Insecure filter:</b>32323
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">VLAN tags:</b>current value
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Switch Mode:</b>max
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div role="tabpanel" class="tab-pane fade" id="diagnostics">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <p>To Be Done !</p>
+                    </div>
+                  </div>
+                </div>
+                <div role="tabpanel" class="tab-pane fade" id="configuration">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="pull-right">
+                        <button class="btn btn-success">Refresh</button>
+                        <button class="btn btn-primary">Help</button>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Boot Image:</b>ROM
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Physical Function:</b>dswe
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Link Speed:</b>1.025.54vD
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">MSI:</b>1.755.54SB
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Link up delay:</b>abc.def.ghi.jk
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">No. of virtual :</b>abc.def.ghi.jk
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Banner delay:</b>Up
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">VF MSI:</b>Up
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Boot Skip:</b>some name
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Frameware:</b>vmnic-2
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Boot type:</b>speed
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Insecure filter:</b>32323
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">VLAN tags:</b>current value
+                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>
+                        <b class="col-md-4">Switch Mode:</b>max
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- content area ends-->

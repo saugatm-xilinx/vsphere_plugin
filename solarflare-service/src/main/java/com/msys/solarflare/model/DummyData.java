@@ -11,7 +11,7 @@ public class DummyData {
 
 	public List<Host> getHostAdapters() {
 		ArrayList<Host> result = new ArrayList<>(data.values());
-		Collections.sort(result);
+		//Collections.sort(result);
 		return result;
 	}
 
@@ -22,7 +22,7 @@ public class DummyData {
 	public DummyData() {
 		// create some dummy data
 		data = new HashMap<>();
-		Host hostA = getHost("Host-A", "Host-A-id");
+		Host hostA = getHost("10.101.10.3", "host-9");
 
 		List<Adapter> adpaters = new ArrayList<>();
 		Adapter adapterA = getAdapter("Adapter 1", "1.1.1.0",
@@ -45,7 +45,7 @@ public class DummyData {
 
 		data.put(hostA.getId(), hostA);
 
-		Host hostB = getHost("Host-B", "Host-B-id");
+		//Host hostB = getHost("Host-B", "Host-B-id");
 
 		List<Adapter> adpatersHostB = new ArrayList<>();
 		Adapter adpaterHostB = getAdapter("Adapter	Intel Corporation 82546EB Gigabit Ethernet Controller", "1.1.1.0",
@@ -55,8 +55,8 @@ public class DummyData {
 		adpaterHostB.setChildren(nicsHostB);
 		adpatersHostB.add(adpaterHostB);
 
-		hostB.setChildren(adpatersHostB);
-		data.put(hostB.getId(), hostB);
+		//hostB.setChildren(adpatersHostB);
+		//data.put(hostB.getId(), hostB);
 	}
 
 	private Host getHost(String name, String id) {
@@ -65,8 +65,30 @@ public class DummyData {
 		host.setName(name);
 		return host;
 	}
-
-	private Adapter getAdapter(String name, String bootROM, String controller, String uefiROM) {
+    public List<Adapter> listAdapter(String hostId)
+    {
+        List<Adapter> list = new ArrayList<>();
+        Adapter ad1 = new Adapter();
+        ad1.setId("d1");
+        ad1.setName("adapter-1");
+        ad1.setLaterVersionAvailable(true);
+        ad1.setVersionBootROM("1.1.1.10000");
+        ad1.setVersionController("1.1.1.10000");
+        ad1.setVersionUEFIROM("1.1.1.10000");
+        ad1.setVersionFirmware("2.2.10000");
+        list.add(ad1);
+        Adapter ad2 = new Adapter();
+        ad2.setId("d2");
+        ad2.setName("adapter-2");
+        ad2.setLaterVersionAvailable(false);
+        ad2.setVersionBootROM("1.1.1.20000");
+        ad2.setVersionController("1.1.1.20000");
+        ad2.setVersionUEFIROM("1.1.1.20000");
+        ad2.setVersionFirmware("2.2.10000");
+        list.add(ad2);
+        return list;
+    }
+    	private Adapter getAdapter(String name, String bootROM, String controller, String uefiROM) {
 		Adapter adapter = new Adapter();
 		adapter.setName(name);
 		adapter.setVersionBootROM(bootROM);
@@ -80,7 +102,7 @@ public class DummyData {
 		nic.setCurrentMTU("100");
 		nic.setDeviceId("sfvmk");
 		nic.setDriverName("sfvmk");
-		nic.setDriverVersion("1.0.0");
+		nic.setDriverVersion("1.1.0");
 		nic.setStatus(status);
 		nic.setMacAddress(macAddress);
 		nic.setName(name);

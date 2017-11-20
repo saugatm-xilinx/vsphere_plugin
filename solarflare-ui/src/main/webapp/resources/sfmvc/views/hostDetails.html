@@ -1,0 +1,305 @@
+<!-- content area starts-->
+<div role="tabpanel">
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#hostoverview" data-toggle="tab" role="tab"
+                                                  aria-controls="tab1">Host Overview</a></li>
+        <li role="presentation" class=""><a href="#firmupdate" data-toggle="tab" role="tab"
+                                            aria-controls="tab2">Firmware Update</a></li>
+        <li role="presentation" class=""><a href="#hostconfig" data-toggle="tab" role="tab"
+                                            aria-controls="tab3">Configuration</a>
+        </li>
+    </ul>
+
+    <div id="tabContent1" class="tab-content">
+        <div role="tabpanel" class="tab-pane fade " id="hostconfig">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12"><span></span></div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-2 col-md-3 col-sm-3 col-xs-6">
+                        <p>RSS</p>
+                    </div>
+                    <div class="col-lg-2 col-md-9 col-sm-9 col-xs-6">
+                        <toggle ng-model="rss" size="btn-xs" ng-change="changed()" onstyle="btn-default"></toggle>{{rss}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-2 col-md-3 col-sm-3 col-xs-6">
+                        <p>Interrupt</p>
+                    </div>
+                    <div class="col-lg-2 col-md-9 col-sm-9 col-xs-6">
+                        <div class="radio">
+                            <label><input type="radio" name="rss">MSI-X</label>
+                        </div>
+                        <div class="radio">
+                            <label><input type="radio" name="rss">MSI</label>
+                        </div>
+                        <div class="radio">
+                            <label><input type="radio" name="rss">Legacy Interrupt</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-2 col-md-3 col-sm-3 col-xs-6">
+                        <p>Debug Mode</p>
+                    </div>
+                    <div class="col-lg-10 col-md-9 col-sm-9 col-xs-6">
+                        <div class="row">
+                            <div class="col-md-2 col-sm-4">
+                                <label class="checkbox-inline"><input type="checkbox" value="">Transmit</label>
+                            </div>
+                            <div class="col-md-2 col-sm-8">
+                                <label class="checkbox-inline"><input type="checkbox" value="">Transmit</label>
+                            </div>
+                            <div class="col-md-8 col-sm-4">
+                                <label class="checkbox-inline"><input type="checkbox" value="">Transmit</label>
+                            </div>
+                            <div class="col-md-2 col-sm-8">
+                                <label class="checkbox-inline"><input type="checkbox" value="">Receive</label>
+                            </div>
+                            <div class="col-md-2 col-sm-4">
+                                <label class="checkbox-inline"><input type="checkbox" value="">Receive</label>
+                            </div>
+                            <div class="col-md-8 col-sm-8">
+                                <label class="checkbox-inline"><input type="checkbox" value="">Receive</label>
+                            </div>
+                            <div class="col-md-2 col-sm-8">
+                                <label class="checkbox-inline"><input type="checkbox" value="">Initialization</label>
+                            </div>
+                            <div class="col-md-2 col-sm-4">
+                                <label class="checkbox-inline"><input type="checkbox" value="">Initialization</label>
+                            </div>
+                            <div class="col-md-8 col-sm-8">
+                                <label class="checkbox-inline"><input type="checkbox" value="">Initialization</label>
+                            </div>
+                            <div class="col-md-2 col-sm-8">
+                                <label class="checkbox-inline"><input type="checkbox" value="">xyz</label>
+                            </div>
+                            <div class="col-md-2 col-sm-4">
+                                <label class="checkbox-inline"><input type="checkbox" value="">xyz</label>
+                            </div>
+                            <div class="col-md-8 col-sm-8">
+                                <label class="checkbox-inline"><input type="checkbox" value="">xyz</label>
+                            </div>
+                            <div class="col-md-2 col-sm-8">
+                                <label class="checkbox-inline"><input type="checkbox" value="">abc</label>
+                            </div>
+                            <div class="col-md-2 col-sm-4">
+                                <label class="checkbox-inline"><input type="checkbox" value="">abc</label>
+                            </div>
+                            <div class="col-md-8 col-sm-8">
+                                <label class="checkbox-inline"><input type="checkbox" value="">abc</label>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-2 col-md-3 col-sm-3 col-xs-6">
+                        <p>VxLAN Offload</p>
+                    </div>
+                    <div class="col-lg-2 col-md-9 col-sm-9 col-xs-6">
+                        <div class="radio">
+                            <label><input type="radio" name="rss">Enable</label>
+                        </div>
+                        <div class="radio">
+                            <label><input type="radio" name="rss">Disable</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-2 col-md-3 col-sm-3 col-xs-6">
+                        <p>GENEVE Offload</p>
+                    </div>
+                    <div class="col-lg-2 col-md-9 col-sm-9 col-xs-6">
+                        <!--                         <div class="radio"> -->
+                        <!--                           <label><input type="radio" name="rss">Enable</label> -->
+                        <!--                         </div> -->
+                        <!--                         <div class="radio"> -->
+                        <!--                           <label><input type="radio" name="rss">Disable</label> -->
+                        <!--                         </div> -->
+                        <toggle ng-model="geneveoffload" size="btn-xs" ng-change="changed()"
+                                onstyle="btn-default"></toggle>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="firmupdate">
+            <div class="row">
+                <div class="col-md-12">
+                    <div style="padding:20px;">
+                        <img src="../assets/images/sf-logo.png" width="140px">
+                        <div class="pull-right">
+                            <button class="btn btn-success" ng-click="fn.fw.refresh(hostDetails.id)">Refresh</button>
+                            <button class="btn btn-primary" tooltip="Get Help">Help</button>
+                        </div>
+                    </div>
+
+                    <table class="table table-striped"
+                           style='font-family: "ProximaNova", "Avenir Next", "Helvetica Neue", Arial, sans-serif, "Avenir Next", "Helvetica Neue", Arial, sans-serif; font-weight: 400; font-size: 13px; color: rgb(86, 86, 86);'>
+                        <tbody>
+                        <tr>
+                            <th width="25"><input ng-disabled="getUpdatableAdaptorsListCount() === 0"
+                                                  ng-change="selectAllAdaptorFwUpdate(adaptorList)"
+                                                  ng-model="selectedAdaptorFw1.check" type="checkbox"></th>
+                            <th>Adapter name</th>
+                            <th>VMware f/w Version</th>
+                            <th>Controller Version</th>
+                            <th>Boot ROM Version</th>
+                            <th>UEFI ROM Version</th>
+                            <th>Later Version Avaiable</th>
+                        </tr>
+                        <tr ng-repeat="adaptor in adaptorList track by $index">
+                            <td><input ng-disabled="!adaptor.laterVersionAvailable" ng-model="selectedAdaptorFw[$index]"
+                                       ng-change="adaptorSelectedFw(adaptor)" type="checkbox"></td>
+                            <td>{{adaptor.name}}</td>
+                            <td>{{adaptor.versionFirmware}}</td>
+                            <td>{{adaptor.versionController}}</td>
+                            <td>{{adaptor.versionBootROM}}</td>
+                            <td>{{adaptor.versionUEFIROM}}</td>
+                            <td>
+                                <span ng-if="adaptor.laterVersionAvailable">
+                                    Yes
+                                </span>
+                                <span ng-if="!adaptor.laterVersionAvailable">
+                                    No
+                                </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-12" style="text-align: center;">
+                    <button class="btn btn-default" ng-disabled="(selectedAdaptorFwList.length === 0)">Update Latest
+                    </button>
+                    <button class="btn btn-default" data-toggle="modal"
+                            data-target="#customFwUpdate" ng-disabled="(selectedAdaptorFwList.length === 0)">Update
+                        Custom
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane fade in active" id="hostoverview">
+            <div class="row">
+                <center ng-if="!hostDetails">
+                    <img src="../assets/images/loading.gif" width="100px">
+                    <h4>Loading...Please wait</h4>
+                </center>
+
+                <div ng-if="hostDetails" class="col-md-12">
+
+
+                    <div style="padding:20px;">
+                        <img src="../assets/images/sf-logo.png" width="140px">
+                        <div class="pull-right">
+                            <button class="btn btn-success" ng-click="fn.hosts.refresh(hostDetails.id)">Refresh</button>
+                            <button class="btn btn-primary" tooltip="Get Help">Help</button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="container-fluid">
+                            <div style="padding: 40px;">
+
+                                <table class="host-overview">
+                                    <tr>
+                                        <td rowspan="4">
+                                            <img src="../assets/images/host.png" width="160px">
+                                        </td>
+                                        <td>Adaptors <span class="pull-right">({{hostDetails.adapterCount}})</span></td>
+                                        <td colspan="2" style="height: 2em">
+                                            <img class="icos" style="float: left;"
+                                                 ng-repeat="_ in ((_ = []) && (_.length=hostDetails.adapterCount) && _) track by $index"
+                                                 src="../assets/images/adaptor.png" width="40px">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ports <span class="pull-right">({{hostDetails.portCount}})</span></td>
+                                        <td colspan="2" style="height: 2em">
+                                            <img class="icos" style="float: left;"
+                                                 ng-repeat="_ in ((_ = []) && (_.length=hostDetails.portCount) && _) track by $index"
+                                                 src="../assets/images/port.png" width="40px">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Driver Version</td>
+                                        <td colspan="2">{{hostDetails.driverVersion}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>CIM Provider Version</td>
+                                        <td colspan="2">{{hostDetails.cimProviderVersion}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" class="text-center"><h3>{{hostDetails.name}}</h3></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- content area ends-->
+
+
+<div class="modal fade" id="customFwUpdate" tabindex="-1" role="dialog" aria-labelledby="CustomFirmwareUpdate"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="CustomFirmwareUpdate">Update Custom Firmware</h4>
+                <button type="button" id="closeModal" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="container-fluid">
+                        <label for="cfw">
+                            Firmware Path
+                        </label>
+                        <div id="cfw">
+
+                            <input id="txt" type="text" ng-readonly="fwFile.upload.length" class="firmwareTxt"
+                                   ng-model="fwPath.dest" placeholder="Path / Select Firmware"/>
+
+                            <input id="filefw" files-input ng-model="fwFile.upload" type="file"
+                                   accept="*" ng-change="changeText(fwFile.upload, 'txt')" style="display: none;"/>
+
+                            <input type="button" class="btn btn-primary pull-right" value="Browse"
+                                   onclick="document.getElementById('filefw').click();"/>
+
+                        </div>
+                        <p><br/>
+                            Note:<br/>
+                            Provide path to firmware file on local-server/http/ftp/sftp.
+                        </p>
+                        <p ng-if="((fwPath.dest.length > 5) || (fwFile.upload.length))">
+                            You have selected
+                            <strong>{{returnSelectedAdaptorsName()}}</strong> for the firmware update
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer footerModal">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="fileUpload()"
+                        ng-disabled="!((fwPath.dest.length > 5) || (fwFile.upload.length))">Update
+                </button>
+                <span ng-if="((fwPath.dest.length > 5) || (fwFile.upload.length))">
+                    <img ng-if="fwFile.upload.length" src="../assets/images/file.svg" width="20px">
+                    <span ng-if="((!fwFile.upload.length) && (fwPath.dest.length > 5))">  Path of the Firmware</span>
+                </span>
+                <div class="pull-right">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" ng-click="clearAllFw()">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-secondary" ng-click="clearAllFw()">Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

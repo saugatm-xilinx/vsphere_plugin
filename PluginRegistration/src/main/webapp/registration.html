@@ -1,0 +1,185 @@
+<html>
+
+<head>
+  <title>Solarflare &reg; </title>
+  <meta charset="utf-8" />
+  <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="Solarflare" type="image/x-icon" href="assets/images/solarflare_iconsm.ico">
+  <style>
+    .txtalign {
+      line-height: 2.2;
+      word-wrap: break-word;
+    }
+
+    .loader-container {
+      width: 91%;
+      height: 85%;
+      background: #eee;
+      opacity: 0.5;
+      position: absolute;
+      z-index: 1000;
+    }
+
+    .loader {
+      background-image: url("assets/images/preload.gif");
+      background-repeat: no-repeat;
+      background-position: center;
+      padding-top: 50%;
+      height: 32px;
+    }
+
+    @media screen and (min-width: 768px) {
+      .jumbotron {
+        padding-top: 5px;
+        padding-bottom: 2px;
+      }
+
+      .panel_height {
+        height: 323px;
+      }
+    }
+
+    ;
+
+    body {
+
+      font-size: 10px;
+      background: #eee;
+    }
+  </style>
+</head>
+
+<body style="font-family: sans-serif">
+  <div style="overflow: hidden;" ng-app="sfApp" ng-controller="sfController">
+    <!-- Main Header -->
+    <div class="jumbotron">
+      <div class="row">
+        <div class="col-md-2 hidden-sm hidden-xs">
+          <a href="#">
+          <img src="assets/images/sflogo.png" style="height: 60px;margin-top: 13px;">
+          </a>
+        </div>
+        <div class="col-md-9">
+          <h2>Solarflare<sup><small>&reg;</small></sup></h2>
+          <h5>VMware vCenter Plugin Installation</h5>
+        </div>
+      </div>
+    </div>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="panel panel-default">
+            <!--<div class="panel-heading">Panel heading without title</div>-->
+            <div class="panel-body">
+              <form class="form-horizontal">
+                <div ng-if="isprocessing==true" class="loader-container">
+                  <div class="loader"></div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <legend><small>Plugin Registration</small></legend>
+                  </div>
+                </div>
+                <div class="form-group" ng-if="alerInfo.isvisible==true">
+                  <div class="col-sm-12">
+                    <div class="alert alert-dismissible" ng-class="alerInfo.class" role="alert">
+                      <button type="button" class="close" ng-click="alerInfo.isvisible=false" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					  <span class="glyphicon glyphicon-minus-sign"></span>
+					  <strong>{{alerInfo.title}}</strong> {{alerInfo.message}}
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-3" for="host">vCenter Host</label>
+                  <div class="col-sm-6">
+                    <input type="text" ng-model="data.url" ng class="form-control" id="host" placeholder="vCenter server Host Name or IP address" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-3" for="Port">Port</label>
+                  <div class="col-sm-6">
+                    <input type="number" min="0" step="0" ng-model="data.port" class="form-control" id="Port" placeholder="Port" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-3" for="username">User Name</label>
+                  <div class="col-sm-6">
+                    <input type="text" ng-model="data.username" class="form-control" id="username" placeholder="vCenter Username" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-3" for="pwd">Password:</label>
+                  <div class="col-sm-6">
+                    <input type="password" ng-model="data.password" class="form-control" id="pwd" placeholder="vCenter password" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-offset-3 col-sm-10">
+                    <button type="submit" ng-click="registerPlugin()" class="btn btn-primary">Register</button>
+                    <button type="submit" ng-click="unregisterPlugin()" class="btn btn-warning">Unregister</button>
+                    <input type="button" value="Cancel" ng-click="clearwithAlert()" class="btn btn-secondary"></input>
+                  </div>
+                </div>
+              </form>
+
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="panel panel-default panel_height">
+            <!--<div class="panel-heading">Panel heading without title</div>-->
+            <div class="panel-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <legend><small>Plugin Information</small></legend>
+                </div>
+              </div>
+              <!--<div class="row txtalign">
+                <div class="col-md-4 col-sm-6 col-xs-12 col-md-push-1"><span> Host URL</span> </div>
+                <div class="col-md-8 col-sm-6 col-xs-12">{{"http://" + data.url + ":" + data.port + "/sdk"}}</div>
+              </div>
+              <div class="row txtalign">
+                <div class="col-md-4 col-sm-6 col-xs-12 col-md-push-1"><span>User Name</span></div>
+                <div class="col-md-8 col-sm-6 col-xs-12">{{data.username}}</div>
+              </div>-->
+              <div class="row txtalign">
+                <div class="col-md-4 col-sm-6 col-xs-12 col-md-push-1">Plugin Name</div>
+                <div class="col-md-8 col-sm-6 col-xs-12">{{hostInfo.name}}</div>
+              </div>
+              <div class="row txtalign">
+                <div class="col-md-4 col-sm-6 col-xs-12 col-md-push-1">Plugin Key</div>
+                <div class="col-md-8 col-sm-6 col-xs-12">{{hostInfo.key}}</div>
+              </div>
+              <div class="row txtalign">
+                <div class="col-md-4 col-sm-6 col-xs-12 col-md-push-1">Version</div>
+                <div class="col-md-8 col-sm-6 col-xs-12">{{hostInfo.version}}</div>
+              </div>
+			   <div class="row">
+                <div class="col-md-4 col-sm-6 col-xs-12 col-md-push-1">Summary</div>
+                <div class="col-md-8 col-sm-6 col-xs-12">{{hostInfo.summary}}</div>
+              </div>
+              <div class="row txtalign">
+                <div class="col-md-4 col-sm-6 col-xs-12 col-md-push-1">Plugin URL</div>
+                <div class="col-md-8 col-sm-6 col-xs-12">{{hostInfo.pluginUrl}}</div>
+              </div>
+              <div class="row txtalign">
+                <div class="col-md-4 col-sm-6 col-xs-12 col-md-push-1">SSL Thumbprint</div>
+                <div class="col-md-8 col-sm-6 col-xs-12">{{hostInfo.serverThumbprint}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer> </footer>
+  <!-- jQuery -->
+  <script src="assets/jquery-1.10.2.min.js"></script>
+  <script src="assets/bootstrap.min.js"></script>
+  <!-- Angular Js Script Starts -->
+  <script src="assets/angular.min.js"></script>
+  <script src="resources/js/app.js"></script>
+  </div>
+</body>
+
+</html>

@@ -33,8 +33,17 @@
 /* } */
 
 
-.appIcon{
+.com_msys_solarflare-appIcon{
 	background: url("../images/sflogo_sm.png");
+    width: 87px;
+    height: 32px;
+    display: inline-block;
+    vertical-align: text-bottom;
+    margin: 1px 4px 0;
+}
+
+.appIcon{
+    background: url("../images/sflogo_sm.png");
     width: 87px;
     height: 32px;
     display: inline-block;
