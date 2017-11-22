@@ -55,6 +55,8 @@
       <copy todir="${BUILD_DIR}/solarflare/plugins" file="${SERVICE_DIR}/target/solarflare-service.jar"/>
       <!-- gson-2.3.1.jar is a 3rd party lib used by the service bundle -->
       <copy todir="${BUILD_DIR}/solarflare/plugins" file="${VSPHERE_SDK_HOME}/libs/gson-2.3.1.jar"/>
+      <copy todir="${BUILD_DIR}/solarflare/plugins" file="${VSPHERE_SDK_HOME}/libs/vim25.jar"/>
+      <copy todir="${BUILD_DIR}/solarflare/plugins" file="${SERVICE_DIR}/libs/sblim-cim-client2-2.1.1.jar"/>
    </target>
 
    <target name="createPluginProxyPackageDir" if="${USE_HTTP_PROXY}"
