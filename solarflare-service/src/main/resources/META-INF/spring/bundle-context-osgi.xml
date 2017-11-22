@@ -39,6 +39,13 @@
 
    <osgi:reference id="vimObjectReferenceService"
          interface="com.vmware.vise.vim.data.VimObjectReferenceService" />
+         
+         <!-- added for solarflare -->
+	<osgi:service id="hostAdapterService" ref="HostAdapterService"
+		interface="com.solarflare.vcp.services.HostAdapterService" />
 
+	<!-- References to platform services used by the controllers -->
+	<osgi:reference id="userSessionService"
+         interface="com.vmware.vise.usersession.UserSessionService"/>
 
 </beans>

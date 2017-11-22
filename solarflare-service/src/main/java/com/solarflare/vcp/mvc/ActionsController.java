@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.gson.Gson;
 import com.solarflare.vcp.services.SampleActionService;
 // [removable-chassis-code]
 import com.solarflare.vcp.model.ChassisInfo;
@@ -151,8 +150,8 @@ public class ActionsController {
       ChassisInfo chassisInfo = null;
       if (json != null) {
          // Create a ChassisInfo java object from the json data.
-         Gson gson = new Gson();
-         chassisInfo = gson.fromJson(json, ChassisInfo.class);
+         //Gson gson = new Gson();
+         //chassisInfo = gson.fromJson(json, ChassisInfo.class);
       } else if (!actionUid.equals("com.solarflare.vcp.deleteChassis")) {
          throw new Exception("Missing json data for " + actionUid);
       }

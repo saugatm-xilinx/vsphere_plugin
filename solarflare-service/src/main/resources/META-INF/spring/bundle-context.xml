@@ -56,4 +56,9 @@
       <constructor-arg index="0" ref="modelObjectUriResolver"/>
    </bean>
    <!-- [end-chassis-code] -->
+   <!-- solarflare  -->
+   <bean name="HostAdapterService"
+		class="com.solarflare.vcp.services.HostAdapterServiceImpl">
+		<constructor-arg index="0" ref="userSessionService"/>
+	</bean>
 </beans>
