@@ -34,6 +34,8 @@
          Bundle Ids must match the Bundle-SymbolicName in each bundle's MANIFEST.MF!
       -->
       <bundle id="com.google.gson" />
+      <bundle id="com.vmware.wsvim25" />
+	  <bundle id="org.sblim.cimclient221" /> 
       <bundle id="com.solarflare.vcp.solarflare-service" />
       <bundle id="com.solarflare.vcp.solarflare-ui" />
    </bundlesOrder>
