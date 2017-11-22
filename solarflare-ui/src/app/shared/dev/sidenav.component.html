@@ -1,0 +1,40 @@
+<!-- Sidenav component used to mock the Client's navigator, not visible in plugin mode -->
+<nav class="sidenav">
+   <section class="sidenav-content">
+      <!-- List of hosts -->
+      <div  *ngIf="hostList$ | async as hostList">
+         <section class="nav-group collapsible" >
+            <input #hostsInput id="Hosts" type="checkbox" (click)="saveSetting($event)" [attr.checked]="false">
+            <label for="Hosts">Hosts</label>
+            <ul class="nav-list" *ngIf="!hostList.error; else hostListError">
+               <li *ngFor="let host of hostList.hosts; let idx = index">
+                  <a class="nav-link" (click)="selectHost(host.id, idx)" [class.active]="idx === selectedHost">
+                     <clr-icon shape="host" size="24"></clr-icon>{{host.name}}</a>
+               </li>
+            </ul>
+            <ng-template #hostListError>
+               Error getting hosts!
+            </ng-template>
+         </section>
+      </div>
+      <!-- List of chassis [removable-chassis-code] -->
+      <div  *ngIf="chassisList$ | async as chassisList">
+         <section class="nav-group collapsible">
+            <input #chassisInput id="Chassis" type="checkbox" (click)="saveSetting($event)" [attr.checked]="false">
+            <label for="Chassis">Chassis</label>
+            <ul class="nav-list" *ngIf="!chassisList.error; else chassisListError">
+               <li *ngFor="let chassis of chassisList.allChassis; let idx = index">
+                  <a class="nav-link" (click)="selectChassis(chassis.id, idx)" [class.active]="idx === selectedChassis">
+                     <!-- using view-list icon because I couldn't find anything better for a chassis :-) -->
+                     <clr-icon shape="view-list" size="20"></clr-icon> {{chassis.name}}</a>
+               </li>
+            </ul>
+            <ng-template #chassisListError>
+               Error getting chassis!
+            </ng-template>
+         </section>
+      </div>
+      <!-- [end-chassis-code] -->
+
+   </section>
+</nav>

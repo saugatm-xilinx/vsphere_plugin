@@ -1,0 +1,93 @@
+<project name="build-plugin-package" default="build" >
+   <description>
+      - When called without argument this script builds a standard plugin package folder,
+        using solarflare-ui and solarflare-service, with this structure:
+
+             solarflare
+                  plugin-package.xml
+                  /plugins
+                     gson-2.3.1.jar
+                     solarflare-ui.war
+                     solarflare-service.jar
+
+      - When called with "-DuseHttpProxy" the plugin package is built using the http-proxy-servle,
+        i.e. solarflare-service.jar is replaced by http-proxy-servlet.jar.
+
+      - When called with "-DnoJava" the plugin package is build without any java service.
+   </description>
+
+   <property environment="env"/>
+   <property name="VSPHERE_SDK_HOME" value="${env.VSPHERE_SDK_HOME}"/>
+   <property name="BUILD_DIR" value="${basedir}/../target"/>
+   <property name="SERVICE_DIR" value="${basedir}/../../solarflare-service"/>
+
+   <!-- Conditional build variables -->
+   <property name="USE_HTTP_PROXY" value="${useHttpProxy}"/>
+   <property name="NO_JAVA" value="${noJava}"/>
+
+   <target name="build" depends="buildCheck, buildUiWar, buildServiceJar, createPluginPackageDir,
+         createPluginProxyPackageDir, createPluginNoJavaPackageDir, copyPluginPackageDir">
+      <echo level="info">*** You must restart the Virgo server to use the new plugin package! ***</echo>
+   </target>
+
+   <target name="buildCheck">
+      <condition property="NORMAL_BUILD">
+         <and>
+            <isfalse value="${USE_HTTP_PROXY}"/>
+            <isfalse value="${NO_JAVA}"/>
+         </and>
+      </condition>
+   </target>
+
+   <target name="buildUiWar">
+      <ant antfile="${basedir}/build-war.xml" dir="${basedir}" inheritAll="true"/>
+   </target>
+
+   <target name="buildServiceJar" if="${NORMAL_BUILD}">
+      <ant antfile="${SERVICE_DIR}/tools/build-java.xml" dir="${SERVICE_DIR}/tools" inheritAll="false"/>
+   </target>
+
+   <target name="createPluginPackageDir" if="${NORMAL_BUILD}">
+      <mkdir dir="${BUILD_DIR}/solarflare" />
+      <mkdir dir="${BUILD_DIR}/solarflare/plugins" />
+      <copy todir="${BUILD_DIR}/solarflare" file="./plugin-package.xml"/>
+      <copy todir="${BUILD_DIR}/solarflare/plugins" file="${BUILD_DIR}/solarflare-ui.war"/>
+      <copy todir="${BUILD_DIR}/solarflare/plugins" file="${SERVICE_DIR}/target/solarflare-service.jar"/>
+      <!-- gson-2.3.1.jar is a 3rd party lib used by the service bundle -->
+      <copy todir="${BUILD_DIR}/solarflare/plugins" file="${VSPHERE_SDK_HOME}/libs/gson-2.3.1.jar"/>
+   </target>
+
+   <target name="createPluginProxyPackageDir" if="${USE_HTTP_PROXY}"
+           depends="http-proxy-servlet-check, http-proxy-servlet-warn">
+      <mkdir dir="${BUILD_DIR}/solarflare" />
+      <mkdir dir="${BUILD_DIR}/solarflare/plugins" />
+      <copy tofile="${BUILD_DIR}/solarflare/plugin-package.xml" file="./plugin-proxy-package.xml"/>
+      <copy todir="${BUILD_DIR}/solarflare/plugins" file="${BUILD_DIR}/solarflare-ui.war"/>
+      <copy todir="${BUILD_DIR}/solarflare/plugins" file="${basedir}/../tools/http-proxy-servlet.jar"/>
+   </target>
+
+   <target name="http-proxy-servlet-check" if="${USE_HTTP_PROXY}">
+      <available file="http-proxy-servlet.jar"  property="http-proxy-servlet.found"/>
+   </target>
+
+   <target name="http-proxy-servlet-warn"  if="${USE_HTTP_PROXY}" unless="${http-proxy-servlet.found}">
+      <fail message="MISSING http-proxy-servlet.jar IN /tools!
+      ${line.separator}=> COPY http-proxy-servlet.jar FROM plugin-seed/tools/http-proxy-tool/http-proxy-tool-plugin/plugins
+TO THIS /tools FOLDER."/>
+   </target>
+
+   <target name="createPluginNoJavaPackageDir" if="${NO_JAVA}">
+      <mkdir dir="${BUILD_DIR}/solarflare" />
+      <mkdir dir="${BUILD_DIR}/solarflare/plugins" />
+      <copy tofile="${BUILD_DIR}/solarflare/plugin-package.xml" file="./plugin-nojava-package.xml"/>
+      <copy todir="${BUILD_DIR}/solarflare/plugins" file="${BUILD_DIR}/solarflare-ui.war"/>
+   </target>
+
+   <target name="copyPluginPackageDir">
+      <delete dir="${VSPHERE_SDK_HOME}/vsphere-ui/plugin-packages/solarflare" quiet="true"/>
+      <copy todir="${VSPHERE_SDK_HOME}/vsphere-ui/plugin-packages/solarflare">
+         <fileset dir="${BUILD_DIR}/solarflare"/>
+      </copy>
+   </target>
+
+</project>

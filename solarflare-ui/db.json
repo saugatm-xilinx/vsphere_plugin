@@ -1,0 +1,57 @@
+{
+  "echos": [
+    {
+      "message": "World!",
+      "id": 1
+    },
+    {
+      "message": "World!",
+      "id": 2
+    },
+    {
+      "message": "World!",
+      "id": 3
+    },
+    {
+      "message": "World!",
+      "id": 4
+    }
+  ],
+  "hosts": [
+    {
+      "id": 1,
+      "name": "mock-Host 1",
+      "status": "yellow",
+      "model": "VMware Virtual Platform",
+      "vms" : ["vm-10", "vm-11", "vm-12"]
+    },
+    {
+      "id": 2,
+      "name": "mock-Host 2",
+      "status": "green",
+      "model": "VMware Virtual Platform",
+      "vms" : ["vm-20", "vm-21", "vm-22"]
+    },
+    {
+      "id": 3,
+      "name": "mock-Host 3",
+      "status": "red",
+      "model": "VMware Virtual Platform",
+      "vms" : ["vm-30", "vm-31"]
+    },
+    {
+      "id": 4,
+      "name": "mock-Host 4",
+      "status": "red",
+      "model": "VMware Virtual Platform",
+      "vms" : ["vm-41", "vm-42", "vm-43", "vm-44"]
+    },
+    {
+      "id": 5,
+      "name": "mock-Host 5",
+      "status": "red",
+      "model": "VMware Virtual Platform",
+      "vms": []
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: solarflare-ui
+Bundle-SymbolicName: com.solarflare.vcp.solarflare-ui
+Bundle-Version: 1.0.0
+Bundle-Vendor: VMware
+Web-ContextPath: vsphere-client/solarflare
+Import-Package: com.solarflare.vcp.services;version="1.0.0",
+ com.solarflare.vcp.mvc;version="1.0.0",
+ com.vmware.vise.data.query;version="0",
+ com.vmware.vise.security;version="0",
+ org.eclipse.virgo.web.dm;version="3.6.0",
+ org.springframework.web.servlet;version="3.1.4",
+ org.springframework.web.servlet.view;version="3.1.4",
+ org.springframework.web.servlet.view.json;version="3.1.4",
+ org.springframework.web.servlet.config;version="3.1.4"

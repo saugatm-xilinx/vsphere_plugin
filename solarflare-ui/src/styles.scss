@@ -1,0 +1,35 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Overide 2 styles in order to adjust wizard (size lg) inside the plugin dialog */
+.modal {
+    padding: 0px;
+}
+
+.clr-wizard.wizard-lg .content-container {
+    height: 576px;
+}
+
+// Shared style to display sidenav correctly
+.td-sidenav {
+    vertical-align: top;
+    padding: 0px;
+    background-color: #CFD8DC
+}
+
+// Overrides Clarity stack-header style to remove the top margin
+.stack-header {
+    margin-top: 0px;
+}
+
+// Shared style to display subnav correctly
+.td-subnav {
+    vertical-align: top;
+    width: 100%;
+    padding: 0px;
+}
+
+// Lower opacity for dev-ui only elements
+.dev-ui {
+    padding-top: 20px;
+    opacity: 0.6;
+}

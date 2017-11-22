@@ -1,0 +1,19 @@
+<clr-modal [(clrModalOpen)]="modalOpened">
+   <h3 class="modal-title">{{gs.isPluginMode() ? 'Get' : 'Update'}} Client Id for Live Data</h3>
+   <div class="modal-body" *ngIf="gs.isPluginMode(); else DevMode">
+      <p>Copy the id below, and paste it in the Settings view of the standalone app.</p>
+      <input #input type="text" id="clientId" size="35" autofocus
+             [(ngModel)]="clientId" name="clientId" #name="ngModel">
+   </div>
+   <ng-template class="modal-body" #DevMode>
+      <p>Run this plugin in
+         <a href="{{settingViewUrl}}" target="_blank">vSphere Client</a>
+         , open the Settings view, copy the Client Id and paste its value here:</p>
+      <input #input type="text" id="clientId2" size="35" selected="true"
+             [(ngModel)]="clientId" name="clientId2" #name="ngModel">
+   </ng-template>
+   <div class="modal-footer">
+      <button *ngIf="!gs.isPluginMode()" type="button" class="btn" (click)="onCancel()">Cancel</button>
+      <button type="submit" class="btn btn-primary" (click)="onSubmit()">{{gs.isPluginMode() ? 'Close' : 'Save'}}</button>
+   </div>
+</clr-modal>
