@@ -11,54 +11,8 @@
       http://www.springframework.org/schema/context
       http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-   <bean name="EchoServiceImpl" class="com.solarflare.vcp.services.EchoServiceImpl"/>
-
-   <bean name="SampleActionServiceImpl" class="com.solarflare.vcp.services.SampleActionServiceImpl">
-        <constructor-arg index="0" ref="vimObjectReferenceService"/>
-   </bean>
-
-   <!-- [removable-chassis-code] -->
-
-   <bean name="chassisDataAdapterImpl"
-         class="com.solarflare.vcp.services.ChassisDataAdapter">
-      <constructor-arg index="0" ref="dataService"/>
-      <constructor-arg index="1" ref="modelObjectUriResolver"/>
-      <constructor-arg index="2" ref="vimObjectReferenceService"/>
-      <constructor-arg index="3" ref="objectStore"/>
-   </bean>
-
-   <bean name="chassisServiceImpl"
-         class="com.solarflare.vcp.services.ChassisServiceImpl">
-      <constructor-arg index="0" ref="modelObjectUriResolver"/>
-      <constructor-arg index="1" ref="objectStore"/>
-   </bean>
-
-   <bean name="modelObjectUriResolver"
-         class="com.solarflare.vcp.ModelObjectUriResolver"/>
-
-   <!-- The bean used to register/unregister modelObjectUriResolver, done
-         automatically when the bundle is started or stopped.
-      arg0: a reference to the ResourceTypeResolverRegistry (in bundle-context-osgi)
-      arg1: the URI scheme or prefix value (it must match the value in the resolver!)
-      arg2: a reference to the modelObjectUriResolver bean above
-   -->
-   <bean name="uriSchemeInitializer" class="com.vmware.vise.data.uri.UriSchemeInitializer"
-         destroy-method="close">
-      <constructor-arg index="0" ref="resourceTypeResolverRegistry" />
-      <constructor-arg index="1" value="urn:cr" />
-      <constructor-arg index="2" ref="modelObjectUriResolver" />
-   </bean>
-
-
-   <bean name="objectStore"
-         class="com.solarflare.vcp.services.ObjectStore"
-         init-method="init" destroy-method="destroy">
-      <constructor-arg index="0" ref="modelObjectUriResolver"/>
-   </bean>
-   <!-- [end-chassis-code] -->
    <!-- solarflare  -->
-   <bean name="HostAdapterService"
-		class="com.solarflare.vcp.services.HostAdapterServiceImpl">
+   <bean name="HostAdapterServiceImpl"	class="com.solarflare.vcp.services.HostAdapterServiceImpl">
 		<constructor-arg index="0" ref="userSessionService"/>
 	</bean>
 </beans>

@@ -12,25 +12,33 @@ import java.security.cert.X509Certificate;
 /**
  * Host name verifier by thumbprint
  */
-public class ThumbprintHostNameVerifier implements HostnameVerifier {
+public class ThumbprintHostNameVerifier implements HostnameVerifier
+{
 
-   @Override
-   public boolean verify(String host, SSLSession session) {
-      try {
-         Certificate[] certificates = session.getPeerCertificates();
-         verify(host, (X509Certificate) certificates[0]);
-         return true;
-      } catch (SSLException e) {
-         return false;
-      }
-   }
+    @Override
+    public boolean verify(String host, SSLSession session)
+    {
+        try
+        {
+            Certificate[] certificates = session.getPeerCertificates();
+            verify(host, (X509Certificate) certificates[0]);
+            return true;
+        }
+        catch (SSLException e)
+        {
+            return false;
+        }
+    }
 
-
-   private void verify(String host, X509Certificate cert) throws SSLException {
-      try {
-         ThumbprintTrustManager.checkThumbprint(cert);
-      } catch(CertificateException e){
-         throw new SSLException(e.getMessage());
-      }
-   }
+    private void verify(String host, X509Certificate cert) throws SSLException
+    {
+        try
+        {
+            ThumbprintTrustManager.checkThumbprint(cert);
+        }
+        catch (CertificateException e)
+        {
+            throw new SSLException(e.getMessage());
+        }
+    }
 }

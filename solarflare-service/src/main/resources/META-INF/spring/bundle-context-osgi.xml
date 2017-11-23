@@ -11,37 +11,10 @@
       keeping these definitions separate is to facilitate integration
       testing of the bundle outside of an OSGi container -->
 
-   <!-- Services defined by this module   -->
-
-   <osgi:service id="EchoService" ref="EchoServiceImpl"
-         interface="com.solarflare.vcp.services.EchoService" />
-
-   <osgi:service id="SampleActionService" ref="SampleActionServiceImpl"
-         interface="com.solarflare.vcp.services.SampleActionService" />
-
-   <!-- [removable-chassis-code] -->
-   <osgi:service id="chassisService" ref="chassisServiceImpl"
-                 interface="com.solarflare.vcp.services.ChassisService"/>
-   <osgi:service id="chassisDataAdapter" ref="chassisDataAdapterImpl"
-                 interface="com.vmware.vise.data.query.DataProviderAdapter" />
-   <!-- [end-chassis-code] -->
-
   <!-- References to platform services used by the controllers -->
-
-   <osgi:reference id="dataService"
-         interface="com.vmware.vise.data.query.DataService" />
-
-   <osgi:reference id="objectReferenceService"
-      interface="com.vmware.vise.data.query.ObjectReferenceService" />
-
-   <osgi:reference id="resourceTypeResolverRegistry"
-                   interface="com.vmware.vise.data.uri.ResourceTypeResolverRegistry" />
-
-   <osgi:reference id="vimObjectReferenceService"
-         interface="com.vmware.vise.vim.data.VimObjectReferenceService" />
-         
+        
          <!-- added for solarflare -->
-	<osgi:service id="hostAdapterService" ref="HostAdapterService"
+	<osgi:service id="HostAdapterService" ref="HostAdapterServiceImpl"
 		interface="com.solarflare.vcp.services.HostAdapterService" />
 
 	<!-- References to platform services used by the controllers -->

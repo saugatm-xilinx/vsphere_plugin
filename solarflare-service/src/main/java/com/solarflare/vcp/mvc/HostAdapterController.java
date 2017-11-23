@@ -15,11 +15,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.solarflare.vcp.model.Adapter;
 import com.solarflare.vcp.model.Host;
@@ -30,7 +30,7 @@ import com.solarflare.vcp.services.HostAdapterService;
 public class HostAdapterController
 {
     private static final Log logger = LogFactory.getLog(HostAdapterController.class);
-    
+
     @Autowired
     HostAdapterService hostAdapterService;
 
@@ -65,7 +65,7 @@ public class HostAdapterController
         }
         catch (Exception e)
         {
-            logger.error("Exception while getting list of hosts, error: "+e.getMessage());
+            logger.error("Exception while getting list of hosts, error: " + e.getMessage());
             throw e;
         }
         logger.info("End getting host list");
@@ -76,7 +76,7 @@ public class HostAdapterController
     @ResponseBody
     public List<Adapter> listAdapter(@PathVariable String hostId) throws Exception
     {
-        logger.info("Start getting list of host adapters for host :" +hostId);
+        logger.info("Start getting list of host adapters for host :" + hostId);
         List<Adapter> adapters = null;
         try
         {
@@ -84,31 +84,32 @@ public class HostAdapterController
         }
         catch (Exception e)
         {
-            logger.error("Exception while getting list of host adapters, error: "+e.getMessage());
+            logger.error("Exception while getting list of host adapters, error: " + e.getMessage());
             throw e;
         }
-        logger.info("End getting list of host adapters for host :" +hostId);
+        logger.info("End getting list of host adapters for host :" + hostId);
         return adapters;
     }
+
     @RequestMapping(value = "/adapters/uploadFile", method = RequestMethod.POST)
     @ResponseBody
-    public void uploadFile(@RequestParam("file") MultipartFile file)
+    public void uploadFile(@RequestParam("file") String file)
     {
-        if (!file.isEmpty())
+        logger.info("start getting file as string content");
+        if (file != null || !file.isEmpty())
         {
             try
             {
-                byte[] bytes = file.getBytes();
-               
+                hostAdapterService.uploadFile(file);
             }
             catch (Exception e)
             {
+                logger.error("Exception while uploading binary file, error :" + e.getMessage());
             }
         }
-        else
-        {
-        }
+        logger.info("End getting file as string content");
     }
+
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public Map<String, String> handleException(Exception ex, HttpServletResponse response)

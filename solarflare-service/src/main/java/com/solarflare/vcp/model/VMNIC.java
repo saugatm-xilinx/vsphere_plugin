@@ -1,204 +1,245 @@
 package com.solarflare.vcp.model;
 
-public class VMNIC {
-	private String type = "NIC";
-	// key
-	private String id;
-	// vimnic0
-	private String name;
-	
-	// pci hardware device
-	private String deviceId;
-	private String deviceName;
-	private String subSystemDeviceId;
+public class VMNIC
+{
+    private String type = "NIC";
+    // key
+    private String id;
+    // vimnic0
+    private String name;
 
-	private String vendorId;
-	private String vendorName;
-	private String subSystemVendorId;
+    // pci hardware device
+    private String deviceId;
+    private String deviceName;
+    private String subSystemDeviceId;
 
-	private String driverName;
-	private String driverVersion;
+    private String vendorId;
+    private String vendorName;
+    private String subSystemVendorId;
 
-	private String macAddress;
+    private String driverName;
+    private String driverVersion;
 
-	private String status;
-	private String interfaceName;
-	private String portSpeed;
-	private String currentMTU;
-	private String maxMTU;
+    private String macAddress;
 
-	private String pciId;
-	private String pciFunction;
-	private String pciBusNumber;
+    private String status;
+    private String interfaceName;
+    private String portSpeed;
+    private String currentMTU;
+    private String maxMTU;
 
-	public String getName() {
-		return name;
-	}
+    private String pciId;
+    private String pciFunction;
+    private String pciBusNumber;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName()
+    {
+        return name;
+    }
 
-	public String getDeviceId() {
-		return deviceId;
-	}
+    public void setName(String name)
+    {
+        this.name = name;
+    }
 
-	public void setDeviceId(String deviceId) {
-		this.deviceId = deviceId;
-	}
+    public String getDeviceId()
+    {
+        return deviceId;
+    }
 
-	public String getSubSystemDeviceId() {
-		return subSystemDeviceId;
-	}
+    public void setDeviceId(String deviceId)
+    {
+        this.deviceId = deviceId;
+    }
 
-	public void setSubSystemDeviceId(String subSystemDeviceId) {
-		this.subSystemDeviceId = subSystemDeviceId;
-	}
+    public String getSubSystemDeviceId()
+    {
+        return subSystemDeviceId;
+    }
 
-	public String getVendorId() {
-		return vendorId;
-	}
+    public void setSubSystemDeviceId(String subSystemDeviceId)
+    {
+        this.subSystemDeviceId = subSystemDeviceId;
+    }
 
-	public void setVendorId(String vendorId) {
-		this.vendorId = vendorId;
-	}
+    public String getVendorId()
+    {
+        return vendorId;
+    }
 
-	public String getSubSystemVendorId() {
-		return subSystemVendorId;
-	}
+    public void setVendorId(String vendorId)
+    {
+        this.vendorId = vendorId;
+    }
 
-	public void setSubSystemVendorId(String subSystemVendorId) {
-		this.subSystemVendorId = subSystemVendorId;
-	}
+    public String getSubSystemVendorId()
+    {
+        return subSystemVendorId;
+    }
 
-	public String getDriverName() {
-		return driverName;
-	}
+    public void setSubSystemVendorId(String subSystemVendorId)
+    {
+        this.subSystemVendorId = subSystemVendorId;
+    }
 
-	public void setDriverName(String driverName) {
-		this.driverName = driverName;
-	}
+    public String getDriverName()
+    {
+        return driverName;
+    }
 
-	public String getDriverVersion() {
-		return driverVersion;
-	}
+    public void setDriverName(String driverName)
+    {
+        this.driverName = driverName;
+    }
 
-	public void setDriverVersion(String driverVersion) {
-		this.driverVersion = driverVersion;
-	}
+    public String getDriverVersion()
+    {
+        return driverVersion;
+    }
 
-	public String getMacAddress() {
-		return macAddress;
-	}
+    public void setDriverVersion(String driverVersion)
+    {
+        this.driverVersion = driverVersion;
+    }
 
-	public void setMacAddress(String macAddress) {
-		this.macAddress = macAddress;
-	}
+    public String getMacAddress()
+    {
+        return macAddress;
+    }
 
-	public String getStatus() {
-		return status;
-	}
+    public void setMacAddress(String macAddress)
+    {
+        this.macAddress = macAddress;
+    }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public String getStatus()
+    {
+        return status;
+    }
 
-	public String getInterfaceName() {
-		return interfaceName;
-	}
+    public void setStatus(String status)
+    {
+        this.status = status;
+    }
 
-	public void setInterfaceName(String interfaceName) {
-		this.interfaceName = interfaceName;
-	}
+    public String getInterfaceName()
+    {
+        return interfaceName;
+    }
 
-	public String getPortSpeed() {
-		return portSpeed;
-	}
+    public void setInterfaceName(String interfaceName)
+    {
+        this.interfaceName = interfaceName;
+    }
 
-	public void setPortSpeed(String portSpeed) {
-		this.portSpeed = portSpeed;
-	}
+    public String getPortSpeed()
+    {
+        return portSpeed;
+    }
 
-	public String getCurrentMTU() {
-		return currentMTU;
-	}
+    public void setPortSpeed(String portSpeed)
+    {
+        this.portSpeed = portSpeed;
+    }
 
-	public void setCurrentMTU(String currentMTU) {
-		this.currentMTU = currentMTU;
-	}
+    public String getCurrentMTU()
+    {
+        return currentMTU;
+    }
 
-	public String getMaxMTU() {
-		return maxMTU;
-	}
+    public void setCurrentMTU(String currentMTU)
+    {
+        this.currentMTU = currentMTU;
+    }
 
-	public void setMaxMTU(String maxMTU) {
-		this.maxMTU = maxMTU;
-	}
+    public String getMaxMTU()
+    {
+        return maxMTU;
+    }
 
-	public String getPciFunction() {
-		return pciFunction;
-	}
+    public void setMaxMTU(String maxMTU)
+    {
+        this.maxMTU = maxMTU;
+    }
 
-	public void setPciFunction(String pciFunction) {
-		this.pciFunction = pciFunction;
-	}
+    public String getPciFunction()
+    {
+        return pciFunction;
+    }
 
-	public String getPciBusNumber() {
-		return pciBusNumber;
-	}
+    public void setPciFunction(String pciFunction)
+    {
+        this.pciFunction = pciFunction;
+    }
 
-	public void setPciBusNumber(String pciBusNumber) {
-		this.pciBusNumber = pciBusNumber;
-	}
+    public String getPciBusNumber()
+    {
+        return pciBusNumber;
+    }
 
-	public String getType() {
-		return type;
-	}
+    public void setPciBusNumber(String pciBusNumber)
+    {
+        this.pciBusNumber = pciBusNumber;
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public String getType()
+    {
+        return type;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public void setType(String type)
+    {
+        this.type = type;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public String getId()
+    {
+        return id;
+    }
 
-	@Override
-	public String toString() {
-		return "VMNIC [type=" + type + ", id=" + id + ", name=" + name + ", deviceId=" + deviceId
-				+ ", subSystemDeviceId=" + subSystemDeviceId + ", vendorId=" + vendorId + ", subSystemVendorId="
-				+ subSystemVendorId + ", driverName=" + driverName + ", driverVersion=" + driverVersion
-				+ ", macAddress=" + macAddress + ", status=" + status + ", interfaceName=" + interfaceName
-				+ ", portSpeed=" + portSpeed + ", currentMTU=" + currentMTU + ", maxMTU=" + maxMTU + ", pciFunction="
-				+ pciFunction + ", pciBusNumber=" + pciBusNumber + "]";
-	}
+    public void setId(String id)
+    {
+        this.id = id;
+    }
 
-	public String getPciId() {
-		return pciId;
-	}
+    @Override
+    public String toString()
+    {
+        return "VMNIC [type=" + type + ", id=" + id + ", name=" + name + ", deviceId=" + deviceId + ", subSystemDeviceId="
+                + subSystemDeviceId + ", vendorId=" + vendorId + ", subSystemVendorId=" + subSystemVendorId + ", driverName="
+                + driverName + ", driverVersion=" + driverVersion + ", macAddress=" + macAddress + ", status=" + status
+                + ", interfaceName=" + interfaceName + ", portSpeed=" + portSpeed + ", currentMTU=" + currentMTU + ", maxMTU="
+                + maxMTU + ", pciFunction=" + pciFunction + ", pciBusNumber=" + pciBusNumber + "]";
+    }
 
-	public void setPciId(String pciId) {
-		this.pciId = pciId;
-	}
+    public String getPciId()
+    {
+        return pciId;
+    }
 
-	public String getVendorName() {
-		return vendorName;
-	}
+    public void setPciId(String pciId)
+    {
+        this.pciId = pciId;
+    }
 
-	public void setVendorName(String vendorName) {
-		this.vendorName = vendorName;
-	}
+    public String getVendorName()
+    {
+        return vendorName;
+    }
 
-	public String getDeviceName() {
-		return deviceName;
-	}
+    public void setVendorName(String vendorName)
+    {
+        this.vendorName = vendorName;
+    }
 
-	public void setDeviceName(String deviceName) {
-		this.deviceName = deviceName;
-	}
+    public String getDeviceName()
+    {
+        return deviceName;
+    }
+
+    public void setDeviceName(String deviceName)
+    {
+        this.deviceName = deviceName;
+    }
 
 }

@@ -48,9 +48,9 @@ public class VCenterService
     private static final Log logger = LogFactory.getLog(VCenterService.class);
     public static final String SOLARFLARE = "Solarflare";
     public static final String SLF = "SLF";
-    public static final String CIM="cim";
-    public static final String SFC="sfc";
-    
+    public static final String CIM = "cim";
+    public static final String SFC = "sfc";
+
     private static VimPortType vimPort = initializeVimPort();
 
     private static VimPortType initializeVimPort()
@@ -67,7 +67,7 @@ public class VCenterService
             for (SoftwarePackage sf : softPac)
             {
                 List<String> vendors = Arrays.asList(new String[]
-                { SLF, SOLARFLARE});
+                { SLF, SOLARFLARE });
                 if (vendors.contains(sf.getVendor()) && sf.getName().contains(CIM))
                 {
                     cimProvider = sf.getVersion();
@@ -130,7 +130,7 @@ public class VCenterService
     public static List<ObjectContent> retrievePropertiesAllObjects(VimPortType vimPort, ManagedObjectReference propCollectorRef,
             List<PropertyFilterSpec> listpfs) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg
     {
-               
+
         RetrieveOptions propObjectRetrieveOpts = new RetrieveOptions();
         List<ObjectContent> listobjcontent = new ArrayList<ObjectContent>();
         RetrieveResult rslts = vimPort.retrievePropertiesEx(propCollectorRef, listpfs, propObjectRetrieveOpts);
@@ -292,7 +292,7 @@ public class VCenterService
         }
         return cimProvider;
     }
-    
+
     /**
      * 
      * @param hostId
@@ -383,7 +383,7 @@ public class VCenterService
                 HostPciDevice pciDecice = hwData.get(nic.getPciId());
                 if (pciDecice == null)
                     continue;
-                
+
                 nic.setDeviceName(pciDecice.getDeviceName());
                 nic.setDeviceId(Short.toString(pciDecice.getDeviceId()));
                 nic.setVendorId(Short.toString(pciDecice.getVendorId()));
@@ -392,7 +392,7 @@ public class VCenterService
                 if (nicGrp.get(adapterName) == null)
                 {
                     List<VMNIC> niclist = new ArrayList<>();
-                    
+
                     niclist.add(nic);
                     nicGrp.put(adapterName, niclist);
                 }
@@ -403,18 +403,18 @@ public class VCenterService
 
             }
 
-//            for (String key : nicGrp.keySet())
-//            {
-//                Adapter adapter = new Adapter();
-//                adapter.setName(key);
-//                adapter.setId(key);
-//                adapter.setChildren(nicGrp.get(key));
-//                adapters.add(adapter);
-//            }
+            // for (String key : nicGrp.keySet())
+            // {
+            // Adapter adapter = new Adapter();
+            // adapter.setName(key);
+            // adapter.setId(key);
+            // adapter.setChildren(nicGrp.get(key));
+            // adapters.add(adapter);
+            // }
         }
         return nicGrp;
     }
-    
+
     public List<Adapter> getAdapters(UserSessionService userSession, String hostId) throws Exception
     {
         logger.info("Getting Adapters for Host by Host Id : " + hostId);
@@ -436,13 +436,13 @@ public class VCenterService
             hostPropSpec.getPathSet().add("hardware");
             // -----------------------------------------------
             List<ObjectContent> objectList = getHostObjs(hostPropSpec, vimPort, serviceContent, rootFolder);
-            String hostName= null;
+            String hostName = null;
             if (objectList != null)
             {
                 adapters = new ArrayList<>();
                 for (ObjectContent oc : objectList)
                 {
-                   
+
                     List<DynamicProperty> dpsHost = oc.getPropSet();
                     for (DynamicProperty dp : dpsHost)
                     {
@@ -467,14 +467,14 @@ public class VCenterService
                         adapter.setName(key);
                         adapter.setId(key);
                         List<VMNIC> listNic = nicGrp.get(key);
-                        if(listNic !=null && listNic.size() > 0)
+                        if (listNic != null && listNic.size() > 0)
                         {
                             String deviceId = listNic.get(0).getName();
                             HostServiceTicket ticket = vimPort.acquireCimServicesTicket(oc.getObj());
                             URL cimBaseURL = cim.cimBaseUrl(hostName);
-                            CIMHost cimHost = new CIMHostSession(cimBaseURL.toString(),ticket.getSessionId());
+                            CIMHost cimHost = new CIMHostSession(cimBaseURL.toString(), ticket.getSessionId());
                             Map<String, String> versions = cim.getAdapterVersions(cimHost, deviceId);
-                            
+
                             String controllerVersion = versions.get(CIMConstants.CONTROLLER_VERSION);
                             String bootROMVersion = versions.get(CIMConstants.BOOT_ROM_VERSION);
                             String firmwareVersion = versions.get(CIMConstants.FIRMARE_VERSION);
@@ -483,7 +483,7 @@ public class VCenterService
                             adapter.setVersionBootROM(bootROMVersion);
                             adapter.setVersionFirmware(firmwareVersion);
                             adapter.setVersionUEFIROM(UEFIROMVersion);
-                            
+
                         }
                         adapters.add(adapter);
                     }
@@ -496,7 +496,7 @@ public class VCenterService
             throw e;
         }
         return adapters;
-    
+
     }
 
 }

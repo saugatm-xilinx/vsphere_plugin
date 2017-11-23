@@ -27,7 +27,7 @@ public class VCenterHelper
 
     public static ServiceContent getServiceContent(UserSessionService usersessionService, VimPortType _vimPort) throws Exception
     {
-        
+
         ServiceContent serviceContent = null;
         ServerInfo serverInfoObject = getServerInfoObject(usersessionService, null);
         setThumbprint(serverInfoObject);

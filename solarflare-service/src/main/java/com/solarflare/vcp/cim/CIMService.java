@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
 import javax.cim.CIMInstance;
 import javax.cim.CIMObjectPath;
 import javax.cim.CIMProperty;
@@ -25,8 +26,6 @@ public class CIMService
 {
 
     private static final Log logger = LogFactory.getLog(CIMService.class);
-    
-    
 
     public Collection<CIMInstance> getAllInstances(CIMHost cimHost, final String namespace,
             final String classname) throws WBEMException
@@ -62,7 +61,7 @@ public class CIMService
         }
         catch (WBEMException e)
         {
-            logger.error("Failed to initialize WBEMClient!"  + e.getMessage());
+            logger.error("Failed to initialize WBEMClient!" + e.getMessage());
         }
         return null;
     }
@@ -72,12 +71,12 @@ public class CIMService
         try
         {
             URL UrlHost = new URL(cimHost.getUrl());
-            return new CIMObjectPath(UrlHost.getProtocol(), UrlHost.getHost(), String.valueOf(UrlHost.getPort()), CIMConstants.CIM_NAMESPACE,
-                    cimObjectName, properties);
+            return new CIMObjectPath(UrlHost.getProtocol(), UrlHost.getHost(), String.valueOf(UrlHost.getPort()),
+                    CIMConstants.CIM_NAMESPACE, cimObjectName, properties);
         }
         catch (MalformedURLException e)
         {
-            logger.error("Invalid URL '"+ cimHost.getUrl() + "'." +  e.getMessage());
+            logger.error("Invalid URL '" + cimHost.getUrl() + "'." + e.getMessage());
         }
         return null;
     }
@@ -232,13 +231,14 @@ public class CIMService
         CIMInstance ethernateInstance = getEthernatePortInstance(cimHost, deviceId);
 
         // Get SF_ControlledBy instance through association
-        CloseableIterator<CIMInstance> inst = getAssociators(client, ethernateInstance.getObjectPath(), CIMConstants.SF_CONTROLLED_BY, null,
-                "Dependent");
+        CloseableIterator<CIMInstance> inst = getAssociators(client, ethernateInstance.getObjectPath(),
+                CIMConstants.SF_CONTROLLED_BY, null, "Dependent");
         CIMInstance controlledByInstance = inst.next();
 
         // Get SF_ControllerSoftwareIdentity instance through association
-        inst = getAssociators(client, controlledByInstance.getObjectPath(), CIMConstants.SF_CONTROLLER_SOFTWARE_IDENTITY, null, "Dependent");
-        
+        inst = getAssociators(client, controlledByInstance.getObjectPath(), CIMConstants.SF_CONTROLLER_SOFTWARE_IDENTITY, null,
+                "Dependent");
+
         while (inst.hasNext())
         {
             CIMInstance instance = inst.next();
@@ -284,23 +284,28 @@ public class CIMService
             return longPassword.toCharArray(); // use our long password instead
         }
     }
+
     /**
-     * builds a base URL to use for CIMObjectPath objects based on the host and
-     * connection objects already present in this object on initialization
+     * builds a base URL to use for CIMObjectPath objects based on the host and connection objects
+     * already present in this object on initialization
      *
      * @return a URL to talk to the CIM server on
      */
-    public URL cimBaseUrl(String hostname) {
-     URL url = null;
-     try {
-         url = new URL("https", hostname, CIMConstants.CIM_PORT, "/");
-     } catch (MalformedURLException e) {
-      e.printStackTrace();
-     }
+    public URL cimBaseUrl(String hostname)
+    {
+        URL url = null;
+        try
+        {
+            url = new URL("https", hostname, CIMConstants.CIM_PORT, "/");
+        }
+        catch (MalformedURLException e)
+        {
+            e.printStackTrace();
+        }
 
-     return check(url) ? url : null;
+        return check(url) ? url : null;
     }
-    
+
     /**
      * checks a URL to see if we can open a connection to it
      *
@@ -308,16 +313,20 @@ public class CIMService
      *            - to examine
      * @return true if we can talk to the host
      */
-    public boolean check(final URL url) {
-     boolean valid = false;
+    public boolean check(final URL url)
+    {
+        boolean valid = false;
 
-     try {
-      url.openConnection();
-      valid = true;
-     } catch (IOException e) {
-      e.printStackTrace();
-     }
+        try
+        {
+            url.openConnection();
+            valid = true;
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
 
-     return valid;
+        return valid;
     }
 }

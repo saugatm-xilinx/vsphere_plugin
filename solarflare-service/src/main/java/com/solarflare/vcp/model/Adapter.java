@@ -3,84 +3,99 @@ package com.solarflare.vcp.model;
 import java.io.Serializable;
 import java.util.List;
 
-public class Adapter implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private String name;
-	private String type = "ADAPTER";
-	private String id;
-	private String versionController;
-	private String versionBootROM;
-	private String versionUEFIROM;
-	private String versionFirmware;
-	private boolean isLaterVersionAvailable;
-	
-	List<VMNIC> children;
+public class Adapter implements Serializable
+{
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    private String name;
+    private String type = "ADAPTER";
+    private String id;
+    private String versionController;
+    private String versionBootROM;
+    private String versionUEFIROM;
+    private String versionFirmware;
+    private boolean isLaterVersionAvailable;
 
-	public String getName() {
-		return name;
-	}
+    List<VMNIC> children;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName()
+    {
+        return name;
+    }
 
-	public String getVersionController() {
-		return versionController;
-	}
+    public void setName(String name)
+    {
+        this.name = name;
+    }
 
-	public void setVersionController(String versionController) {
-		this.versionController = versionController;
-	}
+    public String getVersionController()
+    {
+        return versionController;
+    }
 
-	public String getVersionBootROM() {
-		return versionBootROM;
-	}
+    public void setVersionController(String versionController)
+    {
+        this.versionController = versionController;
+    }
 
-	public void setVersionBootROM(String versionBootROM) {
-		this.versionBootROM = versionBootROM;
-	}
+    public String getVersionBootROM()
+    {
+        return versionBootROM;
+    }
 
-	public String getVersionUEFIROM() {
-		return versionUEFIROM;
-	}
+    public void setVersionBootROM(String versionBootROM)
+    {
+        this.versionBootROM = versionBootROM;
+    }
 
-	public void setVersionUEFIROM(String versionUEFIROM) {
-		this.versionUEFIROM = versionUEFIROM;
-	}
+    public String getVersionUEFIROM()
+    {
+        return versionUEFIROM;
+    }
 
-	public String getType() {
-		return type;
-	}
+    public void setVersionUEFIROM(String versionUEFIROM)
+    {
+        this.versionUEFIROM = versionUEFIROM;
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public String getType()
+    {
+        return type;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public void setType(String type)
+    {
+        this.type = type;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public String getId()
+    {
+        return id;
+    }
 
-	@Override
-	public String toString() {
-		return "Adapter [name=" + name + ", type=" + type + ", id=" + id + ", versionController=" + versionController
-				+ ", versionBootROM=" + versionBootROM + ", versionUEFIROM=" + versionUEFIROM + ", vmnics=" + children
-				+ "]";
-	}
+    public void setId(String id)
+    {
+        this.id = id;
+    }
 
-	public List<VMNIC> getChildren() {
-		return children;
-	}
+    @Override
+    public String toString()
+    {
+        return "Adapter [name=" + name + ", type=" + type + ", id=" + id + ", versionController=" + versionController
+                + ", versionBootROM=" + versionBootROM + ", versionUEFIROM=" + versionUEFIROM + ", vmnics=" + children + "]";
+    }
 
-	public void setChildren(List<VMNIC> children) {
-		this.children = children;
-	}
+    public List<VMNIC> getChildren()
+    {
+        return children;
+    }
+
+    public void setChildren(List<VMNIC> children)
+    {
+        this.children = children;
+    }
 
     public boolean isLaterVersionAvailable()
     {

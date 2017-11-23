@@ -59,6 +59,13 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
     }
 
     @Override
+    public boolean uploadFile(String file) throws Exception
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
     public void sessionEnded(String clientId)
     {
         logger.info("Logging out client session - " + clientId);
@@ -71,10 +78,10 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
     @Override
     public List<Adapter> getHostAdapters(String hostId) throws Exception
     {
-        
+
         List<Adapter> adapters = service.getAdapters(userSessionService, hostId);
         return adapters;
-       
+
     }
 
     @Override
