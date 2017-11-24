@@ -54,6 +54,6 @@ public interface HostAdapterService
      * @throws Exception
      */
 
-    boolean uploadFile(String file) throws Exception;
+    boolean uploadFile(String fileData, String id) throws Exception;
 
 }

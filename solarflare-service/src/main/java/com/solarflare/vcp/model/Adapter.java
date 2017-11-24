@@ -17,6 +17,7 @@ public class Adapter implements Serializable
     private String versionUEFIROM;
     private String versionFirmware;
     private boolean isLaterVersionAvailable;
+    private String fileData;
 
     List<VMNIC> children;
 
@@ -115,6 +116,16 @@ public class Adapter implements Serializable
     public void setVersionFirmware(String versionFirmware)
     {
         this.versionFirmware = versionFirmware;
+    }
+
+    public String getFileData()
+    {
+        return fileData;
+    }
+
+    public void setFileData(String fileData)
+    {
+        this.fileData = fileData;
     }
 
 }

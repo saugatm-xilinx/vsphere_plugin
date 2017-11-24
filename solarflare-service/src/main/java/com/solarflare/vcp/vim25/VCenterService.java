@@ -483,6 +483,8 @@ public class VCenterService
                             adapter.setVersionBootROM(bootROMVersion);
                             adapter.setVersionFirmware(firmwareVersion);
                             adapter.setVersionUEFIROM(UEFIROMVersion);
+                            // TODO for testing purpose
+                            adapter.setLaterVersionAvailable(true);
 
                         }
                         adapters.add(adapter);

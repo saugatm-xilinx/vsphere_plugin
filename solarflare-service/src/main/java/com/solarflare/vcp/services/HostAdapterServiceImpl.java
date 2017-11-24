@@ -59,7 +59,7 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
     }
 
     @Override
-    public boolean uploadFile(String file) throws Exception
+    public boolean uploadFile(String fileData, String id) throws Exception
     {
         // TODO Auto-generated method stub
         return false;

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.solarflare.vcp.model.Adapter;
@@ -93,14 +92,14 @@ public class HostAdapterController
 
     @RequestMapping(value = "/adapters/uploadFile", method = RequestMethod.POST)
     @ResponseBody
-    public void uploadFile(@RequestParam("file") String file)
+    public void uploadFile(@RequestBody Adapter adapter)
     {
         logger.info("start getting file as string content");
-        if (file != null || !file.isEmpty())
+        if (adapter.getFileData() != null && adapter.getId()!=null)
         {
             try
             {
-                hostAdapterService.uploadFile(file);
+                hostAdapterService.uploadFile(adapter.getFileData(),adapter.getId());
             }
             catch (Exception e)
             {
