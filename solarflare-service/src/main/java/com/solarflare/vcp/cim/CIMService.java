@@ -1,8 +1,14 @@
 package com.solarflare.vcp.cim;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -21,6 +27,13 @@ import javax.wbem.client.WBEMClientFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.vmware.vim25.Extension;
+import com.vmware.vim25.ExtensionClientInfo;
+import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.RuntimeFaultFaultMsg;
+import com.vmware.vim25.ServiceContent;
+import com.vmware.vim25.VimPortType;
 
 public class CIMService
 {
@@ -328,5 +341,134 @@ public class CIMService
         }
 
         return valid;
+    }
+
+    public String getLatestControllerFWImageVersion(ServiceContent serviceContent,
+            VimPortType vimPort) throws MalformedURLException, RuntimeFaultFaultMsg, URISyntaxException
+    {
+        String versionString = null;
+        String urlPath = getPluginURL(serviceContent, vimPort, CIMConstants.PLUGIN_KEY);
+        URL pluginURL = new URL(urlPath);
+
+        // URL controllerFWImagePath = new
+        // URL(pluginURL.getProtocol(),pluginURL.getHost(),pluginURL.getPort(),CONTROLLER_FW_IMAGE_PATH);
+        URL controllerFWImagePath = new URL("http", pluginURL.getHost(), CIMConstants.FW_IMAGE_PORT,
+                CIMConstants.CONTROLLER_FW_IMAGE_PATH);
+        System.out.println("controllerFWImagePath : " + controllerFWImagePath);
+
+        versionString = getVersionFromBinaryFile(controllerFWImagePath);
+        return versionString;
+    }
+
+    public String getLatestBootROMFWImageVersion(ServiceContent serviceContent,
+            VimPortType vimPort) throws MalformedURLException, RuntimeFaultFaultMsg, URISyntaxException
+    {
+        String versionString = null;
+        String urlPath = getPluginURL(serviceContent, vimPort, CIMConstants.PLUGIN_KEY);
+        URL pluginURL = new URL(urlPath);
+
+        URL controllerFWImagePath = new URL("http", pluginURL.getHost(), CIMConstants.FW_IMAGE_PORT,
+                CIMConstants.BOOTROM_FW_IMAGE_PATH);
+        System.out.println("controllerFWImagePath : " + controllerFWImagePath);
+
+        versionString = getVersionFromBinaryFile(controllerFWImagePath);
+        return versionString;
+    }
+
+    public String getVersionFromBinaryFile(URL filePath) throws URISyntaxException
+    {
+        Path path = null;
+        byte[] bytes = null;
+        String versionString = "";
+        
+        boolean readComplete = false;
+        bytes = readData(filePath, readComplete);
+        if (bytes == null)
+        {
+            versionString = CIMConstants.DEFAULT_VERSION;
+        }
+        else
+        {
+            ByteBuffer buffer = ByteBuffer.wrap(bytes);
+            buffer.order(ByteOrder.LITTLE_ENDIAN);
+            int ih_magic = buffer.getInt();
+            int ih_version = buffer.getInt();
+            int ih_type = buffer.getInt();
+            int ih_subtype = buffer.getInt();
+            int ih_code_size = buffer.getInt();
+            int ih_size = buffer.getInt();
+
+            int ih_controller_version_min = buffer.getInt();
+
+            int ih_controller_version_max = buffer.getInt();
+
+            short ih_code_version_a = buffer.getShort();
+            short ih_code_version_b = buffer.getShort();
+            short ih_code_version_c = buffer.getShort();
+            short ih_code_version_d = buffer.getShort();
+
+            System.out.println("ih_code_version_a : " + ih_code_version_a);
+            System.out.println("ih_code_version_b : " + ih_code_version_b);
+            System.out.println("ih_code_version_c : " + ih_code_version_c);
+            System.out.println("ih_code_version_d : " + ih_code_version_d);
+
+            StringBuffer version = new StringBuffer();
+            version.append(ih_code_version_a);
+            version.append(".");
+            version.append(ih_code_version_b);
+            version.append(".");
+            version.append(ih_code_version_c);
+            version.append(".");
+            version.append(ih_code_version_d);
+
+            versionString = version.toString();
+        }
+        return versionString;
+    }
+
+    private byte[] readData(URL toDownload, boolean readComplete)
+    {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        try
+        {
+            byte[] chunk = new byte[1000];
+            int bytesRead;
+            InputStream stream = toDownload.openStream();
+            if (readComplete)
+            {
+                while ((bytesRead = stream.read(chunk)) > 0)
+                {
+                    outputStream.write(chunk, 0, bytesRead);
+                }
+            }
+            else
+            {
+                bytesRead = stream.read(chunk);
+                outputStream.write(chunk, 0, bytesRead);
+            }
+        }
+        catch (IOException e)
+        {
+            return null;
+        }
+
+        return outputStream.toByteArray();
+    }
+
+    private String getPluginURL(ServiceContent serviceContent, VimPortType vimPort, String pluginKey) throws RuntimeFaultFaultMsg,
+                                                                                                      MalformedURLException
+    {
+        String urlPath = "";
+        ManagedObjectReference extensionManager = serviceContent.getExtensionManager();
+        Extension ext = vimPort.findExtension(extensionManager, pluginKey);
+        List<ExtensionClientInfo> extClientInfo = ext.getClient();
+        for (ExtensionClientInfo clientInfo : extClientInfo)
+        {
+            urlPath = clientInfo.getUrl();
+        }
+
+        return urlPath;
+
     }
 }

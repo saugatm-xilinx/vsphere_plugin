@@ -94,7 +94,60 @@ public class VCenterHelper
         }
 
     }
+    public static String getLatestVersion(String version1, String version2)
+    {
+        // removing non digit characters
+        String removedNonDigitChar1 =  removeNonDigitChar(version1);
+        String removedNonDigitChar2 =  removeNonDigitChar(version2);
+        
+        String versionAr1 [] = removedNonDigitChar1.split("\\.");
+        String versionAr2 [] = removedNonDigitChar2.split("\\.");
+        // Consider the version like this 1.1.1.1
+        
+        int l1 = versionAr1.length;
+        int l2 = versionAr1.length;
+        
+        String latest = "";
+        
+        if(l1==l2)
+        {
+            for(int i=0; i<l1 ; i++)
+            {
+                int res = versionAr1[i].compareTo(versionAr2[i]);
+                if(res > 0)
+                {
+                    latest = removedNonDigitChar1;
+                    break;
+                }
+                else if(res < 0)
+                {
+                    latest = removedNonDigitChar2;
+                    break;
+                }                
+            }
+        }         
+        return latest;
+    }
+    
+    public static String removeNonDigitChar(String str)
+    {
+        String afterReplace = null;
+        if (str != null)
+        {
+            if(str.contains(" "))
+            {
+                afterReplace = str.split(" ")[0];
+                afterReplace = afterReplace.replaceAll("[^\\d.]", "");
+            }
+            else
+            {
+                afterReplace = str;
+            }
+            
+        }
 
+        return afterReplace;
+    }
     private static ServerInfo getServerInfoObject(UserSessionService usersessionService, String serverGuid)
     {
         UserSession userSession = usersessionService.getUserSession();

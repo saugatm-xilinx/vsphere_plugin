@@ -53,6 +53,8 @@ public class VCenterService
 
     private static VimPortType vimPort = initializeVimPort();
 
+    CIMService cim = new CIMService();
+
     private static VimPortType initializeVimPort()
     {
         VimService vimService = new VimService();
@@ -460,7 +462,6 @@ public class VCenterService
                         }
                     }
                     Map<String, List<VMNIC>> nicGrp = mergPNicAndHWData(nicList, hwData);
-                    CIMService cim = new CIMService();
                     for (String key : nicGrp.keySet())
                     {
                         Adapter adapter = new Adapter();
@@ -483,9 +484,30 @@ public class VCenterService
                             adapter.setVersionBootROM(bootROMVersion);
                             adapter.setVersionFirmware(firmwareVersion);
                             adapter.setVersionUEFIROM(UEFIROMVersion);
-                            // TODO for testing purpose
-                            adapter.setLaterVersionAvailable(true);
-
+                            
+                            //Get version from image binary for controller
+                            String latestControllerVersion = cim.getLatestControllerFWImageVersion(serviceContent, vimPort);
+                            
+                            // Get latest version otherwise blank value if both are equal 
+                            String latestVersion = VCenterHelper.getLatestVersion(controllerVersion,latestControllerVersion);
+                            logger.debug("Gating latest version of controller is :"+latestVersion);
+                            //Check for latest version available
+                            if(latestVersion.equals(latestControllerVersion))
+                            {
+                                adapter.setLaterVersionAvailable(true);
+                            }
+                            else
+                            {
+                                //Get version from image binary for BootRom
+                                String latestBootRomVersion = cim.getLatestBootROMFWImageVersion(serviceContent, vimPort);
+                                logger.debug("Gating latest version of BootRom is :"+latestBootRomVersion);
+                                String finalLatestBootVersion = VCenterHelper.getLatestVersion(bootROMVersion,latestBootRomVersion);
+                                if(latestBootRomVersion.equals(finalLatestBootVersion))
+                                {
+                                    adapter.setLaterVersionAvailable(true);
+                                }
+                            }
+                            
                         }
                         adapters.add(adapter);
                     }
@@ -500,5 +522,4 @@ public class VCenterService
         return adapters;
 
     }
-
 }
