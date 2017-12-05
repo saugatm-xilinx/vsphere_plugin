@@ -51,7 +51,7 @@ public class VCenterService
     public static final String CIM = "cim";
     public static final String SFC = "sfc";
 
-    private static VimPortType vimPort = initializeVimPort();
+    public static VimPortType vimPort = initializeVimPort();
 
     CIMService cim = new CIMService();
 
@@ -417,6 +417,43 @@ public class VCenterService
         return nicGrp;
     }
 
+    public CIMHost getCIMHost(ServiceContent serviceContent, String hostId) throws Exception
+    {
+        logger.info("Getting CIM host object for a host : " + hostId);
+        ManagedObjectReference rootFolder = serviceContent.getRootFolder();
+        CIMHost cimHost = null;
+        String hostName = null;
+        rootFolder.setType("HostSystem");
+        rootFolder.setValue(hostId);
+        // -------------Set property specs --------------
+        PropertySpec hostPropSpec = new PropertySpec();
+        hostPropSpec.setType("HostSystem");
+        hostPropSpec.setAll(false);
+        hostPropSpec.getPathSet().add("name");
+        // -----------------------------------------------
+        List<ObjectContent> objectList = getHostObjs(hostPropSpec, vimPort, serviceContent, rootFolder);
+        List<DynamicProperty> dpsHost = null;
+        if (objectList != null)
+        {
+            ObjectContent objectContent = objectList.get(0);
+            dpsHost = objectContent.getPropSet();
+            for (DynamicProperty dp : dpsHost)
+            {
+                if (dp.getName().equals("name"))
+                {
+                    hostName = dp.getVal().toString();
+                    HostServiceTicket ticket = vimPort.acquireCimServicesTicket(objectContent.getObj());
+                    URL cimBaseURL = cim.cimBaseUrl(hostName);
+                    cimHost = new CIMHostSession(cimBaseURL.toString(), ticket.getSessionId());
+                    break;
+                }
+            }
+
+        }
+        return cimHost;
+
+    }
+
     public List<Adapter> getAdapters(UserSessionService userSession, String hostId) throws Exception
     {
         logger.info("Getting Adapters for Host by Host Id : " + hostId);
@@ -468,6 +505,7 @@ public class VCenterService
                         adapter.setName(key);
                         adapter.setId(key);
                         List<VMNIC> listNic = nicGrp.get(key);
+                        adapter.setChildren(listNic);
                         if (listNic != null && listNic.size() > 0)
                         {
                             String deviceId = listNic.get(0).getName();
@@ -484,30 +522,31 @@ public class VCenterService
                             adapter.setVersionBootROM(bootROMVersion);
                             adapter.setVersionFirmware(firmwareVersion);
                             adapter.setVersionUEFIROM(UEFIROMVersion);
-                            
-                            //Get version from image binary for controller
+
+                            // Get version from image binary for controller
                             String latestControllerVersion = cim.getLatestControllerFWImageVersion(serviceContent, vimPort);
-                            
-                            // Get latest version otherwise blank value if both are equal 
-                            String latestVersion = VCenterHelper.getLatestVersion(controllerVersion,latestControllerVersion);
-                            logger.debug("Gating latest version of controller is :"+latestVersion);
-                            //Check for latest version available
-                            if(latestVersion.equals(latestControllerVersion))
+
+                            // Get latest version otherwise blank value if both are equal
+                            String latestVersion = VCenterHelper.getLatestVersion(controllerVersion, latestControllerVersion);
+                            logger.debug("Gating latest version of controller is :" + latestVersion);
+                            // Check for latest version available
+                            if (latestVersion.equals(latestControllerVersion))
                             {
                                 adapter.setLaterVersionAvailable(true);
                             }
                             else
                             {
-                                //Get version from image binary for BootRom
+                                // Get version from image binary for BootRom
                                 String latestBootRomVersion = cim.getLatestBootROMFWImageVersion(serviceContent, vimPort);
-                                logger.debug("Gating latest version of BootRom is :"+latestBootRomVersion);
-                                String finalLatestBootVersion = VCenterHelper.getLatestVersion(bootROMVersion,latestBootRomVersion);
-                                if(latestBootRomVersion.equals(finalLatestBootVersion))
+                                logger.debug("Gating latest version of BootRom is :" + latestBootRomVersion);
+                                String finalLatestBootVersion = VCenterHelper.getLatestVersion(bootROMVersion,
+                                        latestBootRomVersion);
+                                if (latestBootRomVersion.equals(finalLatestBootVersion))
                                 {
                                     adapter.setLaterVersionAvailable(true);
                                 }
                             }
-                            
+
                         }
                         adapters.add(adapter);
                     }

@@ -54,6 +54,16 @@ public interface HostAdapterService
      * @throws Exception
      */
 
-    boolean uploadFile(String fileData, String id) throws Exception;
+    boolean updateFirmwareToLatest(List<Adapter> adapterList, String hostId) throws Exception;
+    
+    /**
+     * Validate firmware binary file 
+     * @param file
+     * @param isLocal
+     * @return
+     * @throws Exception
+     */
+    
+    boolean validateTypeAndSubTupe(String file, boolean isLocal) throws Exception;
 
 }

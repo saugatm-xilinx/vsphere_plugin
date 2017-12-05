@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.cim.CIMArgument;
+import javax.cim.CIMDataType;
 import javax.cim.CIMInstance;
 import javax.cim.CIMObjectPath;
 import javax.cim.CIMProperty;
@@ -27,7 +29,9 @@ import javax.wbem.client.WBEMClientFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sblim.cimclient.internal.util.MOF;
 
+import com.solarflare.vcp.model.FileHeader;
 import com.vmware.vim25.Extension;
 import com.vmware.vim25.ExtensionClientInfo;
 import com.vmware.vim25.ManagedObjectReference;
@@ -43,7 +47,6 @@ public class CIMService
     public Collection<CIMInstance> getAllInstances(CIMHost cimHost, final String namespace,
             final String classname) throws WBEMException
     {
-
         WBEMClient client = getClient(cimHost, classname);
         CIMObjectPath objectPath = getHostObjectPath(cimHost, null, classname);
 
@@ -117,8 +120,9 @@ public class CIMService
         return subject;
     }
 
-    private CIMInstance getFirmwareSoftwareInstallationInstance(Collection<CIMInstance> instances)
+    public CIMInstance getFirmwareSoftwareInstallationInstance(Collection<CIMInstance> instances)
     {
+        logger.info("Getting Firmware Software Installation Instance");
         CIMInstance svc_mcfw_inst = null;
 
         for (CIMInstance inst : instances)
@@ -133,8 +137,9 @@ public class CIMService
         return svc_mcfw_inst;
     }
 
-    private CIMInstance getBootROMSoftwareInstallationInstance(Collection<CIMInstance> instances)
+    public CIMInstance getBootROMSoftwareInstallationInstance(Collection<CIMInstance> instances)
     {
+        logger.info("Getting BootROM Software Installation Instance");
         CIMInstance svc_bootrom_inst = null;
 
         for (CIMInstance inst : instances)
@@ -178,7 +183,7 @@ public class CIMService
 
     }
 
-    private CIMInstance getNICCardInstance(CIMHost cimHost, String deviceId) throws WBEMException
+    public CIMInstance getNICCardInstance(CIMHost cimHost, String deviceId) throws WBEMException
     {
         String cimClass = "SF_SoftwareInstallationService";
         WBEMClient client = getClient(cimHost, cimClass);
@@ -204,35 +209,36 @@ public class CIMService
         return nicCardIntance;
     }
 
-    public static void main(String[] args) throws WBEMException
-    {
-        String url = "https://10.101.10.3:5989/";
-        String password = "Ibmx#3750c";
-        String user = "root";
-
-        CIMService cimUtil = new CIMService();
-        String cimClass = "SF_SoftwareInstallationService";
-
-        CIMHost cimHost = new CIMHostUser(url, user, password);
-
-        // Get SF_SoftwareInstallationService instance
-        Collection<CIMInstance> instances = cimUtil.getAllInstances(cimHost, CIMConstants.CIM_NAMESPACE, cimClass);
-        for (CIMInstance inst : instances)
-        {
-            System.out.println(inst);
-        }
-
-        // Get Firmware SF_SoftwareInstallationService instance
-        CIMInstance svc_mcfw_inst = cimUtil.getFirmwareSoftwareInstallationInstance(instances);
-
-        // Get BootROM SF_SoftwareInstallationService instance
-        CIMInstance svc_bootrom_inst = cimUtil.getBootROMSoftwareInstallationInstance(instances);
-
-        // Get EthernatePort Instance for 'vmnic6'
-        System.out.println(cimUtil.getEthernatePortInstance(cimHost, "vmnic6"));
-
-        cimUtil.getNICCardInstance(cimHost, "vmnic6");
-    }
+    // public static void main(String[] args) throws WBEMException
+    // {
+    // String url = "https://10.101.10.3:5989/";
+    // String password = "Ibmx#3750c";
+    // String user = "root";
+    //
+    // CIMService cimUtil = new CIMService();
+    // String cimClass = "SF_SoftwareInstallationService";
+    //
+    // CIMHost cimHost = new CIMHostUser(url, user, password);
+    //
+    // // Get SF_SoftwareInstallationService instance
+    // Collection<CIMInstance> instances = cimUtil.getAllInstances(cimHost,
+    // CIMConstants.CIM_NAMESPACE, cimClass);
+    // for (CIMInstance inst : instances)
+    // {
+    // System.out.println(inst);
+    // }
+    //
+    // // Get Firmware SF_SoftwareInstallationService instance
+    // CIMInstance svc_mcfw_inst = cimUtil.getFirmwareSoftwareInstallationInstance(instances);
+    //
+    // // Get BootROM SF_SoftwareInstallationService instance
+    // CIMInstance svc_bootrom_inst = cimUtil.getBootROMSoftwareInstallationInstance(instances);
+    //
+    // // Get EthernatePort Instance for 'vmnic6'
+    // System.out.println(cimUtil.getEthernatePortInstance(cimHost, "vmnic6"));
+    //
+    // cimUtil.getNICCardInstance(cimHost, "vmnic6");
+    // }
 
     public Map<String, String> getAdapterVersions(CIMHost cimHost, String deviceId) throws WBEMException
     {
@@ -354,7 +360,6 @@ public class CIMService
         // URL(pluginURL.getProtocol(),pluginURL.getHost(),pluginURL.getPort(),CONTROLLER_FW_IMAGE_PATH);
         URL controllerFWImagePath = new URL("http", pluginURL.getHost(), CIMConstants.FW_IMAGE_PORT,
                 CIMConstants.CONTROLLER_FW_IMAGE_PATH);
-        System.out.println("controllerFWImagePath : " + controllerFWImagePath);
 
         versionString = getVersionFromBinaryFile(controllerFWImagePath);
         return versionString;
@@ -380,7 +385,7 @@ public class CIMService
         Path path = null;
         byte[] bytes = null;
         String versionString = "";
-        
+
         boolean readComplete = false;
         bytes = readData(filePath, readComplete);
         if (bytes == null)
@@ -391,27 +396,21 @@ public class CIMService
         {
             ByteBuffer buffer = ByteBuffer.wrap(bytes);
             buffer.order(ByteOrder.LITTLE_ENDIAN);
-            int ih_magic = buffer.getInt();
-            int ih_version = buffer.getInt();
-            int ih_type = buffer.getInt();
-            int ih_subtype = buffer.getInt();
-            int ih_code_size = buffer.getInt();
-            int ih_size = buffer.getInt();
-
-            int ih_controller_version_min = buffer.getInt();
-
-            int ih_controller_version_max = buffer.getInt();
+            // int ih_magic = buffer.getInt();
+            // int ih_version = buffer.getInt();
+            // int ih_type = buffer.getInt();
+            // int ih_subtype = buffer.getInt();
+            // int ih_code_size = buffer.getInt();
+            // int ih_size = buffer.getInt();
+            //
+            // int ih_controller_version_min = buffer.getInt();
+            //
+            // int ih_controller_version_max = buffer.getInt();
 
             short ih_code_version_a = buffer.getShort();
             short ih_code_version_b = buffer.getShort();
             short ih_code_version_c = buffer.getShort();
             short ih_code_version_d = buffer.getShort();
-
-            System.out.println("ih_code_version_a : " + ih_code_version_a);
-            System.out.println("ih_code_version_b : " + ih_code_version_b);
-            System.out.println("ih_code_version_c : " + ih_code_version_c);
-            System.out.println("ih_code_version_d : " + ih_code_version_d);
-
             StringBuffer version = new StringBuffer();
             version.append(ih_code_version_a);
             version.append(".");
@@ -471,4 +470,252 @@ public class CIMService
         return urlPath;
 
     }
+
+    public boolean isCustomFWImageCompatible(ServiceContent serviceContent, VimPortType vimPort, CIMHost cimHost,
+            CIMInstance fwInst, CIMInstance nicInstance, String deviceID, String path) throws Exception
+    {
+        boolean isCompatible = false;
+
+        Map<String, String> params = getRequiredFwImageName(cimHost, fwInst, nicInstance);
+
+        int currentType = Integer.parseInt(params.get(CIMConstants.TYPE));
+        int currentSubType = Integer.parseInt(params.get(CIMConstants.SUB_TYPE));
+        logger.debug("Current firmware type : " + currentType);
+        logger.debug("Current firmware subtype : " + currentSubType);
+
+        // Get Type and SubType of given firmware image;
+        // TODO : get path from input param
+        // String urlPath = getPluginURL(serviceContent, vimPort, CIMConstants.PLUGIN_KEY);
+        // URL pluginURL = new URL(urlPath);
+        URL firmwareURL = new URL(path);
+
+        // TODO : check crtificate for https
+        // URL controllerFWImagePath = new URL("http", firmwareURL.getHost(),
+        // firmwareURL.getFile());
+
+        FileHeader header = getFileHeader(firmwareURL);
+        int newType = header.getType();
+        int newSubType = header.getSubtype();
+
+        // TODO : add logs
+        logger.debug("Type from firmware file :" + newType);
+        logger.debug("Subtype from firmware file :" + newSubType);
+        if (currentType == newType && currentSubType == newSubType)
+        {
+            isCompatible = true;
+        }
+
+        return isCompatible;
+    }
+
+    public Map<String, String> getRequiredFwImageName(CIMHost cimHost, CIMInstance fw_inst, CIMInstance nicInstance)
+    {
+        logger.info("Getting Required Firmware Image Version");
+        Map<String, String> params = new HashMap<>();
+
+        try
+        {
+            String cimClass = "SF_SoftwareInstallationService";
+            WBEMClient client = getClient(cimHost, cimClass);
+
+            // Create type for nicInstance and set input parameter
+            CIMDataType instanceType = new CIMDataType(nicInstance.getClassName());
+            CIMArgument<?> cimTarget = new CIMArgument<CIMInstance>(CIMConstants.TARGET, instanceType, nicInstance);
+
+            CIMArgument<?>[] cimArguments =
+            { cimTarget }; // input parameters
+            CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
+                                                                      // parameters
+
+            Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.GET_FW_IMAGE_NAME, cimArguments,
+                    cimArgumentsOut);
+            int statusCode = Integer.parseInt(status.toString());
+            if (statusCode == 0)
+            {
+
+                logger.info("'GetRequiredFwImageName' method invoked successfully!");
+
+                for (int i = 0; i < cimArgumentsOut.length; i++)
+                {
+                    if (cimArgumentsOut[i] != null)
+                    {
+                        params.put(cimArgumentsOut[i].getName(), cimArgumentsOut[i].getValue().toString());
+                    }
+                }
+            }
+            else
+            {
+                String errMsg = getLatestLogErrorMessage(cimHost);
+                throw new Exception(errMsg);
+            }
+
+        }
+        catch (Exception e)
+        {
+            logger.error("Failed to get required Firmware Image Name for given NIC instance! " + e.getMessage());
+        }
+
+        return params;
+    }
+
+    private FileHeader getFileHeader(URL filePath)
+    {
+        FileHeader header = new FileHeader();
+        Path path = null;
+        byte[] bytes = null;
+
+        boolean readComplete = false;
+        bytes = readData(filePath, readComplete);
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        int ih_magic = buffer.getInt();
+        header.setMagic(ih_magic);
+
+        int ih_version = buffer.getInt();
+        header.setVersion(ih_version);
+
+        int ih_type = buffer.getInt();
+        header.setType(ih_type);
+
+        int ih_subtype = buffer.getInt();
+        header.setSubtype(ih_subtype);
+
+        int ih_code_size = buffer.getInt();
+        header.setCodeSize(ih_code_size);
+
+        int ih_size = buffer.getInt();
+        header.setSize(ih_size);
+
+        int ih_controller_version_min = buffer.getInt();
+        header.setControllerVersionMin(ih_controller_version_min);
+
+        int ih_controller_version_max = buffer.getInt();
+        header.setControllerVersionMax(ih_controller_version_max);
+
+        short ih_code_version_a = buffer.getShort();
+        header.setCodeVersion_a(ih_code_version_a);
+
+        short ih_code_version_b = buffer.getShort();
+        header.setCodeVersion_b(ih_code_version_b);
+
+        short ih_code_version_c = buffer.getShort();
+        header.setCodeVersion_c(ih_code_version_c);
+
+        short ih_code_version_d = buffer.getShort();
+        header.setCodeVersion_d(ih_code_version_d);
+        return header;
+    }
+
+    private String getLatestLogErrorMessage(CIMHost cimHost)
+    {
+        String errMsg = null;
+        String cimClass = CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE;
+        WBEMClient client = getClient(cimHost, cimClass);
+        CIMInstance logErrorInstance = null;
+        try
+        {
+            CIMInstance pLogInstance = getProviderLogInstance(cimHost);
+
+            CloseableIterator<CIMInstance> inst = getAssociators(client, pLogInstance.getObjectPath(),
+                    CIMConstants.SF_LOG_MANAGES_RECORD, null, "Log");
+
+            int maxRecordID = -1;
+            while (inst.hasNext())
+            {
+                CIMInstance tempInst = inst.next();
+
+                int recordID = Integer.parseInt(tempInst.getPropertyValue("RecordID").toString(), 16); // record
+                                                                                                       // ID
+                                                                                                       // is
+                                                                                                       // in
+                                                                                                       // Hex
+                                                                                                       // format
+                if (recordID > maxRecordID)
+                {
+                    maxRecordID = recordID;
+                    logErrorInstance = tempInst;
+                }
+            }
+
+            errMsg = logErrorInstance.getPropertyValue("RecordData").toString();
+
+        }
+        catch (WBEMException e)
+        {
+            e.printStackTrace();
+        }
+        return errMsg;
+    }
+
+    private CIMInstance getProviderLogInstance(CIMHost cimHost) throws WBEMException
+    {
+        CIMInstance plInstance = null;
+        CIMService cimUtil = new CIMService();
+        String cimClass = "SF_ProviderLog";
+        // Get SF_EthernetPort instance
+        Collection<CIMInstance> instances = cimUtil.getAllInstances(cimHost, CIMConstants.CIM_NAMESPACE, cimClass);
+        for (CIMInstance inst : instances)
+        {
+            String desc = (String) inst.getProperty("Description").getValue();
+            if (desc != null && desc.equals("Error log"))
+            {
+                plInstance = inst;
+            }
+        }
+        return plInstance;
+    }
+
+    public boolean updateFirmwareFromURL(CIMObjectPath objectPath, CIMHost cimHost, CIMInstance nic,
+            URL fwImagePath) throws Exception
+    {
+
+        String cimClass = CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE;
+        WBEMClient client = getClient(cimHost, cimClass);
+        String pMethodName = CIMConstants.INSTALL_FROM_URI;
+
+        logger.debug("Updating nic object: " + nic.getObjectPath());
+        CIMArgument<CIMObjectPath> target = new CIMArgument<CIMObjectPath>("Target", new CIMDataType(nic.getClassName()), new CIMObjectPath(MOF.objectHandle(nic.getObjectPath(), false, true)));
+        CIMArgument<String> uri = new CIMArgument<String>(CIMConstants.URI, CIMDataType.STRING_T, fwImagePath.toString());
+
+        Integer[] options = new Integer[]
+        { 3 };
+        CIMArgument<?> installOptions = new CIMArgument<Integer[]>(CIMConstants.INSTALL_OPTIONS, CIMDataType.UINT16_ARRAY_T,
+                options);
+
+        String[] optionValues = new String[]
+        { "x" };
+        CIMArgument<?> installOptionsValues = new CIMArgument<String[]>(CIMConstants.INSTALL_OPTIONS_VALUES,
+                CIMDataType.STRING_ARRAY_T, optionValues);
+
+        CIMArgument<?>[] pInputArguments =
+        { target, uri, installOptions, installOptionsValues };
+        CIMArgument<?>[] pOutputArguments = new CIMArgument<?>[10];
+
+        try
+        {
+            Object status = client.invokeMethod(objectPath, pMethodName, pInputArguments, pOutputArguments);
+            logger.debug("status: " + status);
+
+            int statusCode = Integer.parseInt(status.toString());
+            if (statusCode == 0)
+            {
+                logger.info("'InstallFromURI' method invoked successfully!");
+                return true;
+
+            }
+            else
+            {
+                String errMsg = getLatestLogErrorMessage(cimHost);
+                logger.error(errMsg);
+            }
+
+        }
+        catch (Exception e)
+        {
+            logger.error(e.getMessage());
+            throw e;
+        }
+        return false;
+    }
+
 }

@@ -1,15 +1,25 @@
 package com.solarflare.vcp.services;
 
+import java.net.URL;
+import java.util.Collection;
 import java.util.List;
+
+import javax.cim.CIMInstance;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.solarflare.vcp.cim.CIMConstants;
+import com.solarflare.vcp.cim.CIMHost;
+import com.solarflare.vcp.cim.CIMService;
+import com.solarflare.vcp.helper.VCenterHelper;
 import com.solarflare.vcp.model.Adapter;
 import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.NicBootParamInfo;
 import com.solarflare.vcp.vim25.VCenterService;
+import com.vmware.vim25.ServiceContent;
+import com.vmware.vim25.VimPortType;
 import com.vmware.vise.security.ClientSessionEndListener;
 import com.vmware.vise.usersession.UserSessionService;
 
@@ -20,6 +30,7 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
     private UserSessionService userSessionService;
 
     VCenterService service = new VCenterService();
+    CIMService cim = new CIMService();
 
     @Autowired
     public HostAdapterServiceImpl(UserSessionService session)
@@ -59,9 +70,33 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
     }
 
     @Override
-    public boolean uploadFile(String fileData, String id) throws Exception
+    public boolean updateFirmwareToLatest(List<Adapter> adapterList, String hostId) throws Exception
     {
-        // TODO Auto-generated method stub
+        logger.info("Start updating firmware adapter");
+        try
+        {
+            ServiceContent serviceContent = VCenterHelper.getServiceContent(userSessionService, VCenterService.vimPort);
+
+           CIMHost cimHost = service.getCIMHost(serviceContent, hostId);
+           Collection<CIMInstance> instances = cim.getAllInstances(cimHost, CIMConstants.CIM_NAMESPACE, CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE);
+           // Get Controller SF_SoftwareInstallationService instance
+           CIMInstance svc_mcfw_inst = cim.getFirmwareSoftwareInstallationInstance(instances);
+
+           // Get BootROM SF_SoftwareInstallationService instance
+          // CIMInstance svc_bootrom_inst = cim.getBootROMSoftwareInstallationInstance(instances);
+           URL fwImagePath = new URL("http://10.101.10.132"+CIMConstants.CONTROLLER_FW_IMAGE_PATH);
+            for (Adapter adapter : adapterList)
+            {
+                logger.debug("Updating Contoller firmware for adapter : "+adapter.getName());
+                CIMInstance nicInstance = cim.getNICCardInstance(cimHost, adapter.getChildren().get(0).getName());
+                cim.updateFirmwareFromURL(svc_mcfw_inst.getObjectPath(), cimHost, nicInstance, fwImagePath);
+                logger.debug("Contoller firmware update for adapter '" + adapter.getName() + "' is done.");
+            }
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
         return false;
     }
 
@@ -89,6 +124,12 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
     {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public boolean validateTypeAndSubTupe(String file, boolean isLocal) throws Exception
+    {
+        return false;
     }
 
 }

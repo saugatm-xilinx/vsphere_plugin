@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.solarflare.vcp.model.Adapter;
@@ -90,22 +91,30 @@ public class HostAdapterController
         return adapters;
     }
 
-    @RequestMapping(value = "/adapters/uploadFile", method = RequestMethod.POST)
+    @RequestMapping(value = "/adapters/updateToLatest", method = RequestMethod.POST)
     @ResponseBody
-    public void uploadFile(@RequestBody Adapter adapter)
+    public void updateFirmwareToLatest(@RequestBody List<Adapter> adapterList, @RequestParam("hostId") String hostId)
     {
         logger.info("start getting file as string content");
-        if (adapter.getFileData() != null && adapter.getId()!=null)
+        if (adapterList != null && hostId != null)
         {
             try
             {
-                hostAdapterService.uploadFile(adapter.getFileData(),adapter.getId());
+                hostAdapterService.updateFirmwareToLatest(adapterList, hostId);
             }
             catch (Exception e)
             {
                 logger.error("Exception while uploading binary file, error :" + e.getMessage());
             }
         }
+        logger.info("End getting file as string content");
+    }
+    @RequestMapping(value = "/adapters/updateCustom", method = RequestMethod.POST)
+    @ResponseBody
+    public void uploadFile(@RequestBody List<Adapter> adapter, @RequestParam("isLocal") boolean isLocal, @RequestParam("hostId") String hostId)
+    {
+        logger.info("start getting file as string content");
+        
         logger.info("End getting file as string content");
     }
 
