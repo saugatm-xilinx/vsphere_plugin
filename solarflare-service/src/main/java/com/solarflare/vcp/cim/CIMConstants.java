@@ -29,6 +29,7 @@ public interface CIMConstants
     
     String CONTROLLER_FW_IMAGE_PATH = "/firmware/v6.2.5.1000/mcfw.dat";
     String BOOTROM_FW_IMAGE_PATH = "/firmware/BootROM/mcfw.dat";
+    String METADATA_PATH = "/firmware/FirmwareMetadata.json";
     String PLUGIN_KEY = "com.solarflare.vcp";
     int FW_IMAGE_PORT = 8888;
     String DEFAULT_VERSION ="0.0.0.0";

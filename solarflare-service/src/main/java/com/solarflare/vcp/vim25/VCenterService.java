@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.cim.CIMInstance;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -524,11 +526,13 @@ public class VCenterService
                             adapter.setVersionUEFIROM(UEFIROMVersion);
 
                             // Get version from image binary for controller
-                            String latestControllerVersion = cim.getLatestControllerFWImageVersion(serviceContent, vimPort);
+                            CIMInstance fwInstance = cim.getFirmwareSoftwareInstallationInstance(cimHost);
+                            CIMInstance niCimInstance = cim.getNICCardInstance(cimHost, deviceId);
+                            String latestControllerVersion = cim.getLatestControllerFWImageVersion(serviceContent, vimPort,cimHost,fwInstance,niCimInstance);;
 
                             // Get latest version otherwise blank value if both are equal
                             String latestVersion = VCenterHelper.getLatestVersion(controllerVersion, latestControllerVersion);
-                            logger.debug("Gating latest version of controller is :" + latestVersion);
+                            logger.debug("Getting latest version of controller is :" + latestVersion);
                             // Check for latest version available
                             if (latestVersion.equals(latestControllerVersion))
                             {
@@ -537,8 +541,9 @@ public class VCenterService
                             else
                             {
                                 // Get version from image binary for BootRom
-                                String latestBootRomVersion = cim.getLatestBootROMFWImageVersion(serviceContent, vimPort);
-                                logger.debug("Gating latest version of BootRom is :" + latestBootRomVersion);
+                            	CIMInstance bootROMInstance = cim.getBootROMSoftwareInstallationInstance(cimHost);
+                            	String latestBootRomVersion = cim.getLatestBootROMFWImageVersion(serviceContent, vimPort,cimHost,bootROMInstance,niCimInstance);
+                                logger.debug("Getting latest version of BootRom is :" + latestBootRomVersion);
                                 String finalLatestBootVersion = VCenterHelper.getLatestVersion(bootROMVersion,
                                         latestBootRomVersion);
                                 if (latestBootRomVersion.equals(finalLatestBootVersion))
