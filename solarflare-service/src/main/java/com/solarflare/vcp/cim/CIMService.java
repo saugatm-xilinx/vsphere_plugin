@@ -430,8 +430,8 @@ public class CIMService {
 
 	}
 
-	public boolean isCustomFWImageCompatible(ServiceContent serviceContent, VimPortType vimPort, CIMHost cimHost,
-			CIMInstance fwInst, CIMInstance nicInstance, String deviceID, String path) throws Exception {
+	public boolean isCustomFWImageCompatible(CIMHost cimHost,
+			CIMInstance fwInst, CIMInstance nicInstance, URL url) throws Exception {
 		boolean isCompatible = false;
 
 		Map<String, String> params = getRequiredFwImageName(cimHost, fwInst, nicInstance);
@@ -441,22 +441,9 @@ public class CIMService {
 		logger.debug("Current firmware type : " + currentType);
 		logger.debug("Current firmware subtype : " + currentSubType);
 
-		// Get Type and SubType of given firmware image;
-		// TODO : get path from input param
-		// String urlPath = getPluginURL(serviceContent, vimPort,
-		// CIMConstants.PLUGIN_KEY);
-		// URL pluginURL = new URL(urlPath);
-		URL firmwareURL = new URL(path);
-
-		// TODO : check crtificate for https
-		// URL controllerFWImagePath = new URL("http", firmwareURL.getHost(),
-		// firmwareURL.getFile());
-
-		FileHeader header = getFileHeader(firmwareURL);
+		FileHeader header = getFileHeader(url);
 		int newType = header.getType();
 		int newSubType = header.getSubtype();
-
-		// TODO : add logs
 		logger.debug("Type from firmware file :" + newType);
 		logger.debug("Subtype from firmware file :" + newSubType);
 		if (currentType == newType && currentSubType == newSubType) {
@@ -476,7 +463,9 @@ public class CIMService {
 
 			// Create type for nicInstance and set input parameter
 			CIMDataType instanceType = new CIMDataType(nicInstance.getClassName());
-			CIMArgument<?> cimTarget = new CIMArgument<CIMInstance>(CIMConstants.TARGET, instanceType, nicInstance);
+			//CIMArgument<?> cimTarget = new CIMArgument<CIMInstance>(CIMConstants.TARGET, instanceType, nicInstance);
+			
+			CIMArgument<CIMObjectPath> cimTarget = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET, new CIMDataType(nicInstance.getClassName()), new CIMObjectPath(MOF.objectHandle(nicInstance.getObjectPath(), false, true)));
 
 			CIMArgument<?>[] cimArguments = { cimTarget }; // input parameters
 			CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output

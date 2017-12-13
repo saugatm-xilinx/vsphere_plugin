@@ -5,8 +5,8 @@ Tool: Bundlor 1.1.0.RELEASE
 Bundle-Name: solarflare-service
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: com.solarflare.vcp.solarflare-service
-Export-Package: com.solarflare.vcp.services;version="1.0.0",
- com.solarflare.vcp.mvc;version="1.0.0"
+Export-Package: com.solarflare.vcp.services;version="1.13.0",
+ com.solarflare.vcp.mvc;version="1.13.0"
 Import-Package: org.apache.commons.logging;version="1.1.1",
  com.vmware.vise.data;version="0",
  com.vmware.vise.data.query;version="0",
@@ -51,4 +51,9 @@ Import-Package: org.apache.commons.logging;version="1.1.1",
  org.sblim.slp.internal;version="2.1.1",
  org.sblim.slp.internal.msg;version="2.1.1",
  org.sblim.slp.internal.sa;version="2.1.1",
- org.sblim.slp.internal.ua;version="2.1.1"
+ org.sblim.slp.internal.ua;version="2.1.1",
+ com.google.gson.annotations;version="2.3.1",
+ com.google.gson.reflect;version="2.3.1",
+ com.google.gson.stream;version="2.3.1", 
+ com.google.gson.internal;version="2.3.1",
+ com.google.gson.internal.bind;version="2.3.1"

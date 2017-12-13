@@ -48,8 +48,8 @@ public class MetadataHelper {
 
 		Map<String, String> params = cim.getRequiredFwImageName(cimHost, sfFWInstance, nicInstance);
 
-		int currentType = Integer.parseInt(params.get(CIMConstants.TYPE));
-		int currentSubType = Integer.parseInt(params.get(CIMConstants.SUB_TYPE));
+		int currentType = Integer.parseInt(params.isEmpty()? "0":params.get(CIMConstants.TYPE));
+		int currentSubType = Integer.parseInt(params.isEmpty()? "0":params.get(CIMConstants.SUB_TYPE));
 
 		// get version for given Controller from metadata file
 		String urlPath = cim.getPluginURL(serviceContent, vimPort, CIMConstants.PLUGIN_KEY);

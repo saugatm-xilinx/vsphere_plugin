@@ -49,7 +49,7 @@ public interface CIMConstants
     String SUB_TYPE = "Subtype";
     String CURRENT_VERSION = "CurrentVersion";
     String FILE_NAME = "FileName";
-    String BASE64STR = "BAse64Str";
+    String BASE64STR = "Base64Str";
     String URI = "URI";
     String INSTALL_OPTIONS = "InstallOptions";
     String INSTALL_OPTIONS_VALUES = "InstallOptionsValues";

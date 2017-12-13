@@ -407,14 +407,14 @@ public class VCenterService
 
             }
 
-            // for (String key : nicGrp.keySet())
-            // {
-            // Adapter adapter = new Adapter();
-            // adapter.setName(key);
-            // adapter.setId(key);
-            // adapter.setChildren(nicGrp.get(key));
-            // adapters.add(adapter);
-            // }
+//             for (String key : nicGrp.keySet())
+//             {
+//             Adapter adapter = new Adapter();
+//             adapter.setName(key);
+//             adapter.setId(key);
+//             adapter.setChildren(nicGrp.get(key));
+//             adapters.add(adapter);
+//             }
         }
         return nicGrp;
     }
