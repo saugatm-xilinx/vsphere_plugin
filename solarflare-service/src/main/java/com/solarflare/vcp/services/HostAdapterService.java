@@ -56,6 +56,12 @@ public interface HostAdapterService
 
     boolean updateFirmwareToLatest(List<Adapter> adapterList, String hostId) throws Exception;
     
+    boolean customUpdateFirmwareFromLocal(List<Adapter> adapterList, String hostId, String base64Data) throws Exception;
+    
+    boolean customUpdateFirmwareFromURL(List<Adapter> adapterList, String hostId, String fwImagePath) throws Exception;
+    
+    
+    
     /**
      * Validate firmware binary file 
      * @param file

@@ -104,7 +104,7 @@ public class HostAdapterController
             }
             catch (Exception e)
             {
-                logger.error("Exception while uploading binary file, error :" + e.getMessage());
+                logger.error("Exception while updating firmware to latest, error :" + e.getMessage());
             }
         }
         logger.info("End getting file as string content");
@@ -114,7 +114,23 @@ public class HostAdapterController
     public void uploadFile(@RequestBody List<Adapter> adapter, @RequestParam("isLocal") boolean isLocal, @RequestParam("hostId") String hostId)
     {
         logger.info("start getting file as string content");
-        
+        try
+		{
+        	//TODO will change later
+        	String data = adapter.get(0).getFileData();
+			if (isLocal) 
+			{
+				hostAdapterService.customUpdateFirmwareFromLocal(adapter, hostId, data);
+			} 
+			else
+			{
+				hostAdapterService.customUpdateFirmwareFromURL(adapter, hostId, data);
+			}
+		}
+        catch(Exception e)
+        {
+        	logger.error("Exception while updating firmware, error :" + e.getMessage());
+        }
         logger.info("End getting file as string content");
     }
 

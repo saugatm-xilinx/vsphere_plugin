@@ -16,6 +16,7 @@ public interface CIMConstants
     String SF_SOFTWARE_INSTALLATION_SERVICE = "SF_SoftwareInstallationService";
     String SF_CONTROLLED_BY = "SF_ControlledBy";
     String SF_CONTROLLER_SOFTWARE_IDENTITY = "SF_ControllerSoftwareIdentity";
+    String SF_PROVIDER_LOG = "SF_ProviderLog";
     
     //Description for Controller and Boot ROM versions
     String DESC_CONTROLLER = "NIC MC Firmware";
@@ -41,6 +42,7 @@ public interface CIMConstants
     String SEND_FW_IMAGE_DATA = "SendFwImageData";
     String GET_LOCAL_FW_IMAGE_VERSION = "GetLocalFwImageVersion";
     String INSTALL_FROM_URI = "InstallFromURI";
+    String REMOVE_FW_IMAGE = "RemoveFwImage";
     
     //SolarFlare CIM methods params
     String TARGET = "Target";

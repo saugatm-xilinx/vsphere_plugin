@@ -394,7 +394,7 @@ public class CIMService {
 		return versionString;
 	}
 
-	private byte[] readData(URL toDownload, boolean readComplete) {
+	public byte[] readData(URL toDownload, boolean readComplete) {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
 		try {
@@ -430,8 +430,8 @@ public class CIMService {
 
 	}
 
-	public boolean isCustomFWImageCompatible(CIMHost cimHost,
-			CIMInstance fwInst, CIMInstance nicInstance, URL url) throws Exception {
+	public boolean isCustomFWImageCompatible(CIMHost cimHost, CIMInstance fwInst, CIMInstance nicInstance, byte[] bytes)
+			throws Exception {
 		boolean isCompatible = false;
 
 		Map<String, String> params = getRequiredFwImageName(cimHost, fwInst, nicInstance);
@@ -441,7 +441,7 @@ public class CIMService {
 		logger.debug("Current firmware type : " + currentType);
 		logger.debug("Current firmware subtype : " + currentSubType);
 
-		FileHeader header = getFileHeader(url);
+		FileHeader header = getFileHeader(bytes);
 		int newType = header.getType();
 		int newSubType = header.getSubtype();
 		logger.debug("Type from firmware file :" + newType);
@@ -463,9 +463,13 @@ public class CIMService {
 
 			// Create type for nicInstance and set input parameter
 			CIMDataType instanceType = new CIMDataType(nicInstance.getClassName());
-			//CIMArgument<?> cimTarget = new CIMArgument<CIMInstance>(CIMConstants.TARGET, instanceType, nicInstance);
-			
-			CIMArgument<CIMObjectPath> cimTarget = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET, new CIMDataType(nicInstance.getClassName()), new CIMObjectPath(MOF.objectHandle(nicInstance.getObjectPath(), false, true)));
+			// CIMArgument<?> cimTarget = new
+			// CIMArgument<CIMInstance>(CIMConstants.TARGET, instanceType,
+			// nicInstance);
+
+			CIMArgument<CIMObjectPath> cimTarget = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET,
+					new CIMDataType(nicInstance.getClassName()),
+					new CIMObjectPath(MOF.objectHandle(nicInstance.getObjectPath(), false, true)));
 
 			CIMArgument<?>[] cimArguments = { cimTarget }; // input parameters
 			CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
@@ -495,13 +499,10 @@ public class CIMService {
 		return params;
 	}
 
-	private FileHeader getFileHeader(URL filePath) {
+	public FileHeader getFileHeader(byte[] bytes) {
 		FileHeader header = new FileHeader();
 		Path path = null;
-		byte[] bytes = null;
 
-		boolean readComplete = false;
-		bytes = readData(filePath, readComplete);
 		ByteBuffer buffer = ByteBuffer.wrap(bytes);
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
 		int ih_magic = buffer.getInt();
@@ -580,7 +581,7 @@ public class CIMService {
 	private CIMInstance getProviderLogInstance(CIMHost cimHost) throws WBEMException {
 		CIMInstance plInstance = null;
 		CIMService cimUtil = new CIMService();
-		String cimClass = "SF_ProviderLog";
+		String cimClass = CIMConstants.SF_PROVIDER_LOG;
 		// Get SF_EthernetPort instance
 		Collection<CIMInstance> instances = cimUtil.getAllInstances(cimHost, CIMConstants.CIM_NAMESPACE, cimClass);
 		for (CIMInstance inst : instances) {
@@ -600,7 +601,7 @@ public class CIMService {
 		String pMethodName = CIMConstants.INSTALL_FROM_URI;
 
 		logger.debug("Updating nic object: " + nic.getObjectPath());
-		CIMArgument<CIMObjectPath> target = new CIMArgument<CIMObjectPath>("Target",
+		CIMArgument<CIMObjectPath> target = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET,
 				new CIMDataType(nic.getClassName()),
 				new CIMObjectPath(MOF.objectHandle(nic.getObjectPath(), false, true)));
 		CIMArgument<String> uri = new CIMArgument<String>(CIMConstants.URI, CIMDataType.STRING_T,
@@ -638,4 +639,136 @@ public class CIMService {
 		return false;
 	}
 
+	public void sendFWImageData(CIMHost cimHost, CIMInstance fw_inst, String data, String filePath) {
+
+		logger.info("Send Firmware Image Send");
+
+		try {
+			String cimClass = CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE;
+			WBEMClient client = getClient(cimHost, cimClass);
+			CIMArgument cimFilePath = new CIMArgument<String>(CIMConstants.FILE_NAME, CIMDataType.STRING_T, filePath);
+			CIMArgument cimFileData = new CIMArgument<String>(CIMConstants.BASE64STR, CIMDataType.STRING_T, data);
+			CIMArgument<?>[] cimArguments = { cimFilePath, cimFileData };
+			CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
+																		// parameters
+
+			Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.SEND_FW_IMAGE_DATA, cimArguments,
+					cimArgumentsOut);
+			int statusCode = Integer.parseInt(status.toString());
+			if (statusCode == 0) {
+				logger.info("'SendFwImageData' method invoked successfully!");
+			} else {
+				String errMsg = getLatestLogErrorMessage(cimHost);
+				throw new Exception(errMsg);
+			}
+		} catch (Exception e) {
+			logger.error("Failed to Send Firmware Image Data! " + e.getMessage());
+		}
+	}
+
+	public String startFwImageSend(CIMHost cimHost, CIMInstance fw_inst) {
+		String filePath = null;
+		logger.info("Start Firmware Image Send");
+
+		try {
+			String cimClass = CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE;
+			WBEMClient client = getClient(cimHost, cimClass);
+			CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
+																		// parameters
+
+			Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.START_FW_IMAGE_SEND, null,
+					cimArgumentsOut);
+			int statusCode = Integer.parseInt(status.toString());
+			if (statusCode == 0) {
+
+				logger.info("'StartFwImageSend' method invoked successfully!");
+
+				if (cimArgumentsOut[0] != null) {
+					filePath = cimArgumentsOut[0].getValue().toString();
+				}
+			} else {
+				String errMsg = getLatestLogErrorMessage(cimHost);
+				throw new Exception(errMsg);
+			}
+
+		} catch (Exception e) {
+			logger.error("Failed to Start Firmware Image Send! " + e.getMessage());
+		}
+		return filePath;
+	}
+	
+	public boolean removeFwImage(CIMHost cimHost, CIMInstance fw_inst, String tempFilePath) {
+		boolean isRemoved = false;
+		logger.info("Remove FW Image file");
+
+		try {
+			String cimClass = CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE;
+			WBEMClient client = getClient(cimHost, cimClass);
+			CIMArgument cimFilePath = new CIMArgument<String>(CIMConstants.FILE_NAME, CIMDataType.STRING_T, tempFilePath);
+			CIMArgument<?>[] cimArguments = { cimFilePath };
+			CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
+																		// parameters
+
+			Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.REMOVE_FW_IMAGE, cimArguments,
+					cimArgumentsOut);
+			int statusCode = Integer.parseInt(status.toString());
+			if (statusCode == 0) {
+				isRemoved = true;
+				logger.info("'RemoveFwImage' method invoked successfully!");
+
+			} else {
+				String errMsg = getLatestLogErrorMessage(cimHost);
+				throw new Exception(errMsg);
+			}
+
+		} catch (Exception e) {
+			logger.error("Failed to Remove Firmware Image! " + e.getMessage());
+		}
+		return isRemoved;
+	}
+
+
+	public void getLocalFwImageVersion(CIMHost cimHost, CIMInstance fw_inst, CIMInstance nicInstance, String filePath) {
+		logger.info("Getting Local Firmware Image Version");
+
+		try {
+			String cimClass = CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE;;
+			WBEMClient client = getClient(cimHost, cimClass);
+
+			// Create type for nicInstance and set input parameter
+			CIMDataType instanceType = new CIMDataType(nicInstance.getClassName());
+			CIMArgument<CIMObjectPath> cimTarget = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET,
+					new CIMDataType(nicInstance.getClassName()),
+					new CIMObjectPath(MOF.objectHandle(nicInstance.getObjectPath(), false, true)));
+			CIMArgument cimFilePath = new CIMArgument<String>(CIMConstants.FILE_NAME, CIMDataType.STRING_T, filePath);
+			CIMArgument<?>[] cimArguments = { cimTarget, cimFilePath }; // input
+																		// parameters
+			CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
+																		// parameters
+
+			Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.GET_LOCAL_FW_IMAGE_VERSION,
+					cimArguments, cimArgumentsOut);
+			int statusCode = Integer.parseInt(status.toString());
+			if (statusCode == 0) {
+
+				logger.info("'GetLocalFwImageVersion' method invoked successfully!");
+
+				for (int i = 0; i < cimArgumentsOut.length; i++) {
+					if (cimArgumentsOut[i] != null) {
+						System.out.println(
+								cimArgumentsOut[i].getName() + " : " + cimArgumentsOut[i].getValue().toString());
+					}
+				}
+			} else {
+				String errMsg = getLatestLogErrorMessage(cimHost);
+				throw new Exception(errMsg);
+			}
+
+		} catch (Exception e) {
+			logger.error("Failed to get required Firmware Image Name for given NIC instance! " + e.getMessage());
+		}
+
+	}
+
+	
 }

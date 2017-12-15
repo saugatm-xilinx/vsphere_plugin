@@ -18,17 +18,19 @@ public class FirmwareUpdateThread implements Runnable {
 	String adapterName;
 	CIMHost cimHost;
 	URL fwImagePath;
+	String data;
 	CIMService cim;
 	CIMInstance fw_inst;
 	CIMInstance nicInstance;
 	public static Map<String, Status> statusMap = new ConcurrentHashMap<>();
 
-	FirmwareUpdateThread(CIMService cim, CIMHost cimHost, URL fwImagePath, CIMInstance fw_inst,
+	FirmwareUpdateThread(CIMService cim, CIMHost cimHost, URL fwImagePath, String data, CIMInstance fw_inst,
 			CIMInstance nicInstance, String adapterName) {
 		this.adapterName = adapterName;
 		this.cim = cim;
 		this.cimHost = cimHost;
 		this.fwImagePath = fwImagePath;
+		this.data = data;
 		this.fw_inst = fw_inst;
 		this.nicInstance = nicInstance;
 	}
@@ -41,7 +43,14 @@ public class FirmwareUpdateThread implements Runnable {
 
 			// Validate before update
 			setStatus(UploadStatusEnum.VALIDATING.toString(), null);
-			boolean isCompatable = cim.isCustomFWImageCompatible(cimHost, fw_inst, nicInstance, fwImagePath);
+			byte[] bytes = null;
+			if(data != null && !data.isEmpty()) {
+				bytes = data.getBytes();
+			}else{
+				boolean readComplete = false;
+				bytes = cim.readData(fwImagePath, readComplete);
+			}
+			boolean isCompatable = cim.isCustomFWImageCompatible(cimHost, fw_inst, nicInstance, bytes);
 			if (isCompatable) {
 				setStatus(UploadStatusEnum.VALIDATED.toString(), null);
 				setStatus(UploadStatusEnum.UPLOADING.toString(), null);
