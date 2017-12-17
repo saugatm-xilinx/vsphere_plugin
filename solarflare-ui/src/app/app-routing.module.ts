@@ -14,6 +14,12 @@ import { EditChassisComponent } from "./views/modals/edit-chassis.component";
 import { ChassisSummaryComponent } from "./views/chassis-summary/chassis-summary.component";
 // [end-chassis-code]
 
+
+import {HostComponent} from "./views/host/host.component";
+import {OverviewComponent} from "./views/host/overview/overview.component";
+import {FwupdateComponent} from "./views/host/fwupdate/fwupdate.component";
+import {ConfigComponent} from "./views/host/config/config.component";
+
 /**
  * Supported routes and associated components
  */
@@ -51,6 +57,10 @@ const appRoutes: Routes = [
    { path: "chassis-manage/:id",    component: NYIComponent },
    { path: "edit-chassis/:id/:actionUid",   component: EditChassisComponent },
    // [end-chassis-code]
+
+    {
+        path: "host/:id", component: HostComponent
+    }
 ];
 
 /**

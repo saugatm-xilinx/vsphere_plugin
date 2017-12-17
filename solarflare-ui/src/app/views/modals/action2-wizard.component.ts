@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, ViewChild } from "@angular/core";
 
-import { Wizard } from "clarity-angular/wizard/wizard";
+import { Wizard } from "clarity-angular";
 import { GlobalsService }   from "../../shared/index";
 import { WebPlatform }  from "../../shared/vSphereClientSdkTypes";
 import { Host } from "../../services/host.model";

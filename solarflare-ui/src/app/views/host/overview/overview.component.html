@@ -1,0 +1,63 @@
+<div class="row">
+
+    <div class="col-md-12">
+
+        <div style="padding:20px;" class="container-fluid">
+            <img src="../../../../assets/images/sf-logo.png" width="140px">
+            <div style="text-align: right;">
+                <div class="btn-group">
+                    <button class="btn">Refresh</button>
+                    <button class="btn btn-info">Help</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div style="text-align: center">
+                    <span class="spinner spinner-lg" *ngIf="(hostDetail|json) === '{}' ">
+            Loading...
+        </span>
+        </div>
+    <div class="row" *ngIf="(hostDetail|json) !== '{}' ">
+            <div class="container-fluid">
+                <div style="padding: 40px;">
+
+                    <table class="host-overview">
+                        <tr>
+                            <td rowspan="4">
+                                <img src="../../../../assets/images/host.png" width="160px">
+                            </td>
+                            <td>Adaptors <span class="pull-right">({{hostDetail.adapterCount}})</span></td>
+                            <td colspan="2" style="height: 2em">
+                                <img class="icos" style="float: left; margin-left: 2px"
+                                     *ngFor="let adapter of [] | range:hostDetail.adapterCount"
+                                     src="../../../../assets/images/adaptor_.png" width="48px"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Ports <span class="pull-right">({{hostDetail.portCount}})</span></td>
+                            <td colspan="2" style="height: 2em;">
+                                <img class="icos" style="float: left; margin-left: 2px"
+                                     *ngFor="let port of [] | range:hostDetail.portCount"
+                                     src="../../../../assets/images/port_.png" width="48px">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Driver Version</td>
+                            <td colspan="2">{{hostDetail.driverVersion}}</td>
+                        </tr>
+                        <tr>
+                            <td >CIM Provider Version</td>
+                            <td colspan="2">{{hostDetail.cimProviderVersion}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-center"><h3>{{hostDetail.name}}</h3></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

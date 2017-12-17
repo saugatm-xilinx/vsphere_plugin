@@ -1,7 +1,9 @@
-import { Component, Injector, ChangeDetectorRef } from "@angular/core";
+import { Component, OnInit, Injector, ChangeDetectorRef } from "@angular/core";
 
 import { GlobalsService, RefreshService, I18nService }   from "./shared/index";
 import { ActionDevService } from "./services/testing/action-dev.service";
+import { AppMainService} from "./services/app-main.service";
+import {Http} from "@angular/http";
 
 @Component({
    selector: "my-app",
@@ -10,12 +12,16 @@ import { ActionDevService } from "./services/testing/action-dev.service";
    providers: [ ]
 })
 export class AppComponent {
+    public hosts: any;
+    public allHostUrl = this.gs.getWebContextPath() + '/rest/services/hosts';
 
    constructor(public  gs: GlobalsService,
                private injector: Injector,
                private refreshService: RefreshService,
                private i18nService: I18nService,
-               private changeDetector: ChangeDetectorRef) {
+               private changeDetector: ChangeDetectorRef,
+               private appMainService: AppMainService,
+               private http: Http) {
 
       // Refresh handler to be used in plugin mode
       this.gs.getWebPlatform().setGlobalRefreshHandler(this.refresh.bind(this), document);
@@ -30,7 +36,22 @@ export class AppComponent {
       this.i18nService.initLocale("en");
    }
 
-   refresh(): void {
+    ngOnInit(): void {
+       let url = "";
+       if (this.gs.isPluginMode()){
+           url = this.allHostUrl;
+       }else{
+           url = 'https://10.101.10.7/ui/solarflare/rest/services/hosts/';
+       }
+        this.http.get(url)
+            .subscribe(
+                data => { this.hosts = data.json() },
+                err => console.error(err)
+            );
+    }
+
+
+    refresh(): void {
       // This propagates the refresh event to views that have subscribed to the RefreshService
       this.refreshService.refreshView();
 

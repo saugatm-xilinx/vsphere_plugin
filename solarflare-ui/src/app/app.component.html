@@ -9,5 +9,35 @@
 
 </div>
 
-<!-- router will pick the view component to show here -->
-<router-outlet></router-outlet>
+<div class="main-container">
+    <div class="content-container">
+        <clr-vertical-nav [clrVerticalNavCollapsible]="Collapsible">
+            <clr-vertical-nav-group *ngFor="let host of hosts"
+                    routerLink="/host/{{host.id}}/overview" routerLinkActive="active">
+                <clr-icon shape="host" clrVerticalNavIcon></clr-icon>
+                    {{host.name}}
+                <clr-vertical-nav-group-children>
+                    <div style="margin-left:10px;">
+                    <clr-vertical-nav-group *ngFor="let adaptor of host.children"
+                                            routerLink="/adaptor/{{adaptor.id}}/overview"
+                                            routerLinkActive="active">
+                        <img src="../assets/images/adaptor.png" width="20px"/>
+                        {{adaptor.name}}
+                        <clr-vertical-nav-group-children>
+                            <a clrVerticalNavLink *ngFor="let nic of adaptor.children"
+                               routerLink="nic/{{nic.id}}"
+                               routerLinkActive="active">
+                                <img src="../assets/images/port.png" width="15px"/>
+                                {{nic.name}}
+                            </a>
+                        </clr-vertical-nav-group-children>
+                    </clr-vertical-nav-group>
+                    </div>
+                </clr-vertical-nav-group-children>
+            </clr-vertical-nav-group>
+        </clr-vertical-nav>
+        <div class="content-area">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>

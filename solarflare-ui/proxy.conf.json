@@ -1,6 +1,6 @@
 {
   "/ui": {
-    "target": "https://localhost:9443",
-    "secure": false
+    "target": "https://10.101.10.7/ui",
+    "secure": true
   }
 }

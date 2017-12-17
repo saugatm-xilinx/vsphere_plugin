@@ -3,8 +3,17 @@
 <!-- Dev mode header -->
 <app-header *ngIf="gs.showDevUI()" ></app-header>
 
+
+
+
+<div class="container">
+    Main works
+
+</div>
+
 <!-- ---------------------------- Main view content -------------------------------- -->
 
+<!--
 <div class="main-container">
 
    <div class="content-container">
@@ -13,12 +22,12 @@
             Home</clr-tab-link>
          <clr-tab-link [clrTabLinkId]="'echoTab'" [clrTabLinkActive]="isActiveTab('echoTab')">
             Echo Service</clr-tab-link>
-         <!-- [removable-chassis-code] -->
+         &lt;!&ndash; [removable-chassis-code] &ndash;&gt;
          <clr-tab-link [clrTabLinkId]="'chassisTab'" [clrTabLinkActive]="isActiveTab('chassisTab')">
             Chassis List</clr-tab-link>
-         <!-- [end-chassis-code] -->
+         &lt;!&ndash; [end-chassis-code] &ndash;&gt;
 
-         <!-- ------------------- Home tab ---------------------- -->
+         &lt;!&ndash; -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45; Home tab &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45; &ndash;&gt;
 
          <clr-tab-content [clrTabContentActive]="isActiveTab('homeTab')">
             <div class="content-area">
@@ -48,7 +57,7 @@
             </div>
          </clr-tab-content>
 
-         <!-- -------------------Echo service tab ---------------------- -->
+         &lt;!&ndash; -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;Echo service tab &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45; &ndash;&gt;
 
          <clr-tab-content [clrTabContentActive]="isActiveTab('echoTab')">
             <div class="content-area">
@@ -72,7 +81,7 @@
             </div>
          </clr-tab-content>
 
-         <!-- ------------------- Chassis tab ------------------[removable-chassis-code] -->
+         &lt;!&ndash; -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45; Chassis tab &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;[removable-chassis-code] &ndash;&gt;
 
          <clr-tab-content [clrTabContentActive]="isActiveTab('chassisTab')">
             <div class="content-area">
@@ -107,13 +116,14 @@
                </clr-datagrid>
             </div>
          </clr-tab-content>
-         <!-- [end-chassis-code] -->
+         &lt;!&ndash; [end-chassis-code] &ndash;&gt;
       </clr-tabs>
-      <!-- Dev mode sidenav to facilitate object navigation -->
+      &lt;!&ndash; Dev mode sidenav to facilitate object navigation &ndash;&gt;
       <sidenav *ngIf="gs.showSidenav()" style="order:-1"></sidenav>
 
    </div>
 </div>
+-->
 
 <!--
    Modal dialog for the echoService response. Two implementations are provided below:

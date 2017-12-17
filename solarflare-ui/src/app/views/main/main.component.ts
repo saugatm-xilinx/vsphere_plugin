@@ -3,7 +3,7 @@ import { Component, Input, OnInit, OnDestroy, ViewChild, Inject,
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 import { Subscription } from "rxjs/Subscription";
-import { TabLink } from "clarity-angular";
+
 
 import { EchoService, NavService }  from "../../services/index";
 import { GlobalsService, RefreshService,
@@ -181,10 +181,12 @@ export class MainComponent implements OnInit, OnDestroy {
       return (id === this.currentTab);
    }
 
+/*
    onTabSelected(event: TabLink) {
       this.appAlertService.closeAlert();
       this.currentTab = event.id;
       this.userSettingService.setSetting("mainTab", event.id);
       this.refreshView();
    }
+*/
 }
