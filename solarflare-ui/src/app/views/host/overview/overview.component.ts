@@ -10,7 +10,7 @@ import {Subscription} from 'rxjs/Subscription';
     styleUrls: ['./overview.component.scss']
 })
 
-export class OverviewComponent implements OnInit, OnDestroy {
+export class OverviewComponent implements OnInit {
     subscription: Subscription;
     public hostDetailUrl = this.gs.getWebContextPath() + '/rest/services/hosts/';
     public params = {};
@@ -46,8 +46,6 @@ export class OverviewComponent implements OnInit, OnDestroy {
             );
     }
 
-    ngOnDestroy() {
-    }
 
 
 }

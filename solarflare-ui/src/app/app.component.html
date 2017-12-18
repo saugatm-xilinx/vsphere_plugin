@@ -21,7 +21,7 @@
                     <clr-vertical-nav-group *ngFor="let adaptor of host.children"
                                             routerLink="/adaptor/{{adaptor.id}}"
                                             routerLinkActive="active">
-                        <img src="../assets/images/adaptor.png" width="20px"/>
+                        <img src="../solarflare/assets/images/adaptor.png" width="20px"/>
                         {{adaptor.name}}
                         <clr-vertical-nav-group-children>
                             <a clrVerticalNavLink *ngFor="let nic of adaptor.children"

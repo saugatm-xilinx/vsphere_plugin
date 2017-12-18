@@ -7,7 +7,7 @@ import {Router, ActivatedRoute, Params} from '@angular/router';
   templateUrl: './host.component.html',
   styleUrls: ['./host.component.scss']
 })
-export class HostComponent implements OnInit, OnDestroy {
+export class HostComponent implements OnInit {
 
 
   constructor(private router: Router,
@@ -17,13 +17,7 @@ export class HostComponent implements OnInit, OnDestroy {
       this.router.navigate(['overview'], {relativeTo: this.activatedRoute})
   }
 
-
-
-    ngOnDestroy(){
-    }
-
-
-    redirect(route) {
+  redirect(route) {
         this.router.navigate([route], {relativeTo: this.activatedRoute})
     }
 }

@@ -33,7 +33,7 @@ export class FwupdateComponent implements OnInit {
     getAdapterList() {
         let url = "";
         if (this.gs.isPluginMode()) {
-            url = this.hostAdaptersListUrl + this.params['id'] + '/';
+            url = this.hostAdaptersListUrl + this.params['id'] + '/adapters/';
         } else {
             url = 'https://10.101.10.7/ui/solarflare/rest/services/hosts/' + this.params['id'] + '/adapters/';
         }

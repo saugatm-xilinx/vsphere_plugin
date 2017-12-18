@@ -24,7 +24,7 @@
     <div class="col-md-12">
 
         <div style="padding:20px;" class="container-fluid">
-            <img src="../assets/images/sf-logo.png" width="140px">
+            <img src="../solarflare/assets/images/sf-logo.png" width="140px">
             <div style="text-align: right;">
                 <div class="btn-group">
                     <button class="btn">Refresh</button>
@@ -73,7 +73,6 @@
                     </tbody>
                 </table>
 
-
             </div>
             <div class="col-md-12" style="text-align: center;">
                 <button class="btn btn-outline"
@@ -87,7 +86,7 @@
             </div>
         </div>
 
-        <clr-datagrid *ngIf="(adapterList|json) != '[]'" [(clrDgSelected)]="selected">
+<!--        <clr-datagrid *ngIf="(adapterList|json) != '[]'" [(clrDgSelected)]="selected">
             <clr-dg-column>Adapter Name</clr-dg-column>
             <clr-dg-column>VMware f/w version</clr-dg-column>
             <clr-dg-column>Controller Version</clr-dg-column>
@@ -102,7 +101,7 @@
             <clr-dg-footer>{{adapterList.length}} Adapters</clr-dg-footer>
         </clr-datagrid>
 
-        Selected adapters: <span *ngFor="let ad of selected">{{ad.name}}</span>
+        Selected adapters: <span *ngFor="let ad of selected">{{ad.name}}</span>-->
     </div>
 
 </div>

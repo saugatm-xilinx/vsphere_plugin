@@ -1,4 +1,4 @@
-import {Component, OnInit, Injector, ChangeDetectorRef} from "@angular/core";
+import {Component, Injector, ChangeDetectorRef} from "@angular/core";
 
 import {GlobalsService, RefreshService, I18nService} from "./shared/index";
 import {ActionDevService} from "./services/testing/action-dev.service";
@@ -11,6 +11,7 @@ import {Http} from "@angular/http";
     templateUrl: "./app.component.html",
     providers: []
 })
+
 export class AppComponent {
     public hosts: any;
     public allHostUrl = this.gs.getWebContextPath() + '/rest/services/hosts/';
