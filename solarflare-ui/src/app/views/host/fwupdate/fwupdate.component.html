@@ -48,7 +48,7 @@
             <div class="col-md-12">
                 <clr-datagrid *ngIf="(adapterList|json) != '[]'" [(clrDgSelected)]="selected">
                     <clr-dg-column>Adapter Name</clr-dg-column>
-                    <clr-dg-column>VMware f/w version</clr-dg-column>
+                    <clr-dg-column>Firmware Family Version</clr-dg-column>
                     <clr-dg-column>Controller Version</clr-dg-column>
                     <clr-dg-column>Boot Rom Version</clr-dg-column>
                     <clr-dg-column>UEFI Rom Version</clr-dg-column>
@@ -60,7 +60,6 @@
                         <clr-dg-cell>{{ad.versionController}}</clr-dg-cell>
                         <clr-dg-cell>{{ad.versionBootROM}}</clr-dg-cell>
                         <clr-dg-cell>{{ad.versionUEFIROM}}</clr-dg-cell>
-                        <clr-dg-cell>{{ad.versionBootROM}}</clr-dg-cell>
                         <clr-dg-cell>
                              <span *ngIf="ad.laterVersionAvailable">
                                     Yes
