@@ -13,13 +13,13 @@
     <div class="content-container">
         <clr-vertical-nav [clrVerticalNavCollapsible]="Collapsible">
             <clr-vertical-nav-group *ngFor="let host of hosts"
-                    routerLink="/host/{{host.id}}/overview" routerLinkActive="active">
+                    routerLink="/host/{{host.id}}" routerLinkActive="active">
                 <clr-icon shape="host" clrVerticalNavIcon></clr-icon>
                     {{host.name}}
                 <clr-vertical-nav-group-children>
                     <div style="margin-left:10px;">
                     <clr-vertical-nav-group *ngFor="let adaptor of host.children"
-                                            routerLink="/adaptor/{{adaptor.id}}/overview"
+                                            routerLink="/adaptor/{{adaptor.id}}"
                                             routerLinkActive="active">
                         <img src="../assets/images/adaptor.png" width="20px"/>
                         {{adaptor.name}}

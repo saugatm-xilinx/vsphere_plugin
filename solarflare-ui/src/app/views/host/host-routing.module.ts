@@ -6,7 +6,10 @@ import {ConfigComponent} from "./config/config.component";
 import {HostComponent} from "./host.component";
 
 const routes: Routes = [
+    { path: "host/:id", redirectTo: "overview", pathMatch: "full" },
+
     {
+
         path: "host/:id", component: HostComponent, children: [
         {path: "overview", component: OverviewComponent},
         {path: "fwupdate", component: FwupdateComponent},

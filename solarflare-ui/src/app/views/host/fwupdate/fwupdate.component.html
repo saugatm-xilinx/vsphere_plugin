@@ -1,3 +1,91 @@
-<p>
-  fwupdate works!
-</p>
+<clr-modal [(clrModalOpen)]="customUpdateModal" [clrModalClosable]="false" [clrModalStaticBackdrop]="true">
+    <h3 class="modal-title">No "x" in the top-right corner</h3>
+    <div class="modal-body">
+        <p>Custom</p>
+    </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" type="button" (click)="customUpdateModal = false">Cancel</button>
+            <button class="btn btn-primary" type="button">Update</button>
+        </div>
+</clr-modal>
+<clr-modal [(clrModalOpen)]="latestUpdateModal" [clrModalClosable]="false" [clrModalStaticBackdrop]="true">
+    <h3 class="modal-title">No "x" in the top-right corner</h3>
+    <div class="modal-body">
+        <p>Latest.</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-outline" type="button" (click)="latestUpdateModal = false">Cancel</button>
+        <button class="btn btn-primary" type="button">Update</button>
+    </div>
+</clr-modal>
+
+<div class="row">
+
+    <div class="col-md-12">
+
+        <div style="padding:20px;" class="container-fluid">
+            <img src="../assets/images/sf-logo.png" width="140px">
+            <div style="text-align: right;">
+                <div class="btn-group">
+                    <button class="btn">Refresh</button>
+                    <button class="btn btn-info">Help</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-md-12">
+        <div style="text-align: center">
+            <span class="spinner spinner-lg" *ngIf="(adapterList|json) === '[]' ">
+            Loading..
+            </span>
+        </div>
+        <div class="row" *ngIf="(adapterList|json) != '[]'" >
+            <div class="col-md-12">
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <th width="25"><input type="checkbox"></th>
+                        <th>Adapter name</th>
+                        <th>VMware f/w Version</th>
+                        <th>Controller Version</th>
+                        <th>Boot ROM Version</th>
+                        <th>UEFI ROM Version</th>
+                        <th>Later Version Available</th>
+                    </tr>
+                    <tr *ngFor="let adapter of adapterList">
+                        <td width="25"><input type="checkbox"></td>
+                        <td>{{adapter.name}}</td>
+                        <td>{{adapter.versionFirmware}}</td>
+                        <td>{{adapter.versionController}}</td>
+                        <td>{{adapter.versionBootROM}}</td>
+                        <td>{{adapter.versionUEFIROM}}</td>
+                        <td>
+                                <span *ngIf="adapter.laterVersionAvailable">
+                                    Yes
+                                </span>
+                            <span *ngIf="!adapter.laterVersionAvailable">
+                                    No
+                                </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+
+            </div>
+            <div class="col-md-12" style="text-align: center;">
+                <button class="btn btn-outline"
+                        [ngClass]="{'btn-default': updatable.latest}"
+                        (click)="latestUpdateModal = true">Update Latest
+                </button>
+                <button class="btn btn-outline"
+                        [ngClass]="{'btn-default': updatable.custom}"
+                        (click)="customUpdateModal = true" >Update Custom
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>

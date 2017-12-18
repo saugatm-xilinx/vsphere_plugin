@@ -8,12 +8,14 @@ import {FwupdateComponent} from "./fwupdate/fwupdate.component";
 import {ConfigComponent} from "./config/config.component";
 import {ClrTabsModule} from "clarity-angular";
 import {RangePipe} from "../../range.pipe";
+import {ClrModalModule} from "clarity-angular";
 
 @NgModule({
   imports: [
     CommonModule,
     HostRoutingModule,
-      ClrTabsModule
+      ClrTabsModule,
+      ClrModalModule
   ],
   declarations: [HostComponent, OverviewComponent, FwupdateComponent, ConfigComponent, RangePipe]
 })

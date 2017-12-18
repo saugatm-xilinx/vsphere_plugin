@@ -14,8 +14,7 @@ export class HostComponent implements OnInit, OnDestroy {
               private activatedRoute: ActivatedRoute) { }
 
   ngOnInit() {
-
-
+      this.router.navigate(['overview'], {relativeTo: this.activatedRoute})
   }
 
 
