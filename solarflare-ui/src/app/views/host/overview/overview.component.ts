@@ -42,15 +42,15 @@ export class OverviewComponent implements OnInit {
                 data => {
                     this.hostDetail = data.json()
                 },
-                err => console.error(err)
+                err => {
+                    console.error(err);
+                    this.devMode();
+                }
+
             );
     }
 
-
-
-}
-
-/*
+    devMode() {
         this.hostDetail = {
             "type": "HOST",
             "id": "host-9",
@@ -61,5 +61,7 @@ export class OverviewComponent implements OnInit {
             "driverVersion": "444",
             "cimProviderVersion": "2222"
         };
+    }
 
- */
+}
+

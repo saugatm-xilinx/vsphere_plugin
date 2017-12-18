@@ -1,9 +1,9 @@
 
 
 
-{ "app.name": "solarflare",
-"app.mainView": "solarflare Main View",
-"app.settingView": "solarflare Settings View",
+{ "app.name": "Solarflare",
+"app.mainView": "Solarflare",
+"app.settingView": "Solarflare Settings",
 "settings": "Settings",
 
 "sampleAction1.name": "Action1 - dialog",

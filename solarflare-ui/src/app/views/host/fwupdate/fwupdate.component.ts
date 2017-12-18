@@ -44,7 +44,7 @@ export class FwupdateComponent implements OnInit {
                 },
                 err => {
                     console.error(err);
-                    //this.devMode();
+                    this.devMode();
                 }
             );
     }

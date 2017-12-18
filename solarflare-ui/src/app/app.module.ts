@@ -27,7 +27,6 @@ import { InMemoryDataService } from "./services/chassis/in-memory-data.service";
 // [end-chassis-code]
 import { UserSettingService } from "app/shared/user-settings.service";
 import {HostModule} from "./views/host/host.module";
-import {AppMainService} from "./services/app-main.service";
 import {HTTP_INTERCEPTORS, HttpClient, HttpHandler} from "@angular/common/http";
 
 
@@ -69,7 +68,6 @@ import {HTTP_INTERCEPTORS, HttpClient, HttpHandler} from "@angular/common/http";
       NavService,
       RefreshService,
       UserSettingService,
-       AppMainService,
        HttpClient
    ],
    bootstrap: [AppComponent]

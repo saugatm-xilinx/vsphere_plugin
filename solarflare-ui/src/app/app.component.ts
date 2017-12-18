@@ -21,7 +21,6 @@ export class AppComponent {
                 private refreshService: RefreshService,
                 private i18nService: I18nService,
                 private changeDetector: ChangeDetectorRef,
-                private appMainService: AppMainService,
                 private http: Http) {
 
         // Refresh handler to be used in plugin mode
@@ -49,25 +48,14 @@ export class AppComponent {
                 data => {
                     this.hosts = data.json()
                 },
-                err => console.error(err)
+                err => {
+                    console.error(err);
+                    this.devMode();
+                }
             );
     }
 
-
-    refresh(): void {
-        // This propagates the refresh event to views that have subscribed to the RefreshService
-        this.refreshService.refreshView();
-
-        if (this.gs.isPluginMode()) {
-            // This helps refresh the app's children components in Plugin mode after refreshView
-            this.changeDetector.detectChanges();
-        }
-    }
-}
-
-
-/*
-
+    devMode(){
         this.hosts = [{
             "type": "HOST",
             "id": "host-9",
@@ -184,5 +172,22 @@ export class AppComponent {
             "driverVersion": "444",
             "cimProviderVersion": "2222"
         }];
+    }
 
- */
+
+
+    refresh(): void {
+        // This propagates the refresh event to views that have subscribed to the RefreshService
+        this.refreshService.refreshView();
+
+        if (this.gs.isPluginMode()) {
+            // This helps refresh the app's children components in Plugin mode after refreshView
+            this.changeDetector.detectChanges();
+        }
+    }
+}
+
+
+
+
+
