@@ -20,7 +20,7 @@ export class FwupdateComponent implements OnInit {
         latest: false,
         custom: false
     };
-    public selected = false;
+    public selected = [];
 
     constructor(private activatedRoute: ActivatedRoute,
                 private http: Http,
@@ -42,7 +42,10 @@ export class FwupdateComponent implements OnInit {
                 data => {
                     this.adapterList = data.json()
                 },
-                err => console.error(err)
+                err => {
+                    console.error(err);
+                    //this.devMode();
+                }
             );
     }
 
@@ -50,9 +53,7 @@ export class FwupdateComponent implements OnInit {
         this.getAdapterList();
     }
 
-}
-
-/*
+    devMode() {
         this.adapterList = [{
             "name": "Solarflare SFC9220",
             "type": "ADAPTER",
@@ -160,5 +161,9 @@ export class FwupdateComponent implements OnInit {
             }],
             "laterVersionAvailable": true
         }];
+    }
 
- */
+}
+
+
+
