@@ -20,6 +20,7 @@ export class FwupdateComponent implements OnInit {
         latest: false,
         custom: false
     };
+    public selected = false;
 
     constructor(private activatedRoute: ActivatedRoute,
                 private http: Http,

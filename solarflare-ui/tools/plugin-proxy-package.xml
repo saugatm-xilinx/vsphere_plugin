@@ -13,8 +13,8 @@
    type: keep "html" for this plugin to be deployed in the vSphere HTML client.
    name: short name displayed in the Administration < Client plugins view
 -->
-<pluginPackage id="com.solarflare.vcp" version="1.0.0" type="html" name="solarflare"
-               description="Add plugin description" vendor="Add vendor">
+<pluginPackage id="com.solarflare.vcp" version="1.0.0" type="html" name="Solarflare"
+               description="Solarflare VCP Plugin" vendor="Solarflare">
 
    <dependencies>
       <!--

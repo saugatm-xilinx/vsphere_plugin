@@ -86,6 +86,23 @@
                 </button>
             </div>
         </div>
+
+        <clr-datagrid *ngIf="(adapterList|json) != '[]'" [(clrDgSelected)]="selected">
+            <clr-dg-column>Adapter Name</clr-dg-column>
+            <clr-dg-column>VMware f/w version</clr-dg-column>
+            <clr-dg-column>Controller Version</clr-dg-column>
+            <clr-dg-column>Boot Rom Version</clr-dg-column>
+
+            <clr-dg-row *clrDgItems="let ad of adapterList" [clrDgItem]="ad">
+                <clr-dg-cell>{{ad.name}}</clr-dg-cell>
+                <clr-dg-cell>{{ad.versionFirmware}}</clr-dg-cell>
+                <clr-dg-cell>{{ad.versionController}}</clr-dg-cell>
+                <clr-dg-cell>{{ad.versionBootROM}}</clr-dg-cell>
+            </clr-dg-row>
+            <clr-dg-footer>{{adapterList.length}} Adapters</clr-dg-footer>
+        </clr-datagrid>
+
+        Selected adapters: <span *ngFor="let ad of selected">{{ad.name}}</span>
     </div>
 
 </div>

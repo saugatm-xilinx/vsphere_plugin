@@ -3,7 +3,7 @@
     <div class="col-md-12">
 
         <div style="padding:20px;" class="container-fluid">
-            <img src="../assets/images/sf-logo.png" width="140px">
+            <img src="../solarflare/assets/images/sf-logo.png" width="140px">
             <div style="text-align: right;">
                 <div class="btn-group">
                     <button class="btn">Refresh</button>
@@ -28,13 +28,13 @@
                     <table class="host-overview">
                         <tr>
                             <td rowspan="4">
-                                <img src="../assets/images/host.png" width="160px">
+                                <img src="../solarflare/assets/images/host.png" width="160px">
                             </td>
                             <td>Adaptors <span class="pull-right">({{hostDetail.adapterCount}})</span></td>
                             <td colspan="2" style="height: 2em">
                                 <img class="icos" style="float: left; margin-left: 2px"
                                      *ngFor="let adapter of [] | range:hostDetail.adapterCount"
-                                     src="../assets/images/adaptor_.png" width="48px"/>
+                                     src="../solarflare/assets/images/adaptor_.png" width="48px"/>
                             </td>
                         </tr>
                         <tr>
@@ -42,7 +42,7 @@
                             <td colspan="2" style="height: 2em;">
                                 <img class="icos" style="float: left; margin-left: 2px"
                                      *ngFor="let port of [] | range:hostDetail.portCount"
-                                     src="../assets/images/port_.png" width="48px">
+                                     src="../solarflare/assets/images/port_.png" width="48px">
                             </td>
                         </tr>
                         <tr>

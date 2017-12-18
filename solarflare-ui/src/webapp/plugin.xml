@@ -57,7 +57,7 @@
    <extension id="com.solarflare.vcp.mainView">
       <extendedPoint>vise.global.views</extendedPoint>
       <object>
-         <name> </name>
+         <name>Solarflare</name>
          <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
             <object>
                <root>

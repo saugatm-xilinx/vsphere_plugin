@@ -9,13 +9,15 @@ import {ConfigComponent} from "./config/config.component";
 import {ClrTabsModule} from "clarity-angular";
 import {RangePipe} from "../../range.pipe";
 import {ClrModalModule} from "clarity-angular";
+import {ClrDatagridModule} from "clarity-angular";
 
 @NgModule({
   imports: [
     CommonModule,
     HostRoutingModule,
       ClrTabsModule,
-      ClrModalModule
+      ClrModalModule,
+      ClrDatagridModule
   ],
   declarations: [HostComponent, OverviewComponent, FwupdateComponent, ConfigComponent, RangePipe]
 })
