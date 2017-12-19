@@ -2,7 +2,7 @@
     <h3 class="modal-title">Custom Update</h3>
     <div class="modal-body">
         <p>To be implemented</p>
-        Selected adapters: <span *ngFor="let ad of selected">{{ad.id}}</span>
+        Selected adapters: <span *ngFor="let ad of selectedAdapters">{{ad.id}}</span>
 
     </div>
     <div class="modal-footer">
@@ -13,12 +13,55 @@
 <clr-modal [(clrModalOpen)]="latestUpdateModal" [clrModalClosable]="false" [clrModalStaticBackdrop]="true">
     <h3 class="modal-title">Latest Update</h3>
     <div class="modal-body">
-        <p>To be implemented</p>
-        Selected adapters: <span *ngFor="let ad of selected">{{ad.id}}</span>
+        <clr-datagrid>
+            <clr-dg-column>Adapter Name</clr-dg-column>
+            <clr-dg-column>Controller Version</clr-dg-column>
+            <clr-dg-column>Boot Rom Version</clr-dg-column>
+
+            <clr-dg-row *clrDgItems="let ad of selectedAdapters"
+                        [clrDgItem]="ad">
+                <clr-dg-cell >{{ad.name}}</clr-dg-cell>
+                <clr-dg-cell>{{ad.versionController}}</clr-dg-cell>
+                <clr-dg-cell>{{ad.versionBootROM}}</clr-dg-cell>
+            </clr-dg-row>
+        </clr-datagrid>
+
     </div>
     <div class="modal-footer">
         <button class="btn btn-outline" type="button" (click)="latestUpdateModal = false">Cancel</button>
-        <button class="btn btn-primary" type="button">Update</button>
+        <button class="btn btn-primary" type="button" (click)="latestUpdate(); latestUpdateModal = false;">Update</button>
+    </div>
+</clr-modal>
+
+<clr-modal [(clrModalOpen)]="validateLatestUpdateModal" >
+    <h3 class="modal-title">Latest version not found for adapters</h3>
+    <div class="modal-body">
+
+        <clr-datagrid>
+            <clr-dg-column>Adapter Name</clr-dg-column>
+            <clr-dg-column>Controller Version</clr-dg-column>
+            <clr-dg-column>Boot Rom Version</clr-dg-column>
+            <clr-dg-column>Later Version Available</clr-dg-column>
+
+            <clr-dg-row *clrDgItems="let ad of selectedAdapters"
+                        [clrDgItem]="ad" [hidden]="ad.laterVersionAvailable">
+                <clr-dg-cell >{{ad.name}}</clr-dg-cell>
+                <clr-dg-cell>{{ad.versionController}}</clr-dg-cell>
+                <clr-dg-cell>{{ad.versionBootROM}}</clr-dg-cell>
+                <clr-dg-cell>
+                    <span *ngIf="!ad.laterVersionAvailable">
+                        <b style="font-size: large">No</b>
+                    </span>
+                </clr-dg-cell>
+            </clr-dg-row>
+        </clr-datagrid>
+
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-outline" type="button"
+                (click)="validateLatestUpdateModal = false">Cancel</button>
+        <button class="btn btn-primary" type="button" *ngIf="updatable.latest"
+                (click)="validateLatestUpdate('remove')" >Remove and continue</button>
     </div>
 </clr-modal>
 
@@ -30,7 +73,7 @@
             <img src="../solarflare/assets/images/sf-logo.png" width="140px">
             <div style="text-align: right;">
                 <div class="btn-group">
-                    <button class="btn">Refresh</button>
+                    <button class="btn" (click)="getAdapterList()">Refresh</button>
                     <button class="btn btn-info">Help</button>
                 </div>
             </div>
@@ -46,7 +89,8 @@
         </div>
         <div class="row" *ngIf="(adapterList|json) != '[]'">
             <div class="col-md-12">
-                <clr-datagrid *ngIf="(adapterList|json) != '[]'" [(clrDgSelected)]="selected">
+                <clr-datagrid *ngIf="(adapterList|json) != '[]'" [(clrDgSelected)]="selectedAdapters">
+                    <clr-dg-placeholder>We couldn't find any adapters!</clr-dg-placeholder>
                     <clr-dg-column>Adapter Name</clr-dg-column>
                     <clr-dg-column>Firmware Family Version</clr-dg-column>
                     <clr-dg-column>Controller Version</clr-dg-column>
@@ -54,13 +98,17 @@
                     <clr-dg-column>UEFI Rom Version</clr-dg-column>
                     <clr-dg-column>Later Version Available</clr-dg-column>
 
-                    <clr-dg-row *clrDgItems="let ad of adapterList" [clrDgItem]="ad">
-                        <clr-dg-cell>{{ad.name}}</clr-dg-cell>
+                    <clr-dg-row [ngStyle]="{'background-color' : ad.status !== null ? '#E3DDD1' : 'inherit'}"
+                             *clrDgItems="let ad of adapterList" [clrDgItem]="ad">
+                        <clr-dg-cell>
+                            {{ad.name}}
+                        </clr-dg-cell>
                         <clr-dg-cell>{{ad.versionFirmware}}</clr-dg-cell>
                         <clr-dg-cell>{{ad.versionController}}</clr-dg-cell>
                         <clr-dg-cell>{{ad.versionBootROM}}</clr-dg-cell>
                         <clr-dg-cell>{{ad.versionUEFIROM}}</clr-dg-cell>
-                        <clr-dg-cell>
+
+                        <clr-dg-cell *ngIf="ad.status == null">
                              <span *ngIf="ad.laterVersionAvailable">
                                     Yes
                                 </span>
@@ -68,18 +116,24 @@
                                     No
                                 </span>
                         </clr-dg-cell>
+
+                        <clr-dg-cell *ngIf="ad.status !== null">
+                            <span class="spinner spinner-sm"></span>
+                        </clr-dg-cell>
                     </clr-dg-row>
                     <clr-dg-footer>{{adapterList.length}} Adapters</clr-dg-footer>
                 </clr-datagrid>
             </div>
             <div class="col-md-12" style="text-align: center;">
-                <button class="btn btn-outline"
-                        [ngClass]="{'btn-default': updatable.latest}"
-                        (click)="latestUpdateModal = true">Update Latest
+                <button class="btn"
+                        (click)="validateLatestUpdate() && latestUpdateModal = true"
+                        [disabled]="selectedAdapters.length == 0" >
+                    Update Latest
                 </button>
                 <button class="btn btn-outline"
-                        [ngClass]="{'btn-default': updatable.custom}"
-                        (click)="customUpdateModal = true">Update Custom
+                        (click)="customUpdateModal = true"
+                        [disabled]="selectedAdapters.length == 0" >
+                    Update Custom
                 </button>
             </div>
         </div>
