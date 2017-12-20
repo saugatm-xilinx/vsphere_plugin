@@ -18,7 +18,9 @@ public class Adapter implements Serializable
     private String versionFirmware;
     private boolean isLaterVersionAvailable;
     private String fileData;
-
+    // default status and error message is null;
+    private List<Status> status;
+    
     List<VMNIC> children;
 
     public String getName()
@@ -81,13 +83,6 @@ public class Adapter implements Serializable
         this.id = id;
     }
 
-    @Override
-    public String toString()
-    {
-        return "Adapter [name=" + name + ", type=" + type + ", id=" + id + ", versionController=" + versionController
-                + ", versionBootROM=" + versionBootROM + ", versionUEFIROM=" + versionUEFIROM + ", vmnics=" + children + "]";
-    }
-
     public List<VMNIC> getChildren()
     {
         return children;
@@ -128,4 +123,20 @@ public class Adapter implements Serializable
         this.fileData = fileData;
     }
 
+	public List<Status> getStatus() {
+		return status;
+	}
+
+	public void setStatus(List<Status> status) {
+		this.status = status;
+	}
+
+	@Override
+	public String toString() {
+		return "Adapter [name=" + name + ", type=" + type + ", id=" + id + ", versionController=" + versionController
+				+ ", versionBootROM=" + versionBootROM + ", versionUEFIROM=" + versionUEFIROM + ", versionFirmware="
+				+ versionFirmware + ", isLaterVersionAvailable=" + isLaterVersionAvailable + ", fileData=" + fileData
+				+ ", status=" + status + ", children=" + children + "]";
+	}
+	
 }

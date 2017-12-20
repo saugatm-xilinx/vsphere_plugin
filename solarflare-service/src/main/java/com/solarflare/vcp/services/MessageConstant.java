@@ -7,4 +7,8 @@ public interface MessageConstant
     String VALIDATION_FAIL = "Binary validation failed";
     String UPLOAD_FAIL = "Binary file uploading failed";
     
+	String CONTROLLER = "controller";
+	String BOOTROM = "BootROM";
+
+    
 }

@@ -71,6 +71,7 @@ public class MetadataHelper {
 			files = bootROM.getFiles();
 		}
 
+		//TODO: latest version
 		for (SfFirmware file : files) {
 			int type = Integer.parseInt(file.getType());
 			int subType = Integer.parseInt(file.getSubtype());

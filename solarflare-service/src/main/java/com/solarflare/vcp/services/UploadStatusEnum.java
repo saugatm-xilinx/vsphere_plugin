@@ -7,5 +7,6 @@ public enum UploadStatusEnum
     UPLOADING_FAIL,
     VALIDATING,
     VALIDATED,
-    VALIDATION_FAIL
+    VALIDATION_FAIL,
+    DONE
 }

@@ -1,7 +1,13 @@
 package com.solarflare.vcp.model;
 
-public class BinaryFiles {
+import java.io.Serializable;
 
+public class BinaryFiles implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3013944344069991065L;
 	private Controller controller;
 	private BootROM bootROM;
 

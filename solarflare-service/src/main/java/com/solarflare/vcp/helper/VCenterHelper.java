@@ -166,4 +166,8 @@ public class VCenterHelper {
 			e.printStackTrace();
 		}
 	}
+	public static String  generateId(String hostId, String adapterId, String controller)
+	{
+		return hostId+"_"+adapterId+"_"+controller;
+	}
 }

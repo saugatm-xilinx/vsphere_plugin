@@ -8,7 +8,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -148,7 +147,7 @@ public class CIMService {
 		Collection<CIMInstance> instances = cimUtil.getAllInstances(cimHost, CIMConstants.CIM_NAMESPACE, cimClass);
 		for (CIMInstance inst : instances) {
 			String devId = (String) inst.getProperty("DeviceID").getValue();
-			String macAddress = (String) inst.getProperty("PermanentAddress").getValue();
+			//String macAddress = (String) inst.getProperty("PermanentAddress").getValue();
 			if (devId != null && devId.equals(deviceId)) {
 				ethernateInstance = inst;
 			}
@@ -178,7 +177,7 @@ public class CIMService {
 		// Get SF_ControllerSoftwareIdentity instance through association
 		inst = getAssociators(client, controlledByInstance.getObjectPath(), "SF_ControllerSoftwareIdentity", null,
 				"Dependent");
-		CIMInstance controllerSoftwareIdentityInstance = inst.next();
+		//CIMInstance controllerSoftwareIdentityInstance = inst.next();
 
 		// Get SF_CardRealizesController and NICCard instance through
 		// association
@@ -262,9 +261,9 @@ public class CIMService {
 	}
 
 	/**
-	 * The default PasswordCredential will prevent us from using sessionId's
-	 * that can be over 16 characters in length. Instead use inheritance to
-	 * force the PasswordCredential class to hold values longer than 16 chars.
+	 * The default PasswordCredential will prevent us from using sessionId's that
+	 * can be over 16 characters in length. Instead use inheritance to force the
+	 * PasswordCredential class to hold values longer than 16 chars.
 	 * <p>
 	 * 
 	 * @see javax.wbem.client.PasswordCredential
@@ -352,9 +351,7 @@ public class CIMService {
 		// versionString = getVersionFromBinaryFile(metaDataFilePath);
 		return versionString;
 	}
-
 	public String getVersionFromBinaryFile(URL filePath) throws URISyntaxException {
-		Path path = null;
 		byte[] bytes = null;
 		String versionString = "";
 
@@ -363,33 +360,7 @@ public class CIMService {
 		if (bytes == null) {
 			versionString = CIMConstants.DEFAULT_VERSION;
 		} else {
-			ByteBuffer buffer = ByteBuffer.wrap(bytes);
-			buffer.order(ByteOrder.LITTLE_ENDIAN);
-			int ih_magic = buffer.getInt();
-			int ih_version = buffer.getInt();
-			int ih_type = buffer.getInt();
-			int ih_subtype = buffer.getInt();
-			int ih_code_size = buffer.getInt();
-			int ih_size = buffer.getInt();
-
-			int ih_controller_version_min = buffer.getInt();
-
-			int ih_controller_version_max = buffer.getInt();
-
-			short ih_code_version_a = buffer.getShort();
-			short ih_code_version_b = buffer.getShort();
-			short ih_code_version_c = buffer.getShort();
-			short ih_code_version_d = buffer.getShort();
-			StringBuffer version = new StringBuffer();
-			version.append(ih_code_version_a);
-			version.append(".");
-			version.append(ih_code_version_b);
-			version.append(".");
-			version.append(ih_code_version_c);
-			version.append(".");
-			version.append(ih_code_version_d);
-
-			versionString = version.toString();
+			getFileHeader(bytes);
 		}
 		return versionString;
 	}
@@ -435,21 +406,27 @@ public class CIMService {
 		boolean isCompatible = false;
 
 		Map<String, String> params = getRequiredFwImageName(cimHost, fwInst, nicInstance);
-
+		logger.info("CIMInstance object path: " + fwInst.getObjectPath());
 		int currentType = Integer.parseInt(params.get(CIMConstants.TYPE));
 		int currentSubType = Integer.parseInt(params.get(CIMConstants.SUB_TYPE));
-		logger.debug("Current firmware type : " + currentType);
-		logger.debug("Current firmware subtype : " + currentSubType);
+		logger.info("Current firmware type : " + currentType);
+		logger.info("Current firmware subtype : " + currentSubType);
 
 		FileHeader header = getFileHeader(bytes);
+		logger.info("Headers: " + header);
 		int newType = header.getType();
 		int newSubType = header.getSubtype();
-		logger.debug("Type from firmware file :" + newType);
-		logger.debug("Subtype from firmware file :" + newSubType);
+		logger.info("New Type:" + newType);
+		logger.info("New Subtype:" + newSubType);
+		
 		if (currentType == newType && currentSubType == newSubType) {
 			isCompatible = true;
+			logger.info("Custom Firmeware Image compatable");
 		}
-
+		else
+		{
+			logger.info("Custom Firmeware Image not compatable");
+		}
 		return isCompatible;
 	}
 
@@ -460,12 +437,6 @@ public class CIMService {
 		try {
 			String cimClass = "SF_SoftwareInstallationService";
 			WBEMClient client = getClient(cimHost, cimClass);
-
-			// Create type for nicInstance and set input parameter
-			CIMDataType instanceType = new CIMDataType(nicInstance.getClassName());
-			// CIMArgument<?> cimTarget = new
-			// CIMArgument<CIMInstance>(CIMConstants.TARGET, instanceType,
-			// nicInstance);
 
 			CIMArgument<CIMObjectPath> cimTarget = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET,
 					new CIMDataType(nicInstance.getClassName()),
@@ -485,10 +456,13 @@ public class CIMService {
 				for (int i = 0; i < cimArgumentsOut.length; i++) {
 					if (cimArgumentsOut[i] != null) {
 						params.put(cimArgumentsOut[i].getName(), cimArgumentsOut[i].getValue().toString());
+						logger.info("getRequiredFwImageName:=> " + cimArgumentsOut[i].getName() + " = "
+								+ cimArgumentsOut[i].getValue().toString());
 					}
 				}
 			} else {
 				String errMsg = getLatestLogErrorMessage(cimHost);
+				logger.error(errMsg);
 				throw new Exception(errMsg);
 			}
 
@@ -501,7 +475,6 @@ public class CIMService {
 
 	public FileHeader getFileHeader(byte[] bytes) {
 		FileHeader header = new FileHeader();
-		Path path = null;
 
 		ByteBuffer buffer = ByteBuffer.wrap(bytes);
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -646,8 +619,8 @@ public class CIMService {
 		try {
 			String cimClass = CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE;
 			WBEMClient client = getClient(cimHost, cimClass);
-			CIMArgument cimFilePath = new CIMArgument<String>(CIMConstants.FILE_NAME, CIMDataType.STRING_T, filePath);
-			CIMArgument cimFileData = new CIMArgument<String>(CIMConstants.BASE64STR, CIMDataType.STRING_T, data);
+			CIMArgument<?> cimFilePath = new CIMArgument<String>(CIMConstants.FILE_NAME, CIMDataType.STRING_T, filePath);
+			CIMArgument<?> cimFileData = new CIMArgument<String>(CIMConstants.BASE64STR, CIMDataType.STRING_T, data);
 			CIMArgument<?>[] cimArguments = { cimFilePath, cimFileData };
 			CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
 																		// parameters
@@ -696,7 +669,7 @@ public class CIMService {
 		}
 		return filePath;
 	}
-	
+
 	public boolean removeFwImage(CIMHost cimHost, CIMInstance fw_inst, String tempFilePath) {
 		boolean isRemoved = false;
 		logger.info("Remove FW Image file");
@@ -704,7 +677,8 @@ public class CIMService {
 		try {
 			String cimClass = CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE;
 			WBEMClient client = getClient(cimHost, cimClass);
-			CIMArgument cimFilePath = new CIMArgument<String>(CIMConstants.FILE_NAME, CIMDataType.STRING_T, tempFilePath);
+			CIMArgument<?> cimFilePath = new CIMArgument<String>(CIMConstants.FILE_NAME, CIMDataType.STRING_T,
+					tempFilePath);
 			CIMArgument<?>[] cimArguments = { cimFilePath };
 			CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
 																		// parameters
@@ -727,20 +701,20 @@ public class CIMService {
 		return isRemoved;
 	}
 
-
 	public void getLocalFwImageVersion(CIMHost cimHost, CIMInstance fw_inst, CIMInstance nicInstance, String filePath) {
 		logger.info("Getting Local Firmware Image Version");
 
 		try {
-			String cimClass = CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE;;
+			String cimClass = CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE;
+			;
 			WBEMClient client = getClient(cimHost, cimClass);
 
 			// Create type for nicInstance and set input parameter
-			CIMDataType instanceType = new CIMDataType(nicInstance.getClassName());
+			//CIMDataType instanceType = new CIMDataType(nicInstance.getClassName());
 			CIMArgument<CIMObjectPath> cimTarget = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET,
 					new CIMDataType(nicInstance.getClassName()),
 					new CIMObjectPath(MOF.objectHandle(nicInstance.getObjectPath(), false, true)));
-			CIMArgument cimFilePath = new CIMArgument<String>(CIMConstants.FILE_NAME, CIMDataType.STRING_T, filePath);
+			CIMArgument<?> cimFilePath = new CIMArgument<String>(CIMConstants.FILE_NAME, CIMDataType.STRING_T, filePath);
 			CIMArgument<?>[] cimArguments = { cimTarget, cimFilePath }; // input
 																		// parameters
 			CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
@@ -770,5 +744,4 @@ public class CIMService {
 
 	}
 
-	
 }

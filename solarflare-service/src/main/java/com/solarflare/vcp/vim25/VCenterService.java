@@ -19,7 +19,10 @@ import com.solarflare.vcp.cim.CIMService;
 import com.solarflare.vcp.helper.VCenterHelper;
 import com.solarflare.vcp.model.Adapter;
 import com.solarflare.vcp.model.Host;
+import com.solarflare.vcp.model.Status;
+import com.solarflare.vcp.model.TaskStatus;
 import com.solarflare.vcp.model.VMNIC;
+import com.solarflare.vcp.services.MessageConstant;
 import com.vmware.vim25.DynamicProperty;
 import com.vmware.vim25.HostConfigInfo;
 import com.vmware.vim25.HostConfigManager;
@@ -210,7 +213,8 @@ public class VCenterService
                 {
                     Adapter adapter = new Adapter();
                     adapter.setName(key);
-                    adapter.setId(key);
+                    String id = nicGrp.get(key).get(0).getDeviceName();
+                    adapter.setId(id);
                     adapter.setChildren(nicGrp.get(key));
                     adapters.add(adapter);
                 }
@@ -505,9 +509,30 @@ public class VCenterService
                     {
                         Adapter adapter = new Adapter();
                         adapter.setName(key);
-                        adapter.setId(key);
+                        String id = nicGrp.get(key).get(0).getDeviceName();
+                        adapter.setId(id);
                         List<VMNIC> listNic = nicGrp.get(key);
                         adapter.setChildren(listNic);
+                        String statusControllerId = VCenterHelper.generateId(hostId,id, MessageConstant.CONTROLLER);
+                        String statusBootROMId = VCenterHelper.generateId(hostId,id, MessageConstant.BOOTROM);
+                        List<Status> listStatus = new ArrayList<Status>();
+                        if(adapter.getStatus() == null || adapter.getStatus().size() == 0) 
+                        {
+                        	adapter.setStatus(listStatus);
+                        }
+                        else
+                        {
+                        	listStatus = adapter.getStatus();
+                        }
+                        List<Status> cntStatusList = TaskStatus.getTaskStatus(statusControllerId);
+                        List<Status> bootRomStatusList = TaskStatus.getTaskStatus(statusBootROMId);
+                        
+                        // Set status for controller and bootrom
+                        listStatus.addAll(cntStatusList == null ? new ArrayList<Status>(): cntStatusList);
+                    	listStatus.addAll(bootRomStatusList == null ? new ArrayList<Status>(): bootRomStatusList);
+                    	
+                        adapter.setStatus(listStatus);
+                        
                         if (listNic != null && listNic.size() > 0)
                         {
                             String deviceId = listNic.get(0).getName();
