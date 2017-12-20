@@ -5,6 +5,7 @@ import java.util.List;
 import com.solarflare.vcp.model.Adapter;
 import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.NicBootParamInfo;
+import com.solarflare.vcp.model.Status;
 
 public interface HostAdapterService
 {
@@ -71,5 +72,7 @@ public interface HostAdapterService
      */
     
     boolean validateTypeAndSubTupe(String file, boolean isLocal) throws Exception;
+
+    List<Status> getStatus(String hostId, String adapterId) throws Exception;
 
 }
