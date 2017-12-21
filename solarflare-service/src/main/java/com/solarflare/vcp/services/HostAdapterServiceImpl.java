@@ -20,6 +20,7 @@ import com.solarflare.vcp.helper.SFBase64;
 import com.solarflare.vcp.helper.VCenterHelper;
 import com.solarflare.vcp.model.Adapter;
 import com.solarflare.vcp.model.FileHeader;
+import com.solarflare.vcp.model.FirmewareVersion;
 import com.solarflare.vcp.model.FirmwareType;
 import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.NicBootParamInfo;
@@ -74,70 +75,25 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 			String data = null; // as this is Update from URL
 			ServiceContent serviceContent = VCenterHelper.getServiceContent(userSessionService, VCenterService.vimPort);
 			CIMHost cimHost = service.getCIMHost(serviceContent, hostId);
-			// TODO taken for testing
-			// URL fwImagePath = new URL("http://10.101.10.132" +
-			// CIMConstants.CONTROLLER_FW_IMAGE_PATH);
-
 			CIMInstance nicInstance = null;
 			for (Adapter adapter : adapterList) {
 				String adapterId = adapter.getId();
 				nicInstance = cim.getNICCardInstance(cimHost, adapter.getChildren().get(0).getName());
-				// get the URL of latest firmware file
-				// String urlPath = cim.getPluginURL(serviceContent, VCenterService.vimPort,
-				// CIMConstants.PLUGIN_KEY);
-				// URL pluginURL = new URL(urlPath);
-				// String filePath = null;
-
+				FirmewareVersion fwVersion = adapter.getLatestVersion();
+				boolean contronller = false;
+				boolean bootRom = false;
+				if(fwVersion.getControlerVersion() !=null)
+				{
+					contronller = true;
+				}
+				if(fwVersion.getBootROMVersion() != null)
+				{
+					bootRom = true;
+				}
 				Runnable workerForController = new FirmwareUpdateThread(serviceContent, cim, cimHost, null, data,
-						nicInstance, adapterId, hostId, false, false, false);
+						nicInstance, adapterId, hostId, false, contronller, bootRom);
 				executor.execute(workerForController);
-
-				// boolean isController = true;
-				// SfFirmware file = metadataHelper.getMetaDataForAdapter(serviceContent,
-				// VCenterService.vimPort, cimHost,
-				// svc_mcfw_inst, nicInstance, isController);
-				// if (file != null) {
-				// filePath = file.getPath();
-				// }
-				// TODO : check for https certificate warning
-				// URL fwImagePath = new
-				// URL(pluginURL.getProtocol(),pluginURL.getHost(),pluginURL.getPort(),filePath);
-
-				// TODO check version current version and version from file for
-				// both controller and BootRom
-				// URL fwImageURL = new URL("http", pluginURL.getHost(), filePath);
-				// FirmwareUpdateThread updateFirmware = new
-				// FirmwareUpdateThread(cim, cimHost, fwImagePath,
-				// svc_mcfw_inst,
-				// nicInstance, "cnt-"+adapter.getId());
-				// Thread thread = new Thread(updateFirmware);
-				// thread.start();
-
-				/*
-				 * Runnable workerForController = new FirmwareUpdateThread(serviceContent, cim,
-				 * cimHost, null, data, svc_mcfw_inst, nicInstance, adapterId);
-				 * executor.execute(workerForController);
-				 */
-
-				// Update BootROM
-				// isController = false;
-				// file = metadataHelper.getMetaDataForAdapter(serviceContent,
-				// VCenterService.vimPort, cimHost,
-				// svc_bootrom_inst, nicInstance, isController);
-				// if (file != null) {
-				// filePath = file.getPath();
-				// }
-				// // TODO : check for https certificate warning
-				// // URL fwImagePath = new
-				// //
-				// URL(pluginURL.getProtocol(),pluginURL.getHost(),pluginURL.getPort(),filePath);
-				// fwImageURL = new URL("http", pluginURL.getHost(), filePath);
-				//
-				// Runnable workerForBoot = new FirmwareUpdateThread(cim, cimHost, fwImageURL,
-				// data, svc_bootrom_inst,
-				// nicInstance, "boot-" + adapter.getId());
-				// executor.execute(workerForBoot);
-
+				return true;
 			}
 		} catch (Exception e) {
 			throw e;

@@ -88,8 +88,12 @@ public class FirmwareUpdateThread implements Runnable {
 			}
 
 		} else {
-			updateController();
-			updateBootROM();
+			if (controller) {
+				updateController();
+			}
+			if (bootrom) {
+				updateBootROM();
+			}
 		}
 	}
 
