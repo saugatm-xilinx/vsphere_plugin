@@ -24,12 +24,20 @@
    <!-- Conditional build variables -->
    <property name="USE_HTTP_PROXY" value="${useHttpProxy}"/>
    <property name="NO_JAVA" value="${noJava}"/>
-
-   <target name="build" depends="buildCheck, buildUiWar, buildServiceJar, createPluginPackageDir,
-         createPluginProxyPackageDir, createPluginNoJavaPackageDir, copyPluginPackageDir">
+   
+   <!-- custome defind property -->
+   <property name="BUILD_PRIFIX" value="solarflare" />
+   <property name="VERSION" value="1.45.0"/>
+   <property name="BUILD_ZIP_DIR" value="${basedir}/../../installer/Third-party-utilities/TomcatServer/webapps" />
+   <property name="PLUGIN_REGISTRATION" value="${basedir}/../../PluginRegistration"/>
+   <property name="P_GOLES" value="clean install" />
+   <property name="PLUGIN_PATH" value="solarflare-vcp" />
+   <property name="CLASSES" value="${SERVICE_DIR}/target/classes" />
+  
+   <target name="build" depends="buildCheck, buildUiWar, buildServiceJar, run_utility, createPluginPackageDir,
+         createPluginProxyPackageDir, createPluginNoJavaPackageDir, mvnWindowsSetup, mvnUnixSetup, runMvnGoals,copyPluginPackageDir, copyRegistrationWar">
       <echo level="info">*** You must restart the Virgo server to use the new plugin package! ***</echo>
    </target>
-
    <target name="buildCheck">
       <condition property="NORMAL_BUILD">
          <and>
@@ -46,8 +54,19 @@
    <target name="buildServiceJar" if="${NORMAL_BUILD}">
       <ant antfile="${SERVICE_DIR}/tools/build-java.xml" dir="${SERVICE_DIR}/tools" inheritAll="false"/>
    </target>
-
-   <target name="createPluginPackageDir" if="${NORMAL_BUILD}">
+   
+   <target name="run_utility">
+    <java classname="com.solarflare.vcp.helper.XMLUtility" fork="true" failonerror="yes">
+		<arg value="${VERSION}"/>
+		<arg value="./plugin-package.xml"/>
+		<classpath>
+			<pathelement path="${CLASSES}"/>
+		</classpath>
+	  </java>
+   </target>
+   <!-- Edit plugin package before copy-->
+	
+   <target name="createPluginPackageDir" if="${NORMAL_BUILD}" depends="run_utility">
       <mkdir dir="${BUILD_DIR}/solarflare" />
       <mkdir dir="${BUILD_DIR}/solarflare/plugins" />
       <copy todir="${BUILD_DIR}/solarflare" file="./plugin-package.xml"/>
@@ -57,6 +76,7 @@
       <copy todir="${BUILD_DIR}/solarflare/plugins" file="${VSPHERE_SDK_HOME}/libs/gson-2.3.1.jar"/>
       <copy todir="${BUILD_DIR}/solarflare/plugins" file="${VSPHERE_SDK_HOME}/libs/vim25.jar"/>
       <copy todir="${BUILD_DIR}/solarflare/plugins" file="${SERVICE_DIR}/libs/sblim-cim-client2-2.1.1.jar"/>
+	  
    </target>
 
    <target name="createPluginProxyPackageDir" if="${USE_HTTP_PROXY}"
@@ -85,11 +105,42 @@ TO THIS /tools FOLDER."/>
       <copy todir="${BUILD_DIR}/solarflare/plugins" file="${BUILD_DIR}/solarflare-ui.war"/>
    </target>
 
+   <condition property="is_windows">
+        <os family="windows"/>
+    </condition>
+	<condition property="is_unix">
+        <os family="unix"/>
+    </condition>
+	<target name="mvnWindowsSetup" if="is_windows">
+		<property name="mvn.executable" value="cmd" />
+		<property name="mvn.args" value="/c" />
+	</target>
+	<target name="mvnUnixSetup" if="is_unix">
+		<property name="mvn.executable" value="sh" />
+		<property name="mvn.args" value="-c" />
+	</target>
+	<!-- Before build modify property file content of version and host ip-->
+	<propertyfile file="${PLUGIN_REGISTRATION}/src/main/webapp/WEB-INF/registerPlugin.properties">
+		<entry key="pluginPath" value="${PLUGIN_PATH}/${BUILD_PRIFIX}-${VERSION}.zip" />
+		<entry key="version" value="${VERSION}" />
+	</propertyfile>
+	<target name="runMvnGoals" depends="mvnWindowsSetup, mvnUnixSetup">
+		<exec dir="${PLUGIN_REGISTRATION}" executable="${mvn.executable}" >
+			<arg line="${mvn.args} 'mvn ${P_GOLES}'" />
+		</exec>
+	</target>
    <target name="copyPluginPackageDir">
       <delete dir="${VSPHERE_SDK_HOME}/vsphere-ui/plugin-packages/solarflare" quiet="true"/>
+	  <delete dir="${BUILD_ZIP_DIR}" quiet="true" />
+	  <mkdir dir="${BUILD_ZIP_DIR}"/>
       <copy todir="${VSPHERE_SDK_HOME}/vsphere-ui/plugin-packages/solarflare">
          <fileset dir="${BUILD_DIR}/solarflare"/>
       </copy>
+	  <zip  destfile="${BUILD_ZIP_DIR}/${BUILD_PRIFIX}-${VERSION}.zip" basedir="${BUILD_DIR}/solarflare"/>
    </target>
+  
+	<target name="copyRegistrationWar" description="Copy war file in plugin dist directory">
+		<copy todir="${BUILD_ZIP_DIR}/" file="${PLUGIN_REGISTRATION}/target/plugin-registration.war"/>
+	</target>
 
 </project>

@@ -76,6 +76,10 @@ ${line.separator} Then rename it playerglobal.swc and move it to ${FLEX_HOME}/fr
          <os family="windows" />
       </condition>
    </target>
+   <!-- edit version,  plugin xml -->
+	<!-- <propertyfile file="${WEBAPP_DIR}/plugin.xml">
+			<entry key="version" value="10.15.0" />
+	</propertyfile> -->
 
    <!-- Normal dev build -->
    <target name="ng-build" depends="build-mac, build-windows"></target>
@@ -192,6 +196,7 @@ ${line.separator} Then rename it playerglobal.swc and move it to ${FLEX_HOME}/fr
     -->
    <target name="make-bundle"  depends="init, ng-build, compile-resources">
       <mkdir dir="${BUILD_DIR}/webapp/"/>
+	  <mkdir dir="${basedir}/../dist" />
       <copy todir="${BUILD_DIR}/webapp">
          <fileset dir="${DIST_DIR}"/>
          <fileset dir="${SRC_DIR}/webapp">
