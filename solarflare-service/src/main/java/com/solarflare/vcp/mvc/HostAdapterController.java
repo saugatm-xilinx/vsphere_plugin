@@ -3,7 +3,6 @@ package com.solarflare.vcp.mvc;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,6 @@ import com.solarflare.vcp.model.Adapter;
 import com.solarflare.vcp.model.CustomUpdateRequest;
 import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.Status;
-import com.solarflare.vcp.model.TaskStatus;
 import com.solarflare.vcp.services.HostAdapterService;
 
 @Controller

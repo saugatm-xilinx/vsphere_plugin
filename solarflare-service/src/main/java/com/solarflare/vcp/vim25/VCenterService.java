@@ -18,6 +18,7 @@ import com.solarflare.vcp.cim.CIMHostSession;
 import com.solarflare.vcp.cim.CIMService;
 import com.solarflare.vcp.helper.VCenterHelper;
 import com.solarflare.vcp.model.Adapter;
+import com.solarflare.vcp.model.FirmewareVersion;
 import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.Status;
 import com.solarflare.vcp.model.TaskStatus;
@@ -559,24 +560,26 @@ public class VCenterService
                             String latestVersion = VCenterHelper.getLatestVersion(controllerVersion, latestControllerVersion);
                             logger.debug("Getting latest version of controller is :" + latestVersion);
                             // Check for latest version available
+                            FirmewareVersion frmVesion = new FirmewareVersion();
+                            
                             if (latestVersion.equals(latestControllerVersion))
                             {
-                                adapter.setLaterVersionAvailable(true);
+                            	frmVesion.setControlerVersion(latestControllerVersion);
+                            	adapter.setLaterVersionAvailable(true);
                             }
-                            else
-                            {
-                                // Get version from image binary for BootRom
-                            	CIMInstance bootROMInstance = cim.getBootROMSoftwareInstallationInstance(cimHost);
-                            	String latestBootRomVersion = cim.getLatestBootROMFWImageVersion(serviceContent, vimPort,cimHost,bootROMInstance,niCimInstance);
-                                logger.debug("Getting latest version of BootRom is :" + latestBootRomVersion);
-                                String finalLatestBootVersion = VCenterHelper.getLatestVersion(bootROMVersion,
-                                        latestBootRomVersion);
-                                if (latestBootRomVersion.equals(finalLatestBootVersion))
-                                {
-                                    adapter.setLaterVersionAvailable(true);
-                                }
-                            }
-
+                           
+							// Get version from image binary for BootRom
+							CIMInstance bootROMInstance = cim.getBootROMSoftwareInstallationInstance(cimHost);
+							String latestBootRomVersion = cim.getLatestBootROMFWImageVersion(serviceContent, vimPort,
+									cimHost, bootROMInstance, niCimInstance);
+							logger.debug("Getting latest version of BootRom is :" + latestBootRomVersion);
+							String finalLatestBootVersion = VCenterHelper.getLatestVersion(bootROMVersion,
+									latestBootRomVersion);
+							if (latestBootRomVersion.equals(finalLatestBootVersion)) {
+								frmVesion.setBootROMVersion(finalLatestBootVersion);
+								adapter.setLaterVersionAvailable(true);
+							}
+							adapter.setLatestVersion(frmVesion);
                         }
                         adapters.add(adapter);
                     }
