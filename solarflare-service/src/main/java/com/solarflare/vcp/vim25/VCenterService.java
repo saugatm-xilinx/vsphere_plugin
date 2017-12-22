@@ -424,7 +424,14 @@ public class VCenterService
 //             adapters.add(adapter);
 //             }
         }
-        return nicGrp;
+        
+        Map<String, List<VMNIC>> nicGrpNew = new HashMap<>();
+        for(String adapterId : nicGrp.keySet()){
+        	List<VMNIC> nicList = nicGrp.get(adapterId);
+        	String macAddress = getMinMacAddress(nicList);
+        	nicGrpNew.put(adapterId + "-" + macAddress, nicList);
+         }
+        return nicGrpNew;
     }
 
     public CIMHost getCIMHost(ServiceContent serviceContent, String hostId, CIMService cim) throws Exception
@@ -512,8 +519,7 @@ public class VCenterService
                     for (String key : nicGrp.keySet())
                     {
                         Adapter adapter = new Adapter();
-                        String macAddress = getMinMacAddress(nicGrp.get(key));
-                        adapter.setName(key+"-"+macAddress);
+                        adapter.setName(key);
                         String id = nicGrp.get(key).get(0).getDeviceName();
                         adapter.setId(id);
                         List<VMNIC> listNic = nicGrp.get(key);
