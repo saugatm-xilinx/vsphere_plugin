@@ -42,7 +42,7 @@ export class FwupdateComponent implements OnInit {
         this.http.get(url)
             .subscribe(
                 data => {
-                    this.adapterList = data.json()
+                    this.adapterList = data.json();
                 },
                 err => {
                     console.error(err);
@@ -53,10 +53,11 @@ export class FwupdateComponent implements OnInit {
 
     ngOnInit() {
         this.getAdapterList();
+        //this.devMode();
     }
 
     validateLatestUpdate(remove: string) {
-        let updatable = 0, invalid = 0;
+        let updatable = 0, invalid = 0, filterdAdapters= [];
         this.selectedAdapters.forEach((value, index) => {
             if (value.laterVersionAvailable) {
                 updatable++;
@@ -66,9 +67,11 @@ export class FwupdateComponent implements OnInit {
         });
         if (remove == 'remove') {
             this.selectedAdapters.forEach((value, index) => {
-                if (!value.laterVersionAvailable)
-                    this.selectedAdapters.splice(index, 1);
+                if (value.laterVersionAvailable) {
+                    filterdAdapters.push(value);
+                }
             });
+            this.selectedAdapters = filterdAdapters;
             this.validateLatestUpdateModal = false;
             if (this.selectedAdapters && this.selectedAdapters.length !== 0) {
                 this.latestUpdateModal = true;
@@ -90,14 +93,15 @@ export class FwupdateComponent implements OnInit {
     latestUpdate() {
         let url = "";
         if (this.gs.isPluginMode()) {
-            url = this.hostAdaptersListUrl + 'adapters/updateToLatest?hostId=' + this.params['id'];
+            url = this.hostAdaptersListUrl + this.params['id'] + '/adapters/latest';
         } else {
-            url = 'https://10.101.10.7/ui/solarflare/rest/services/hosts/adapters/updateToLatest?hostId=' + this.params['id'];
+            url = 'https://10.101.10.7/ui/solarflare/rest/services/hosts/' + this.params['id'] + '/adapters/latest';
         }
         this.http.post(url, this.selectedAdapters)
             .subscribe(
                 data => {
                     this.getAdapterList();
+                    this.latestUpdateModal = false;
                 },
                 err =>
                     console.error(err)
@@ -106,70 +110,26 @@ export class FwupdateComponent implements OnInit {
     }
 
     devMode() {
-        this.adapterList = [{
-            "name": "Solarflare SFC9220",
-            "type": "ADAPTER",
-            "id": "SFC9220",
-            "versionController": "6.2.0.1016 rx1 tx1",
-            "versionBootROM": "0.0.0.0",
-            "versionUEFIROM": "1.1.1.0",
-            "versionFirmware": "1.1.1.0",
-            "fileData": null,
-            "status": {"status": "UPLOADING", "message": "Controller", "timeStamp": ""},
-            "children": [{
-                "type": "NIC",
-                "id": "key-vim.host.PhysicalNic-vmnic4",
-                "name": "vmnic4",
-                "deviceId": "2563",
-                "deviceName": "SFC9220",
-                "subSystemDeviceId": null,
-                "vendorId": "6436",
-                "vendorName": "Solarflare",
-                "subSystemVendorId": null,
-                "driverName": null,
-                "driverVersion": null,
-                "macAddress": null,
-                "status": null,
-                "interfaceName": null,
-                "portSpeed": null,
-                "currentMTU": null,
-                "maxMTU": null,
-                "pciId": "0000:82:00.0",
-                "pciFunction": null,
-                "pciBusNumber": null
-            }, {
-                "type": "NIC",
-                "id": "key-vim.host.PhysicalNic-vmnic5",
-                "name": "vmnic5",
-                "deviceId": "2563",
-                "deviceName": "SFC9220",
-                "subSystemDeviceId": null,
-                "vendorId": "6436",
-                "vendorName": "Solarflare",
-                "subSystemVendorId": null,
-                "driverName": null,
-                "driverVersion": null,
-                "macAddress": null,
-                "status": null,
-                "interfaceName": null,
-                "portSpeed": null,
-                "currentMTU": null,
-                "maxMTU": null,
-                "pciId": "0000:82:00.1",
-                "pciFunction": null,
-                "pciBusNumber": null
-            }],
-            "laterVersionAvailable": false
-        }, {
-            "name": "Solarflare SFC9140",
+        this.adapterList =[{
+            "name": "SFC9140-00:0f:53:2f:bf:20",
             "type": "ADAPTER",
             "id": "SFC9140",
             "versionController": "6.2.5.1000 rx1 tx1",
             "versionBootROM": "5.0.5.1002",
             "versionUEFIROM": "1.1.1.0",
             "versionFirmware": "1.1.1.0",
-            "fileData": null,
-            "status": null,
+            "latestVersion": {
+                "controlerVersion": "6.2.7.1000",
+                "bootROMVersion": null,
+                "uefiVersion": null,
+                "firmewareFamilyVersion": null
+            },
+            "status": [{
+                "status": "UPLOADING_FAIL",
+                "message": "Fail to update Controller firmware image",
+                "timeStamp": 1513925798583,
+                "type": "controller"
+            }],
             "children": [{
                 "type": "NIC",
                 "id": "key-vim.host.PhysicalNic-vmnic6",
@@ -182,7 +142,7 @@ export class FwupdateComponent implements OnInit {
                 "subSystemVendorId": null,
                 "driverName": null,
                 "driverVersion": null,
-                "macAddress": null,
+                "macAddress": "00:0f:53:2f:bf:20",
                 "status": null,
                 "interfaceName": null,
                 "portSpeed": null,
@@ -191,7 +151,105 @@ export class FwupdateComponent implements OnInit {
                 "pciId": "0000:04:00.0",
                 "pciFunction": null,
                 "pciBusNumber": null
-            }, {
+            }],
+            "laterVersionAvailable": true
+        }, {
+            "name": "SFC9220-00:0f:53:4b:66:50",
+            "type": "ADAPTER",
+            "id": "SFC9220",
+            "versionController": "6.2.0.1016 rx1 tx1",
+            "versionBootROM": "0.0.0.0",
+            "versionUEFIROM": "1.1.1.0",
+            "versionFirmware": "1.1.1.0",
+            "latestVersion": {
+                "controlerVersion": null,
+                "bootROMVersion": null,
+                "uefiVersion": null,
+                "firmewareFamilyVersion": null
+            },
+            "status": [],
+            "children": [{
+                "type": "NIC",
+                "id": "key-vim.host.PhysicalNic-vmnic4",
+                "name": "vmnic4",
+                "deviceId": "2563",
+                "deviceName": "SFC9220",
+                "subSystemDeviceId": null,
+                "vendorId": "6436",
+                "vendorName": "Solarflare",
+                "subSystemVendorId": null,
+                "driverName": null,
+                "driverVersion": null,
+                "macAddress": "00:0f:53:4b:66:50",
+                "status": null,
+                "interfaceName": null,
+                "portSpeed": null,
+                "currentMTU": null,
+                "maxMTU": null,
+                "pciId": "0000:82:00.0",
+                "pciFunction": null,
+                "pciBusNumber": null
+            }],
+            "laterVersionAvailable": false
+        }, {
+            "name": "SFC9220-00:0f:53:4b:66:51",
+            "type": "ADAPTER",
+            "id": "SFC9220",
+            "versionController": "6.2.0.1016 rx1 tx1",
+            "versionBootROM": "0.0.0.0",
+            "versionUEFIROM": "1.1.1.0",
+            "versionFirmware": "1.1.1.0",
+            "latestVersion": {
+                "controlerVersion": null,
+                "bootROMVersion": null,
+                "uefiVersion": null,
+                "firmewareFamilyVersion": null
+            },
+            "status": [],
+            "children": [{
+                "type": "NIC",
+                "id": "key-vim.host.PhysicalNic-vmnic5",
+                "name": "vmnic5",
+                "deviceId": "2563",
+                "deviceName": "SFC9220",
+                "subSystemDeviceId": null,
+                "vendorId": "6436",
+                "vendorName": "Solarflare",
+                "subSystemVendorId": null,
+                "driverName": null,
+                "driverVersion": null,
+                "macAddress": "00:0f:53:4b:66:51",
+                "status": null,
+                "interfaceName": null,
+                "portSpeed": null,
+                "currentMTU": null,
+                "maxMTU": null,
+                "pciId": "0000:82:00.1",
+                "pciFunction": null,
+                "pciBusNumber": null
+            }],
+            "laterVersionAvailable": false
+        }, {
+            "name": "SFC9140-00:0f:53:2f:bf:21",
+            "type": "ADAPTER",
+            "id": "SFC9140",
+            "versionController": "6.2.5.1000 rx1 tx1",
+            "versionBootROM": "5.0.5.1002",
+            "versionUEFIROM": "1.1.1.0",
+            "versionFirmware": "1.1.1.0",
+            "latestVersion": {
+                "controlerVersion": "6.2.7.1000",
+                "bootROMVersion": null,
+                "uefiVersion": null,
+                "firmewareFamilyVersion": null
+            },
+            "status": [{
+                "status": "UPLOADING_FAIL",
+                "message": "Fail to update Controller firmware image",
+                "timeStamp": 1513925798583,
+                "type": "controller"
+            }],
+            "children": [{
                 "type": "NIC",
                 "id": "key-vim.host.PhysicalNic-vmnic7",
                 "name": "vmnic7",
@@ -203,7 +261,7 @@ export class FwupdateComponent implements OnInit {
                 "subSystemVendorId": null,
                 "driverName": null,
                 "driverVersion": null,
-                "macAddress": null,
+                "macAddress": "00:0f:53:2f:bf:21",
                 "status": null,
                 "interfaceName": null,
                 "portSpeed": null,

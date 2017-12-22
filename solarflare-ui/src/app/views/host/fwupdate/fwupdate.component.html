@@ -1,4 +1,4 @@
-<clr-modal [(clrModalOpen)]="customUpdateModal" [clrModalClosable]="false" [clrModalStaticBackdrop]="true">
+<clr-modal [clrModalSize]="'lg'" [(clrModalOpen)]="customUpdateModal" [clrModalClosable]="false" [clrModalStaticBackdrop]="true">
     <h3 class="modal-title">Custom Update</h3>
     <div class="modal-body">
         <p>To be implemented</p>
@@ -10,47 +10,31 @@
         <button class="btn btn-primary" type="button">Update</button>
     </div>
 </clr-modal>
-<clr-modal [(clrModalOpen)]="latestUpdateModal" [clrModalClosable]="false" [clrModalStaticBackdrop]="true">
-    <h3 class="modal-title">Latest Update</h3>
-    <div class="modal-body">
-        <clr-datagrid>
-            <clr-dg-column>Adapter Name</clr-dg-column>
-            <clr-dg-column>Controller Version</clr-dg-column>
-            <clr-dg-column>Boot Rom Version</clr-dg-column>
 
-            <clr-dg-row *clrDgItems="let ad of selectedAdapters"
-                        [clrDgItem]="ad">
-                <clr-dg-cell >{{ad.name}}</clr-dg-cell>
-                <clr-dg-cell>{{ad.versionController}}</clr-dg-cell>
-                <clr-dg-cell>{{ad.versionBootROM}}</clr-dg-cell>
-            </clr-dg-row>
-        </clr-datagrid>
-
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-outline" type="button" (click)="latestUpdateModal = false">Cancel</button>
-        <button class="btn btn-primary" type="button" (click)="latestUpdate(); latestUpdateModal = false;">Update</button>
-    </div>
-</clr-modal>
-
-<clr-modal [(clrModalOpen)]="validateLatestUpdateModal" >
-    <h3 class="modal-title">Latest version not found for adapters</h3>
+<clr-modal [clrModalSize]="'lg'" [(clrModalOpen)]="validateLatestUpdateModal" >
+    <h3 class="modal-title">Later version(s) not found for adapters</h3>
     <div class="modal-body">
 
         <clr-datagrid>
             <clr-dg-column>Adapter Name</clr-dg-column>
             <clr-dg-column>Controller Version</clr-dg-column>
             <clr-dg-column>Boot Rom Version</clr-dg-column>
+            <clr-dg-column>UEFI Rom Version</clr-dg-column>
+
             <clr-dg-column>Later Version Available</clr-dg-column>
 
             <clr-dg-row *clrDgItems="let ad of selectedAdapters"
-                        [clrDgItem]="ad" [hidden]="ad.laterVersionAvailable">
+                        [clrDgItem]="ad" >
                 <clr-dg-cell >{{ad.name}}</clr-dg-cell>
                 <clr-dg-cell>{{ad.versionController}}</clr-dg-cell>
                 <clr-dg-cell>{{ad.versionBootROM}}</clr-dg-cell>
+                <clr-dg-cell>{{ad.versionUEFIROM}}</clr-dg-cell>
                 <clr-dg-cell>
                     <span *ngIf="!ad.laterVersionAvailable">
                         <b style="font-size: large">No</b>
+                    </span>
+                    <span *ngIf="ad.laterVersionAvailable">
+                        Yes
                     </span>
                 </clr-dg-cell>
             </clr-dg-row>
@@ -90,16 +74,14 @@
         <div class="row" *ngIf="(adapterList|json) != '[]'">
             <div class="col-md-12">
                 <clr-datagrid *ngIf="(adapterList|json) != '[]'" [(clrDgSelected)]="selectedAdapters">
-                    <clr-dg-placeholder>We couldn't find any adapters!</clr-dg-placeholder>
                     <clr-dg-column>Adapter Name</clr-dg-column>
                     <clr-dg-column>Firmware Family Version</clr-dg-column>
                     <clr-dg-column>Controller Version</clr-dg-column>
                     <clr-dg-column>Boot Rom Version</clr-dg-column>
                     <clr-dg-column>UEFI Rom Version</clr-dg-column>
-                    <clr-dg-column>Later Version Available</clr-dg-column>
+                    <clr-dg-column>Updates Available</clr-dg-column>
 
-                    <clr-dg-row [ngStyle]="{'background-color' : ad.status !== null ? '#E3DDD1' : 'inherit'}"
-                             *clrDgItems="let ad of adapterList" [clrDgItem]="ad">
+                    <clr-dg-row *clrDgItems="let ad of adapterList" [clrDgItem]="ad">
                         <clr-dg-cell>
                             {{ad.name}}
                         </clr-dg-cell>
@@ -108,18 +90,15 @@
                         <clr-dg-cell>{{ad.versionBootROM}}</clr-dg-cell>
                         <clr-dg-cell>{{ad.versionUEFIROM}}</clr-dg-cell>
 
-                        <clr-dg-cell *ngIf="ad.status == null">
+                        <clr-dg-cell >
                              <span *ngIf="ad.laterVersionAvailable">
-                                    Yes
+                                 <b>Available</b>
                                 </span>
                             <span *ngIf="!ad.laterVersionAvailable">
                                     No
                                 </span>
                         </clr-dg-cell>
 
-                        <clr-dg-cell *ngIf="ad.status !== null">
-                            <span class="spinner spinner-sm"></span>
-                        </clr-dg-cell>
                     </clr-dg-row>
                     <clr-dg-footer>{{adapterList.length}} Adapters</clr-dg-footer>
                 </clr-datagrid>
@@ -128,12 +107,12 @@
                 <button class="btn"
                         (click)="validateLatestUpdate() && latestUpdateModal = true"
                         [disabled]="selectedAdapters.length == 0" >
-                    Update Latest
+                    Update
                 </button>
                 <button class="btn btn-outline"
                         (click)="customUpdateModal = true"
                         [disabled]="selectedAdapters.length == 0" >
-                    Update Custom
+                     Custom Update
                 </button>
             </div>
         </div>
@@ -141,34 +120,63 @@
 
 </div>
 
-<!--
-<table class="table">
-                    <tbody>
-                    <tr>
-                        <th width="25"><input type="checkbox"></th>
-                        <th>Adapter name</th>
-                        <th>VMware f/w Version</th>
-                        <th>Controller Version</th>
-                        <th>Boot ROM Version</th>
-                        <th>UEFI ROM Version</th>
-                        <th>Later Version Available</th>
-                    </tr>
-                    <tr *ngFor="let adapter of adapterList">
-                        <td width="25"><input type="checkbox"></td>
-                        <td>{{adapter.name}}</td>
-                        <td>{{adapter.versionFirmware}}</td>
-                        <td>{{adapter.versionController}}</td>
-                        <td>{{adapter.versionBootROM}}</td>
-                        <td>{{adapter.versionUEFIROM}}</td>
-                        <td>
-                                <span *ngIf="adapter.laterVersionAvailable">
-                                    Yes
-                                </span>
-                            <span *ngIf="!adapter.laterVersionAvailable">
-                                    No
-                                </span>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
--->
+<clr-modal [clrModalSize]="'lg'" [(clrModalOpen)]="latestUpdateModal" [clrModalClosable]="false" [clrModalStaticBackdrop]="true">
+    <h3 class="modal-title">Latest Update</h3>
+    <div class="modal-body">
+
+        <table class="table">
+            <tr>
+                <th rowspan="2" class="table-border-right"
+                    style="vertical-align: middle;">
+                    Adapter Name
+                </th>
+                <th colspan="2" class="table-border-right">Controller Version</th>
+                <th colspan="2" class="table-border-right">Boot Rom Version</th>
+                <th colspan="2">UEFI Rom Version</th>
+            </tr>
+            <tr>
+                <th class="table-border-right">Current</th>
+                <th class="table-border-right" style="color:#781DA0;">Latest</th>
+                <th class="table-border-right">Current</th>
+                <th class="table-border-right" style="color:#781DA0;">Latest</th>
+                <th class="table-border-right">Current</th>
+                <th style="color:#781DA0;">Latest</th>
+            </tr>
+            <tr *ngFor="let ad of selectedAdapters">
+                <td>{{ad.name}}</td>
+                <td>{{ad.versionController}}</td>
+                <td>
+                    <b style="color:#781DA0;" *ngIf="ad.latestVersion.controlerVersion !== null">
+                        {{ad.latestVersion.controlerVersion}}
+                    </b>
+                    <b *ngIf="ad.latestVersion.controlerVersion === null">
+                        NA
+                    </b>
+                </td>
+                <td>{{ad.versionBootROM}}</td>
+                <td>
+                    <b style="color:#781DA0;" *ngIf="ad.latestVersion.bootROMVersion !== null">
+                        {{ad.latestVersion.bootROMVersion}}
+                    </b>
+                    <b *ngIf="ad.latestVersion.bootROMVersion === null">
+                        NA
+                    </b>
+                </td>
+                <td>{{ad.versionUEFIROM}}</td>
+                <td>
+                    <b style="color:#781DA0;" *ngIf="ad.latestVersion.uefiVersion !== null">
+                        {{ad.latestVersion.uefiVersion}}
+                    </b>
+                    <b *ngIf="ad.latestVersion.uefiVersion === null">
+                        NA
+                    </b>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-outline" type="button" (click)="latestUpdateModal = false">Cancel</button>
+        <button class="btn btn-primary" type="button" (click)="latestUpdate();">Update</button>
+    </div>
+</clr-modal>

@@ -17,12 +17,12 @@
                 <clr-icon shape="host" clrVerticalNavIcon></clr-icon>
                     {{host.name}}
                 <clr-vertical-nav-group-children>
-                    <div style="margin-left:10px;">
+                    <div style="margin-left:6px;" >
                     <clr-vertical-nav-group *ngFor="let adaptor of host.children"
                                             routerLink="/adaptor/{{adaptor.id}}"
                                             routerLinkActive="active">
                         <img src="../solarflare/assets/images/adaptor.png" width="20px"/>
-                        {{adaptor.name}}
+                        <span class="adaptorName"> {{adaptor.name}} </span>
                         <clr-vertical-nav-group-children>
                             <a clrVerticalNavLink *ngFor="let nic of adaptor.children"
                                routerLink="nic/{{nic.id}}"
