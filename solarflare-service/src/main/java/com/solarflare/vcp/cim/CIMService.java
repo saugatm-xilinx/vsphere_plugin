@@ -44,7 +44,7 @@ public class CIMService {
 
 	private static final Log logger = LogFactory.getLog(CIMService.class);
 
-	public Collection<CIMInstance> getAllInstances(CIMHost cimHost, final String namespace, final String classname)
+	public synchronized Collection<CIMInstance> getAllInstances(CIMHost cimHost, final String namespace, final String classname)
 			throws WBEMException {
 		WBEMClient client = getClient(cimHost, classname);
 		CIMObjectPath objectPath = getHostObjectPath(cimHost, null, classname);
@@ -138,7 +138,7 @@ public class CIMService {
 		return svc_bootrom_inst;
 	}
 
-	private CIMInstance getEthernatePortInstance(CIMHost cimHost, String deviceId) throws WBEMException {
+	private synchronized CIMInstance getEthernatePortInstance(CIMHost cimHost, String deviceId) throws WBEMException {
 		CIMInstance ethernateInstance = null;
 		CIMService cimUtil = new CIMService();
 		String cimClass = "SF_EthernetPort";
@@ -163,7 +163,7 @@ public class CIMService {
 
 	}
 
-	public CIMInstance getNICCardInstance(CIMHost cimHost, String deviceId) throws WBEMException {
+	public synchronized CIMInstance getNICCardInstance(CIMHost cimHost, String deviceId) throws WBEMException {
 		String cimClass = "SF_SoftwareInstallationService";
 		WBEMClient client = getClient(cimHost, cimClass);
 		// Get EthernatePort Instance
@@ -223,7 +223,7 @@ public class CIMService {
 	// cimUtil.getNICCardInstance(cimHost, "vmnic6");
 	// }
 
-	public Map<String, String> getAdapterVersions(CIMHost cimHost, String deviceId) throws WBEMException {
+	public synchronized Map<String, String> getAdapterVersions(CIMHost cimHost, String deviceId) throws WBEMException {
 		logger.info("Getting Adapter Versions for Device Id : " + deviceId);
 		String cimClass = CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE;
 		Map<String, String> versions = new HashMap<String, String>();
@@ -430,7 +430,7 @@ public class CIMService {
 		return isCompatible;
 	}
 
-	public Map<String, String> getRequiredFwImageName(CIMHost cimHost, CIMInstance fw_inst, CIMInstance nicInstance) {
+	public synchronized Map<String, String> getRequiredFwImageName(CIMHost cimHost, CIMInstance fw_inst, CIMInstance nicInstance) {
 		logger.info("Getting Required Firmware Image Version");
 		Map<String, String> params = new HashMap<>();
 
@@ -516,7 +516,7 @@ public class CIMService {
 		return header;
 	}
 
-	private String getLatestLogErrorMessage(CIMHost cimHost) {
+	private synchronized String getLatestLogErrorMessage(CIMHost cimHost) {
 		String errMsg = null;
 		String cimClass = CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE;
 		WBEMClient client = getClient(cimHost, cimClass);
@@ -551,7 +551,7 @@ public class CIMService {
 		return errMsg;
 	}
 
-	private CIMInstance getProviderLogInstance(CIMHost cimHost) throws WBEMException {
+	private synchronized CIMInstance getProviderLogInstance(CIMHost cimHost) throws WBEMException {
 		CIMInstance plInstance = null;
 		CIMService cimUtil = new CIMService();
 		String cimClass = CIMConstants.SF_PROVIDER_LOG;
@@ -566,7 +566,7 @@ public class CIMService {
 		return plInstance;
 	}
 
-	public boolean updateFirmwareFromURL(CIMObjectPath objectPath, CIMHost cimHost, CIMInstance nic, URL fwImagePath)
+	public synchronized boolean  updateFirmwareFromURL(CIMObjectPath objectPath, CIMHost cimHost, CIMInstance nic, URL fwImagePath)
 			throws Exception {
 
 		String cimClass = CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE;
@@ -612,7 +612,7 @@ public class CIMService {
 		return false;
 	}
 
-	public void sendFWImageData(CIMHost cimHost, CIMInstance fw_inst, String data, String filePath) {
+	public synchronized void sendFWImageData(CIMHost cimHost, CIMInstance fw_inst, String data, String filePath) {
 
 		logger.info("Send Firmware Image Send");
 
@@ -639,7 +639,7 @@ public class CIMService {
 		}
 	}
 
-	public String startFwImageSend(CIMHost cimHost, CIMInstance fw_inst) {
+	public synchronized String startFwImageSend(CIMHost cimHost, CIMInstance fw_inst) {
 		String filePath = null;
 		logger.info("Start Firmware Image Send");
 
@@ -670,7 +670,7 @@ public class CIMService {
 		return filePath;
 	}
 
-	public boolean removeFwImage(CIMHost cimHost, CIMInstance fw_inst, String tempFilePath) {
+	public synchronized boolean removeFwImage(CIMHost cimHost, CIMInstance fw_inst, String tempFilePath) {
 		boolean isRemoved = false;
 		logger.info("Remove FW Image file");
 
@@ -701,7 +701,7 @@ public class CIMService {
 		return isRemoved;
 	}
 
-	public void getLocalFwImageVersion(CIMHost cimHost, CIMInstance fw_inst, CIMInstance nicInstance, String filePath) {
+	public synchronized void getLocalFwImageVersion(CIMHost cimHost, CIMInstance fw_inst, CIMInstance nicInstance, String filePath) {
 		logger.info("Getting Local Firmware Image Version");
 
 		try {

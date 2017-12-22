@@ -78,7 +78,7 @@ public class FirmwareUpdateThread implements Runnable {
 		}
 	}
 
-	private void process() throws Exception {
+	public void process() throws Exception {
 		if (isCustom) {
 			if (controller) {
 				updateController();
@@ -114,7 +114,7 @@ public class FirmwareUpdateThread implements Runnable {
 		return fwImageURL;
 	}
 
-	private void updateController() throws Exception {
+	private synchronized void updateController() throws Exception {
 		logger.info("Start updating controller for adapterId : " + adapterId);
 		currentProcess = MessageConstant.CONTROLLER;
 		String statusId = VCenterHelper.generateId(hostId,adapterId, MessageConstant.CONTROLLER);
@@ -155,7 +155,7 @@ public class FirmwareUpdateThread implements Runnable {
 		currentProcess = "";
 	}
 
-	private void updateBootROM() throws Exception {
+	private synchronized void updateBootROM() throws Exception {
 		logger.info("Starting bootrom update ");
 		currentProcess = MessageConstant.BOOTROM;
 		String statusId = VCenterHelper.generateId(hostId,adapterId, MessageConstant.BOOTROM);

@@ -87,6 +87,7 @@ public class HostAdapterController {
     public void updateFirmwareToLatest(@RequestBody String adapterList, @PathVariable String hostId)
     {
         logger.info("start getting file as string content");
+        logger.info("adapterList (input) : "+adapterList);
         if (adapterList != null && hostId != null)
         {
         	Gson gson = new Gson();
@@ -95,7 +96,6 @@ public class HostAdapterController {
             }.getType();
 
 			List<Adapter> adapter = gson.fromJson(adapterList, listType);
-        	
             try
             {
                 hostAdapterService.updateFirmwareToLatest(adapter, hostId);

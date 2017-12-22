@@ -4,7 +4,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -39,6 +41,11 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 
 	VCenterService service = new VCenterService();
 	CIMService cim = new CIMService();
+	
+	//Work-around for multi-threading issue in updating firmware
+	Map<String,Host> hostMap = new HashMap<>();
+	Map<String,List<Adapter>> hostAdapters = new HashMap<>();
+	boolean isUpdateInProgress = false;
 
 	@Autowired
 	public HostAdapterServiceImpl(UserSessionService session) {
@@ -49,7 +56,17 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 	public List<Host> getHostList() throws Exception {
 		List<Host> hostList = null;
 		try {
-			hostList = service.getHostsList(userSessionService);
+			if(isUpdateInProgress){
+				for(String hostID : hostMap.keySet()){
+					hostList.add(hostMap.get(hostID));
+				}
+			}else{
+				hostList = service.getHostsList(userSessionService);
+				for(Host host : hostList){
+					hostMap.put(host.getId(), host);
+				}
+			}
+			
 		} catch (Exception e) {
 			throw e;
 		}
@@ -60,7 +77,13 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 	public Host getHostById(String hostId) throws Exception {
 		Host host = null;
 		try {
-			host = service.getHostById(userSessionService, hostId);
+			if(isUpdateInProgress){
+				hostMap.get(hostId);
+			}else{
+			
+				host = service.getHostById(userSessionService, hostId);
+				hostMap.put(host.getId(), host);
+			}
 		} catch (Exception e) {
 			throw e;
 		}
@@ -70,11 +93,13 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 
 	@Override
 	public boolean updateFirmwareToLatest(List<Adapter> adapterList, String hostId) throws Exception {
+		boolean isSuccess = false;
+		isUpdateInProgress = true;
 		logger.info("Start updating firmware adapter");
 		try {
 			String data = null; // as this is Update from URL
 			ServiceContent serviceContent = VCenterHelper.getServiceContent(userSessionService, VCenterService.vimPort);
-			CIMHost cimHost = service.getCIMHost(serviceContent, hostId);
+			CIMHost cimHost = service.getCIMHost(serviceContent, hostId, cim);
 			CIMInstance nicInstance = null;
 			for (Adapter adapter : adapterList) {
 				String adapterId = adapter.getId();
@@ -93,22 +118,30 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 				Runnable workerForController = new FirmwareUpdateThread(serviceContent, cim, cimHost, null, data,
 						nicInstance, adapterId, hostId, false, contronller, bootRom);
 				executor.execute(workerForController);
-				return true;
+				
+				//FirmwareUpdateThread workerForController = new FirmwareUpdateThread(serviceContent, cim, cimHost, null, data,
+				//				nicInstance, adapterId, hostId, false, contronller, bootRom);
+				//workerForController.process();
+				
 			}
+			isSuccess = true;
+			isUpdateInProgress = false;
 		} catch (Exception e) {
+			isUpdateInProgress = false;
 			throw e;
 		}
-		return false;
+		return isSuccess;
 	}
 
 	@Override
 	public boolean customUpdateFirmwareFromLocal(List<Adapter> adapterList, String hostId, String base64Data)
 			throws Exception {
 		logger.info("Start updating firmware adapter");
+		isUpdateInProgress = true;
 		try {
 			URL fwImageURL = null;
 			ServiceContent serviceContent = VCenterHelper.getServiceContent(userSessionService, VCenterService.vimPort);
-			CIMHost cimHost = service.getCIMHost(serviceContent, hostId);
+			CIMHost cimHost = service.getCIMHost(serviceContent, hostId, cim);
 
 			byte[] dataBytes = base64Data.getBytes();
 			// Decode this data using java's decoder
@@ -157,8 +190,9 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 			} else {
 				// TODO : log error for invalid firmware file
 			}
-
+			isUpdateInProgress = false;
 		} catch (Exception e) {
+			isUpdateInProgress = false;
 			throw e;
 		}
 		return false;
@@ -168,12 +202,14 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 	public boolean customUpdateFirmwareFromURL(List<Adapter> adapterList, String hostId, String fwImagePath)
 			throws Exception {
 		logger.info("Start updating firmware adapter");
+		boolean isSuccess = false;
+		isUpdateInProgress = true;
 		try {
 			logger.info("fwImagePath : "+fwImagePath);
 			String data = null; // As this is update from URL
 			URL fwImageURL = new URL(fwImagePath);
 			ServiceContent serviceContent = VCenterHelper.getServiceContent(userSessionService, VCenterService.vimPort);
-			CIMHost cimHost = service.getCIMHost(serviceContent, hostId);
+			CIMHost cimHost = service.getCIMHost(serviceContent, hostId, cim);
 
 			boolean readComplete = false;
 			byte[] headerData = cim.readData(fwImageURL, readComplete);
@@ -195,14 +231,21 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 			for (Adapter adapter : adapterList) {
 				nicInstance = cim.getNICCardInstance(cimHost, adapter.getChildren().get(0).getName());
 
-				Runnable workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL, data,
+				//Runnable workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL, data,
+				//		nicInstance, adapter.getId(), hostId, true, controller, bootrom);
+				//executor.execute(workerForFW);
+				
+				FirmwareUpdateThread workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL, data,
 						nicInstance, adapter.getId(), hostId, true, controller, bootrom);
-				executor.execute(workerForFW);
+				workerForFW.process();
 			}
+			isSuccess = true;
+			isUpdateInProgress = false;
 		} catch (Exception e) {
+			isUpdateInProgress = false;
 			throw e;
 		}
-		return false;
+		return isSuccess;
 	}
 
 	@Override
@@ -217,7 +260,13 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 	@Override
 	public List<Adapter> getHostAdapters(String hostId) throws Exception {
 
-		List<Adapter> adapters = service.getAdapters(userSessionService, hostId);
+		List<Adapter> adapters = new ArrayList<>();
+		if(isUpdateInProgress){
+			adapters = hostAdapters.get(hostId);
+		}else{
+			adapters = service.getAdapters(userSessionService, hostId,cim);
+			hostAdapters.put(hostId, adapters);
+		}
 		return adapters;
 
 	}

@@ -59,7 +59,7 @@ public class VCenterService
 
     public static VimPortType vimPort = initializeVimPort();
 
-    CIMService cim = new CIMService();
+    //CIMService cim = new CIMService();
 
     private static VimPortType initializeVimPort()
     {
@@ -269,6 +269,8 @@ public class VCenterService
                             pnicInfo.setName(pnicDevice);
 
                             pnicInfo.setPciId(physicalNic.getPci());
+                            pnicInfo.setMacAddress(physicalNic.getMac());
+                            
                             nics.add(pnicInfo);
                         }
                     }
@@ -397,7 +399,8 @@ public class VCenterService
                 nic.setDeviceId(Short.toString(pciDecice.getDeviceId()));
                 nic.setVendorId(Short.toString(pciDecice.getVendorId()));
                 nic.setVendorName(pciDecice.getVendorName());
-                String adapterName = nic.getVendorName() + " " + nic.getDeviceName();
+                //String adapterName = nic.getVendorName() + " " + nic.getDeviceName();
+                String adapterName = nic.getDeviceName();
                 if (nicGrp.get(adapterName) == null)
                 {
                     List<VMNIC> niclist = new ArrayList<>();
@@ -424,7 +427,7 @@ public class VCenterService
         return nicGrp;
     }
 
-    public CIMHost getCIMHost(ServiceContent serviceContent, String hostId) throws Exception
+    public CIMHost getCIMHost(ServiceContent serviceContent, String hostId, CIMService cim) throws Exception
     {
         logger.info("Getting CIM host object for a host : " + hostId);
         ManagedObjectReference rootFolder = serviceContent.getRootFolder();
@@ -461,7 +464,7 @@ public class VCenterService
 
     }
 
-    public List<Adapter> getAdapters(UserSessionService userSession, String hostId) throws Exception
+    public List<Adapter> getAdapters(UserSessionService userSession, String hostId, CIMService cim) throws Exception
     {
         logger.info("Getting Adapters for Host by Host Id : " + hostId);
         List<Adapter> adapters = null;
@@ -509,7 +512,8 @@ public class VCenterService
                     for (String key : nicGrp.keySet())
                     {
                         Adapter adapter = new Adapter();
-                        adapter.setName(key);
+                        String macAddress = getMinMacAddress(nicGrp.get(key));
+                        adapter.setName(key+"-"+macAddress);
                         String id = nicGrp.get(key).get(0).getDeviceName();
                         adapter.setId(id);
                         List<VMNIC> listNic = nicGrp.get(key);
@@ -594,4 +598,15 @@ public class VCenterService
         return adapters;
 
     }
+
+	private String getMinMacAddress(List<VMNIC> nicList) {
+		String[] macAddresses = new String[nicList.size()];
+		int i=0;
+		for(VMNIC nic : nicList){
+			macAddresses[i++] = nic.getMacAddress();
+		}
+		Arrays.sort(macAddresses);
+		String plainMinMac = macAddresses[0].replaceAll(":", "");
+		return plainMinMac;
+	}
 }
