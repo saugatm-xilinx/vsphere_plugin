@@ -30,6 +30,11 @@ export class OverviewComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.getHostDetail();
+    }
+
+    getHostDetail(){
+        this.hostDetail = {};
         let url = "";
         if (this.gs.isPluginMode()) {
             url = this.hostDetailUrl + this.params['id'] + '/';

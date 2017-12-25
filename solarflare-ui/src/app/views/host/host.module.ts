@@ -11,6 +11,7 @@ import {RangePipe} from "../../range.pipe";
 import {ClrModalModule} from "clarity-angular";
 import {ClrDatagridModule} from "clarity-angular";
 import {ClrIconModule} from "clarity-angular";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 @NgModule({
   imports: [
@@ -19,8 +20,13 @@ import {ClrIconModule} from "clarity-angular";
       ClrTabsModule,
       ClrModalModule,
       ClrDatagridModule,
-      ClrIconModule
+      ClrIconModule,
+      FormsModule,
+      ReactiveFormsModule
   ],
-  declarations: [HostComponent, OverviewComponent, FwupdateComponent, ConfigComponent, RangePipe]
+  declarations: [HostComponent, OverviewComponent, FwupdateComponent, ConfigComponent, RangePipe],
+    exports:[
+        ReactiveFormsModule
+    ]
 })
 export class HostModule { }

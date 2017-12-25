@@ -41,3 +41,37 @@ span.adaptorName{
 .table-border-right{
   border-right: 0.5px solid teal;
 }
+
+.datagrid-body{
+  overflow-y: inherit;
+}
+
+.colored:before{
+    background-color: #62a420 !important;
+  border-color: #62a420 !important;
+}
+
+.UPLOADING{
+    color: forestgreen;
+}
+.UPLOADED{
+    color: blue;
+
+}
+.UPLOADING_FAIL{
+    color: red;
+}
+.VALIDATING{
+    color: darkgreen;
+
+}
+.VALIDATED{
+    color: green;
+
+}
+.VALIDATION_FAIL{
+    color: red;
+}
+.DONE{
+    color: orange;
+}
