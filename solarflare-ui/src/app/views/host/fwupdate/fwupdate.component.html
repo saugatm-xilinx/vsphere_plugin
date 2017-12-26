@@ -134,8 +134,8 @@
 
 <clr-modal [clrModalSize]="'md'" [(clrModalOpen)]="customUpdateModal" [clrModalClosable]="false"
            [clrModalStaticBackdrop]="true">
-    <h3 class="modal-title">Custom Update from
-        <div class="toggle-switch">
+    <h3 class="modal-title">Custom Update
+        <div style="position: absolute;right: 0;" class="toggle-switch">
             <input type="checkbox" name="isUrl" id="urlFileSelect"
                    style="visibility: hidden;" [(ngModel)]="customSelectUrl">
             <label [ngStyle]="{'font-weight': customSelectUrl === true ? '' : 900,
@@ -187,7 +187,7 @@
             &nbsp; Please select firmware file
         </p>
 
-        <form [formGroup]="customUploadUrl" *ngIf="customSelectUrl">
+        <form style="min-height: 72px;" [formGroup]="customUploadUrl" *ngIf="customSelectUrl">
             <section class="form-block">
                 <div class="form-group row">
                     <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
@@ -206,10 +206,18 @@
                                class="tooltip tooltip-validation tooltip-md tooltip-top-left"
                                [class.invalid]="customUploadUrl.invalid && (customUploadUrl.dirty || customUploadUrl.touched)">
                             <input type="text" id="url" formControlName="url"
-                                   required pattern="^([a-zA-Z0-9]+(\.[a-zA-Z0-9]+)+.*)$"
+                                   required
+                                   (input)="urlVerifier()"
                                    placeholder="solarflare.com/downloads/.../mcfw.dat" size="40">
                             <span class="tooltip-content">
-                    Valid Protocol and URL Required
+                                Valid
+                                <i *ngIf="customUploadUrl.value.url === ''
+                                && customUploadUrl.value.urlProtocol !== ''">URL</i>
+                                <i *ngIf="customUploadUrl.value.urlProtocol === ''
+                                && customUploadUrl.value.url !== ''">Protocol</i>
+                                <i *ngIf="urlVerifier() && customUploadUrl.value.url === ''
+                                && customUploadUrl.value.urlProtocol === ''">Protocol and URL</i>
+                                Required
                 </span>
                         </label>
                     </div>
@@ -227,7 +235,7 @@
                                 {{customUploadFile.value.fwFile.filename}}
                             </a>
                             <a *ngIf="customUploadFile.invalid">
-                                Select F/w File
+                                Select Firmware File
                             </a>
                         </label>
                         <input type="file"
@@ -235,7 +243,6 @@
                                placeholder="Select file" style="display: none;"
                                accept=".dat"/>
                     </div>
-
                     <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
 
                         <button type="button" class="btn btn-sm btn-default" (click)="clearFile()">Clear</button>
@@ -344,7 +351,7 @@
                             </a>
                         </clr-dg-cell>
 
-                        <clr-dg-cell>
+                        <clr-dg-cell >
                              <span *ngIf="ad.laterVersionAvailable">
                                  <b>Available</b>
                                 </span>
@@ -359,7 +366,7 @@
             </div>
             <div class="col-md-12" style="text-align: center;">
                 <button class="btn"
-                        (click)="validateLatestUpdate() && latestUpdateModal = true"
+                        (click)="latestUpdateModal = true"
                         [disabled]="selectedAdapters.length == 0">
                     Update
                 </button>
