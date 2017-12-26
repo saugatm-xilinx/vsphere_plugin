@@ -60,11 +60,11 @@ public class CIMService {
 		return results;
 	}
 
-	public WBEMClient getClient(CIMHost cimHost, String cimObjectName) {
+	public synchronized WBEMClient getClient(CIMHost cimHost, String cimObjectName) {
 		return getClient(cimHost, cimObjectName, null);
 	}
 
-	public WBEMClient getClient(CIMHost cimHost, String cimObjectName, CIMProperty<?>[] properties) {
+	public synchronized WBEMClient getClient(CIMHost cimHost, String cimObjectName, CIMProperty<?>[] properties) {
 		javax.security.auth.Subject subject = createSubjectFromHost(cimHost);
 
 		try {
@@ -78,7 +78,7 @@ public class CIMService {
 		return null;
 	}
 
-	private CIMObjectPath getHostObjectPath(CIMHost cimHost, CIMProperty<?>[] properties, String cimObjectName) {
+	private synchronized CIMObjectPath getHostObjectPath(CIMHost cimHost, CIMProperty<?>[] properties, String cimObjectName) {
 		try {
 			URL UrlHost = new URL(cimHost.getUrl());
 			return new CIMObjectPath(UrlHost.getProtocol(), UrlHost.getHost(), String.valueOf(UrlHost.getPort()),
@@ -89,7 +89,7 @@ public class CIMService {
 		return null;
 	}
 
-	private javax.security.auth.Subject createSubjectFromHost(CIMHost cimHost) {
+	private synchronized javax.security.auth.Subject createSubjectFromHost(CIMHost cimHost) {
 		String user = "";
 		String password = "";
 		javax.security.auth.Subject subject = new javax.security.auth.Subject();
@@ -108,7 +108,7 @@ public class CIMService {
 		return subject;
 	}
 
-	public CIMInstance getFirmwareSoftwareInstallationInstance(CIMHost cimHost) throws WBEMException {
+	public synchronized CIMInstance getFirmwareSoftwareInstallationInstance(CIMHost cimHost) throws WBEMException {
 		Collection<CIMInstance> instances = getAllInstances(cimHost, CIMConstants.CIM_NAMESPACE,
 				CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE);
 		logger.info("Getting Firmware Software Installation Instance");
@@ -124,7 +124,7 @@ public class CIMService {
 		return svc_mcfw_inst;
 	}
 
-	public CIMInstance getBootROMSoftwareInstallationInstance(CIMHost cimHost) throws WBEMException {
+	public synchronized CIMInstance getBootROMSoftwareInstallationInstance(CIMHost cimHost) throws WBEMException {
 		logger.info("Getting BootROM Software Installation Instance");
 		Collection<CIMInstance> instances = getAllInstances(cimHost, CIMConstants.CIM_NAMESPACE,
 				CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE);
@@ -321,7 +321,7 @@ public class CIMService {
 		return valid;
 	}
 
-	public String getLatestControllerFWImageVersion(ServiceContent serviceContent, VimPortType vimPort, CIMHost cimHost,
+	public synchronized String getLatestControllerFWImageVersion(ServiceContent serviceContent, VimPortType vimPort, CIMHost cimHost,
 			CIMInstance fwInstance, CIMInstance nicInstance)
 			throws MalformedURLException, RuntimeFaultFaultMsg, URISyntaxException, WBEMException {
 		String versionString = "0.0.0.0";
@@ -338,7 +338,7 @@ public class CIMService {
 		return versionString;
 	}
 
-	public String getLatestBootROMFWImageVersion(ServiceContent serviceContent, VimPortType vimPort, CIMHost cimHost,
+	public synchronized String getLatestBootROMFWImageVersion(ServiceContent serviceContent, VimPortType vimPort, CIMHost cimHost,
 			CIMInstance bootROMInstance, CIMInstance nicInstance)
 			throws MalformedURLException, RuntimeFaultFaultMsg, URISyntaxException, WBEMException {
 		String versionString = "0.0.0.0";
@@ -403,7 +403,7 @@ public class CIMService {
 
 	}
 
-	public boolean isCustomFWImageCompatible(CIMHost cimHost, CIMInstance fwInst, CIMInstance nicInstance, FileHeader header)
+	public synchronized boolean isCustomFWImageCompatible(CIMHost cimHost, CIMInstance fwInst, CIMInstance nicInstance, FileHeader header)
 			throws Exception {
 		boolean isCompatible = false;
 

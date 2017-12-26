@@ -119,6 +119,7 @@ public class FirmwareUpdateThread implements Runnable {
 	}
 
 	private synchronized void updateController() throws Exception {
+		try{
 		logger.info("Start updating controller for adapterId : " + adapterId);
 		currentProcess = MessageConstant.CONTROLLER;
 		String statusId = VCenterHelper.generateId(hostId, adapterId, MessageConstant.CONTROLLER);
@@ -131,6 +132,7 @@ public class FirmwareUpdateThread implements Runnable {
 			bytes = cim.readData(fwImagePath, readComplete);
 			header = cim.getFileHeader(bytes);
 		}
+		logger.info("FW Image URL : "+fwImagePath);
 		TaskStatus.updateTaskStatus(statusId, UploadStatusEnum.VALIDATING.toString(),
 				"Controller firmware image validation in-progress", MessageConstant.CONTROLLER);
 		logger.info("Adapter Id :" + statusId + " , controller " + UploadStatusEnum.VALIDATING.toString());
@@ -143,7 +145,7 @@ public class FirmwareUpdateThread implements Runnable {
 			TaskStatus.updateTaskStatus(statusId, UploadStatusEnum.UPLOADING.toString(),
 					"Controller firmware image file uploading in-progress", MessageConstant.CONTROLLER);
 
-			boolean res = cim.updateFirmwareFromURL(svc_mcfw_inst.getObjectPath(), cimHost, nicInstance, fwImagePath);
+			boolean res = cim.updateFirmwareFromURL(svc_mcfw_inst.getObjectPath(), cimHost, this.nicInstance, fwImagePath);
 			logger.info("Result after upload is : " + res);
 			if (res) {
 				TaskStatus.updateTaskStatus(statusId, UploadStatusEnum.DONE.toString(),
@@ -161,6 +163,9 @@ public class FirmwareUpdateThread implements Runnable {
 			logger.info("Image not compatable");
 		}
 		currentProcess = "";
+		}catch(Exception e){
+			logger.error("Error in updating controller firmware, error "+e.getMessage());
+		}
 	}
 
 	private synchronized void updateBootROM() throws Exception {

@@ -175,7 +175,8 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 
 				sendDataInChunks(cimHost, fwInstance, tempFile, decodedDataBytes);
 
-				fwImageURL = new URL("file:\\" + tempFile);
+				///TODO check /
+				fwImageURL = new URL("file:/" + tempFile);
 
 				CIMInstance nicInstance = null;
 
@@ -185,6 +186,9 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 					Runnable workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL, header,
 							nicInstance, adapter.getId(), hostId, true, controller, bootrom);
 					executor.execute(workerForFW);
+					//FirmwareUpdateThread workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL, header,
+						//	nicInstance, adapter.getId(), hostId, true, controller, bootrom);
+					//workerForFW.process();
 				}
 
 				// Delete temp file after updating firmware
