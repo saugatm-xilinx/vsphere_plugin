@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -31,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
 import org.sblim.cimclient.internal.util.MOF;
 
 import com.solarflare.vcp.helper.MetadataHelper;
+import com.solarflare.vcp.helper.SFBase64;
 import com.solarflare.vcp.model.FileHeader;
 import com.solarflare.vcp.model.SfFirmware;
 import com.vmware.vim25.Extension;
@@ -401,7 +403,7 @@ public class CIMService {
 
 	}
 
-	public boolean isCustomFWImageCompatible(CIMHost cimHost, CIMInstance fwInst, CIMInstance nicInstance, byte[] bytes)
+	public boolean isCustomFWImageCompatible(CIMHost cimHost, CIMInstance fwInst, CIMInstance nicInstance, FileHeader header)
 			throws Exception {
 		boolean isCompatible = false;
 
@@ -412,7 +414,7 @@ public class CIMService {
 		logger.info("Current firmware type : " + currentType);
 		logger.info("Current firmware subtype : " + currentSubType);
 
-		FileHeader header = getFileHeader(bytes);
+		//FileHeader header = getFileHeader(bytes);
 		logger.info("Headers: " + header);
 		int newType = header.getType();
 		int newSubType = header.getSubtype();
@@ -628,6 +630,7 @@ public class CIMService {
 			Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.SEND_FW_IMAGE_DATA, cimArguments,
 					cimArgumentsOut);
 			int statusCode = Integer.parseInt(status.toString());
+			logger.info("Status Code : "+statusCode);
 			if (statusCode == 0) {
 				logger.info("'SendFwImageData' method invoked successfully!");
 			} else {
@@ -743,5 +746,6 @@ public class CIMService {
 		}
 
 	}
-
+	
+	
 }

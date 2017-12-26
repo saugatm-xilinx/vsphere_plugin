@@ -41,10 +41,10 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 
 	VCenterService service = new VCenterService();
 	CIMService cim = new CIMService();
-	
-	//Work-around for multi-threading issue in updating firmware
-	Map<String,Host> hostMap = new HashMap<>();
-	Map<String,List<Adapter>> hostAdapters = new HashMap<>();
+
+	// Work-around for multi-threading issue in updating firmware
+	Map<String, Host> hostMap = new HashMap<>();
+	Map<String, List<Adapter>> hostAdapters = new HashMap<>();
 	boolean isUpdateInProgress = false;
 
 	@Autowired
@@ -56,17 +56,17 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 	public List<Host> getHostList() throws Exception {
 		List<Host> hostList = null;
 		try {
-			if(isUpdateInProgress){
-				for(String hostID : hostMap.keySet()){
+			if (isUpdateInProgress) {
+				for (String hostID : hostMap.keySet()) {
 					hostList.add(hostMap.get(hostID));
 				}
-			}else{
+			} else {
 				hostList = service.getHostsList(userSessionService);
-				for(Host host : hostList){
+				for (Host host : hostList) {
 					hostMap.put(host.getId(), host);
 				}
 			}
-			
+
 		} catch (Exception e) {
 			throw e;
 		}
@@ -77,10 +77,10 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 	public Host getHostById(String hostId) throws Exception {
 		Host host = null;
 		try {
-			if(isUpdateInProgress){
+			if (isUpdateInProgress) {
 				hostMap.get(hostId);
-			}else{
-			
+			} else {
+
 				host = service.getHostById(userSessionService, hostId);
 				hostMap.put(host.getId(), host);
 			}
@@ -107,22 +107,22 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 				FirmewareVersion fwVersion = adapter.getLatestVersion();
 				boolean contronller = false;
 				boolean bootRom = false;
-				if(fwVersion.getControlerVersion() !=null)
-				{
+				if (fwVersion.getControlerVersion() != null) {
 					contronller = true;
 				}
-				if(fwVersion.getBootROMVersion() != null)
-				{
+				if (fwVersion.getBootROMVersion() != null) {
 					bootRom = true;
 				}
-				Runnable workerForController = new FirmwareUpdateThread(serviceContent, cim, cimHost, null, data,
+				Runnable workerForController = new FirmwareUpdateThread(serviceContent, cim, cimHost, null, null,
 						nicInstance, adapterId, hostId, false, contronller, bootRom);
 				executor.execute(workerForController);
-				
-				//FirmwareUpdateThread workerForController = new FirmwareUpdateThread(serviceContent, cim, cimHost, null, data,
-				//				nicInstance, adapterId, hostId, false, contronller, bootRom);
-				//workerForController.process();
-				
+
+				// FirmwareUpdateThread workerForController = new
+				// FirmwareUpdateThread(serviceContent, cim, cimHost, null,
+				// data,
+				// nicInstance, adapterId, hostId, false, contronller, bootRom);
+				// workerForController.process();
+
 			}
 			isSuccess = true;
 			isUpdateInProgress = false;
@@ -155,14 +155,17 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 																		// bytes
 			FileHeader header = cim.getFileHeader(headerData);
 
+			logger.info("Header : " + header);
 			boolean controller = false;
 			boolean bootrom = false;
 			CIMInstance fwInstance = null;
 			if (FirmwareType.FIRMWARE_TYPE_MCFW.ordinal() == header.getType()) {
+				logger.info("Updating Controller");
 				fwInstance = cim.getFirmwareSoftwareInstallationInstance(cimHost);
 				controller = true;
 			} else if (FirmwareType.FIRMWARE_TYPE_BOOTROM.ordinal() == header.getType()) {
 				// Get BootROM SF_SoftwareInstallationService instance
+				logger.info("Updating BootROM");
 				fwInstance = cim.getBootROMSoftwareInstallationInstance(cimHost);
 				bootrom = true;
 			}
@@ -179,14 +182,16 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 				for (Adapter adapter : adapterList) {
 					nicInstance = cim.getNICCardInstance(cimHost, adapter.getChildren().get(0).getName());
 
-					Runnable workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL,
-							new String(decodedDataBytes), nicInstance, adapter.getId(), hostId, true, controller, bootrom);
+					Runnable workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL, header,
+							nicInstance, adapter.getId(), hostId, true, controller, bootrom);
 					executor.execute(workerForFW);
 				}
 
 				// Delete temp file after updating firmware
-				boolean isRemoved = cim.removeFwImage(cimHost, fwInstance, tempFile);
-				logger.info("File " + tempFile + " Removed status: " + isRemoved);
+				// boolean isRemoved = cim.removeFwImage(cimHost, fwInstance,
+				// tempFile);
+				// logger.info("File " + tempFile + " Removed status: " +
+				// isRemoved);
 			} else {
 				// TODO : log error for invalid firmware file
 			}
@@ -205,7 +210,7 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 		boolean isSuccess = false;
 		isUpdateInProgress = true;
 		try {
-			logger.info("fwImagePath : "+fwImagePath);
+			logger.info("fwImagePath : " + fwImagePath);
 			String data = null; // As this is update from URL
 			URL fwImageURL = new URL(fwImagePath);
 			ServiceContent serviceContent = VCenterHelper.getServiceContent(userSessionService, VCenterService.vimPort);
@@ -223,20 +228,23 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 			} else if (FirmwareType.FIRMWARE_TYPE_BOOTROM.ordinal() == header.getType()) {
 				bootrom = true;
 			}
-			logger.info("is controller " + controller) ;
-			logger.info("is BootROM " + bootrom) ;
-			
+			logger.info("is controller " + controller);
+			logger.info("is BootROM " + bootrom);
+
 			CIMInstance nicInstance = null;
 
 			for (Adapter adapter : adapterList) {
 				nicInstance = cim.getNICCardInstance(cimHost, adapter.getChildren().get(0).getName());
 
-				//Runnable workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL, data,
-				//		nicInstance, adapter.getId(), hostId, true, controller, bootrom);
-				//executor.execute(workerForFW);
-				
-				FirmwareUpdateThread workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL, data,
-						nicInstance, adapter.getId(), hostId, true, controller, bootrom);
+				// Runnable workerForFW = new
+				// FirmwareUpdateThread(serviceContent, cim, cimHost,
+				// fwImageURL, data,
+				// nicInstance, adapter.getId(), hostId, true, controller,
+				// bootrom);
+				// executor.execute(workerForFW);
+
+				FirmwareUpdateThread workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL,
+						header, nicInstance, adapter.getId(), hostId, true, controller, bootrom);
 				workerForFW.process();
 			}
 			isSuccess = true;
@@ -261,10 +269,10 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 	public List<Adapter> getHostAdapters(String hostId) throws Exception {
 
 		List<Adapter> adapters = new ArrayList<>();
-		if(isUpdateInProgress){
+		if (isUpdateInProgress) {
 			adapters = hostAdapters.get(hostId);
-		}else{
-			adapters = service.getAdapters(userSessionService, hostId,cim);
+		} else {
+			adapters = service.getAdapters(userSessionService, hostId, cim);
 			hostAdapters.put(hostId, adapters);
 		}
 		return adapters;
@@ -283,43 +291,71 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 	}
 
 	private void sendDataInChunks(CIMHost cimHost, CIMInstance fwInstance, String tempFile, byte[] decodedDataBytes) {
-		// Send/write this data to temp file on host
+		// Send/write this data totemp file on host
+		logger.info("Sending data in chunks");
 		SFBase64 sfBase64 = new SFBase64();
 		int chunkSize = 100000;
 		int index;
-		for (index = chunkSize; index < decodedDataBytes.length; index += chunkSize) {
-			byte[] temp = Arrays.copyOf(decodedDataBytes, index);
-			int encodeSize = sfBase64.base64_enc_size(index);
+		logger.info("decodedDataBytes.length : " + decodedDataBytes.length);
+		for (index = 0; index < decodedDataBytes.length; index += chunkSize) {
+			logger.info("index : " + index);
+			if(index+chunkSize > decodedDataBytes.length){
+				chunkSize  = decodedDataBytes.length - index;
+			}
+			logger.info("chunkSize : " + chunkSize);
+			byte[] temp = Arrays.copyOfRange(decodedDataBytes, index, index + chunkSize);
+			int encodeSize = sfBase64.base64_enc_size(chunkSize);
 			byte[] encoded = new byte[encodeSize];
 			// using SFBase64 to encode data
-			encoded = sfBase64.base64_encode(temp, index);
+			encoded = sfBase64.base64_encode(temp, chunkSize);
 			cim.sendFWImageData(cimHost, fwInstance, new String(encoded), tempFile);
 		}
 
 		// send remaining last chunk
-		index -= chunkSize;
-		byte[] temp = Arrays.copyOfRange(decodedDataBytes, index, decodedDataBytes.length);
-		int encodeSize = sfBase64.base64_enc_size(index);
-		byte[] encoded = new byte[encodeSize];
-		encoded = sfBase64.base64_encode(temp, index);
-		cim.sendFWImageData(cimHost, fwInstance, new String(encoded), tempFile);
+		//index -= chunkSize;
+		//byte[] temp = Arrays.copyOfRange(decodedDataBytes, index, decodedDataBytes.length);
+		//int encodeSize = sfBase64.base64_enc_size(decodedDataBytes.length - index);
+		//byte[] encoded = new byte[encodeSize];
+		//encoded = sfBase64.base64_encode(temp, decodedDataBytes.length - index);
+		//cim.sendFWImageData(cimHost, fwInstance, new String(encoded), tempFile);
+		logger.info("Sending data in chunks is complete");
 	}
+
+	/*
+	 * private void sendDataInChunks(CIMHost cimHost, CIMInstance fwInstance,
+	 * String tempFile, byte[] decodedDataBytes) {
+	 * logger.info("Sending data in chunks"); // Send/write this data to temp
+	 * file on host SFBase64 sfBase64 = new SFBase64(); int chunkSize = 100000;
+	 * int dataSent = 0; int decodedDataSize = decodedDataBytes.length; for (int
+	 * index = 0; index <= decodedDataSize; index += chunkSize) {
+	 * System.out.println("index:" + index); if (index + chunkSize >
+	 * decodedDataSize) { // Adjust chunk size chunkSize = decodedDataSize -
+	 * index; }
+	 * 
+	 * if (chunkSize > 0) { byte[] temp = Arrays.copyOfRange(decodedDataBytes,
+	 * index, chunkSize); int encodeSize = sfBase64.base64_enc_size(chunkSize);
+	 * byte[] encoded = new byte[encodeSize]; // using SFBase64 to encode data
+	 * encoded = sfBase64.base64_encode(temp, chunkSize);
+	 * cim.sendFWImageData(cimHost, fwInstance, new String(encoded), tempFile);
+	 * dataSent += chunkSize; } }
+	 * logger.info("Sending data in chunks is complete"); }
+	 */
 
 	@Override
 	public List<Status> getStatus(String hostId, String adapterId) throws Exception {
-		
+
 		String cntStatusId = VCenterHelper.generateId(hostId, adapterId, MessageConstant.CONTROLLER);
 		String bootStatusId = VCenterHelper.generateId(hostId, adapterId, MessageConstant.BOOTROM);
-		
+
 		List<Status> statusList = new ArrayList<>();
 		List<Status> cntStatus = TaskStatus.getTaskStatus(cntStatusId);
 		List<Status> boootStatus = TaskStatus.getTaskStatus(bootStatusId);
-		
-		statusList.addAll(cntStatus == null ? new ArrayList<Status>(): cntStatus);
-		statusList.addAll(boootStatus == null ? new ArrayList<Status>(): boootStatus);
-		
+
+		statusList.addAll(cntStatus == null ? new ArrayList<Status>() : cntStatus);
+		statusList.addAll(boootStatus == null ? new ArrayList<Status>() : boootStatus);
+
 		return statusList;
-		
+
 	}
 
 }
