@@ -4,7 +4,7 @@ import {Http} from "@angular/http";
 import {GlobalsService} from "../../../shared/globals.service";
 import {Subscription} from 'rxjs/Subscription';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {isEmpty} from "rxjs/operator/isEmpty";
+
 
 @Component({
     selector: 'app-fwupdate',
@@ -135,7 +135,6 @@ export class FwupdateComponent implements OnInit {
             );
     }
 
-
     createFormFile() {
         this.customUploadFile = this.fb.group({
             fwFile: ['', Validators.required],
@@ -201,7 +200,6 @@ export class FwupdateComponent implements OnInit {
 
     }
 
-
     onSubmitUrl() {
         this.button.custom = true;
         const formModel = this.customUploadUrl.value;
@@ -223,6 +221,8 @@ export class FwupdateComponent implements OnInit {
                     this.customUpdateModal = false;
                     this.button.custom = false;
                     this.button.customErr = false;
+                    this.customUploadUrl.get('url').setValue('');
+                    this.customUploadUrl.get('urlProtocol').setValue('');
                 },
                 err => {
                     console.error(err);
@@ -279,16 +279,38 @@ export class FwupdateComponent implements OnInit {
         return false;
     }
 
+    urlVerifier(){
+        let url = this.customUploadUrl.get('url');
+        let re = /^(https?:\/\/)/;
+        let rehttp = /^(http:\/\/)/;
+        let rehttps =/^(https:\/\/)/;
+        if (url.status !== 'INVALID'){
+            if(rehttp.test(url.value)){
+                this.customUploadUrl.get('url').setValue(url.value.replace( re , ""));
+                this.customUploadUrl.get('urlProtocol').setValue('http://');
+            }else if (rehttps.test(url.value)){
+                this.customUploadUrl.get('url').setValue(url.value.replace( re , ""));
+                this.customUploadUrl.get('urlProtocol').setValue('https://');
+            }
+        }else{
+            return true;
+        }
+    }
+
+    /*var re = new RegExp("^(http|https)://", "i");
+var str = "My String";
+var match = re.test(str);*/
+
     /*
-    * 	UPLOADING,
+    UPLOADING,
     UPLOADED,
     UPLOADING_FAIL,
     VALIDATING,
     VALIDATED,
     VALIDATION_FAIL,
     DONE
-
     */
+
     devMode() {
         this.adapterList =[{
             "name": "SFC9140-00:0f:53:2f:bf:20",
