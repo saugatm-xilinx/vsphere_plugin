@@ -100,6 +100,10 @@ public class VCenterHelper {
 		String versionAr2[] = removedNonDigitChar2.split("\\.");
 		// Consider the version like this 1.1.1.1
 
+		if(removedNonDigitChar1.equals(removedNonDigitChar2)){
+			return removedNonDigitChar1;
+		}
+		
 		int l1 = versionAr1.length;
 		int l2 = versionAr1.length;
 

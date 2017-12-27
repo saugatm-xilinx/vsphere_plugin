@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.cim.CIMInstance;
 
@@ -108,21 +109,23 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 				FirmewareVersion fwVersion = adapter.getLatestVersion();
 				boolean contronller = false;
 				boolean bootRom = false;
-				if (fwVersion.getControlerVersion() != null) {
+				//Check for controller version
+				String currentVersion = adapter.getVersionController();
+				String latestVersion = fwVersion.getControlerVersion(); 
+				String latest = VCenterHelper.getLatestVersion(currentVersion, latestVersion);
+				if ( latest.equals(latestVersion)) {
 					contronller = true;
 				}
-				if (fwVersion.getBootROMVersion() != null) {
+				//Check for Boot ROM version
+				currentVersion = adapter.getVersionBootROM();
+				latestVersion = fwVersion.getBootROMVersion(); 
+				latest = VCenterHelper.getLatestVersion(currentVersion, latestVersion);
+				if (latest.equals(latestVersion)) {
 					bootRom = true;
 				}
 				Runnable workerForController = new FirmwareUpdateThread(serviceContent, cim, cimHost, null, null,
 						nicInstance, adapterId, hostId, false, contronller, bootRom);
 				executor.execute(workerForController);
-
-				// FirmwareUpdateThread workerForController = new
-				// FirmwareUpdateThread(serviceContent, cim, cimHost, null,
-				// data,
-				// nicInstance, adapterId, hostId, false, contronller, bootRom);
-				// workerForController.process();
 
 			}
 			isSuccess = true;
@@ -176,7 +179,7 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 
 				sendDataInChunks(cimHost, fwInstance, tempFile, decodedDataBytes);
 
-				///TODO check /
+				/// TODO check /
 				fwImageURL = new URL("file:/" + tempFile);
 
 				CIMInstance nicInstance = null;
@@ -187,16 +190,15 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 					Runnable workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL, header,
 							nicInstance, adapter.getId(), hostId, true, controller, bootrom);
 					executor.execute(workerForFW);
-					//FirmwareUpdateThread workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL, header,
-						//	nicInstance, adapter.getId(), hostId, true, controller, bootrom);
-					//workerForFW.process();
 				}
-
-				// Delete temp file after updating firmware
-				// boolean isRemoved = cim.removeFwImage(cimHost, fwInstance,
-				// tempFile);
-				// logger.info("File " + tempFile + " Removed status: " +
-				// isRemoved);
+				//executor.shutdown();
+				//boolean finshed = executor.awaitTermination(1, TimeUnit.MINUTES);
+				/*
+				if (finshed) {
+					// Delete temp file after updating firmware
+					boolean isRemoved = cim.removeFwImage(cimHost, fwInstance, tempFile);
+					logger.info("File " + tempFile + " Removed status: " + isRemoved);
+				}*/
 			} else {
 				// TODO : log error for invalid firmware file
 			}
@@ -241,16 +243,9 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 			for (Adapter adapter : adapterList) {
 				nicInstance = cim.getNICCardInstance(cimHost, adapter.getChildren().get(0).getName());
 
-				// Runnable workerForFW = new
-				// FirmwareUpdateThread(serviceContent, cim, cimHost,
-				// fwImageURL, data,
-				// nicInstance, adapter.getId(), hostId, true, controller,
-				// bootrom);
-				// executor.execute(workerForFW);
-
-				FirmwareUpdateThread workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL,
-						header, nicInstance, adapter.getId(), hostId, true, controller, bootrom);
-				workerForFW.process();
+				 Runnable workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL, header, nicInstance, adapter.getId(), hostId, true, controller,bootrom);
+				 executor.execute(workerForFW);
+				
 			}
 			isSuccess = true;
 			isUpdateInProgress = false;
@@ -301,13 +296,10 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 		SFBase64 sfBase64 = new SFBase64();
 		int chunkSize = 100000;
 		int index;
-		logger.info("decodedDataBytes.length : " + decodedDataBytes.length);
 		for (index = 0; index < decodedDataBytes.length; index += chunkSize) {
-			logger.info("index : " + index);
-			if(index+chunkSize > decodedDataBytes.length){
-				chunkSize  = decodedDataBytes.length - index;
+			if (index + chunkSize > decodedDataBytes.length) {
+				chunkSize = decodedDataBytes.length - index;
 			}
-			logger.info("chunkSize : " + chunkSize);
 			byte[] temp = Arrays.copyOfRange(decodedDataBytes, index, index + chunkSize);
 			int encodeSize = sfBase64.base64_enc_size(chunkSize);
 			byte[] encoded = new byte[encodeSize];
@@ -315,36 +307,9 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 			encoded = sfBase64.base64_encode(temp, chunkSize);
 			cim.sendFWImageData(cimHost, fwInstance, new String(encoded), tempFile);
 		}
-
-		// send remaining last chunk
-		//index -= chunkSize;
-		//byte[] temp = Arrays.copyOfRange(decodedDataBytes, index, decodedDataBytes.length);
-		//int encodeSize = sfBase64.base64_enc_size(decodedDataBytes.length - index);
-		//byte[] encoded = new byte[encodeSize];
-		//encoded = sfBase64.base64_encode(temp, decodedDataBytes.length - index);
-		//cim.sendFWImageData(cimHost, fwInstance, new String(encoded), tempFile);
+		
 		logger.info("Sending data in chunks is complete");
 	}
-
-	/*
-	 * private void sendDataInChunks(CIMHost cimHost, CIMInstance fwInstance,
-	 * String tempFile, byte[] decodedDataBytes) {
-	 * logger.info("Sending data in chunks"); // Send/write this data to temp
-	 * file on host SFBase64 sfBase64 = new SFBase64(); int chunkSize = 100000;
-	 * int dataSent = 0; int decodedDataSize = decodedDataBytes.length; for (int
-	 * index = 0; index <= decodedDataSize; index += chunkSize) {
-	 * System.out.println("index:" + index); if (index + chunkSize >
-	 * decodedDataSize) { // Adjust chunk size chunkSize = decodedDataSize -
-	 * index; }
-	 * 
-	 * if (chunkSize > 0) { byte[] temp = Arrays.copyOfRange(decodedDataBytes,
-	 * index, chunkSize); int encodeSize = sfBase64.base64_enc_size(chunkSize);
-	 * byte[] encoded = new byte[encodeSize]; // using SFBase64 to encode data
-	 * encoded = sfBase64.base64_encode(temp, chunkSize);
-	 * cim.sendFWImageData(cimHost, fwInstance, new String(encoded), tempFile);
-	 * dataSent += chunkSize; } }
-	 * logger.info("Sending data in chunks is complete"); }
-	 */
 
 	@Override
 	public List<Status> getStatus(String hostId, String adapterId) throws Exception {

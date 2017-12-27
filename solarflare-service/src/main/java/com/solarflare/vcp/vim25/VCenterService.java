@@ -572,9 +572,9 @@ public class VCenterService
                             // Check for latest version available
                             FirmewareVersion frmVesion = new FirmewareVersion();
                             
-                            if (latestVersion.equals(latestControllerVersion))
+                            frmVesion.setControlerVersion(latestControllerVersion);
+                            if (latestVersion.equals(latestControllerVersion) && !latestVersion.equals(VCenterHelper.removeNonDigitChar(controllerVersion)))
                             {
-                            	frmVesion.setControlerVersion(latestControllerVersion);
                             	adapter.setLaterVersionAvailable(true);
                             }
                            
@@ -585,10 +585,15 @@ public class VCenterService
 							logger.debug("Getting latest version of BootRom is :" + latestBootRomVersion);
 							String finalLatestBootVersion = VCenterHelper.getLatestVersion(bootROMVersion,
 									latestBootRomVersion);
-							if (latestBootRomVersion.equals(finalLatestBootVersion)) {
-								frmVesion.setBootROMVersion(finalLatestBootVersion);
+							frmVesion.setBootROMVersion(finalLatestBootVersion);
+							if (latestBootRomVersion.equals(finalLatestBootVersion) && !finalLatestBootVersion.equals(VCenterHelper.removeNonDigitChar(bootROMVersion))) {
 								adapter.setLaterVersionAvailable(true);
 							}
+							
+							// Put dummy latest versions for UEFI and Firmware family
+							frmVesion.setUefiVersion(UEFIROMVersion); //setting current as latest for now
+							frmVesion.setFirmewareFamilyVersion(firmwareVersion); //setting current as latest for now
+							
 							adapter.setLatestVersion(frmVesion);
                         }
                         adapters.add(adapter);

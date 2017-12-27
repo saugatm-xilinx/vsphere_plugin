@@ -6,7 +6,6 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -36,7 +35,6 @@ import com.solarflare.vcp.services.HostAdapterService;
 @RequestMapping(value = "/services/hosts")
 public class HostAdapterController {
 	private static final Log logger = LogFactory.getLog(HostAdapterController.class);
-	private static final ReentrantLock lock = new ReentrantLock();
 
 	@Autowired
 	HostAdapterService hostAdapterService;
@@ -47,14 +45,12 @@ public class HostAdapterController {
 		logger.info("Start getting host info by host id :" + hostId);
 
 		Host host = null;
-		lock.lock();
 		try {
 			host = hostAdapterService.getHostById(hostId);
 		} catch (Exception e) {
 			logger.error("Exception while getting host by host id, error: " + e.getMessage());
 			throw e;
 		} finally {
-			lock.unlock();
 		}
 		logger.info("End getting host info by host id :" + hostId);
 		return host;
@@ -64,7 +60,6 @@ public class HostAdapterController {
 	@ResponseBody
 	public List<Host> getHostList() throws Exception {
 		logger.info("Start getting host list");
-		lock.lock();
 		List<Host> hostList = null;
 		try {
 			hostList = hostAdapterService.getHostList();
@@ -72,7 +67,6 @@ public class HostAdapterController {
 			logger.error("Exception while getting list of hosts, error: " + e.getMessage());
 			throw e;
 		} finally {
-			lock.unlock();
 		}
 		logger.info("End getting host list");
 		return hostList;
@@ -82,7 +76,6 @@ public class HostAdapterController {
 	@ResponseBody
 	public List<Adapter> listAdapter(@PathVariable String hostId) throws Exception {
 		logger.info("Start getting list of host adapters for host :" + hostId);
-		lock.lock();
 		List<Adapter> adapters = null;
 		try {
 			adapters = hostAdapterService.getHostAdapters(hostId);
@@ -90,7 +83,6 @@ public class HostAdapterController {
 			logger.error("Exception while getting list of host adapters, error: " + e.getMessage());
 			throw e;
 		} finally {
-			lock.unlock();
 		}
 		logger.info("End getting list of host adapters for host :" + hostId);
 		return adapters;
@@ -101,7 +93,6 @@ public class HostAdapterController {
 	public void updateFirmwareToLatest(@RequestBody String adapterList, @PathVariable String hostId) {
 		logger.info("start getting file as string content");
 		logger.info("adapterList (input) : " + adapterList);
-		lock.lock();
 		try {
 			if (adapterList != null && hostId != null) {
 				Gson gson = new Gson();
@@ -116,7 +107,6 @@ public class HostAdapterController {
 				}
 			}
 		} finally {
-			lock.unlock();
 		}
 		logger.info("End getting file as string content");
 	}
@@ -133,7 +123,6 @@ public class HostAdapterController {
 	@ResponseBody
 	public void updateCustomWithUrl(@RequestBody String adapters, @PathVariable String hostId) {
 		logger.info("start getting file as string content ");
-		lock.lock();
 		try {
 			Gson gson = new Gson();
 			CustomUpdateRequest customUpdateRequest = gson.fromJson(adapters, CustomUpdateRequest.class);
@@ -144,7 +133,6 @@ public class HostAdapterController {
 		} catch (Exception e) {
 			logger.error("Exception while updating firmware, error :" + e.getMessage());
 		} finally {
-			lock.unlock();
 		}
 		logger.info("End getting file as string content");
 	}
@@ -153,7 +141,6 @@ public class HostAdapterController {
 	@ResponseBody
 	public void updateCustomWithBinary(@RequestBody String adapters, @PathVariable String hostId) {
 		logger.info("start getting file as string content");
-		lock.lock();
 		try {
 			Gson gson = new Gson();
 			CustomUpdateRequest customUpdateRequest = gson.fromJson(adapters, CustomUpdateRequest.class);
@@ -162,7 +149,6 @@ public class HostAdapterController {
 		} catch (Exception e) {
 			logger.error("Exception while updating firmware, error :" + e.getMessage());
 		} finally {
-			lock.unlock();
 		}
 		logger.info("End getting file as string content");
 	}
