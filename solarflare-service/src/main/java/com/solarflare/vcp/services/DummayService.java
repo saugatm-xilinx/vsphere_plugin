@@ -3,9 +3,12 @@ package com.solarflare.vcp.services;
 import java.util.List;
 
 import com.solarflare.vcp.model.Adapter;
+import com.solarflare.vcp.model.Debugging;
 import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.HostConfiguration;
+import com.solarflare.vcp.model.NetQueue;
 import com.solarflare.vcp.model.NicBootParamInfo;
+import com.solarflare.vcp.model.Overlay;
 import com.solarflare.vcp.model.Status;
 
 public class DummayService implements HostAdapterService{
@@ -71,12 +74,21 @@ public class DummayService implements HostAdapterService{
 		
 		HostConfiguration hostConfiguration = new HostConfiguration();
 		
-		hostConfiguration.setNetQueueCount(8);
-		hostConfiguration.setNetQueueRSS(4);
-		hostConfiguration.setDebudggingMaskUtils(true);
-		hostConfiguration.setDebudggingMaskReceive(true);
-		hostConfiguration.setOverlayVxlanOffloadEnable(true);
-		hostConfiguration.setOverlayGeneveOffloadEnable(true);
+		NetQueue netQueue = new NetQueue();
+		netQueue.setNetQueueCount(8);
+		netQueue.setRss(4);
+		
+		Debugging debugging = new Debugging();
+		debugging.setMaskUtils(true);
+		debugging.setMaskReceive(true);
+		
+		Overlay overlay = new Overlay();
+		overlay.setGeneveOffloadEnable(true);
+		overlay.setVxlanOffloadEnable(true);
+		
+		hostConfiguration.setNetQueue(netQueue);
+		hostConfiguration.setDebugging(debugging);
+		hostConfiguration.setOverlay(overlay);
 		return hostConfiguration;
 	}
 
