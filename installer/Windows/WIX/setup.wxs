@@ -1,0 +1,692 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<?include BuildVars.wxi?>
+<?include EnvironmentVars.wxi?>
+
+<Product Id="$(var.ProductCode)" Name="$(var.Add_RemoveProductName)" Version="$(var.ProductVersion)" Manufacturer="$(var.ProductManufacturer)" UpgradeCode="$(var.ProductUpgradeCode)" Language="1033">
+	<Package Id="*" InstallerVersion="200" Description="$(var.PackageDescription)" Comments="$(var.PackageComments)" Platform="x64" InstallPrivileges="elevated" Languages="1033" Compressed="yes"/>
+	
+	<InstallExecuteSequence>
+		<Custom Action="ServerStart" Before="InstallFinalize">NOT Installed</Custom>
+		<!-- <Custom Action="ServerStop" Before="RemoveFiles">Installed</Custom> -->
+		<Custom Action="LaunchBrowser" After="InstallFinalize">Installed AND (BROWSER_CHECKBOX_PROPERTY="1")</Custom>
+	</InstallExecuteSequence>
+	<AdminExecuteSequence/>
+	<InstallUISequence/>
+	<AdminUISequence/>
+	<AdvertiseExecuteSequence/>
+	<Media Id="1" DiskPrompt="Disk 1" Cabinet="setup.cab" EmbedCab="yes" CompressionLevel="mszip"/>
+
+	<Property Id="BROWSER" Secure="yes">
+        <RegistrySearch Id="IEXPLORE_SEARCH" Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\IEXPLORE.EXE" Type="raw" Win64="yes" />
+    </Property>
+	<Property Id="INSTALLDIR">
+		<RegistrySearch Id="InstallDirectorySearch" Type="raw" Root="HKLM" Key="Software\$(var.AppName)" Name="InstallDir" Win64="yes"/>
+	</Property>
+	<Property Id="BROWSER_CHECKBOX_PROPERTY" Secure="yes"/>
+	<Property Id="App_Name" Value="$(var.AppName)"/>
+	<Property Id="DiskPrompt" Value="!(loc.UIDiskPrompt)"/>
+	<Property Id="ARPURLINFOABOUT" Value="http://www.solarFlare.com/"/>
+	<Property Id="ARPURLUPDATEINFO" Value="http://www.solarFlare.com/"/>
+	<Property Id="ARPHELPLINK" Value="http://www.solarFlare.com/"/>
+	<Property Id="ARPNOREPAIR" Value="1"/>
+	<Property Id="ARPNOMODIFY" Value="1"/>
+	<Property Id="ARPPRODUCTICON" Value="icon.ico"/>
+	<Icon Id="icon.ico" SourceFile="$(var.ImageFolder)icon.ico"/>
+	<Property Id="ALLUSERS" Value="1"/>
+	<Property Id="MSIFACTUIRMOption" Value="UseRM"/>
+	<Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes" />
+	<Property Id="MSIFACTUSERPROFILE" Value="ALLUSERS"/>
+	<Property Id="MSIFACT_INSTALLDIR" Value="INSTALLDIR"/>
+	<Property Id="PIDTemplate" Value="&lt;####-####-####-####&gt;"/>
+
+	<Feature Id="bin" Title="bin" Level="1" Description="bin folder" Absent="allow" AllowAdvertise="no" TypicalDefault="install" Display="collapse" InstallDefault="local">
+		<ComponentRef Id="bootstrap.jar"/>
+		<ComponentRef Id="catalina.bat"/>
+		<ComponentRef Id="catalina.sh"/>
+		<ComponentRef Id="catalina_tasks.xml"/>
+		<ComponentRef Id="commons_daemon.jar"/>
+		<ComponentRef Id="commons_daemon_native.tar.gz"/>
+		<ComponentRef Id="configtest.bat"/>
+		<ComponentRef Id="configtest.sh"/>
+		<ComponentRef Id="daemon.sh"/>
+		<ComponentRef Id="digest.bat"/>
+		<ComponentRef Id="digest.sh"/>
+		<ComponentRef Id="service.bat"/>
+		<ComponentRef Id="setclasspath.bat"/>
+		<ComponentRef Id="setclasspath.sh"/>
+		<ComponentRef Id="shutdown.bat"/>
+		<ComponentRef Id="shutdown.sh"/>
+		<ComponentRef Id="startup.bat"/>
+		<ComponentRef Id="startup.sh"/>
+		<ComponentRef Id="tcnative_1.dll"/>
+		<ComponentRef Id="tomcat9.exe"/>
+		<ComponentRef Id="tomcat9w.exe"/>
+		<ComponentRef Id="tomcat_juli.jar"/>
+		<ComponentRef Id="tomcat_native.tar.gz"/>
+		<ComponentRef Id="tool_wrapper.bat"/>
+		<ComponentRef Id="tool_wrapper.sh"/>
+		<ComponentRef Id="version.bat"/>
+		<ComponentRef Id="version.sh"/>
+	</Feature>
+	<Feature Id="conf" Title="conf" Level="1" Description="conf folder" Absent="allow" AllowAdvertise="no" TypicalDefault="install" Display="collapse" InstallDefault="local">
+		<ComponentRef Id="catalina.policy"/>
+		<ComponentRef Id="catalina.properties"/>
+		<ComponentRef Id="context.xml"/>
+		<ComponentRef Id="certstore.jks"/>
+		<ComponentRef Id="jaspic_providers.xml"/>
+		<ComponentRef Id="jaspic_providers.xsd"/>
+		<ComponentRef Id="logging.properties"/>
+		<ComponentRef Id="server.xml"/>
+		<ComponentRef Id="tomcat_users.xml"/>
+		<ComponentRef Id="tomcat_users.xsd"/>
+		<ComponentRef Id="web.xml"/>
+	</Feature>
+	<Feature Id="lib" Title="lib" Level="1" Description="lib folder" Absent="allow" AllowAdvertise="no" TypicalDefault="install" Display="collapse" InstallDefault="local">
+		<ComponentRef Id="annotations_api.jar"/>
+		<ComponentRef Id="catalina.jar"/>
+		<ComponentRef Id="catalina_ant.jar"/>
+		<ComponentRef Id="catalina_ha.jar"/>
+		<ComponentRef Id="catalina_storeconfig.jar"/>
+		<ComponentRef Id="catalina_tribes.jar"/>
+		<ComponentRef Id="ecj_4.6.3.jar"/>
+		<ComponentRef Id="el_api.jar"/>
+		<ComponentRef Id="jasper.jar"/>
+		<ComponentRef Id="jasper_el.jar"/>
+		<ComponentRef Id="jaspic_api.jar"/>
+		<ComponentRef Id="jsp_api.jar"/>
+		<ComponentRef Id="servlet_api.jar"/>
+		<ComponentRef Id="tomcat_api.jar"/>
+		<ComponentRef Id="tomcat_coyote.jar"/>
+		<ComponentRef Id="tomcat_dbcp.jar"/>
+		<ComponentRef Id="tomcat_i18n_es.jar"/>
+		<ComponentRef Id="tomcat_i18n_fr.jar"/>
+		<ComponentRef Id="tomcat_i18n_ja.jar"/>
+		<ComponentRef Id="tomcat_jdbc.jar"/>
+		<ComponentRef Id="tomcat_jni.jar"/>
+		<ComponentRef Id="tomcat_util.jar"/>
+		<ComponentRef Id="tomcat_util_scan.jar"/>
+		<ComponentRef Id="tomcat_websocket.jar"/>
+		<ComponentRef Id="websocket_api.jar"/>
+	</Feature>	
+	<Feature Id="temp" Title="temp" Level="1" Description="temp folder" Absent="allow" AllowAdvertise="no" TypicalDefault="install" Display="collapse" InstallDefault="local">
+		<ComponentRef Id="safeToDelete.tmp"/>
+	</Feature>
+	<Feature Id="webapps_dir" Title="webapps" Level="1" Description="webapps folder">
+		<ComponentGroupRef Id="ComponentGroupId" />
+	</Feature>
+	<Feature Id="Server" Title="Server Files" Level="1" Description="Files related to this Installation" Absent="allow" AllowAdvertise="no" TypicalDefault="install" Display="collapse" InstallDefault="local">
+		<ComponentRef Id="LICENSE"/>
+		<ComponentRef Id="NOTICE"/>
+		<ComponentRef Id="RELEASE_NOTES"/>
+		<ComponentRef Id="RUNNING.txt"/>
+	</Feature>
+	<Directory Id="TARGETDIR" Name="SourceDir">
+		<Directory Id="ProgramMenuFolder" Name="ProgramMenuFolder">
+			<!-- <Directory Id="StartMenuAppFolder" Name="SolarFlare"/> -->
+		</Directory>
+		<Directory Id="ProgramFiles64Folder" Name="ProgramFiles64Folder">
+			<Directory Id="INSTALLDIR" Name="Solarflare">
+				<Directory Id="images" Name="images"/>
+				<Directory Id="Server" Name="$(var.ServerName)">
+					<Directory Id="bin" Name="bin"/>
+					<Directory Id="conf" Name="conf"/>
+					<Directory Id="lib" Name="lib"/>
+					<Directory Id="logs" Name="logs"/>
+					<Directory Id="temp" Name="temp"/>
+					<Directory Id="webapps_dir" Name="webapps"/>
+					<Directory Id="work" Name="work"/>
+				</Directory>
+			</Directory>
+		</Directory>
+	</Directory>
+	<UIRef Id="SUFWI_UI"/>
+	<UIRef Id="SUFWIUI_Common" />
+	<UIRef Id="SUFUI_ErrorText" />
+	<UIRef Id="SUFUI_ProgressText" />
+	
+	<CustomAction Id="ServerStart" ExeCommand="[INSTALLDIR]\$(var.ServerName)\bin\startup.bat" Directory="INSTALLDIR" Execute="deferred" Impersonate="no" Return="check"/>
+	<CustomAction Id="ServerStop" ExeCommand="[INSTALLDIR]\$(var.ServerName)\bin\shutdown.bat" Directory="INSTALLDIR" Execute="deferred" Impersonate="no" Return="check"/>
+	<CustomAction Id="LaunchBrowser" Property="BROWSER" Execute="immediate" ExeCommand="$(var.URL)" Return="asyncNoWait" />
+	
+</Product>
+<Fragment>
+	<DirectoryRef Id="TARGETDIR">
+		<Component Id="InstallDirectorySearch" Guid="9BE8902F-CB46-4DF6-A8C2-34F2366CC12E" KeyPath="yes">
+			<RegistryKey Key="Software\$(var.AppName)" Root="HKLM" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
+				<RegistryValue Type="string" Name="InstallDir" Value="[INSTALLDIR]" />
+			</RegistryKey> 
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="bootstrap.jar" Guid="CA891910-DA30-4815-B2C2-ABB63622F9B2">
+			<File Id="bootstrap.jar" Name="bootstrap.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\bootstrap.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="catalina.bat" Guid="7E994C65-5595-42C6-992D-D92D0601BC70">
+			<File Id="catalina.bat" Name="catalina.bat" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\catalina.bat"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="catalina.sh" Guid="06F8FD25-9F5F-43D6-98F4-D2C4DC61EE8B">
+			<File Id="catalina.sh" Name="catalina.sh" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\catalina.sh"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="catalina_tasks.xml" Guid="21B640A1-C940-4F82-8ECC-A854673BC1FB">
+			<File Id="catalina_tasks.xml" Name="catalina-tasks.xml" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\catalina-tasks.xml"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="commons_daemon.jar" Guid="7698E8FF-5308-4E90-BBC9-44B5D829378B">
+			<File Id="commons_daemon.jar" Name="commons-daemon.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\commons-daemon.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="commons_daemon_native.tar.gz" Guid="CA891910-DA30-4815-B2C2-ACB63622F9B2">
+			<File Id="commons_daemon_native.tar.gz" Name="commons-daemon-native.tar.gz" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\commons-daemon-native.tar.gz"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="configtest.bat" Guid="7E994C65-5595-42C6-992D-D02D0601BC70">
+			<File Id="configtest.bat" Name="configtest.bat" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\configtest.bat"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="configtest.sh" Guid="06F8FD25-9F5F-43D6-98F4-D3C4DC61EE8B">
+			<File Id="configtest.sh" Name="configtest.sh" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\configtest.sh"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="daemon.sh" Guid="21B640A1-C940-4F82-8ECC-A954673BC1FB">
+			<File Id="daemon.sh" Name="daemon.sh" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\daemon.sh"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="digest.bat" Guid="7698E8FF-5308-4E90-BBC9-45B5D829378B">
+			<File Id="digest.bat" Name="digest.bat" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\digest.bat"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="digest.sh" Guid="CA891910-DA30-4815-B3C2-ABB63622F9B2">
+			<File Id="digest.sh" Name="digest.sh" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\digest.sh"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="service.bat" Guid="7E994C65-5595-42C6-902D-D92D0601BC70">
+			<File Id="service.bat" Name="service.bat" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\service.bat"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="setclasspath.bat" Guid="06F8FD25-9F5F-43D6-99F4-D2C4DC61EE8B">
+			<File Id="setclasspath.bat" Name="setclasspath.bat" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\setclasspath.bat"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="setclasspath.sh" Guid="21B640A1-C940-4F82-8FCC-A854673BC1FB">
+			<File Id="setclasspath.sh" Name="setclasspath.sh" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\setclasspath.sh"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="shutdown.bat" Guid="7698E8FF-5308-4E90-BCC9-44B5D829378B">
+			<File Id="shutdown.bat" Name="shutdown.bat" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\shutdown.bat"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="shutdown.sh" Guid="CA891910-DA30-4915-B2C2-ABB63622F9B2">
+			<File Id="shutdown.sh" Name="shutdown.sh" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\shutdown.sh"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="startup.bat" Guid="7E994C65-5595-43C6-992D-D92D0601BC70">
+			<File Id="startup.bat" Name="startup.bat" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\startup.bat"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="startup.sh" Guid="07F8FD25-9F5F-43D6-98F4-D2C4DC61EE8B">
+			<File Id="startup.sh" Name="startup.sh" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\startup.sh"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="tcnative_1.dll" Guid="21B640A1-C940-4A82-8ECC-A854673BC1FB">
+			<File Id="tcnative_1.dll" Name="tcnative-1.dll" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\tcnative-1.dll"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="tomcat9.exe" Guid="7698E8FF-5308-4F90-BBC9-44B5D829378B">
+			<File Id="tomcat9.exe" Name="tomcat9.exe" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\tomcat9.exe"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="tomcat9w.exe" Guid="CA891910-DB30-4815-B2C2-ABB63622F9B2">
+			<File Id="tomcat9w.exe" Name="tomcat9w.exe" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\tomcat9w.exe"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="tomcat_juli.jar" Guid="7E994C65-5695-42C6-992D-D92D0601BC70">
+			<File Id="tomcat_juli.jar" Name="tomcat-juli.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\tomcat-juli.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="tomcat_native.tar.gz" Guid="06F8FD25-9A5F-43D6-98F4-D2C4DC61EE8B">
+			<File Id="tomcat_native.tar.gz" Name="tomcat-native.tar.gz" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\tomcat-native.tar.gz"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="tool_wrapper.bat" Guid="21B640A1-C040-4F82-8ECC-A854673BC1FB">
+			<File Id="tool_wrapper.bat" Name="tool-wrapper.bat" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\tool-wrapper.bat"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="tool_wrapper.sh" Guid="7698E8FF-5408-4E90-BBC9-44B5D829378B">
+			<File Id="tool_wrapper.sh" Name="tool-wrapper.sh" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\tool-wrapper.sh"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="version.bat" Guid="CB891910-DA30-4815-B2C2-ACB63622F9B2">
+			<File Id="version.bat" Name="version.bat" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\version.bat"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="version.sh" Guid="CC891910-DA30-4815-B2C2-ACB63622F9B2">
+			<File Id="version.sh" Name="version.sh" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\version.sh"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="conf">
+		<Component Id="catalina.policy" Guid="89A897AF-7881-478B-B2CA-C0286FAFF27A">
+			<File Id="catalina.policy" Name="catalina.policy" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\conf\catalina.policy"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="conf">
+		<Component Id="catalina.properties" Guid="523FA791-B7D2-484B-B3A7-DE72B4919115">
+			<File Id="catalina.properties" Name="catalina.properties" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\conf\catalina.properties"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="conf">
+		<Component Id="certstore.jks" Guid="8CDD943A-ACA2-47DE-BB88-3414A13BD73E">
+			<File Id="certstore.jks" Name="certstore.jks" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\conf\certstore.jks"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="conf">
+		<Component Id="context.xml" Guid="7CDD943A-ACA2-47DE-BB88-3414A13BD73E">
+			<File Id="context.xml" Name="context.xml" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\conf\context.xml"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="conf">
+		<Component Id="jaspic_providers.xml" Guid="618E9406-5F66-4E9A-B384-E567235653C8">
+			<File Id="jaspic_providers.xml" Name="jaspic-providers.xml" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\conf\jaspic-providers.xml"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="conf">
+		<Component Id="jaspic_providers.xsd" Guid="D5F2EEE4-291F-414C-A3DB-9F342EB254CB">
+			<File Id="jaspic_providers.xsd" Name="jaspic-providers.xsd" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\conf\jaspic-providers.xsd"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="conf">
+		<Component Id="logging.properties" Guid="89A897AF-7881-478B-B2CA-C1286FAFF27A">
+			<File Id="logging.properties" Name="logging.properties" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\conf\logging.properties"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="conf">
+		<Component Id="server.xml" Guid="523FA791-B7D2-484B-B3A7-DF72B4919115">
+			<File Id="server.xml" Name="server.xml" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\conf\server.xml"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="conf">
+		<Component Id="tomcat_users.xml" Guid="7CDD943A-ACA2-47DE-BB88-3514A13BD73E">
+			<File Id="tomcat_users.xml" Name="tomcat-users.xml" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\conf\tomcat-users.xml"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="conf">
+		<Component Id="tomcat_users.xsd" Guid="618E9406-5F66-4E9A-B384-E667235653C8">
+			<File Id="tomcat_users.xsd" Name="tomcat-users.xsd" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\conf\tomcat-users.xsd"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="conf">
+		<Component Id="web.xml" Guid="D5F2EEE4-291F-414C-A3DB-9A342EB254CB">
+			<File Id="web.xml" Name="web.xml" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\conf\web.xml"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="annotations_api.jar" Guid="049644D2-03D5-47CE-A60B-110AA88F7466">
+			<File Id="annotations_api.jar" Name="annotations-api.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\annotations-api.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="catalina.jar" Guid="24FAC142-6991-41A4-9A8E-7DF01853B499">
+			<File Id="catalina.jar" Name="catalina.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\catalina.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="catalina_ant.jar" Guid="06BC394B-F94B-4C8E-8DD5-B2A7C2DC2C13">
+			<File Id="catalina_ant.jar" Name="catalina-ant.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\catalina-ant.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="catalina_ha.jar" Guid="94608180-9933-4388-A87D-437865622BBB">
+			<File Id="catalina_ha.jar" Name="catalina-ha.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\catalina-ha.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="catalina_storeconfig.jar" Guid="2F2F012E-12F7-448B-A6CF-D200D2D88A34">
+			<File Id="catalina_storeconfig.jar" Name="catalina-storeconfig.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\catalina-storeconfig.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="catalina_tribes.jar" Guid="D9BB5EDF-8EEA-4B87-91EA-7BF84820916B">
+			<File Id="catalina_tribes.jar" Name="catalina-tribes.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\catalina-tribes.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="ecj_4.6.3.jar" Guid="F49FEC44-DEFB-4898-A055-D561E1A0D8A4">
+			<File Id="ecj_4.6.3.jar" Name="ecj-4.6.3.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\ecj-4.6.3.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="el_api.jar" Guid="05EE8DA5-C235-4081-A237-61C1413BC1CF">
+			<File Id="el_api.jar" Name="el-api.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\el-api.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="jasper.jar" Guid="A559BCB2-2085-4F1C-A9C7-C397756D2B39">
+			<File Id="jasper.jar" Name="jasper.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\jasper.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="jasper_el.jar" Guid="CAAFD938-1F45-40BE-AD86-AACE20B27BD6">
+			<File Id="jasper_el.jar" Name="jasper-el.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\jasper-el.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="jaspic_api.jar" Guid="83F095C2-561C-4280-A54E-5D299CC0A0C3">
+			<File Id="jaspic_api.jar" Name="jaspic-api.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\jaspic-api.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="jsp_api.jar" Guid="FACB914C-09B8-40C3-8500-D4EA9C3DCF7C">
+			<File Id="jsp_api.jar" Name="jsp-api.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\jsp-api.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="servlet_api.jar" Guid="F7DFA8C6-5AC3-46D1-B906-7BFE42EA05AE">
+			<File Id="servlet_api.jar" Name="servlet-api.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\servlet-api.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="tomcat_api.jar" Guid="097B6966-F888-487C-AE22-484829BD2230">
+			<File Id="tomcat_api.jar" Name="tomcat-api.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\tomcat-api.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="tomcat_coyote.jar" Guid="BCA960B8-9E9E-41A8-B936-AA34B1CB64C0">
+			<File Id="tomcat_coyote.jar" Name="tomcat-coyote.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\tomcat-coyote.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="tomcat_dbcp.jar" Guid="8829A420-F161-4028-B7A3-E33EEF4C57D3">
+			<File Id="tomcat_dbcp.jar" Name="tomcat-dbcp.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\tomcat-dbcp.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="tomcat_i18n_es.jar" Guid="CD86F15E-44C2-46AA-9A74-B102A764994B">
+			<File Id="tomcat_i18n_es.jar" Name="tomcat-i18n-es.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\tomcat-i18n-es.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="tomcat_i18n_fr.jar" Guid="CA51E56C-E37B-4C1D-AFB1-D37134F43CDA">
+			<File Id="tomcat_i18n_fr.jar" Name="tomcat-i18n-fr.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\tomcat-i18n-fr.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="tomcat_i18n_ja.jar" Guid="E7A25791-2C57-417E-9295-77F07DC5C4C3">
+			<File Id="tomcat_i18n_ja.jar" Name="tomcat-i18n-ja.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\tomcat-i18n-ja.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="tomcat_jdbc.jar" Guid="80081FE9-6600-4004-9526-CF432FD8875C">
+			<File Id="tomcat_jdbc.jar" Name="tomcat-jdbc.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\tomcat-jdbc.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="tomcat_jni.jar" Guid="D51CACCB-AAF7-41A3-8EA9-5F3E00ECE77D">
+			<File Id="tomcat_jni.jar" Name="tomcat-jni.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\tomcat-jni.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="tomcat_util.jar" Guid="D1912EF3-4D29-4662-98B6-290208E4AEA8">
+			<File Id="tomcat_util.jar" Name="tomcat-util.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\tomcat-util.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="tomcat_util_scan.jar" Guid="D38FA696-D119-45FC-9C67-E8CD9635A7FE">
+			<File Id="tomcat_util_scan.jar" Name="tomcat-util-scan.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\tomcat-util-scan.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="tomcat_websocket.jar" Guid="41CF41F7-2E3E-4ED6-8AEA-5D91939186CE">
+			<File Id="tomcat_websocket.jar" Name="tomcat-websocket.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\tomcat-websocket.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="lib">
+		<Component Id="websocket_api.jar" Guid="1FA02746-C54E-4127-A9B7-8C9D4064B180">
+			<File Id="websocket_api.jar" Name="websocket-api.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\websocket-api.jar"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="logs">
+		
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="temp">
+		<Component Id="safeToDelete.tmp" Guid="B7F5744F-C313-43ED-A6EB-898C430B1281">
+			<File Id="safeToDelete.tmp" Name="safeToDelete.tmp" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\temp\safeToDelete.tmp"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="Server">
+		<Component Id="LICENSE" Guid="47E5E091-B598-4402-BCDE-16BC07B0A19F">
+			<File Id="LICENSE" Name="LICENSE" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\LICENSE"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="Server">
+		<Component Id="NOTICE" Guid="AE1A6CE5-280A-44CA-82E9-788355B0D3CD">
+			<File Id="NOTICE" Name="NOTICE" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\NOTICE"/>
+		</Component>	
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="Server">
+		<Component Id="RELEASE_NOTES" Guid="B4207232-9538-4EFA-998D-DE0F55192757">
+			<File Id="RELEASE_NOTES" Name="RELEASE-NOTES" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\RELEASE-NOTES"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="Server">
+		<Component Id="RUNNING.txt" Guid="CB387954-3141-470B-928D-C7A25704D521">
+			<File Id="RUNNING.txt" Name="RUNNING.txt" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\RUNNING.txt"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="images">
+		<Component Id="bannrbmp.bmp" Guid="D5F41A48-6A72-4106-AEA7-8EE5D43CE775" Win64="yes">
+			<File Id="bannrbmp.bmp" Name="bannrbmp.bmp" DiskId="1" KeyPath="yes" Source="$(var.ImageFolder)bannrbmp.bmp"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="images">
+		<Component Id="dlgbmp.bmp" Guid="246DBB09-73FC-41B8-9C77-90A606F99484" Win64="yes">
+			<File Id="dlgbmp.bmp" Name="dlgbmp.bmp" DiskId="1" KeyPath="yes" Source="$(var.ImageFolder)dlgbmp.bmp"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="images">
+		<Component Id="exclamic.ico" Guid="A657AFF4-9E10-49A5-94A8-8C2A48491F97" Win64="yes">
+			<File Id="exclamic.ico" Name="exclamic.ico" DiskId="1" KeyPath="yes" Source="$(var.ImageFolder)exclamic.ico"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="images">
+		<Component Id="info.ico" Guid="203B70E2-EBFA-479F-823F-4A92524C6983" Win64="yes">
+			<File Id="info.ico" Name="info.ico" DiskId="1" KeyPath="yes" Source="$(var.ImageFolder)info.ico"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="images">
+		<Component Id="New.ico" Guid="09B8B570-F6B6-4905-80A9-8CDA71F78EFB" Win64="yes">
+			<File Id="New.ico" Name="New.ico" DiskId="1" KeyPath="yes" Source="$(var.ImageFolder)New.ico"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="images">
+		<Component Id="Up.ico" Guid="788631E6-3B49-410D-A88F-745C5C4CF7AC" Win64="yes">
+			<File Id="Up.ico" Name="Up.ico" DiskId="1" KeyPath="yes" Source="$(var.ImageFolder)Up.ico"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="images">
+		<Component Id="icon.ico" Guid="788631E6-3B49-410D-A88F-745C5C4CF7AD" Win64="yes">
+			<File Id="icon.ico" Name="icon.ico" DiskId="1" KeyPath="yes" Source="$(var.ImageFolder)icon.ico"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+</Wix>

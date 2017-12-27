@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="webapps_dir">
+            <Directory Id="dirD34F6912A149674093D78047824BD9FA" Name="firmware" />
+            <Directory Id="dir1D036038AA53327BE8D23C8A8515AE1D" Name="solarflare-vcp" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="ComponentGroupId">
+            <Component Id="cmpC618065A4CC62AAE75176771AD1A66B7" Directory="webapps_dir" Guid="{EBE7C81E-A976-4DF4-A078-5D5C2F3D609E}">
+                <File Id="filFA8BB631D8ABA9B7BFD5A730C2FFCC09" KeyPath="yes" Source="SourceDir\plugin-registration.war" />
+            </Component>
+            <Component Id="cmpC00FD776743F5B445EE1A0AC34AE1425" Directory="dirBA01446B316FACDCE6E11AA154840D31" Guid="{81FC3DEE-9613-4536-B2E2-4A690FF45053}">
+                <File Id="filD63D168A7BD24BE4AE43D28E0DFF0476" KeyPath="yes" Source="SourceDir\firmware\firmware\FirmwareMetadata.json" />
+            </Component>
+            <Component Id="cmp49846F9F58099F7B8B16B21FE5D8ACF1" Directory="dirB8560897C06B8BB8D66B01D5682596DD" Guid="{3CAE04BD-9165-4987-AEF2-3D5EA7348A49}">
+                <File Id="fil2FAD32DD661B3B6D4E1D5DE0BE8DD0F7" KeyPath="yes" Source="SourceDir\firmware\firmware\bootrom\SFC9140.dat" />
+            </Component>
+            <Component Id="cmp5316A7C490915D6604791C91B0330CD8" Directory="dirAEC4ABE1E5A19DD897E5BB57A4361315" Guid="{F65D072F-FDE5-4938-9BE7-5FFE60C66062}">
+                <File Id="filFE610BE46E3C4A923C7EEC556A075437" KeyPath="yes" Source="SourceDir\firmware\firmware\controller\mcfw.dat" />
+            </Component>
+            <Component Id="cmp219450A9E35076D5312856B954765302" Directory="dir1D036038AA53327BE8D23C8A8515AE1D" Guid="{76E86E64-C4A4-44D2-AE57-64401F26E640}">
+                <File Id="fil90EF9B1C3C56F20691F2D8DF5C070329" KeyPath="yes" Source="SourceDir\solarflare-vcp\solarflare-1.45.0.zip" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirBA01446B316FACDCE6E11AA154840D31">
+            <Directory Id="dirAEC4ABE1E5A19DD897E5BB57A4361315" Name="controller" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirBA01446B316FACDCE6E11AA154840D31">
+            <Directory Id="dirB8560897C06B8BB8D66B01D5682596DD" Name="bootrom" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirD34F6912A149674093D78047824BD9FA">
+            <Directory Id="dirBA01446B316FACDCE6E11AA154840D31" Name="firmware" />
+        </DirectoryRef>
+    </Fragment>
+</Wix>

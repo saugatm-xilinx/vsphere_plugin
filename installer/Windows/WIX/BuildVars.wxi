@@ -1,0 +1,11 @@
+<Include>
+<?define AppName="Solarflare" ?>
+<?define Add_RemoveProductName="Solarflare vSphere client plugin" ?>
+<?define ProductManufacturer="Solarflare Inc." ?>
+<?define ProductUpgradeCode="07E63CD8-315E-4273-B865-D53F3BC5CC24" ?>
+<?define PackageDescription="Solarflare Installer" ?>
+<?define PackageComments="Installer for Solarflare" ?>
+<?define ImageFolder="..\images\" ?>
+<?define ServerName="Tomcat_Server" ?>
+<?define URL=" https://localhost:8443/plugin-registration/registration.html" ?>
+</Include>
