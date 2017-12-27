@@ -159,7 +159,7 @@ export class FwupdateComponent implements OnInit {
                     filename: file.name,
                     filetype: file.type,
                     value: reader.result.split(',')[1]
-                })
+                });
             };
         }
     }
@@ -297,20 +297,6 @@ export class FwupdateComponent implements OnInit {
         }
     }
 
-    /*var re = new RegExp("^(http|https)://", "i");
-var str = "My String";
-var match = re.test(str);*/
-
-    /*
-    UPLOADING,
-    UPLOADED,
-    UPLOADING_FAIL,
-    VALIDATING,
-    VALIDATED,
-    VALIDATION_FAIL,
-    DONE
-    */
-
     devMode() {
         this.adapterList =[{
             "name": "SFC9140-00:0f:53:2f:bf:20",
@@ -335,13 +321,13 @@ var match = re.test(str);*/
                 "status": "UPLOADING_FAIL",
                 "message": "Fail to update Controller firmware image",
                 "timeStamp": 1513925798583,
-                "type": "bootROM"
+                "type": "BootROM"
             },{
                 "status": "UPLOADED",
                 "message": "Uploaded Controller firmware image",
                 "timeStamp": 1513925798583,
                 "type": "UEFIROM"
-            },],
+            }],
             "children": [{
                 "type": "NIC",
                 "id": "key-vim.host.PhysicalNic-vmnic6",
@@ -379,7 +365,22 @@ var match = re.test(str);*/
                 "uefiVersion": null,
                 "firmewareFamilyVersion": null
             },
-            "status": [],
+            "status": [{
+                "status": "VALIDATING",
+                "message": "Validating Controller firmware image",
+                "timeStamp": 1513925798583,
+                "type": "controller"
+            },{
+                "status": "VALIDATION_FAIL",
+                "message": "Fail to validate BootROM image",
+                "timeStamp": 1513925798583,
+                "type": "BootROM"
+            },{
+                "status": "VALIDATED",
+                "message": "Validated UEFIRom image",
+                "timeStamp": 1513925798583,
+                "type": "UEFIROM"
+            }],
             "children": [{
                 "type": "NIC",
                 "id": "key-vim.host.PhysicalNic-vmnic4",
@@ -417,7 +418,22 @@ var match = re.test(str);*/
                 "uefiVersion": null,
                 "firmewareFamilyVersion": null
             },
-            "status": [],
+            "status": [{
+                "status": "DONE",
+                "message": "Done Controller firmware image update",
+                "timeStamp": 1513925798583,
+                "type": "controller"
+            },{
+                "status": "UPLOADING_FAIL",
+                "message": "Fail to update bootrom firmware image",
+                "timeStamp": 1513925798583,
+                "type": "BootROM"
+            },{
+                "status": "UPLOADED",
+                "message": "Uploaded uefi firmware image",
+                "timeStamp": 1513925798583,
+                "type": "UEFIROM"
+            }],
             "children": [{
                 "type": "NIC",
                 "id": "key-vim.host.PhysicalNic-vmnic5",
@@ -486,8 +502,6 @@ var match = re.test(str);*/
             "laterVersionAvailable": true
         }];
     }
-
-
 
 }
 

@@ -46,10 +46,10 @@ import 'core-js/es7/reflect';
 
 
 /** ALL Firefox browsers require the following to support `@angular/animation`. **/
-// import 'web-animations-js';  // Run `npm install --save web-animations-js`.
+ import 'web-animations-js';  // Run `npm install --save web-animations-js`.
 
 /** Required by PhantomJS for unit testing **/
-// import '@webcomponents/custom-elements/custom-elements.min.js';
+import '@webcomponents/custom-elements/custom-elements.min.js';
 
 /***************************************************************************************************
  * Zone JS is required by Angular itself.
