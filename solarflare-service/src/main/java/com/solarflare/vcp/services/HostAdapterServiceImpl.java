@@ -25,6 +25,7 @@ import com.solarflare.vcp.model.FileHeader;
 import com.solarflare.vcp.model.FirmewareVersion;
 import com.solarflare.vcp.model.FirmwareType;
 import com.solarflare.vcp.model.Host;
+import com.solarflare.vcp.model.HostConfiguration;
 import com.solarflare.vcp.model.NicBootParamInfo;
 import com.solarflare.vcp.model.Status;
 import com.solarflare.vcp.model.TaskStatus;
@@ -360,6 +361,18 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 
 		return statusList;
 
+	}
+	
+	@Override
+	public HostConfiguration getHostConfigurations(String hostId) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void updateHostConfigurations(HostConfiguration hostConfigurationRequest) throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

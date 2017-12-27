@@ -27,7 +27,9 @@ import com.google.gson.reflect.TypeToken;
 import com.solarflare.vcp.model.Adapter;
 import com.solarflare.vcp.model.CustomUpdateRequest;
 import com.solarflare.vcp.model.Host;
+import com.solarflare.vcp.model.HostConfiguration;
 import com.solarflare.vcp.model.Status;
+import com.solarflare.vcp.services.DummayService;
 import com.solarflare.vcp.services.HostAdapterService;
 
 @Controller
@@ -164,7 +166,44 @@ public class HostAdapterController {
 		}
 		logger.info("End getting file as string content");
 	}
+	// Get configuration
+	@RequestMapping(value = "/{hostId}/configuration", method = RequestMethod.GET)
+	@ResponseBody
+	public HostConfiguration getConfiguration(@PathVariable String hostId)
+	{
+		logger.info("Start configuring host, hostId:"+hostId);
+		HostConfiguration hostConfigurations = null;
+		try {
+			DummayService service = new DummayService();
+			//hostConfigurations = hostAdapterService.getHostConfigurations(hostId);
+			hostConfigurations = service.getHostConfigurations(hostId);
+		} catch (Exception e) {
+			logger.error("Exception while getting host configurations, hostId:" + hostId);
+		}
+		return hostConfigurations;
 
+	}
+
+	// Get configuration
+	@RequestMapping(value = "/{hostId}/configuration", method = RequestMethod.POST)
+	@ResponseBody
+	public void updateConfiguration(@RequestBody String hostConfiguration, @PathVariable String hostId) {
+		try {
+			if (hostId == null || hostId.isEmpty()) {
+				throw new Exception("hostId should not be is null or empty");
+			}
+			if (hostConfiguration == null || hostConfiguration.isEmpty()) {
+				throw new Exception("Host configuration should not be is null or empty");
+			}
+			Gson gson = new Gson();
+			HostConfiguration hostConfigurationRequest = gson.fromJson(hostConfiguration, HostConfiguration.class);
+
+			hostAdapterService.updateHostConfigurations(hostConfigurationRequest);
+
+		} catch (Exception e) {
+			logger.error("Exception while getting host configurations, hostId:" + hostId);
+		}
+	}
 	@ExceptionHandler(Exception.class)
 	@ResponseBody
 	public Map<String, String> handleException(Exception ex, HttpServletResponse response) {
