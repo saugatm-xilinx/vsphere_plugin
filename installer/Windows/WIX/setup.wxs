@@ -7,8 +7,10 @@
 	<Package Id="*" InstallerVersion="200" Description="$(var.PackageDescription)" Comments="$(var.PackageComments)" Platform="x64" InstallPrivileges="elevated" Languages="1033" Compressed="yes"/>
 	
 	<InstallExecuteSequence>
-		<Custom Action="ServerStart" Before="InstallFinalize">NOT Installed</Custom>
-		<!-- <Custom Action="ServerStop" Before="RemoveFiles">Installed</Custom> -->
+		<Custom Action="ServerInstall" Before="InstallFinalize">NOT Installed</Custom>
+		<Custom Action="ServerStart" After="ServerInstall">NOT Installed</Custom>
+		<Custom Action="ServerStop" Before="ServerUninstall">Installed</Custom>
+		<Custom Action="ServerUninstall" Before="RemoveRegistryValues">Installed</Custom>
 		<Custom Action="LaunchBrowser" After="InstallFinalize">Installed AND (BROWSER_CHECKBOX_PROPERTY="1")</Custom>
 	</InstallExecuteSequence>
 	<AdminExecuteSequence/>
@@ -25,6 +27,7 @@
 	</Property>
 	<Property Id="BROWSER_CHECKBOX_PROPERTY" Secure="yes"/>
 	<Property Id="App_Name" Value="$(var.AppName)"/>
+	<Property Id="MsiLogging" Value="v" />
 	<Property Id="DiskPrompt" Value="!(loc.UIDiskPrompt)"/>
 	<Property Id="ARPURLINFOABOUT" Value="http://www.solarFlare.com/"/>
 	<Property Id="ARPURLUPDATEINFO" Value="http://www.solarFlare.com/"/>
@@ -120,11 +123,9 @@
 		<ComponentRef Id="NOTICE"/>
 		<ComponentRef Id="RELEASE_NOTES"/>
 		<ComponentRef Id="RUNNING.txt"/>
+		<ComponentRef Id="InstallDirectorySearch"/>
 	</Feature>
 	<Directory Id="TARGETDIR" Name="SourceDir">
-		<Directory Id="ProgramMenuFolder" Name="ProgramMenuFolder">
-			<!-- <Directory Id="StartMenuAppFolder" Name="SolarFlare"/> -->
-		</Directory>
 		<Directory Id="ProgramFiles64Folder" Name="ProgramFiles64Folder">
 			<Directory Id="INSTALLDIR" Name="Solarflare">
 				<Directory Id="images" Name="images"/>
@@ -145,8 +146,15 @@
 	<UIRef Id="SUFUI_ErrorText" />
 	<UIRef Id="SUFUI_ProgressText" />
 	
-	<CustomAction Id="ServerStart" ExeCommand="[INSTALLDIR]\$(var.ServerName)\bin\startup.bat" Directory="INSTALLDIR" Execute="deferred" Impersonate="no" Return="check"/>
-	<CustomAction Id="ServerStop" ExeCommand="[INSTALLDIR]\$(var.ServerName)\bin\shutdown.bat" Directory="INSTALLDIR" Execute="deferred" Impersonate="no" Return="check"/>
+	<SetProperty Id="ServerInstall" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\service.bat&quot; install" Sequence="execute" Before="ServerInstall" />
+	<SetProperty Id="ServerUninstall" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\service.bat&quot; remove" Sequence="execute" Before="ServerUninstall" />
+	<SetProperty Id="ServerStart" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\tomcat9.exe&quot; start" Sequence="execute" Before="ServerStart" />
+	<SetProperty Id="ServerStop" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\tomcat9.exe&quot; stop" Sequence="execute" Before="ServerStop" />
+
+	<CustomAction Id="ServerInstall" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Impersonate="no" Return="check"/>
+	<CustomAction Id="ServerStart" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Impersonate="no" Return="check"/>
+	<CustomAction Id="ServerStop" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Impersonate="no" Return="check"/>
+	<CustomAction Id="ServerUninstall" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Impersonate="no" Return="check"/>
 	<CustomAction Id="LaunchBrowser" Property="BROWSER" Execute="immediate" ExeCommand="$(var.URL)" Return="asyncNoWait" />
 	
 </Product>
