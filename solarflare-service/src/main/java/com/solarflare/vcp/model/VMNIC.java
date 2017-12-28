@@ -9,13 +9,10 @@ public class VMNIC
     private String name;
 
     // pci hardware device
-    private String deviceId;
     private String deviceName;
-    private String subSystemDeviceId;
-
-    private String vendorId;
+        
     private String vendorName;
-    private String subSystemVendorId;
+    
 
     private String driverName;
     private String driverVersion;
@@ -42,46 +39,8 @@ public class VMNIC
         this.name = name;
     }
 
-    public String getDeviceId()
-    {
-        return deviceId;
-    }
-
-    public void setDeviceId(String deviceId)
-    {
-        this.deviceId = deviceId;
-    }
-
-    public String getSubSystemDeviceId()
-    {
-        return subSystemDeviceId;
-    }
-
-    public void setSubSystemDeviceId(String subSystemDeviceId)
-    {
-        this.subSystemDeviceId = subSystemDeviceId;
-    }
-
-    public String getVendorId()
-    {
-        return vendorId;
-    }
-
-    public void setVendorId(String vendorId)
-    {
-        this.vendorId = vendorId;
-    }
-
-    public String getSubSystemVendorId()
-    {
-        return subSystemVendorId;
-    }
-
-    public void setSubSystemVendorId(String subSystemVendorId)
-    {
-        this.subSystemVendorId = subSystemVendorId;
-    }
-
+   
+    
     public String getDriverName()
     {
         return driverName;
@@ -202,15 +161,7 @@ public class VMNIC
         this.id = id;
     }
 
-    @Override
-    public String toString()
-    {
-        return "VMNIC [type=" + type + ", id=" + id + ", name=" + name + ", deviceId=" + deviceId + ", subSystemDeviceId="
-                + subSystemDeviceId + ", vendorId=" + vendorId + ", subSystemVendorId=" + subSystemVendorId + ", driverName="
-                + driverName + ", driverVersion=" + driverVersion + ", macAddress=" + macAddress + ", status=" + status
-                + ", interfaceName=" + interfaceName + ", portSpeed=" + portSpeed + ", currentMTU=" + currentMTU + ", maxMTU="
-                + maxMTU + ", pciFunction=" + pciFunction + ", pciBusNumber=" + pciBusNumber + "]";
-    }
+   
 
     public String getPciId()
     {
@@ -241,5 +192,16 @@ public class VMNIC
     {
         this.deviceName = deviceName;
     }
+
+	@Override
+	public String toString() {
+		return "VMNIC [type=" + type + ", id=" + id + ", name=" + name + ", deviceName=" + deviceName + ", vendorName="
+				+ vendorName + ", driverName=" + driverName + ", driverVersion=" + driverVersion + ", macAddress="
+				+ macAddress + ", status=" + status + ", interfaceName=" + interfaceName + ", portSpeed=" + portSpeed
+				+ ", currentMTU=" + currentMTU + ", maxMTU=" + maxMTU + ", pciId=" + pciId + ", pciFunction="
+				+ pciFunction + ", pciBusNumber=" + pciBusNumber + "]";
+	}
+    
+    
 
 }

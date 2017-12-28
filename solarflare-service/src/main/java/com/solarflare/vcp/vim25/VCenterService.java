@@ -216,6 +216,13 @@ public class VCenterService
                     adapter.setName(key);
                     String id = nicGrp.get(key).get(0).getDeviceName();
                     adapter.setId(id);
+                  //Removed below 4 fields from NIC and added to adapter
+                    HostPciDevice pciDecice = hwData.get(nicGrp.get(key).get(0).getPciId());
+                    adapter.setDeviceId(Short.toString(pciDecice.getDeviceId()));
+                    adapter.setVendorId(Short.toString(pciDecice.getVendorId()));
+                    adapter.setSubSystemDeviceId(Short.toString(pciDecice.getSubDeviceId()));
+                    adapter.setSubSystemVendorId(Short.toString(pciDecice.getSubVendorId()));
+                    
                     adapter.setChildren(nicGrp.get(key));
                     adapters.add(adapter);
                 }
@@ -370,6 +377,13 @@ public class VCenterService
                         Adapter adapter = new Adapter();
                         adapter.setName(key);
                         adapter.setId(key);
+                      //Removed below 4 fields from NIC and added to adapter
+                        HostPciDevice pciDecice = hwData.get(nicGrp.get(key).get(0).getPciId());
+                        adapter.setDeviceId(Short.toString(pciDecice.getDeviceId()));
+                        adapter.setVendorId(Short.toString(pciDecice.getVendorId()));
+                        adapter.setSubSystemDeviceId(Short.toString(pciDecice.getSubDeviceId()));
+                        adapter.setSubSystemVendorId(Short.toString(pciDecice.getSubVendorId()));
+                        
                         adapter.setChildren(nicGrp.get(key));
                         adapters.add(adapter);
                     }
@@ -396,8 +410,9 @@ public class VCenterService
                     continue;
 
                 nic.setDeviceName(pciDecice.getDeviceName());
-                nic.setDeviceId(Short.toString(pciDecice.getDeviceId()));
-                nic.setVendorId(Short.toString(pciDecice.getVendorId()));
+                
+                //nic.setDeviceId(Short.toString(pciDecice.getDeviceId()));
+                //nic.setVendorId(Short.toString(pciDecice.getVendorId()));
                 nic.setVendorName(pciDecice.getVendorName());
                 //String adapterName = nic.getVendorName() + " " + nic.getDeviceName();
                 String adapterName = nic.getDeviceName();
@@ -523,6 +538,13 @@ public class VCenterService
                         String id = nicGrp.get(key).get(0).getDeviceName();
                         adapter.setId(id);
                         List<VMNIC> listNic = nicGrp.get(key);
+                        //Removed below 4 fields from NIC and added to adapter
+                        HostPciDevice pciDecice = hwData.get(listNic.get(0).getPciId());
+                        adapter.setDeviceId(Short.toString(pciDecice.getDeviceId()));
+                        adapter.setVendorId(Short.toString(pciDecice.getVendorId()));
+                        adapter.setSubSystemDeviceId(Short.toString(pciDecice.getSubDeviceId()));
+                        adapter.setSubSystemVendorId(Short.toString(pciDecice.getSubVendorId()));
+                        
                         adapter.setChildren(listNic);
                         String statusControllerId = VCenterHelper.generateId(hostId,id, MessageConstant.CONTROLLER);
                         String statusBootROMId = VCenterHelper.generateId(hostId,id, MessageConstant.BOOTROM);

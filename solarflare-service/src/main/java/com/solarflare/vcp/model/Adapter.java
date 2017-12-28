@@ -19,8 +19,55 @@ public class Adapter implements Serializable {
 	private List<Status> status;
 	private boolean isLaterVersionAvailable;
 	List<VMNIC> children;
+	private String deviceId;
+	private String subSystemDeviceId;
+	private String vendorId;
+	private String subSystemVendorId;
 
-	public String getName() {
+	
+	
+	 public String getDeviceId()
+	    {
+	        return deviceId;
+	    }
+
+	    public void setDeviceId(String deviceId)
+	    {
+	        this.deviceId = deviceId;
+	    }
+
+	    public String getSubSystemDeviceId()
+	    {
+	        return subSystemDeviceId;
+	    }
+
+	    public void setSubSystemDeviceId(String subSystemDeviceId)
+	    {
+	        this.subSystemDeviceId = subSystemDeviceId;
+	    }
+
+	
+	    public String getVendorId()
+	    {
+	        return vendorId;
+	    }
+
+	    public void setVendorId(String vendorId)
+	    {
+	        this.vendorId = vendorId;
+	    }
+
+	    public String getSubSystemVendorId()
+	    {
+	        return subSystemVendorId;
+	    }
+
+	    public void setSubSystemVendorId(String subSystemVendorId)
+	    {
+	        this.subSystemVendorId = subSystemVendorId;
+	    }
+
+	    public String getName() {
 		return name;
 	}
 
