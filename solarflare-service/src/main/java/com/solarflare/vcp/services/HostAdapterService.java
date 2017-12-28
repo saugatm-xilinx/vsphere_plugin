@@ -56,11 +56,11 @@ public interface HostAdapterService
      * @throws Exception
      */
 
-    boolean updateFirmwareToLatest(List<Adapter> adapterList, String hostId) throws Exception;
+    String updateFirmwareToLatest(List<Adapter> adapterList, String hostId) throws Exception;
     
-    boolean customUpdateFirmwareFromLocal(List<Adapter> adapterList, String hostId, String base64Data) throws Exception;
+    String customUpdateFirmwareFromLocal(List<Adapter> adapterList, String hostId, String base64Data) throws Exception;
     
-    boolean customUpdateFirmwareFromURL(List<Adapter> adapterList, String hostId, String fwImagePath) throws Exception;
+    String customUpdateFirmwareFromURL(List<Adapter> adapterList, String hostId, String fwImagePath) throws Exception;
     
     
     

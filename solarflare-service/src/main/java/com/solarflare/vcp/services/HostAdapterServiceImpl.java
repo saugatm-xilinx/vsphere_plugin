@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import javax.cim.CIMInstance;
 
@@ -29,6 +28,7 @@ import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.HostConfiguration;
 import com.solarflare.vcp.model.NicBootParamInfo;
 import com.solarflare.vcp.model.Status;
+import com.solarflare.vcp.model.TaskInfo;
 import com.solarflare.vcp.model.TaskStatus;
 import com.solarflare.vcp.vim25.VCenterService;
 import com.vmware.vim25.ServiceContent;
@@ -94,11 +94,15 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 	}
 
 	@Override
-	public boolean updateFirmwareToLatest(List<Adapter> adapterList, String hostId) throws Exception {
-		boolean isSuccess = false;
+	public String updateFirmwareToLatest(List<Adapter> adapterList, String hostId) throws Exception {
+		String taskID = null;
 		isUpdateInProgress = true;
 		logger.info("Start updating firmware adapter");
 		try {
+			TaskManager taskManager = TaskManager.getInstance();
+			taskID = taskManager.getTaskId();
+			TaskInfo taskInfo = new TaskInfo();
+			taskInfo.setTaskid(taskID);
 			String data = null; // as this is Update from URL
 			ServiceContent serviceContent = VCenterHelper.getServiceContent(userSessionService, VCenterService.vimPort);
 			CIMHost cimHost = service.getCIMHost(serviceContent, hostId, cim);
@@ -124,25 +128,31 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 					bootRom = true;
 				}
 				Runnable workerForController = new FirmwareUpdateThread(serviceContent, cim, cimHost, null, null,
-						nicInstance, adapterId, hostId, false, contronller, bootRom);
+						nicInstance, adapterId, hostId, false, contronller, bootRom, taskInfo);
 				executor.execute(workerForController);
 
 			}
-			isSuccess = true;
+			taskManager.addTaskInfo(taskInfo);
 			isUpdateInProgress = false;
 		} catch (Exception e) {
 			isUpdateInProgress = false;
 			throw e;
 		}
-		return isSuccess;
+		return taskID;
 	}
 
 	@Override
-	public boolean customUpdateFirmwareFromLocal(List<Adapter> adapterList, String hostId, String base64Data)
+	public String customUpdateFirmwareFromLocal(List<Adapter> adapterList, String hostId, String base64Data)
 			throws Exception {
 		logger.info("Start updating firmware adapter");
 		isUpdateInProgress = true;
+		String taskID = null;
 		try {
+			
+			TaskManager taskManager = TaskManager.getInstance();
+			taskID = taskManager.getTaskId();
+			TaskInfo taskInfo = new TaskInfo();
+			taskInfo.setTaskid(taskID);
 			URL fwImageURL = null;
 			ServiceContent serviceContent = VCenterHelper.getServiceContent(userSessionService, VCenterService.vimPort);
 			CIMHost cimHost = service.getCIMHost(serviceContent, hostId, cim);
@@ -188,7 +198,7 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 					nicInstance = cim.getNICCardInstance(cimHost, adapter.getChildren().get(0).getName());
 
 					Runnable workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL, header,
-							nicInstance, adapter.getId(), hostId, true, controller, bootrom);
+							nicInstance, adapter.getId(), hostId, true, controller, bootrom, taskInfo);
 					executor.execute(workerForFW);
 				}
 				//executor.shutdown();
@@ -202,22 +212,28 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 			} else {
 				// TODO : log error for invalid firmware file
 			}
+			taskManager.addTaskInfo(taskInfo);
 			isUpdateInProgress = false;
 		} catch (Exception e) {
 			isUpdateInProgress = false;
 			throw e;
 		}
-		return false;
+		return taskID;
 	}
 
 	@Override
-	public boolean customUpdateFirmwareFromURL(List<Adapter> adapterList, String hostId, String fwImagePath)
+	public String customUpdateFirmwareFromURL(List<Adapter> adapterList, String hostId, String fwImagePath)
 			throws Exception {
 		logger.info("Start updating firmware adapter");
-		boolean isSuccess = false;
+		String taskID = null;
 		isUpdateInProgress = true;
 		try {
 			logger.info("fwImagePath : " + fwImagePath);
+			TaskManager taskManager = TaskManager.getInstance();
+			taskID = taskManager.getTaskId();
+			TaskInfo taskInfo = new TaskInfo();
+			taskInfo.setTaskid(taskID);
+			taskInfo.setHostId(hostId);
 			String data = null; // As this is update from URL
 			URL fwImageURL = new URL(fwImagePath);
 			ServiceContent serviceContent = VCenterHelper.getServiceContent(userSessionService, VCenterService.vimPort);
@@ -243,17 +259,17 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 			for (Adapter adapter : adapterList) {
 				nicInstance = cim.getNICCardInstance(cimHost, adapter.getChildren().get(0).getName());
 
-				 Runnable workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL, header, nicInstance, adapter.getId(), hostId, true, controller,bootrom);
+				 Runnable workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL, header, nicInstance, adapter.getId(), hostId, true, controller,bootrom,taskInfo);
 				 executor.execute(workerForFW);
 				
 			}
-			isSuccess = true;
+			taskManager.addTaskInfo(taskInfo);
 			isUpdateInProgress = false;
 		} catch (Exception e) {
 			isUpdateInProgress = false;
 			throw e;
 		}
-		return isSuccess;
+		return taskID;
 	}
 
 	@Override

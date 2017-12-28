@@ -1,6 +1,8 @@
 package com.solarflare.vcp.services;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.cim.CIMInstance;
 
@@ -12,8 +14,13 @@ import com.solarflare.vcp.cim.CIMHost;
 import com.solarflare.vcp.cim.CIMService;
 import com.solarflare.vcp.helper.MetadataHelper;
 import com.solarflare.vcp.helper.VCenterHelper;
+import com.solarflare.vcp.model.AdapterTask;
 import com.solarflare.vcp.model.FileHeader;
+import com.solarflare.vcp.model.FwType;
 import com.solarflare.vcp.model.SfFirmware;
+import com.solarflare.vcp.model.Status;
+import com.solarflare.vcp.model.TaskInfo;
+import com.solarflare.vcp.model.TaskState;
 import com.solarflare.vcp.model.TaskStatus;
 import com.solarflare.vcp.vim25.VCenterService;
 import com.vmware.vim25.ServiceContent;
@@ -32,12 +39,13 @@ public class FirmwareUpdateThread implements Runnable {
 	CIMInstance nicInstance;
 	ServiceContent serviceContent;
 	private String currentProcess;
+	private TaskInfo taskInfo;
 
 	MetadataHelper metadataHelper = new MetadataHelper();
 
 	FirmwareUpdateThread(ServiceContent serviceContent, CIMService cim, CIMHost cimHost, URL fwImageURL,
 			FileHeader header, CIMInstance nicInstance, String adapterId, String hostId, boolean isCustom,
-			boolean controller, boolean bootrom) {
+			boolean controller, boolean bootrom, TaskInfo taskInfo) {
 		this.adapterId = adapterId;
 		this.cim = cim;
 		this.cimHost = cimHost;
@@ -49,6 +57,7 @@ public class FirmwareUpdateThread implements Runnable {
 		this.controller = controller;
 		this.bootrom = bootrom;
 		this.hostId = hostId;
+		this.taskInfo = taskInfo;
 	}
 
 	@Override
@@ -83,22 +92,36 @@ public class FirmwareUpdateThread implements Runnable {
 	}
 
 	public void process() throws Exception {
+		Status controllerStatus = null;
+		Status bootROMStatus = null;
 		if (isCustom) {
 			if (controller) {
-				updateController();
+				controllerStatus = updateController();
 			}
 			if (bootrom) {
-				updateBootROM();
+				bootROMStatus = updateBootROM();
 			}
 
 		} else {
 			if (controller) {
-				updateController();
+				controllerStatus =  updateController();
 			}
 			if (bootrom) {
-				updateBootROM();
+				bootROMStatus = updateBootROM();
 			}
 		}
+		
+		List<AdapterTask> adapterTasks = taskInfo.getAdapterTasks();
+		if(adapterTasks == null){
+			adapterTasks = new ArrayList<>();
+		}
+		AdapterTask aTask = new AdapterTask();
+		aTask.setAdapterId(adapterId);
+		aTask.setController(controllerStatus);
+		aTask.setBootROM(bootROMStatus);
+		
+		adapterTasks.add(aTask);
+		taskInfo.setAdapterTasks(adapterTasks);
 	}
 
 	private URL getImageURL(CIMInstance fw_inst, boolean isController) throws Exception {
@@ -118,8 +141,14 @@ public class FirmwareUpdateThread implements Runnable {
 		return fwImageURL;
 	}
 
-	private synchronized void updateController() throws Exception {
+	private synchronized Status updateController() throws Exception {
+		Status controllerStatus = null;
 		try{
+			
+			
+			controllerStatus= new Status(TaskState.Queued, null, FwType.CONTROLLER);
+			
+			
 		logger.info("Start updating controller for adapterId : " + adapterId);
 		currentProcess = MessageConstant.CONTROLLER;
 		String statusId = VCenterHelper.generateId(hostId, adapterId, MessageConstant.CONTROLLER);
@@ -145,31 +174,42 @@ public class FirmwareUpdateThread implements Runnable {
 			TaskStatus.updateTaskStatus(statusId, UploadStatusEnum.UPLOADING.toString(),
 					"Controller firmware image file uploading in-progress", MessageConstant.CONTROLLER);
 
+			controllerStatus.setState(TaskState.Running); 
 			boolean res = cim.updateFirmwareFromURL(svc_mcfw_inst.getObjectPath(), cimHost, this.nicInstance, fwImagePath);
 			logger.info("Result after upload is : " + res);
 			if (res) {
+				controllerStatus.setState(TaskState.Success);
 				TaskStatus.updateTaskStatus(statusId, UploadStatusEnum.DONE.toString(),
 						"Controller firmware image update is done", MessageConstant.CONTROLLER);
 				logger.info("Contoller firmware update for adapter '" + statusId + "' is done.");
 			} else {
+				controllerStatus.setState(TaskState.Error);
+				controllerStatus.setErrorMessage("Fail to update Controller firmware image");
 				TaskStatus.updateTaskStatus(statusId, UploadStatusEnum.UPLOADING_FAIL.toString(),
 						"Fail to update Controller firmware image", MessageConstant.CONTROLLER);
 				logger.info("Contoller firmware update for adapter '" + statusId + "' is failed");
 			}
 
 		} else {
+			controllerStatus.setState(TaskState.Error);
+			controllerStatus.setErrorMessage("Controller firmware image is not compatable");
 			TaskStatus.updateTaskStatus(statusId, UploadStatusEnum.VALIDATION_FAIL.toString(),
 					"Controller firmware image is not compatable", MessageConstant.CONTROLLER);
 			logger.info("Image not compatable");
 		}
 		currentProcess = "";
 		}catch(Exception e){
+			controllerStatus.setState(TaskState.Error);
+			controllerStatus.setErrorMessage("Controller firmware image is not compatable");
 			logger.error("Error in updating controller firmware, error "+e.getMessage());
 		}
+		return controllerStatus;
 	}
 
-	private synchronized void updateBootROM() throws Exception {
+	private synchronized Status updateBootROM() throws Exception {
 		logger.info("Starting bootrom update ");
+		Status bootROMStatus = null; 
+		bootROMStatus= new Status(TaskState.Queued, null, FwType.BOOTROM);
 		currentProcess = MessageConstant.BOOTROM;
 		String statusId = VCenterHelper.generateId(hostId, adapterId, MessageConstant.BOOTROM);
 		CIMInstance svc_bootrom_inst = cim.getBootROMSoftwareInstallationInstance(cimHost);
@@ -197,22 +237,29 @@ public class FirmwareUpdateThread implements Runnable {
 			TaskStatus.updateTaskStatus(statusId, UploadStatusEnum.UPLOADING.toString(),
 					"BootROM firmware image file uploading in-progress", MessageConstant.BOOTROM);
 
+			bootROMStatus.setState(TaskState.Running);
 			boolean res = cim.updateFirmwareFromURL(svc_bootrom_inst.getObjectPath(), cimHost, nicInstance,
 					fwImagePath);
 			if (res) {
+				bootROMStatus.setState(TaskState.Success);
 				TaskStatus.updateTaskStatus(statusId, UploadStatusEnum.DONE.toString(),
 						"BootROM firmware image update is done", MessageConstant.BOOTROM);
 				logger.debug("BootROM firmware update for adapter '" + statusId + "' is done.");
 			} else {
+				bootROMStatus.setState(TaskState.Error);
+				bootROMStatus.setErrorMessage("Fail to update BootROM firmware image");
 				TaskStatus.updateTaskStatus(statusId, UploadStatusEnum.UPLOADING_FAIL.toString(),
 						"Fail to update BootROM firmware image", MessageConstant.BOOTROM);
 				logger.debug("BootROM firmware update for adapter '" + statusId + "' is failed");
 			}
 
 		} else {
+			bootROMStatus.setState(TaskState.Error);
+			bootROMStatus.setErrorMessage("BootROM firmware image is not compatable");
 			TaskStatus.updateTaskStatus(statusId, UploadStatusEnum.VALIDATION_FAIL.toString(),
 					"BootROM firmware image is not compatable", MessageConstant.BOOTROM);
 		}
+		return bootROMStatus;
 	}
 
 }

@@ -28,8 +28,10 @@ import com.solarflare.vcp.model.CustomUpdateRequest;
 import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.HostConfiguration;
 import com.solarflare.vcp.model.Status;
+import com.solarflare.vcp.model.TaskInfo;
 import com.solarflare.vcp.services.DummayService;
 import com.solarflare.vcp.services.HostAdapterService;
+import com.solarflare.vcp.services.TaskManager;
 
 @Controller
 @RequestMapping(value = "/services/hosts")
@@ -90,9 +92,10 @@ public class HostAdapterController {
 
 	@RequestMapping(value = "/{hostId}/adapters/latest", method = RequestMethod.POST)
 	@ResponseBody
-	public void updateFirmwareToLatest(@RequestBody String adapterList, @PathVariable String hostId) {
+	public String updateFirmwareToLatest(@RequestBody String adapterList, @PathVariable String hostId) {
 		logger.info("start getting file as string content");
 		logger.info("adapterList (input) : " + adapterList);
+		String taskIDResponse = null;
 		try {
 			if (adapterList != null && hostId != null) {
 				Gson gson = new Gson();
@@ -101,7 +104,10 @@ public class HostAdapterController {
 
 				List<Adapter> adapter = gson.fromJson(adapterList, listType);
 				try {
-					hostAdapterService.updateFirmwareToLatest(adapter, hostId);
+					String taskID = hostAdapterService.updateFirmwareToLatest(adapter, hostId);
+					Map<String,String> response = new HashMap<>();
+					response.put("taskId", taskID);
+					taskIDResponse = gson.toJson(response);
 				} catch (Exception e) {
 					logger.error("Exception while updating firmware to latest, error :" + e.getMessage());
 				}
@@ -109,6 +115,7 @@ public class HostAdapterController {
 		} finally {
 		}
 		logger.info("End getting file as string content");
+		return taskIDResponse;
 	}
 
 	@RequestMapping(value = "/{hostId}/adapters/{adapterId}/status", method = RequestMethod.GET)
@@ -119,38 +126,69 @@ public class HostAdapterController {
 		return status;
 	}
 
+	@RequestMapping(value = "/tasks/{taskId}", method = RequestMethod.GET)
+	@ResponseBody
+	public TaskInfo getTaskInfo(@PathVariable String taskId) throws Exception {
+		logger.info("Getting task info for Host ID : " + taskId);
+		List<TaskInfo> tasks = TaskManager.getInstance().getTasks();
+		for(TaskInfo task : tasks){
+			if(task.getTaskid().equals(taskId)){
+				return task;
+			}
+		}
+		return null;
+	}
+	
+	@RequestMapping(value = "/tasks", method = RequestMethod.GET)
+	@ResponseBody
+	public List<TaskInfo> getTasks() throws Exception {
+		logger.info("Getting List of Tasks " );
+		List<TaskInfo> tasks = TaskManager.getInstance().getTasks();
+		return tasks;
+	}
+	
 	@RequestMapping(value = "/{hostId}/adapters/updateCustomWithUrl", method = RequestMethod.POST)
 	@ResponseBody
-	public void updateCustomWithUrl(@RequestBody String adapters, @PathVariable String hostId) {
+	public String updateCustomWithUrl(@RequestBody String adapters, @PathVariable String hostId) {
 		logger.info("start getting file as string content ");
+		String taskIDResponse = null;
 		try {
 			Gson gson = new Gson();
 			CustomUpdateRequest customUpdateRequest = gson.fromJson(adapters, CustomUpdateRequest.class);
 			String url = customUpdateRequest.getUrl();
 			logger.info("url : " + url);
-			hostAdapterService.customUpdateFirmwareFromURL(customUpdateRequest.getAdapters(), hostId, url);
+			String taskID = hostAdapterService.customUpdateFirmwareFromURL(customUpdateRequest.getAdapters(), hostId, url);
+			Map<String,String> response = new HashMap<>();
+			response.put("taskId", taskID);
+			taskIDResponse = gson.toJson(response);
 
 		} catch (Exception e) {
 			logger.error("Exception while updating firmware, error :" + e.getMessage());
 		} finally {
 		}
 		logger.info("End getting file as string content");
+		return taskIDResponse;
 	}
 
 	@RequestMapping(value = "/{hostId}/adapters/updateCustomWithBinary", method = RequestMethod.POST)
 	@ResponseBody
-	public void updateCustomWithBinary(@RequestBody String adapters, @PathVariable String hostId) {
+	public String updateCustomWithBinary(@RequestBody String adapters, @PathVariable String hostId) {
 		logger.info("start getting file as string content");
+		String taskIDResponse = null;
 		try {
 			Gson gson = new Gson();
 			CustomUpdateRequest customUpdateRequest = gson.fromJson(adapters, CustomUpdateRequest.class);
 			String data = customUpdateRequest.getBase64Data();
-			hostAdapterService.customUpdateFirmwareFromLocal(customUpdateRequest.getAdapters(), hostId, data);
+			String taskID = hostAdapterService.customUpdateFirmwareFromLocal(customUpdateRequest.getAdapters(), hostId, data);
+			Map<String,String> response = new HashMap<>();
+			response.put("taskId", taskID);
+			taskIDResponse = gson.toJson(response);
 		} catch (Exception e) {
 			logger.error("Exception while updating firmware, error :" + e.getMessage());
 		} finally {
 		}
 		logger.info("End getting file as string content");
+		return taskIDResponse;
 	}
 	// Get configuration
 	@RequestMapping(value = "/{hostId}/configuration", method = RequestMethod.GET)

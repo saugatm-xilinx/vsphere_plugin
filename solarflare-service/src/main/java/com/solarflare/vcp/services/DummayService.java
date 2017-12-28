@@ -38,23 +38,23 @@ public class DummayService implements HostAdapterService{
 	}
 
 	@Override
-	public boolean updateFirmwareToLatest(List<Adapter> adapterList, String hostId) throws Exception {
+	public String updateFirmwareToLatest(List<Adapter> adapterList, String hostId) throws Exception {
 		// TODO Auto-generated method stub
-		return false;
+		return null;
 	}
 
 	@Override
-	public boolean customUpdateFirmwareFromLocal(List<Adapter> adapterList, String hostId, String base64Data)
+	public String customUpdateFirmwareFromLocal(List<Adapter> adapterList, String hostId, String base64Data)
 			throws Exception {
 		// TODO Auto-generated method stub
-		return false;
+		return null;
 	}
 
 	@Override
-	public boolean customUpdateFirmwareFromURL(List<Adapter> adapterList, String hostId, String fwImagePath)
+	public String customUpdateFirmwareFromURL(List<Adapter> adapterList, String hostId, String fwImagePath)
 			throws Exception {
 		// TODO Auto-generated method stub
-		return false;
+		return null;
 	}
 
 	@Override
