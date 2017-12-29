@@ -166,7 +166,7 @@ public class CIMService {
 	}
 
 	public synchronized CIMInstance getNICCardInstance(CIMHost cimHost, String deviceId) throws WBEMException {
-		String cimClass = "SF_SoftwareInstallationService";
+		String cimClass = CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE;
 		WBEMClient client = getClient(cimHost, cimClass);
 		// Get EthernatePort Instance
 		CIMInstance ethernateInstance = getEthernatePortInstance(cimHost, deviceId);
@@ -186,8 +186,6 @@ public class CIMService {
 		inst = getAssociators(client, controlledByInstance.getObjectPath(), "SF_CardRealizesController", "SF_NICCard",
 				"Dependent");
 		CIMInstance nicCardIntance = inst.next();
-
-		System.out.println(nicCardIntance);
 
 		return nicCardIntance;
 	}
@@ -334,7 +332,6 @@ public class CIMService {
 			versionString = file.getVersionString();
 		}
 
-		// versionString = getVersionFromBinaryFile(metaDataFilePath);
 		return versionString;
 	}
 
@@ -350,7 +347,6 @@ public class CIMService {
 			versionString = file.getVersionString();
 		}
 
-		// versionString = getVersionFromBinaryFile(metaDataFilePath);
 		return versionString;
 	}
 	public String getVersionFromBinaryFile(URL filePath) throws URISyntaxException {
@@ -408,7 +404,6 @@ public class CIMService {
 		boolean isCompatible = false;
 
 		Map<String, String> params = getRequiredFwImageName(cimHost, fwInst, nicInstance);
-		logger.info("CIMInstance object path: " + fwInst.getObjectPath());
 		int currentType = Integer.parseInt(params.get(CIMConstants.TYPE));
 		int currentSubType = Integer.parseInt(params.get(CIMConstants.SUB_TYPE));
 		logger.info("Current firmware type : " + currentType);
@@ -437,7 +432,7 @@ public class CIMService {
 		Map<String, String> params = new HashMap<>();
 
 		try {
-			String cimClass = "SF_SoftwareInstallationService";
+			String cimClass = CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE;
 			WBEMClient client = getClient(cimHost, cimClass);
 
 			CIMArgument<CIMObjectPath> cimTarget = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET,
@@ -713,7 +708,6 @@ public class CIMService {
 			WBEMClient client = getClient(cimHost, cimClass);
 
 			// Create type for nicInstance and set input parameter
-			//CIMDataType instanceType = new CIMDataType(nicInstance.getClassName());
 			CIMArgument<CIMObjectPath> cimTarget = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET,
 					new CIMDataType(nicInstance.getClassName()),
 					new CIMObjectPath(MOF.objectHandle(nicInstance.getObjectPath(), false, true)));

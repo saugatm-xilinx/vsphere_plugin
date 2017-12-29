@@ -84,16 +84,6 @@ public class MetadataHelper {
 
 	}
 
-	// TODO : Cleanup
-	/*
-	 * public static void main(String[] args) throws MalformedURLException {
-	 * MetadataHelper obj = new MetadataHelper();
-	 * 
-	 * URL filePath = new
-	 * URL("http","10.101.10.132",CIMConstants.METADATA_PATH); BinaryFiles
-	 * fwMetaData = obj.getMetadata(filePath); // String json =
-	 * gson.toJson(createfile()); System.out.println(fwMetaData); }
-	 */
 	private byte[] readData(URL toDownload, boolean readComplete) {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 

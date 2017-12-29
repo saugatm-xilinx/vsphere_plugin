@@ -30,6 +30,10 @@ public class CustomUpdateRequest implements Serializable {
 	public void setAdapters(List<Adapter> adapters) {
 		this.adapters = adapters;
 	}
+	@Override
+	public String toString() {
+		return "CustomUpdateRequest [url=" + url + ", base64Data=" + base64Data + ", adapters=" + adapters + "]";
+	}
 	
 	
 	

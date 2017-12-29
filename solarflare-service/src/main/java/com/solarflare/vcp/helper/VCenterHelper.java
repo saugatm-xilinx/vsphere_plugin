@@ -81,11 +81,6 @@ public class VCenterHelper {
 			nic.setPciBusNumber(Byte.toString(pciDecice.getBus()));
 
 			nic.setDeviceName(pciDecice.getDeviceName());
-			//nic.setDeviceId(Short.toString(pciDecice.getDeviceId()));
-			//nic.setSubSystemDeviceId(Short.toString(pciDecice.getSubDeviceId()));
-
-			//nic.setVendorId(Short.toString(pciDecice.getVendorId()));
-			//nic.setSubSystemVendorId(Short.toString(pciDecice.getSubVendorId()));
 			nic.setVendorName(pciDecice.getVendorName());
 		}
 

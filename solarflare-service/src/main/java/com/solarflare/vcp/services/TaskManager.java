@@ -80,35 +80,20 @@ public class TaskManager {
 		boolean isTaskDone = true;
 		for (AdapterTask aTask : adapterTasks) {
 			Status controllerStatus = aTask.getController();
-			TaskState taskStateController = null;
-			if (controllerStatus != null) {
-				taskStateController = controllerStatus.getState();
-			}
-			if (taskStateController != null && !(TaskState.Success.equals(taskStateController)
-					|| TaskState.Error.equals(taskStateController))) {
-				isTaskDone = false;
+			isTaskDone = isTaskDone(controllerStatus);
+			if(!isTaskDone){
 				break;
 			}
-
+			
 			Status bootROMStatus = aTask.getBootROM();
-			TaskState taskStateBootROM = null;
-			if (bootROMStatus != null) {
-				taskStateBootROM = bootROMStatus.getState();
-			}
-			if (taskStateBootROM != null
-					&& !(TaskState.Success.equals(taskStateBootROM) || TaskState.Error.equals(taskStateBootROM))) {
-				isTaskDone = false;
+			isTaskDone = isTaskDone(bootROMStatus);
+			if(!isTaskDone){
 				break;
 			}
-
+			
 			Status UEFIStatus = aTask.getUefiROM();
-			TaskState taskStateUEFI = null;
-			if (UEFIStatus != null) {
-				taskStateUEFI = UEFIStatus.getState();
-			}
-			if (taskStateUEFI != null
-					&& !(TaskState.Success.equals(taskStateUEFI) || TaskState.Error.equals(taskStateUEFI))) {
-				isTaskDone = false;
+			isTaskDone = isTaskDone(UEFIStatus);
+			if(!isTaskDone){
 				break;
 			}
 		}
@@ -161,5 +146,18 @@ public class TaskManager {
 			tasks.add(task);
 		}
 		return tasks;
+	}
+	
+	private boolean isTaskDone(Status status){
+		TaskState taskState = null;
+		if (status != null) {
+			taskState = status.getState();
+		}
+		if (taskState != null && !(TaskState.Success.equals(taskState)
+				|| TaskState.Error.equals(taskState))) {
+			return false;
+			
+		}
+		return true;
 	}
 }

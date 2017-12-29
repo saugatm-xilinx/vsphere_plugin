@@ -4,11 +4,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.cim.CIMInstance;
 
@@ -22,7 +22,7 @@ import com.solarflare.vcp.helper.SFBase64;
 import com.solarflare.vcp.helper.VCenterHelper;
 import com.solarflare.vcp.model.Adapter;
 import com.solarflare.vcp.model.FileHeader;
-import com.solarflare.vcp.model.FirmewareVersion;
+import com.solarflare.vcp.model.FirmwareVersion;
 import com.solarflare.vcp.model.FirmwareType;
 import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.HostConfiguration;
@@ -39,15 +39,10 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 	private static final Log logger = LogFactory.getLog(HostAdapterServiceImpl.class);
 
 	private UserSessionService userSessionService;
-	private static ExecutorService executor = Executors.newFixedThreadPool(10);
+	private static ExecutorService executor = Executors.newFixedThreadPool(1);
 
 	VCenterService service = new VCenterService();
 	CIMService cim = new CIMService();
-
-	// Work-around for multi-threading issue in updating firmware
-	Map<String, Host> hostMap = new HashMap<>();
-	Map<String, List<Adapter>> hostAdapters = new HashMap<>();
-	boolean isUpdateInProgress = false;
 
 	@Autowired
 	public HostAdapterServiceImpl(UserSessionService session) {
@@ -58,17 +53,7 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 	public List<Host> getHostList() throws Exception {
 		List<Host> hostList = null;
 		try {
-			if (isUpdateInProgress) {
-				for (String hostID : hostMap.keySet()) {
-					hostList.add(hostMap.get(hostID));
-				}
-			} else {
-				hostList = service.getHostsList(userSessionService);
-				for (Host host : hostList) {
-					hostMap.put(host.getId(), host);
-				}
-			}
-
+			hostList = service.getHostsList(userSessionService);
 		} catch (Exception e) {
 			throw e;
 		}
@@ -79,13 +64,7 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 	public Host getHostById(String hostId) throws Exception {
 		Host host = null;
 		try {
-			if (isUpdateInProgress) {
-				hostMap.get(hostId);
-			} else {
-
-				host = service.getHostById(userSessionService, hostId);
-				hostMap.put(host.getId(), host);
-			}
+			host = service.getHostById(userSessionService, hostId);
 		} catch (Exception e) {
 			throw e;
 		}
@@ -96,7 +75,6 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 	@Override
 	public String updateFirmwareToLatest(List<Adapter> adapterList, String hostId) throws Exception {
 		String taskID = null;
-		isUpdateInProgress = true;
 		logger.info("Start updating firmware adapter");
 		try {
 			TaskManager taskManager = TaskManager.getInstance();
@@ -110,32 +88,31 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 			for (Adapter adapter : adapterList) {
 				String adapterId = adapter.getId();
 				nicInstance = cim.getNICCardInstance(cimHost, adapter.getChildren().get(0).getName());
-				FirmewareVersion fwVersion = adapter.getLatestVersion();
+				FirmwareVersion fwVersion = adapter.getLatestVersion();
 				boolean contronller = false;
 				boolean bootRom = false;
-				//Check for controller version
+				// Check for controller version
 				String currentVersion = adapter.getVersionController();
-				String latestVersion = fwVersion.getControlerVersion(); 
+				String latestVersion = fwVersion.getControlerVersion();
 				String latest = VCenterHelper.getLatestVersion(currentVersion, latestVersion);
-				if ( latest.equals(latestVersion)) {
+				if (latest.equals(latestVersion)) {
 					contronller = true;
 				}
-				//Check for Boot ROM version
+				// Check for Boot ROM version
 				currentVersion = adapter.getVersionBootROM();
-				latestVersion = fwVersion.getBootROMVersion(); 
+				latestVersion = fwVersion.getBootROMVersion();
 				latest = VCenterHelper.getLatestVersion(currentVersion, latestVersion);
 				if (latest.equals(latestVersion)) {
 					bootRom = true;
 				}
-				Runnable workerForController = new FirmwareUpdateThread(serviceContent, cim, cimHost, null, null,
+				Callable<Void> workerForController = new FirmwareUpdateThread(serviceContent, cim, cimHost, null, null,
 						nicInstance, adapterId, hostId, false, contronller, bootRom, taskInfo);
-				executor.execute(workerForController);
+				Future<Void> futureTask = executor.submit(workerForController);
 
 			}
+
 			taskManager.addTaskInfo(taskInfo);
-			isUpdateInProgress = false;
 		} catch (Exception e) {
-			isUpdateInProgress = false;
 			throw e;
 		}
 		return taskID;
@@ -145,10 +122,9 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 	public String customUpdateFirmwareFromLocal(List<Adapter> adapterList, String hostId, String base64Data)
 			throws Exception {
 		logger.info("Start updating firmware adapter");
-		isUpdateInProgress = true;
 		String taskID = null;
 		try {
-			
+
 			TaskManager taskManager = TaskManager.getInstance();
 			taskID = taskManager.getTaskId();
 			TaskInfo taskInfo = new TaskInfo();
@@ -169,7 +145,6 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 																		// bytes
 			FileHeader header = cim.getFileHeader(headerData);
 
-			logger.info("Header : " + header);
 			boolean controller = false;
 			boolean bootrom = false;
 			CIMInstance fwInstance = null;
@@ -189,7 +164,6 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 
 				sendDataInChunks(cimHost, fwInstance, tempFile, decodedDataBytes);
 
-				/// TODO check /
 				fwImageURL = new URL("file:/" + tempFile);
 
 				CIMInstance nicInstance = null;
@@ -197,25 +171,22 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 				for (Adapter adapter : adapterList) {
 					nicInstance = cim.getNICCardInstance(cimHost, adapter.getChildren().get(0).getName());
 
-					Runnable workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL, header,
-							nicInstance, adapter.getId(), hostId, true, controller, bootrom, taskInfo);
-					executor.execute(workerForFW);
+					Callable<Void> workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL,
+							header, nicInstance, adapter.getId(), hostId, true, controller, bootrom, taskInfo);
+					Future<Void> futureTask = executor.submit(workerForFW);
+
 				}
-				//executor.shutdown();
-				//boolean finshed = executor.awaitTermination(1, TimeUnit.MINUTES);
 				/*
-				if (finshed) {
-					// Delete temp file after updating firmware
-					boolean isRemoved = cim.removeFwImage(cimHost, fwInstance, tempFile);
-					logger.info("File " + tempFile + " Removed status: " + isRemoved);
-				}*/
+				 * if (finshed) { // Delete temp file after updating firmware
+				 * boolean isRemoved = cim.removeFwImage(cimHost, fwInstance,
+				 * tempFile); logger.info("File " + tempFile +
+				 * " Removed status: " + isRemoved); }
+				 */
 			} else {
-				// TODO : log error for invalid firmware file
+				logger.error("Fail to get CIM Firmware Instance");
 			}
 			taskManager.addTaskInfo(taskInfo);
-			isUpdateInProgress = false;
 		} catch (Exception e) {
-			isUpdateInProgress = false;
 			throw e;
 		}
 		return taskID;
@@ -226,9 +197,7 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 			throws Exception {
 		logger.info("Start updating firmware adapter");
 		String taskID = null;
-		isUpdateInProgress = true;
 		try {
-			logger.info("fwImagePath : " + fwImagePath);
 			TaskManager taskManager = TaskManager.getInstance();
 			taskID = taskManager.getTaskId();
 			TaskInfo taskInfo = new TaskInfo();
@@ -242,7 +211,6 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 			boolean readComplete = false;
 			byte[] headerData = cim.readData(fwImageURL, readComplete);
 			FileHeader header = cim.getFileHeader(headerData);
-			logger.info("header : " + header);
 			data = new String(headerData);
 			boolean controller = false;
 			boolean bootrom = false;
@@ -251,22 +219,19 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 			} else if (FirmwareType.FIRMWARE_TYPE_BOOTROM.ordinal() == header.getType()) {
 				bootrom = true;
 			}
-			logger.info("is controller " + controller);
-			logger.info("is BootROM " + bootrom);
 
 			CIMInstance nicInstance = null;
 
 			for (Adapter adapter : adapterList) {
 				nicInstance = cim.getNICCardInstance(cimHost, adapter.getChildren().get(0).getName());
 
-				 Runnable workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL, header, nicInstance, adapter.getId(), hostId, true, controller,bootrom,taskInfo);
-				 executor.execute(workerForFW);
-				
+				Callable<Void> workerForFW = new FirmwareUpdateThread(serviceContent, cim, cimHost, fwImageURL, header,
+						nicInstance, adapter.getId(), hostId, true, controller, bootrom, taskInfo);
+				Future<Void> futureTask = executor.submit(workerForFW);
+
 			}
 			taskManager.addTaskInfo(taskInfo);
-			isUpdateInProgress = false;
 		} catch (Exception e) {
-			isUpdateInProgress = false;
 			throw e;
 		}
 		return taskID;
@@ -285,12 +250,8 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 	public List<Adapter> getHostAdapters(String hostId) throws Exception {
 
 		List<Adapter> adapters = new ArrayList<>();
-		if (isUpdateInProgress) {
-			adapters = hostAdapters.get(hostId);
-		} else {
-			adapters = service.getAdapters(userSessionService, hostId, cim);
-			hostAdapters.put(hostId, adapters);
-		}
+		adapters = service.getAdapters(userSessionService, hostId, cim);
+
 		return adapters;
 
 	}
@@ -323,7 +284,7 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 			encoded = sfBase64.base64_encode(temp, chunkSize);
 			cim.sendFWImageData(cimHost, fwInstance, new String(encoded), tempFile);
 		}
-		
+
 		logger.info("Sending data in chunks is complete");
 	}
 
@@ -343,7 +304,7 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 		return statusList;
 
 	}
-	
+
 	@Override
 	public HostConfiguration getHostConfigurations(String hostId) throws Exception {
 		// TODO Auto-generated method stub
@@ -353,7 +314,7 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 	@Override
 	public void updateHostConfigurations(HostConfiguration hostConfigurationRequest) throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

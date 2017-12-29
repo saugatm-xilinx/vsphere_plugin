@@ -15,7 +15,7 @@ public class Adapter implements Serializable {
 	private String versionBootROM;
 	private String versionUEFIROM;
 	private String versionFirmware;
-	private FirmewareVersion latestVersion;
+	private FirmwareVersion latestVersion;
 	private List<Status> status;
 	private boolean isLaterVersionAvailable;
 	List<VMNIC> children;
@@ -139,11 +139,11 @@ public class Adapter implements Serializable {
 		this.status = status;
 	}
 
-	public FirmewareVersion getLatestVersion() {
+	public FirmwareVersion getLatestVersion() {
 		return latestVersion;
 	}
 
-	public void setLatestVersion(FirmewareVersion latestVersion) {
+	public void setLatestVersion(FirmwareVersion latestVersion) {
 		this.latestVersion = latestVersion;
 	}
 
@@ -155,4 +155,15 @@ public class Adapter implements Serializable {
 		this.isLaterVersionAvailable = isLaterVersionAvailable;
 	}
 
+	@Override
+	public String toString() {
+		return "Adapter [name=" + name + ", type=" + type + ", id=" + id + ", versionController=" + versionController
+				+ ", versionBootROM=" + versionBootROM + ", versionUEFIROM=" + versionUEFIROM + ", versionFirmware="
+				+ versionFirmware + ", latestVersion=" + latestVersion + ", status=" + status
+				+ ", isLaterVersionAvailable=" + isLaterVersionAvailable + ", children=" + children + ", deviceId="
+				+ deviceId + ", subSystemDeviceId=" + subSystemDeviceId + ", vendorId=" + vendorId
+				+ ", subSystemVendorId=" + subSystemVendorId + "]";
+	}
+
+	
 }

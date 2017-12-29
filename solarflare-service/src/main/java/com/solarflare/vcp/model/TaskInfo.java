@@ -1,5 +1,6 @@
 package com.solarflare.vcp.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TaskInfo {
@@ -31,6 +32,18 @@ public class TaskInfo {
 
 	public void setAdapterTasks(List<AdapterTask> adapterTasks) {
 		this.adapterTasks = adapterTasks;
+	}
+
+	public void add(AdapterTask aTask){
+		if(this.adapterTasks == null){
+			this.adapterTasks = new ArrayList<AdapterTask>();
+		}
+		this.adapterTasks.add(aTask);
+	}
+
+	@Override
+	public String toString() {
+		return "TaskInfo [taskid=" + taskid + ", hostId=" + hostId + ", adapterTasks=" + adapterTasks + "]";
 	}
 
 	

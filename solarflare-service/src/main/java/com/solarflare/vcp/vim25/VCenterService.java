@@ -18,7 +18,7 @@ import com.solarflare.vcp.cim.CIMHostSession;
 import com.solarflare.vcp.cim.CIMService;
 import com.solarflare.vcp.helper.VCenterHelper;
 import com.solarflare.vcp.model.Adapter;
-import com.solarflare.vcp.model.FirmewareVersion;
+import com.solarflare.vcp.model.FirmwareVersion;
 import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.Status;
 import com.solarflare.vcp.model.TaskStatus;
@@ -592,7 +592,7 @@ public class VCenterService
                             String latestVersion = VCenterHelper.getLatestVersion(controllerVersion, latestControllerVersion);
                             logger.debug("Getting latest version of controller is :" + latestVersion);
                             // Check for latest version available
-                            FirmewareVersion frmVesion = new FirmewareVersion();
+                            FirmwareVersion frmVesion = new FirmwareVersion();
                             
                             frmVesion.setControlerVersion(latestControllerVersion);
                             if (latestVersion.equals(latestControllerVersion) && !latestVersion.equals(VCenterHelper.removeNonDigitChar(controllerVersion)))

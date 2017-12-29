@@ -39,4 +39,11 @@ public class AdapterTask {
 		this.uefiROM = uefiROM;
 	}
 
+	@Override
+	public String toString() {
+		return "AdapterTask [adapterId=" + adapterId + ", bootROM=" + bootROM + ", controller=" + controller
+				+ ", uefiROM=" + uefiROM + "]";
+	}
+
+	
 }

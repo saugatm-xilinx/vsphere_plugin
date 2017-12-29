@@ -2,7 +2,7 @@ package com.solarflare.vcp.model;
 
 import java.io.Serializable;
 
-public class FirmewareVersion implements Serializable {
+public class FirmwareVersion implements Serializable {
 
 	/**
 	 * 
