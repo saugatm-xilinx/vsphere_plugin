@@ -7,8 +7,12 @@ public class TaskInfo {
 
 	private String taskid;
 	private String hostId;
+	private Long requestSubmitted;
 	private List<AdapterTask> adapterTasks;
 
+	public TaskInfo(){
+		this.requestSubmitted = System.currentTimeMillis();
+	}
 	public String getTaskid() {
 		return taskid;
 	}

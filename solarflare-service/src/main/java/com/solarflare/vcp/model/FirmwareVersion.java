@@ -9,47 +9,47 @@ public class FirmwareVersion implements Serializable {
 	 */
 	private static final long serialVersionUID = -4274221033707581898L;
 
-	private String controlerVersion;
-	private String bootROMVersion;
-	private String uefiVersion;
-	private String firmewareFamilyVersion;
+	private String controller;
+	private String bootROM;
+	private String uefi;
+	private String firmewareFamily;
 
-	public String getControlerVersion() {
-		return controlerVersion;
+	public String getController() {
+		return controller;
 	}
 
-	public void setControlerVersion(String controlerVersion) {
-		this.controlerVersion = controlerVersion;
+	public void setController(String controller) {
+		this.controller = controller;
 	}
 
-	public String getBootROMVersion() {
-		return bootROMVersion;
+	public String getBootROM() {
+		return bootROM;
 	}
 
-	public void setBootROMVersion(String bootROMVersion) {
-		this.bootROMVersion = bootROMVersion;
+	public void setBootROM(String bootROM) {
+		this.bootROM = bootROM;
 	}
 
-	public String getUefiVersion() {
-		return uefiVersion;
+	public String getUefi() {
+		return uefi;
 	}
 
-	public void setUefiVersion(String uefiVersion) {
-		this.uefiVersion = uefiVersion;
+	public void setUefi(String uefi) {
+		this.uefi = uefi;
 	}
 
-	public String getFirmewareFamilyVersion() {
-		return firmewareFamilyVersion;
+	public String getFirmewareFamily() {
+		return firmewareFamily;
 	}
 
-	public void setFirmewareFamilyVersion(String firmewareFamilyVersion) {
-		this.firmewareFamilyVersion = firmewareFamilyVersion;
+	public void setFirmewareFamily(String firmewareFamily) {
+		this.firmewareFamily = firmewareFamily;
 	}
 
 	@Override
 	public String toString() {
-		return "FirmewareVersion [controlerVersion=" + controlerVersion + ", bootROMVersion=" + bootROMVersion
-				+ ", uefiVersion=" + uefiVersion + ", firmewareFamilyVersion=" + firmewareFamilyVersion + "]";
+		return "FirmwareVersion [controller=" + controller + ", bootROM=" + bootROM + ", uefi=" + uefi
+				+ ", firmewareFamily=" + firmewareFamily + "]";
 	}
 
 }

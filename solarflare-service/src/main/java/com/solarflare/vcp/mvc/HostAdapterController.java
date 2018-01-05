@@ -23,6 +23,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.solarflare.vcp.exception.SfInvalidLoginException;
+import com.solarflare.vcp.exception.SfInvalidRequestException;
+import com.solarflare.vcp.exception.SfNotFoundException;
 import com.solarflare.vcp.model.Adapter;
 import com.solarflare.vcp.model.CustomUpdateRequest;
 import com.solarflare.vcp.model.Host;
@@ -32,6 +35,7 @@ import com.solarflare.vcp.model.TaskInfo;
 import com.solarflare.vcp.services.DummayService;
 import com.solarflare.vcp.services.HostAdapterService;
 import com.solarflare.vcp.services.TaskManager;
+import com.solarflare.vcp.vim.SimpleTimeCounter;
 
 @Controller
 @RequestMapping(value = "/services/hosts")
@@ -44,6 +48,7 @@ public class HostAdapterController {
 	@RequestMapping(value = "/{hostId}", method = RequestMethod.GET)
 	@ResponseBody
 	public Host getHostAdapterInfo(@PathVariable String hostId) throws Exception {
+		SimpleTimeCounter timer = new SimpleTimeCounter("SolarFlare :: getHostAdapterInfo");
 		logger.info("Start getting host info by host id :" + hostId);
 
 		Host host = null;
@@ -55,12 +60,14 @@ public class HostAdapterController {
 		} finally {
 		}
 		logger.info("End getting host info by host id :" + hostId);
+		timer.stop();
 		return host;
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Host> getHostList() throws Exception {
+		SimpleTimeCounter timer = new SimpleTimeCounter("SolarFlare :: getHostList");
 		logger.info("Start getting host list");
 		List<Host> hostList = null;
 		try {
@@ -71,12 +78,14 @@ public class HostAdapterController {
 		} finally {
 		}
 		logger.info("End getting host list");
+		timer.stop();
 		return hostList;
 	}
 
 	@RequestMapping(value = "/{hostId}/adapters", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Adapter> listAdapter(@PathVariable String hostId) throws Exception {
+		SimpleTimeCounter timer = new SimpleTimeCounter("SolarFlare :: listAdapter");
 		logger.info("Start getting list of host adapters for host :" + hostId);
 		List<Adapter> adapters = null;
 		try {
@@ -87,14 +96,15 @@ public class HostAdapterController {
 		} finally {
 		}
 		logger.info("End getting list of host adapters for host :" + hostId);
+		timer.stop();
 		return adapters;
 	}
 
 	@RequestMapping(value = "/{hostId}/adapters/latest", method = RequestMethod.POST)
 	@ResponseBody
 	public String updateFirmwareToLatest(@RequestBody String adapterList, @PathVariable String hostId) {
+		SimpleTimeCounter timer = new SimpleTimeCounter("SolarFlare :: updateFirmwareToLatest");
 		logger.info("start getting file as string content");
-		logger.info("adapterList (input) : " + adapterList);
 		String taskIDResponse = null;
 		try {
 			if (adapterList != null && hostId != null) {
@@ -115,6 +125,7 @@ public class HostAdapterController {
 		} finally {
 		}
 		logger.info("End getting file as string content");
+		timer.stop();
 		return taskIDResponse;
 	}
 
@@ -129,27 +140,33 @@ public class HostAdapterController {
 	@RequestMapping(value = "/tasks/{taskId}", method = RequestMethod.GET)
 	@ResponseBody
 	public TaskInfo getTaskInfo(@PathVariable String taskId) throws Exception {
+		SimpleTimeCounter timer = new SimpleTimeCounter("SolarFlare :: getTaskInfo");
 		logger.info("Getting task info for Host ID : " + taskId);
+		TaskInfo taskInfo = null;
 		List<TaskInfo> tasks = TaskManager.getInstance().getTasks();
 		for(TaskInfo task : tasks){
 			if(task.getTaskid().equals(taskId)){
-				return task;
+				taskInfo = task;
 			}
 		}
-		return null;
+		timer.stop();
+		return taskInfo;
 	}
 	
 	@RequestMapping(value = "/tasks", method = RequestMethod.GET)
 	@ResponseBody
 	public List<TaskInfo> getTasks() throws Exception {
+		SimpleTimeCounter timer = new SimpleTimeCounter("SolarFlare :: getTasks");
 		logger.info("Getting List of Tasks " );
 		List<TaskInfo> tasks = TaskManager.getInstance().getTasks();
+		timer.stop();
 		return tasks;
 	}
 	
 	@RequestMapping(value = "/{hostId}/adapters/updateCustomWithUrl", method = RequestMethod.POST)
 	@ResponseBody
 	public String updateCustomWithUrl(@RequestBody String adapters, @PathVariable String hostId) {
+		SimpleTimeCounter timer = new SimpleTimeCounter("SolarFlare :: updateCustomWithUrl");
 		logger.info("start getting file as string content ");
 		String taskIDResponse = null;
 		try {
@@ -167,12 +184,14 @@ public class HostAdapterController {
 		} finally {
 		}
 		logger.info("End getting file as string content");
+		timer.stop();
 		return taskIDResponse;
 	}
 
 	@RequestMapping(value = "/{hostId}/adapters/updateCustomWithBinary", method = RequestMethod.POST)
 	@ResponseBody
 	public String updateCustomWithBinary(@RequestBody String adapters, @PathVariable String hostId) {
+		SimpleTimeCounter timer = new SimpleTimeCounter("SolarFlare :: updateCustomWithBinary");
 		logger.info("start getting file as string content");
 		String taskIDResponse = null;
 		try {
@@ -188,6 +207,7 @@ public class HostAdapterController {
 		} finally {
 		}
 		logger.info("End getting file as string content");
+		timer.stop();
 		return taskIDResponse;
 	}
 	// Get configuration
@@ -195,6 +215,7 @@ public class HostAdapterController {
 	@ResponseBody
 	public HostConfiguration getConfiguration(@PathVariable String hostId)
 	{
+		SimpleTimeCounter timer = new SimpleTimeCounter("SolarFlare :: getConfiguration");
 		logger.info("Start configuring host, hostId:"+hostId);
 		HostConfiguration hostConfigurations = null;
 		try {
@@ -204,6 +225,7 @@ public class HostAdapterController {
 		} catch (Exception e) {
 			logger.error("Exception while getting host configurations, hostId:" + hostId);
 		}
+		timer.stop();
 		return hostConfigurations;
 
 	}
@@ -212,6 +234,7 @@ public class HostAdapterController {
 	@RequestMapping(value = "/{hostId}/configuration", method = RequestMethod.POST)
 	@ResponseBody
 	public void updateConfiguration(@RequestBody String hostConfiguration, @PathVariable String hostId) {
+		SimpleTimeCounter timer = new SimpleTimeCounter("SolarFlare :: updateConfiguration");
 		try {
 			if (hostId == null || hostId.isEmpty()) {
 				throw new Exception("hostId should not be is null or empty");
@@ -227,7 +250,65 @@ public class HostAdapterController {
 		} catch (Exception e) {
 			logger.error("Exception while getting host configurations, hostId:" + hostId);
 		}
+		timer.stop();
 	}
+	
+	
+	@ExceptionHandler(SfNotFoundException.class)
+	@ResponseBody
+	public Map<String, String> handleException(SfNotFoundException ex, HttpServletResponse response) {
+		response.setStatus(HttpStatus.NOT_FOUND.value());
+
+		Map<String, String> errorMap = new HashMap<String, String>();
+		errorMap.put("message", ex.getMessage());
+		if (ex.getCause() != null) {
+			errorMap.put("cause", ex.getCause().getMessage());
+		}
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		ex.printStackTrace(pw);
+		errorMap.put("stackTrace", sw.toString());
+
+		return errorMap;
+	}
+
+	@ExceptionHandler(SfInvalidRequestException.class)
+	@ResponseBody
+	public Map<String, String> handleException(SfInvalidRequestException ex, HttpServletResponse response) {
+		response.setStatus(HttpStatus.BAD_REQUEST.value());
+
+		Map<String, String> errorMap = new HashMap<String, String>();
+		errorMap.put("message", ex.getMessage());
+		if (ex.getCause() != null) {
+			errorMap.put("cause", ex.getCause().getMessage());
+		}
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		ex.printStackTrace(pw);
+		errorMap.put("stackTrace", sw.toString());
+
+		return errorMap;
+	}
+
+	@ExceptionHandler(SfInvalidLoginException.class)
+	@ResponseBody
+	public Map<String, String> handleException(SfInvalidLoginException ex, HttpServletResponse response) {
+		response.setStatus(HttpStatus.UNAUTHORIZED.value());
+
+		Map<String, String> errorMap = new HashMap<String, String>();
+		errorMap.put("message", ex.getMessage());
+		if (ex.getCause() != null) {
+			errorMap.put("cause", ex.getCause().getMessage());
+		}
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		ex.printStackTrace(pw);
+		errorMap.put("stackTrace", sw.toString());
+
+		return errorMap;
+	}
+
+	
 	@ExceptionHandler(Exception.class)
 	@ResponseBody
 	public Map<String, String> handleException(Exception ex, HttpServletResponse response) {
@@ -245,4 +326,5 @@ public class HostAdapterController {
 
 		return errorMap;
 	}
+		
 }

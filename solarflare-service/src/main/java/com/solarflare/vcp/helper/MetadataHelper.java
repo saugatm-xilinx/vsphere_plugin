@@ -17,9 +17,11 @@ import com.google.gson.stream.JsonReader;
 import com.solarflare.vcp.cim.CIMConstants;
 import com.solarflare.vcp.cim.CIMHost;
 import com.solarflare.vcp.cim.CIMService;
+import com.solarflare.vcp.cim.SfCIMService;
 import com.solarflare.vcp.model.BinaryFiles;
 import com.solarflare.vcp.model.BootROM;
 import com.solarflare.vcp.model.Controller;
+import com.solarflare.vcp.model.FwType;
 import com.solarflare.vcp.model.SfFirmware;
 import com.vmware.vim25.RuntimeFaultFaultMsg;
 import com.vmware.vim25.ServiceContent;
@@ -69,6 +71,52 @@ public class MetadataHelper {
 		} else {
 			BootROM bootROM = metadata.getBootROM();
 			files = bootROM.getFiles();
+		}
+
+		//TODO: latest version
+		for (SfFirmware file : files) {
+			int type = Integer.parseInt(file.getType());
+			int subType = Integer.parseInt(file.getSubtype());
+			if (type == currentType && subType == currentSubType) {
+				metaDatafile = file;
+			}
+		}
+
+		return metaDatafile;
+
+	}
+
+	
+	public SfFirmware getMetaDataForAdapter(URL pluginURL, SfCIMService cimService,
+			CIMInstance sfFWInstance, CIMInstance nicInstance, FwType fwType)
+			throws MalformedURLException, RuntimeFaultFaultMsg {
+
+		SfFirmware metaDatafile = null;
+
+		Map<String, String> params = cimService.getRequiredFwImageName(sfFWInstance, nicInstance);
+
+		int currentType = Integer.parseInt(params.isEmpty()? "0":params.get(CIMConstants.TYPE));
+		int currentSubType = Integer.parseInt(params.isEmpty()? "0":params.get(CIMConstants.SUB_TYPE));
+
+		// TODO : check for https certificate warning
+		// URL controllerFWImagePath = new
+		// URL(pluginURL.getProtocol(),pluginURL.getHost(),pluginURL.getPort(),CONTROLLER_FW_IMAGE_PATH);
+		URL metaDataFilePath = new URL("http", pluginURL.getHost(), CIMConstants.METADATA_PATH);
+
+		MetadataHelper metadataHelper = new MetadataHelper();
+		BinaryFiles metadata = metadataHelper.getMetadata(metaDataFilePath);
+		List<SfFirmware> files = null;
+		if (FwType.CONTROLLER.equals(fwType)) {
+			Controller controller = metadata.getController();
+			files = controller.getFiles();
+		} 
+		if(FwType.BOOTROM.equals(fwType)) {
+			BootROM bootROM = metadata.getBootROM();
+			files = bootROM.getFiles();
+		}
+		
+		if(FwType.UEFIROM.equals(fwType)) {
+			//TODO code for UEFI ROM
 		}
 
 		//TODO: latest version

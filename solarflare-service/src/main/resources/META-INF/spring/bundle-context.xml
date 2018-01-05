@@ -15,4 +15,12 @@
    <bean name="HostAdapterServiceImpl"	class="com.solarflare.vcp.services.HostAdapterServiceImpl">
 		<constructor-arg index="0" ref="userSessionService"/>
 	</bean>
+	
+	<bean name="SfVimService" class="com.solarflare.vcp.vim.SfVimService">
+		<constructor-arg index="0" ref="ConnectionImpl"/>
+		<constructor-arg index="1" ref="userSessionService"/>
+	</bean>
+	
+	<bean name="ConnectionImpl" class="com.solarflare.vcp.vim.connection.ConnectionImpl">
+	</bean>
 </beans>

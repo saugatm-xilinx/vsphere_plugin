@@ -56,6 +56,7 @@ public class VCenterService
     public static final String SLF = "SLF";
     public static final String CIM = "cim";
     public static final String SFC = "sfc";
+    public static final short SF_VENDOR_ID = 6436;
 
     public static VimPortType vimPort = initializeVimPort();
 
@@ -243,7 +244,8 @@ public class VCenterService
             {
                 for (HostPciDevice pciDecice : pciDecices)
                 {
-                    if ("Solarflare".equalsIgnoreCase(pciDecice.getVendorName()))
+                    //if ("Solarflare".equalsIgnoreCase(pciDecice.getVendorName()))
+                	if(pciDecice.getVendorId() == SF_VENDOR_ID)
                         map.put(pciDecice.getId(), pciDecice);
                 }
             }
@@ -549,14 +551,7 @@ public class VCenterService
                         String statusControllerId = VCenterHelper.generateId(hostId,id, MessageConstant.CONTROLLER);
                         String statusBootROMId = VCenterHelper.generateId(hostId,id, MessageConstant.BOOTROM);
                         List<Status> listStatus = new ArrayList<Status>();
-                        if(adapter.getStatus() == null || adapter.getStatus().size() == 0) 
-                        {
-                        	adapter.setStatus(listStatus);
-                        }
-                        else
-                        {
-                        	listStatus = adapter.getStatus();
-                        }
+                        
                         List<Status> cntStatusList = TaskStatus.getTaskStatus(statusControllerId);
                         List<Status> bootRomStatusList = TaskStatus.getTaskStatus(statusBootROMId);
                         
@@ -564,7 +559,6 @@ public class VCenterService
                         listStatus.addAll(cntStatusList == null ? new ArrayList<Status>(): cntStatusList);
                     	listStatus.addAll(bootRomStatusList == null ? new ArrayList<Status>(): bootRomStatusList);
                     	
-                        adapter.setStatus(listStatus);
                         
                         if (listNic != null && listNic.size() > 0)
                         {
@@ -594,11 +588,8 @@ public class VCenterService
                             // Check for latest version available
                             FirmwareVersion frmVesion = new FirmwareVersion();
                             
-                            frmVesion.setControlerVersion(latestControllerVersion);
-                            if (latestVersion.equals(latestControllerVersion) && !latestVersion.equals(VCenterHelper.removeNonDigitChar(controllerVersion)))
-                            {
-                            	adapter.setLaterVersionAvailable(true);
-                            }
+                            frmVesion.setController(latestControllerVersion);
+                            
                            
 							// Get version from image binary for BootRom
 							CIMInstance bootROMInstance = cim.getBootROMSoftwareInstallationInstance(cimHost);
@@ -607,14 +598,12 @@ public class VCenterService
 							logger.debug("Getting latest version of BootRom is :" + latestBootRomVersion);
 							String finalLatestBootVersion = VCenterHelper.getLatestVersion(bootROMVersion,
 									latestBootRomVersion);
-							frmVesion.setBootROMVersion(finalLatestBootVersion);
-							if (latestBootRomVersion.equals(finalLatestBootVersion) && !finalLatestBootVersion.equals(VCenterHelper.removeNonDigitChar(bootROMVersion))) {
-								adapter.setLaterVersionAvailable(true);
-							}
+							frmVesion.setBootROM(finalLatestBootVersion);
+							
 							
 							// Put dummy latest versions for UEFI and Firmware family
-							frmVesion.setUefiVersion(UEFIROMVersion); //setting current as latest for now
-							frmVesion.setFirmewareFamilyVersion(firmwareVersion); //setting current as latest for now
+							frmVesion.setUefi(UEFIROMVersion); //setting current as latest for now
+							frmVesion.setFirmewareFamily(firmwareVersion); //setting current as latest for now
 							
 							adapter.setLatestVersion(frmVesion);
                         }

@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.solarflare.vcp.exception.SfNotFoundException;
 import com.solarflare.vcp.model.AdapterTask;
 import com.solarflare.vcp.model.Status;
 import com.solarflare.vcp.model.TaskInfo;
@@ -66,7 +67,7 @@ public class TaskManager {
 
 		if (task == null) {
 			log.error("getTaskInfo : This taskInfo is null, maybe it is invalid or have bean deleted");
-			throw new Exception("getTaskInfo : This taskInfo is null, maybe it is invalid or have bean deleted.");
+			throw new SfNotFoundException("getTaskInfo : This taskInfo is null, maybe it is invalid or have bean deleted.");
 		}
 		return task;
 	}
@@ -121,7 +122,7 @@ public class TaskManager {
 	private void validateTaskId(String taskId) throws Exception {
 		if (taskId == null) {
 			log.error("validateTask : taskId is null.");
-			throw new Exception("validateTask : Task ID is null.");
+			throw new SfNotFoundException("validateTask : Task ID is null.");
 		}
 	}
 

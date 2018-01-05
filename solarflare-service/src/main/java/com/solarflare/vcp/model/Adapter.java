@@ -16,58 +16,45 @@ public class Adapter implements Serializable {
 	private String versionUEFIROM;
 	private String versionFirmware;
 	private FirmwareVersion latestVersion;
-	private List<Status> status;
-	private boolean isLaterVersionAvailable;
 	List<VMNIC> children;
 	private String deviceId;
 	private String subSystemDeviceId;
 	private String vendorId;
 	private String subSystemVendorId;
 
-	
-	
-	 public String getDeviceId()
-	    {
-	        return deviceId;
-	    }
+	public String getDeviceId() {
+		return deviceId;
+	}
 
-	    public void setDeviceId(String deviceId)
-	    {
-	        this.deviceId = deviceId;
-	    }
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
 
-	    public String getSubSystemDeviceId()
-	    {
-	        return subSystemDeviceId;
-	    }
+	public String getSubSystemDeviceId() {
+		return subSystemDeviceId;
+	}
 
-	    public void setSubSystemDeviceId(String subSystemDeviceId)
-	    {
-	        this.subSystemDeviceId = subSystemDeviceId;
-	    }
+	public void setSubSystemDeviceId(String subSystemDeviceId) {
+		this.subSystemDeviceId = subSystemDeviceId;
+	}
 
-	
-	    public String getVendorId()
-	    {
-	        return vendorId;
-	    }
+	public String getVendorId() {
+		return vendorId;
+	}
 
-	    public void setVendorId(String vendorId)
-	    {
-	        this.vendorId = vendorId;
-	    }
+	public void setVendorId(String vendorId) {
+		this.vendorId = vendorId;
+	}
 
-	    public String getSubSystemVendorId()
-	    {
-	        return subSystemVendorId;
-	    }
+	public String getSubSystemVendorId() {
+		return subSystemVendorId;
+	}
 
-	    public void setSubSystemVendorId(String subSystemVendorId)
-	    {
-	        this.subSystemVendorId = subSystemVendorId;
-	    }
+	public void setSubSystemVendorId(String subSystemVendorId) {
+		this.subSystemVendorId = subSystemVendorId;
+	}
 
-	    public String getName() {
+	public String getName() {
 		return name;
 	}
 
@@ -131,14 +118,6 @@ public class Adapter implements Serializable {
 		this.versionFirmware = versionFirmware;
 	}
 
-	public List<Status> getStatus() {
-		return status;
-	}
-
-	public void setStatus(List<Status> status) {
-		this.status = status;
-	}
-
 	public FirmwareVersion getLatestVersion() {
 		return latestVersion;
 	}
@@ -147,23 +126,13 @@ public class Adapter implements Serializable {
 		this.latestVersion = latestVersion;
 	}
 
-	public boolean isLaterVersionAvailable() {
-		return isLaterVersionAvailable;
-	}
-
-	public void setLaterVersionAvailable(boolean isLaterVersionAvailable) {
-		this.isLaterVersionAvailable = isLaterVersionAvailable;
-	}
 
 	@Override
 	public String toString() {
 		return "Adapter [name=" + name + ", type=" + type + ", id=" + id + ", versionController=" + versionController
 				+ ", versionBootROM=" + versionBootROM + ", versionUEFIROM=" + versionUEFIROM + ", versionFirmware="
-				+ versionFirmware + ", latestVersion=" + latestVersion + ", status=" + status
-				+ ", isLaterVersionAvailable=" + isLaterVersionAvailable + ", children=" + children + ", deviceId="
-				+ deviceId + ", subSystemDeviceId=" + subSystemDeviceId + ", vendorId=" + vendorId
-				+ ", subSystemVendorId=" + subSystemVendorId + "]";
+				+ versionFirmware + ", latestVersion=" + latestVersion +  ", children=" + children + ", deviceId=" + deviceId + ", subSystemDeviceId="
+				+ subSystemDeviceId + ", vendorId=" + vendorId + ", subSystemVendorId=" + subSystemVendorId + "]";
 	}
 
-	
 }

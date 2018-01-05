@@ -14,36 +14,69 @@ import javax.wbem.client.WBEMClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.solarflare.vcp.vim.SimpleTimeCounter;
+
 public class SfCIMClientService {
+
+	private WBEMClient cimClient;
+	private CIMHost cimHost;
+
+	public WBEMClient getCimClient() {
+		return cimClient;
+	}
+
+	public void setCimClient(WBEMClient cimClient) {
+		this.cimClient = cimClient;
+	}
+
+	public CIMHost getCimHost() {
+		return cimHost;
+	}
+
+	public void setCimHost(CIMHost cimHost) {
+		this.cimHost = cimHost;
+	}
+
+	public SfCIMClientService(CIMHost cimHost) {
+		this.cimHost = cimHost;
+		this.cimClient = getClient(null);
+
+	}
 
 	private static final Log logger = LogFactory.getLog(SfCIMClientService.class);
 
-	public WBEMClient getClient(CIMHost cimHost, String cimObjectName) {
-		return getClient(cimHost, cimObjectName, null);
+	public WBEMClient getClient(String cimObjectName) {
+		return getClient(cimObjectName, null);
 	}
 
-	public WBEMClient getClient(CIMHost cimHost, String cimObjectName, CIMProperty<?>[] properties) {
+	public WBEMClient getClient(String cimObjectName, CIMProperty<?>[] properties) {
 		javax.security.auth.Subject subject = createSubjectFromHost(cimHost);
-
+		SimpleTimeCounter timer = new SimpleTimeCounter("SolarFlare :: getClient");
 		try {
 			WBEMClient client = WBEMClientFactory.getClient(CIMConstants.WBEMCLIENT_FORMAT);
-			client.initialize(getHostObjectPath(cimHost, properties, cimObjectName), subject,
+			client.initialize(getHostObjectPath(properties, cimObjectName), subject,
 					Locale.getAvailableLocales());
+			timer.stop();
 			return client;
 		} catch (WBEMException e) {
 			logger.error("Failed to initialize WBEMClient!" + e.getMessage());
 		}
+		timer.stop();
 		return null;
 	}
 
-	private CIMObjectPath getHostObjectPath(CIMHost cimHost, CIMProperty<?>[] properties, String cimObjectName) {
+	public CIMObjectPath getHostObjectPath(CIMProperty<?>[] properties, String cimObjectName) {
+		SimpleTimeCounter timer = new SimpleTimeCounter("SolarFlare :: getHostObjectPath");
 		try {
 			URL UrlHost = new URL(cimHost.getUrl());
-			return new CIMObjectPath(UrlHost.getProtocol(), UrlHost.getHost(), String.valueOf(UrlHost.getPort()),
-					CIMConstants.CIM_NAMESPACE, cimObjectName, properties);
+			CIMObjectPath cimObjPath = new CIMObjectPath(UrlHost.getProtocol(), UrlHost.getHost(), String.valueOf(UrlHost.getPort()),
+					CIMConstants.CIM_NAMESPACE, cimObjectName, properties); 
+			timer.stop();
+			return cimObjPath;
 		} catch (MalformedURLException e) {
 			logger.error("Invalid URL '" + cimHost.getUrl() + "'." + e.getMessage());
 		}
+		timer.stop();
 		return null;
 	}
 
