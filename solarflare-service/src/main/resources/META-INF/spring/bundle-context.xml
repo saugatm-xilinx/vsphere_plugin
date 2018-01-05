@@ -16,11 +16,11 @@
 		<constructor-arg index="0" ref="userSessionService"/>
 	</bean>
 	
-	<bean name="SfVimService" class="com.solarflare.vcp.vim.SfVimService">
-		<constructor-arg index="0" ref="ConnectionImpl"/>
-		<constructor-arg index="1" ref="userSessionService"/>
+	<bean name="ConnectionImpl" class="com.solarflare.vcp.vim.connection.ConnectionImpl">
 	</bean>
 	
-	<bean name="ConnectionImpl" class="com.solarflare.vcp.vim.connection.ConnectionImpl">
+	<bean name="SfVimServiceImpl" class="com.solarflare.vcp.vim.SfVimServiceImpl">
+		<constructor-arg index="0" ref="ConnectionImpl"/>
+		<constructor-arg index="1" ref="userSessionService"/>
 	</bean>
 </beans>

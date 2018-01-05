@@ -10,13 +10,8 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import javax.cim.CIMInstance;
-import javax.wbem.WBEMException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,7 +21,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.solarflare.vcp.cim.CIMConstants;
 import com.solarflare.vcp.cim.CIMHost;
-import com.solarflare.vcp.cim.CIMService;
 import com.solarflare.vcp.cim.SfCIMClientService;
 import com.solarflare.vcp.cim.SfCIMService;
 import com.solarflare.vcp.helper.MetadataHelper;
@@ -48,6 +42,7 @@ import com.solarflare.vcp.model.TaskState;
 import com.solarflare.vcp.model.TaskStatus;
 import com.solarflare.vcp.model.UpdateRequest;
 import com.solarflare.vcp.vim.SfVimService;
+import com.solarflare.vcp.vim.SfVimServiceImpl;
 import com.solarflare.vcp.vim.connection.Connection;
 import com.solarflare.vcp.vim25.VCenterService;
 import com.vmware.vim25.ServiceContent;
@@ -59,17 +54,18 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 	private static final Log logger = LogFactory.getLog(HostAdapterServiceImpl.class);
 
 	private UserSessionService userSessionService;
-	private static ExecutorService executor = Executors.newFixedThreadPool(1);
+	//private static ExecutorService executor = Executors.newFixedThreadPool(1);
 
 	//VCenterService service = new VCenterService();
 	//CIMService cim = new CIMService();
 	
 	@Autowired
 	SfVimService sfVimService;
-//	@Autowired
-//	public HostAdapterServiceImpl(UserSessionService session) {
-//		userSessionService = session;
-//	}
+	
+	@Autowired
+	public HostAdapterServiceImpl(UserSessionService session) {
+		userSessionService = session;
+	}
 
 	@Override
 	public List<Host> getHostList() throws Exception {
@@ -462,7 +458,7 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 		//CIMHost cimHost = new SfVimService().getCIMHost(hostId, "testing only");
 		CIMHost cimHost = sfVimService.getCIMHost(hostId);
 		SfCIMService cimService = new SfCIMService(new SfCIMClientService(cimHost));
-		Connection con = new SfVimService().getConnection();
+		Connection con = new SfVimServiceImpl().getConnection();
 		ServiceContent serviceContent = con.getServiceContent();
 		VimPortType vimPort = con.getVimPort();
 		for (Adapter adapter : adapters) {
@@ -547,7 +543,7 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 			taskInfo.setHostId(hostId);
 
 			//CIMHost cimHost = new SfVimService().getCIMHost(hostId, "TestingOnly");
-			CIMHost cimHost = new SfVimService().getCIMHost(hostId);
+			CIMHost cimHost = new SfVimServiceImpl().getCIMHost(hostId);
 			SfCIMService cimService = new SfCIMService(new SfCIMClientService(cimHost));
 
 			// Call some CIM method for increasing session validity to 15 min
@@ -639,7 +635,7 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 			// VCenterHelper.getServiceContent(userSessionService,
 			// VCenterService.vimPort);
 			//CIMHost cimHost = new SfVimService().getCIMHost(hostId, "TestingOnly");
-			CIMHost cimHost = new SfVimService().getCIMHost(hostId, "TestingOnly");
+			CIMHost cimHost = new SfVimServiceImpl().getCIMHost(hostId, "TestingOnly");
 			SfCIMService cimService = new SfCIMService(new SfCIMClientService(cimHost));
 
 			boolean controller = false;
@@ -687,7 +683,7 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 			URL fwImageURL = null;
 
 			//CIMHost cimHost = new SfVimService().getCIMHost(hostId, "TestingOnly");
-			CIMHost cimHost = new SfVimService().getCIMHost(hostId);
+			CIMHost cimHost = new SfVimServiceImpl().getCIMHost(hostId);
 			SfCIMService cimService = new SfCIMService(new SfCIMClientService(cimHost));
 
 			byte[] dataBytes = base64Data.getBytes();
@@ -867,13 +863,13 @@ public class HostAdapterServiceImpl implements HostAdapterService, ClientSession
 	
 	// TODO : Cleanup main method
 
-		public static void main(String[] args) throws Exception {
-
-			HostAdapterServiceImpl adapterServiceImpl = new HostAdapterServiceImpl();
-			List<Adapter> adapterList = adapterServiceImpl.getAdaptersFromFile();
-			String imgPath = "http://10.101.10.132/customFw/v6.2.5.1000/mcfw.dat";
-			//adapterServiceImpl.customUpdateFromURL(adapterList, "host-14", imgPath);
-			adapterServiceImpl.updateLatest(adapterList, "host-14");
-		}
+//		public static void main(String[] args) throws Exception {
+//
+//			HostAdapterServiceImpl adapterServiceImpl = new HostAdapterServiceImpl();
+//			List<Adapter> adapterList = adapterServiceImpl.getAdaptersFromFile();
+//			String imgPath = "http://10.101.10.132/customFw/v6.2.5.1000/mcfw.dat";
+//			//adapterServiceImpl.customUpdateFromURL(adapterList, "host-14", imgPath);
+//			adapterServiceImpl.updateLatest(adapterList, "host-14");
+//		}
 
 }

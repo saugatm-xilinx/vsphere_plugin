@@ -21,7 +21,10 @@
 	<osgi:reference id="userSessionService"
          interface="com.vmware.vise.usersession.UserSessionService"/>
    
-     <osgi:service id="connection" ref="ConnectionImpl"
-		interface="com.solarflare.vcp.vim.connection.Connection" />
-
+   <osgi:service id="SfVimService" ref="SfVimServiceImpl" 
+	    interface="com.solarflare.vcp.vim.SfVimService" />
+   
+<!--    <osgi:service id="connection" ref="ConnectionImpl"
+		interface="com.solarflare.vcp.vim.connection.Connection" /> -->
+		
 </beans>
