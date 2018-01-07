@@ -80,7 +80,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			TaskInfo taskInfo = new TaskInfo();
 			taskInfo.setTaskid(taskID);
 			taskInfo.setHostId(hostId);
-
+			taskManager.addTaskInfo(taskInfo);
 			CIMHost cimHost = sfVimService.getCIMHost(hostId);
 			SfCIMService cimService = new SfCIMService(new SfCIMClientService(cimHost));
 
@@ -113,7 +113,6 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 				}
 			}
 
-			taskManager.addTaskInfo(taskInfo);
 		} catch (Exception e) {
 			throw e;
 		}
@@ -131,6 +130,8 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			taskID = taskManager.getTaskId();
 			TaskInfo taskInfo = new TaskInfo();
 			taskInfo.setTaskid(taskID);
+			taskInfo.setHostId(hostId);
+			taskManager.addTaskInfo(taskInfo);
 			URL fwImageURL = null;
 
 			// CIMHost cimHost = new SfVimService().getCIMHost(hostId,
@@ -193,7 +194,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			} else {
 				logger.error("Fail to get CIM Firmware Instance");
 			}
-			taskManager.addTaskInfo(taskInfo);
+
 		} catch (Exception e) {
 			throw e;
 		}
@@ -214,7 +215,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			taskInfo.setTaskid(taskID);
 			taskInfo.setHostId(hostId);
 			taskManager.addTaskInfo(taskInfo);
-			
+
 			URL fwImageURL = new URL(fwImagePath);
 			CIMHost cimHost = sfVimService.getCIMHost(hostId);
 			SfCIMService cimService = new SfCIMService(new SfCIMClientService(cimHost));
