@@ -10,7 +10,7 @@ public class TaskInfo {
 	private Long requestSubmitted;
 	private List<AdapterTask> adapterTasks;
 
-	public TaskInfo(){
+	public TaskInfo() {
 		this.requestSubmitted = System.currentTimeMillis();
 	}
 	public String getTaskid() {
@@ -21,7 +21,6 @@ public class TaskInfo {
 		this.taskid = taskid;
 	}
 
-	
 	public String getHostId() {
 		return hostId;
 	}
@@ -38,17 +37,19 @@ public class TaskInfo {
 		this.adapterTasks = adapterTasks;
 	}
 
-	public void add(AdapterTask aTask){
-		if(this.adapterTasks == null){
+	public void add(AdapterTask aTask) {
+		if (this.adapterTasks == null) {
 			this.adapterTasks = new ArrayList<AdapterTask>();
 		}
 		this.adapterTasks.add(aTask);
 	}
 
+	public Long getRequestSubmitted() {
+		return requestSubmitted;
+	}
 	@Override
 	public String toString() {
-		return "TaskInfo [taskid=" + taskid + ", hostId=" + hostId + ", adapterTasks=" + adapterTasks + "]";
+		return "TaskInfo [taskid=" + taskid + ", hostId=" + hostId + ", requestSubmitted=" + requestSubmitted + ", adapterTasks=" + adapterTasks + "]";
 	}
 
-	
 }

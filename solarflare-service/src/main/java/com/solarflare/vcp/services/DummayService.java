@@ -9,9 +9,8 @@ import com.solarflare.vcp.model.HostConfiguration;
 import com.solarflare.vcp.model.NetQueue;
 import com.solarflare.vcp.model.NicBootParamInfo;
 import com.solarflare.vcp.model.Overlay;
-import com.solarflare.vcp.model.Status;
 
-public class DummayService implements HostAdapterService{
+public class DummayService implements HostAdapterService {
 
 	@Override
 	public List<Host> getHostList() throws Exception {
@@ -44,15 +43,13 @@ public class DummayService implements HostAdapterService{
 	}
 
 	@Override
-	public String customUpdateFirmwareFromLocal(List<Adapter> adapterList, String hostId, String base64Data)
-			throws Exception {
+	public String customUpdateFirmwareFromLocal(List<Adapter> adapterList, String hostId, String base64Data) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String customUpdateFirmwareFromURL(List<Adapter> adapterList, String hostId, String fwImagePath)
-			throws Exception {
+	public String customUpdateFirmwareFromURL(List<Adapter> adapterList, String hostId, String fwImagePath) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -64,28 +61,22 @@ public class DummayService implements HostAdapterService{
 	}
 
 	@Override
-	public List<Status> getStatus(String hostId, String adapterId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public HostConfiguration getHostConfigurations(String hostId) throws Exception {
-		
+
 		HostConfiguration hostConfiguration = new HostConfiguration();
-		
+
 		NetQueue netQueue = new NetQueue();
 		netQueue.setNetQueueCount(8);
 		netQueue.setRss(4);
-		
+
 		Debugging debugging = new Debugging();
 		debugging.setMaskUtils(true);
 		debugging.setMaskReceive(true);
-		
+
 		Overlay overlay = new Overlay();
 		overlay.setGeneveOffloadEnable(true);
 		overlay.setVxlanOffloadEnable(true);
-		
+
 		hostConfiguration.setNetQueue(netQueue);
 		hostConfiguration.setDebugging(debugging);
 		hostConfiguration.setOverlay(overlay);
@@ -93,12 +84,9 @@ public class DummayService implements HostAdapterService{
 	}
 
 	@Override
-	public void updateHostConfigurations(HostConfiguration hostConfigurationRequest)
-			throws Exception {
+	public void updateHostConfigurations(HostConfiguration hostConfigurationRequest) throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
-	
 
 }

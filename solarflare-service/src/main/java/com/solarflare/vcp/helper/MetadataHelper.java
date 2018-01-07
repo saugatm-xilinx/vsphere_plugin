@@ -15,8 +15,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import com.solarflare.vcp.cim.CIMConstants;
-import com.solarflare.vcp.cim.CIMHost;
-import com.solarflare.vcp.cim.CIMService;
 import com.solarflare.vcp.cim.SfCIMService;
 import com.solarflare.vcp.model.BinaryFiles;
 import com.solarflare.vcp.model.BootROM;
@@ -24,12 +22,12 @@ import com.solarflare.vcp.model.Controller;
 import com.solarflare.vcp.model.FwType;
 import com.solarflare.vcp.model.SfFirmware;
 import com.vmware.vim25.RuntimeFaultFaultMsg;
-import com.vmware.vim25.ServiceContent;
-import com.vmware.vim25.VimPortType;
 
 public class MetadataHelper {
 
-	public BinaryFiles getMetadata(URL filePath) throws MalformedURLException {
+	private static BinaryFiles metadata;
+
+	public static BinaryFiles getMetadata(URL filePath) throws MalformedURLException {
 
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -41,85 +39,36 @@ public class MetadataHelper {
 		return fwMetaData;
 	}
 
-	public SfFirmware getMetaDataForAdapter(ServiceContent serviceContent, VimPortType vimPort, CIMHost cimHost,
-			CIMInstance sfFWInstance, CIMInstance nicInstance, boolean isController)
-			throws MalformedURLException, RuntimeFaultFaultMsg {
-
-		SfFirmware metaDatafile = null;
-		CIMService cim = new CIMService();
-
-		Map<String, String> params = cim.getRequiredFwImageName(cimHost, sfFWInstance, nicInstance);
-
-		int currentType = Integer.parseInt(params.isEmpty()? "0":params.get(CIMConstants.TYPE));
-		int currentSubType = Integer.parseInt(params.isEmpty()? "0":params.get(CIMConstants.SUB_TYPE));
-
-		// get version for given Controller from metadata file
-		String urlPath = cim.getPluginURL(serviceContent, vimPort, CIMConstants.PLUGIN_KEY);
-		URL pluginURL = new URL(urlPath);
-
-		// TODO : check for https certificate warning
-		// URL controllerFWImagePath = new
-		// URL(pluginURL.getProtocol(),pluginURL.getHost(),pluginURL.getPort(),CONTROLLER_FW_IMAGE_PATH);
-		URL metaDataFilePath = new URL("http", pluginURL.getHost(), CIMConstants.METADATA_PATH);
-
-		MetadataHelper metadataHelper = new MetadataHelper();
-		BinaryFiles metadata = metadataHelper.getMetadata(metaDataFilePath);
-		List<SfFirmware> files = null;
-		if (isController) {
-			Controller controller = metadata.getController();
-			files = controller.getFiles();
-		} else {
-			BootROM bootROM = metadata.getBootROM();
-			files = bootROM.getFiles();
-		}
-
-		//TODO: latest version
-		for (SfFirmware file : files) {
-			int type = Integer.parseInt(file.getType());
-			int subType = Integer.parseInt(file.getSubtype());
-			if (type == currentType && subType == currentSubType) {
-				metaDatafile = file;
-			}
-		}
-
-		return metaDatafile;
-
-	}
-
-	
-	public SfFirmware getMetaDataForAdapter(URL pluginURL, SfCIMService cimService,
-			CIMInstance sfFWInstance, CIMInstance nicInstance, FwType fwType)
-			throws MalformedURLException, RuntimeFaultFaultMsg {
+	public static SfFirmware getMetaDataForAdapter(URL pluginURL, SfCIMService cimService, CIMInstance sfFWInstance, CIMInstance nicInstance, FwType fwType) throws MalformedURLException, RuntimeFaultFaultMsg {
 
 		SfFirmware metaDatafile = null;
 
 		Map<String, String> params = cimService.getRequiredFwImageName(sfFWInstance, nicInstance);
 
-		int currentType = Integer.parseInt(params.isEmpty()? "0":params.get(CIMConstants.TYPE));
-		int currentSubType = Integer.parseInt(params.isEmpty()? "0":params.get(CIMConstants.SUB_TYPE));
+		int currentType = Integer.parseInt(params.isEmpty() ? "0" : params.get(CIMConstants.TYPE));
+		int currentSubType = Integer.parseInt(params.isEmpty() ? "0" : params.get(CIMConstants.SUB_TYPE));
 
-		// TODO : check for https certificate warning
-		// URL controllerFWImagePath = new
-		// URL(pluginURL.getProtocol(),pluginURL.getHost(),pluginURL.getPort(),CONTROLLER_FW_IMAGE_PATH);
-		URL metaDataFilePath = new URL("http", pluginURL.getHost(), CIMConstants.METADATA_PATH);
+		if (metadata == null) {
+			// TODO : check for https certificate warning
+			URL metaDataFilePath = new URL("http", pluginURL.getHost(), CIMConstants.METADATA_PATH);
+			metadata = getMetadata(metaDataFilePath);
+		}
 
-		MetadataHelper metadataHelper = new MetadataHelper();
-		BinaryFiles metadata = metadataHelper.getMetadata(metaDataFilePath);
 		List<SfFirmware> files = null;
 		if (FwType.CONTROLLER.equals(fwType)) {
 			Controller controller = metadata.getController();
 			files = controller.getFiles();
-		} 
-		if(FwType.BOOTROM.equals(fwType)) {
+		}
+		if (FwType.BOOTROM.equals(fwType)) {
 			BootROM bootROM = metadata.getBootROM();
 			files = bootROM.getFiles();
 		}
-		
-		if(FwType.UEFIROM.equals(fwType)) {
-			//TODO code for UEFI ROM
+
+		if (FwType.UEFIROM.equals(fwType)) {
+			// TODO code for UEFI ROM
 		}
 
-		//TODO: latest version
+		// TODO: latest version
 		for (SfFirmware file : files) {
 			int type = Integer.parseInt(file.getType());
 			int subType = Integer.parseInt(file.getSubtype());
@@ -132,7 +81,7 @@ public class MetadataHelper {
 
 	}
 
-	private byte[] readData(URL toDownload, boolean readComplete) {
+	private static byte[] readData(URL toDownload, boolean readComplete) {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
 		try {

@@ -26,11 +26,12 @@ public class UpdateRequestThread implements Runnable {
 	}
 
 	public void run() {
+		SfCIMService cimService = updateRequest.getCimService();
+		CIMInstance fwInstance = updateRequest.getFwInstance();
+
 		try {
 			setTaskState(TaskState.Running, null);
 
-			SfCIMService cimService = updateRequest.getCimService();
-			CIMInstance fwInstance = updateRequest.getFwInstance();
 			CIMInstance nicInstance = updateRequest.getNicInstance();
 			URL fwImagePath = updateRequest.getFwImagePath();
 
@@ -42,6 +43,12 @@ public class UpdateRequestThread implements Runnable {
 			String errorMsg = "Update request failed! Error : " + e.getMessage();
 			logger.error(errorMsg);
 			setTaskState(TaskState.Error, errorMsg);
+		} finally {
+			// if temp file is created then remove it.
+			if (updateRequest.isCustom() && updateRequest.getTempFilePath() != null && !updateRequest.getTempFilePath().isEmpty()) { // Delete
+				boolean status = cimService.removeFwImage(fwInstance, updateRequest.getTempFilePath());
+				logger.debug("Temp file : " + updateRequest.getTempFilePath() + " removed: " + status);
+			}
 		}
 	}
 
@@ -49,7 +56,7 @@ public class UpdateRequestThread implements Runnable {
 		// update task state as running
 		Status status = new Status(taskState, error, updateRequest.getFwType());
 		TaskManager taskManager = TaskManager.getInstance();
-		taskManager.updateTaskState(updateRequest.getTaskId(), updateRequest.getAdapterId(),status);
+		taskManager.updateTaskState(updateRequest.getTaskId(), updateRequest.getAdapterId(), status);
 
 	}
 }

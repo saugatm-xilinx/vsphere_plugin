@@ -20,7 +20,8 @@ public class UpdateRequest {
 	private SfCIMService cimService;
 	private String taskId;
 	private FwType fwType;
-
+	private String tempFilePath;
+	
 	public boolean isCustom() {
 		return isCustom;
 	}
@@ -93,6 +94,12 @@ public class UpdateRequest {
 	public String toString() {
 		return "UpdateRequest [isCustom=" + isCustom + ", hostId=" + hostId + ", adapterId=" + adapterId + ", fwImagePath=" + fwImagePath + ", header=" + header + ", nicInstance=" + nicInstance + ", fwInstance=" + fwInstance + ", serviceContent=" + serviceContent
 				+ ", cimService=" + cimService + ", taskId=" + taskId + ", fwType=" + fwType + "]";
+	}
+	public String getTempFilePath() {
+		return tempFilePath;
+	}
+	public void setTempFilePath(String tempFilePath) {
+		this.tempFilePath = tempFilePath;
 	}
 
 }
