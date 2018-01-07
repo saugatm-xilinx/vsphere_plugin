@@ -132,6 +132,17 @@
     </div>
 </clr-modal>
 
+<clr-modal [clrModalSize]="'md'" [(clrModalOpen)]="validateCustomUpdateModal">
+    <h3 class="modal-title">Incompatible adapters selected</h3>
+    <div class="modal-body">
+
+        <h6> Please select adapters of the same family type.</h6>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-outline" type="button" (click)="validateCustomUpdateModal = false;" >Ok</button>
+    </div>
+</clr-modal>
+
 <clr-modal [clrModalSize]="'md'" [(clrModalOpen)]="customUpdateModal" [clrModalClosable]="false"
            [clrModalStaticBackdrop]="true">
     <h3 class="modal-title">Custom Update
@@ -196,6 +207,9 @@
                                 <option selected value="">Select URL Protocol</option>
                                 <option value="http://">http://</option>
                                 <option value="https://">https://</option>
+                                <option value="sftp://">sftp://</option>
+                                <option value="tftp://">tftp://</option>
+                                <option value="ftp://">ftp://</option>
                             </select>
                         </div>
                     </div>
@@ -276,6 +290,137 @@
     </div>
 </clr-modal>
 
+<clr-modal [clrModalSize]="'md'" [(clrModalOpen)]="status.custom.modal">
+    <h3 class="modal-title">Custom Firmware Update Status</h3>
+    <div class="modal-body" style="min-height: 140px;">
+        <h6>Note: Firmware update may take some time ...</h6>
+
+        <div *ngFor="let output of status.custom.output; let i = index">
+            <h6>{{i+1}}. {{output.name}} :</h6>
+            <div *ngIf="output.controller !== null ">
+                <span *ngIf="output.controller.state === 'Success' && output.controller.to ">
+                Controller Firmware: v{{output.controller.from}} updated to v{{output.controller.to}}
+            </span>
+                <span *ngIf="output.controller.state === 'Success' && !output.controller.to ">
+                Controller Firmware: v{{output.controller.from}} updating ...
+            </span>
+                <span *ngIf="output.controller.state === 'Error'">
+                Controller Firmware: Error occurred while updating v{{output.controller.from}}
+                <i *ngIf="output.controller.message !== null">Error: {{output.controller.message}}</i>
+            </span>
+                <span *ngIf="output.controller.state === 'Queued' || output.controller.state === 'Running'">
+                Controller Firmware: v{{output.controller.from}} updating ...
+            </span>
+                <br/>
+            </div>
+
+            <div *ngIf="output.bootRom !== null ">
+                <span *ngIf="output.bootRom.state === 'Success' && output.bootRom.to ">
+                BootROM Firmware: v{{output.bootRom.from}} updated to v{{output.bootRom.to}}
+            </span>
+                <span *ngIf="output.bootRom.state === 'Success' && !output.bootRom.to ">
+                BootROM Firmware: v{{output.bootRom.from}} updating ...
+            </span>
+                <span *ngIf="output.bootRom.state === 'Error'">
+                BootROM Firmware: Error occurred while updating v{{output.bootRom.from}}
+                <i *ngIf="output.bootRom.message !== null">Error: {{output.bootRom.message}}</i>
+            </span>
+                <span *ngIf="output.bootRom.state === 'Queued' || output.bootRom.state === 'Running'">
+                BootROM Firmware: v{{output.bootRom.from}} updating ...
+            </span>
+                <br/>
+            </div>
+
+            <div *ngIf="output.uefiRom !== null">
+                <span *ngIf="output.uefiRom.state === 'Success' && output.uefiRom.to ">
+                UefiROM Firmware: v{{output.uefiRom.from}} updated to v{{output.uefiRom.to}}
+            </span>
+                <span *ngIf="output.uefiRom.state === 'Success' && !output.uefiRom.to ">
+                UefiROM Firmware: v{{output.uefiRom.from}} updating ...
+            </span>
+                <span *ngIf="output.uefiRom.state === 'Error'">
+                UefiROM Firmware: Error occurred while updating v{{output.uefiRom.from}}
+                <i *ngIf="output.uefiRom.message !== null">Error: {{output.uefiRom.message}}</i>
+            </span>
+                <span *ngIf="output.uefiRom.state === 'Queued' || output.uefiRom.state === 'Running'">
+                UefiROM Firmware: v{{output.uefiRom.from}} updating ...
+            </span>
+                <br/>
+            </div>
+
+
+            <span *ngIf="output.uefiRom === null && output.bootRom === null && output.controller === null">
+                Update is in progress.. Please wait...<br/>
+            </span>
+
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-outline" type="button" (click)="status.custom.modal = false;
+        status.status = true;reInitStatus();" >Ok</button>
+    </div>
+</clr-modal>
+
+<clr-modal [clrModalSize]="'md'" [(clrModalOpen)]="status.latest.modal">
+    <h3 class="modal-title">Latest Firmware Update Status</h3>
+    <div class="modal-body" style="min-height: 140px;">
+        <h6>Note: Firmware update may take some time ...</h6>
+
+        <div *ngFor="let output of status.latest.output; let i = index">
+            <h6>{{i+1}}. {{output.name}}</h6>
+            <div *ngIf="output.controller !== null">
+                <span *ngIf="output.controller.state === 'Success'">
+                Controller Firmware: v{{output.controller.from}} updated to v{{output.controller.to}}
+            </span>
+                <span *ngIf="output.controller.state === 'Error'">
+                Controller Firmware: Error occurred while updating v{{output.controller.from}} to v{{output.controller.to}}
+                <i *ngIf="output.controller.message !== null">{{output.controller.message}}</i>
+            </span>
+                <span *ngIf="output.controller.state === 'Queued' || output.controller.state === 'Running'">
+                Controller Firmware: v{{output.controller.from}} updating to v{{output.controller.to}}
+            </span>
+                <br/>
+            </div>
+            <div *ngIf="output.bootRom !== null">
+                <span *ngIf="output.bootRom.state === 'Success'">
+                BootROM Firmware: v{{output.bootRom.from}} updated to v{{output.bootRom.to}}
+            </span>
+                <span *ngIf="output.bootRom.state === 'Error'">
+                BootROM Firmware: Error occurred while updating v{{output.bootRom.from}} to v{{output.bootRom.to}}
+                <i *ngIf="output.bootRom.message !== null">{{output.bootRom.message}}</i>
+            </span>
+                <span *ngIf="output.bootRom.state === 'Queued' || output.bootRom.state === 'Running'">
+                BootROM Firmware: v{{output.bootRom.from}} updating to v{{output.bootRom.to}}
+            </span>
+                <br/>
+            </div>
+            <div *ngIf="output.uefiRom !== null">
+                <span *ngIf="output.uefiRom.state === 'Success'">
+                UefiROM Firmware: v{{output.uefiRom.from}} updated to v{{output.uefiRom.to}}
+            </span>
+                <span *ngIf="output.uefiRom.state === 'Error'">
+                UefiROM Firmware: Error occurred while updating v{{output.uefiRom.from}} to v{{output.uefiRom.to}}
+                <i *ngIf="output.uefiRom.message !== null">{{output.uefiRom.message}}</i>
+            </span>
+                <span *ngIf="output.uefiRom.state === 'Queued' || output.uefiRom.state === 'Running'">
+                UefiROM Firmware: v{{output.uefiRom.from}} updating to v{{output.uefiRom.to}}
+            </span>
+                <br/>
+            </div>
+
+
+            <span *ngIf="output.uefiRom === null && output.bootRom === null && output.controller === null">
+                Update is in progress.. Please wait...
+            </span>
+
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-outline" type="button" (click)="status.latest.modal = false;
+        status.status = true;reInitStatus();" >Ok</button>
+    </div>
+</clr-modal>
+
 <div class="row">
 
     <div class="col-md-12">
@@ -298,86 +443,94 @@
             Loading..
             </span>
         </div>
-        <div class="row" *ngIf="(adapterList|json) != '[]'">
-            <div class="col-md-12">
-                <clr-datagrid style="min-height: 80px;"
-                              *ngIf="(adapterList|json) != '[]'" [(clrDgSelected)]="selectedAdapters">
-                    <clr-dg-column>Adapter Name</clr-dg-column>
-                    <clr-dg-column>Firmware Family Version</clr-dg-column>
-                    <clr-dg-column>Controller Version</clr-dg-column>
-                    <clr-dg-column>Boot Rom Version</clr-dg-column>
-                    <clr-dg-column>UEFI Rom Version</clr-dg-column>
-                    <clr-dg-column>Updates Available</clr-dg-column>
-
-                    <clr-dg-row *clrDgItems="let ad of adapterList; let i = index" [clrDgItem]="ad">
-                        <clr-dg-cell>
-                            {{ad.name}}
-                        </clr-dg-cell>
-                        <clr-dg-cell>{{ad.versionFirmware}}</clr-dg-cell>
-                        <clr-dg-cell>
-                            {{ad.versionController}}
-
-
-                            <a role="tooltip" aria-haspopup="true"
-                               *ngIf="statusUpdate(ad.status, 'controller', 'bool')"
-                               [ngClass]="statusUpdate(ad.status, 'controller', 'class')"
-                               [class.tooltip-bottom-right]="!i" class="tooltip tooltip-md">
-                                <clr-icon [attr.shape]="statusUpdate(ad.status, 'controller', 'shape')" size="24"></clr-icon>
-                                <span class="tooltip-content">{{statusUpdate(ad.status, 'controller', 'txt')}}</span>
-                            </a>
-
-                        </clr-dg-cell>
-                        <clr-dg-cell>
-                            {{ad.versionBootROM}}
-
-                            <a role="tooltip" aria-haspopup="true"
-                               *ngIf="statusUpdate(ad.status, 'BootROM', 'bool')"
-                               [ngClass]="statusUpdate(ad.status, 'BootROM', 'class')"
-                               [class.tooltip-bottom-right]="!i" class="tooltip tooltip-md">
-                                <clr-icon [attr.shape]="statusUpdate(ad.status, 'BootROM', 'shape')" size="24"></clr-icon>
-                                <span class="tooltip-content">{{statusUpdate(ad.status, 'BootROM', 'txt')}}</span>
-                            </a>
-
-                        </clr-dg-cell>
-                        <clr-dg-cell>
-                            {{ad.versionUEFIROM}}
-
-                            <a role="tooltip" aria-haspopup="true"
-                               *ngIf="statusUpdate(ad.status, 'UEFIROM', 'bool')"
-                               [ngClass]="statusUpdate(ad.status, 'UEFIROM', 'class')"
-                               [class.tooltip-bottom-right]="!i" class="tooltip tooltip-md">
-                                <clr-icon [attr.shape]="statusUpdate(ad.status, 'UEFIROM', 'shape')" size="24"></clr-icon>
-                                <span class="tooltip-content">{{statusUpdate(ad.status, 'UEFIROM', 'txt')}}</span>
-                            </a>
-                        </clr-dg-cell>
-
-                        <clr-dg-cell >
-                             <span *ngIf="ad.laterVersionAvailable">
-                                 <b>Available</b>
-                                </span>
-                            <span *ngIf="!ad.laterVersionAvailable">
-                                    No
-                                </span>
-                        </clr-dg-cell>
-
-                    </clr-dg-row>
-                    <clr-dg-footer>{{adapterList.length}} Adapters</clr-dg-footer>
-                </clr-datagrid>
-            </div>
-            <div class="col-md-12" style="text-align: center;">
-                <button class="btn"
-                        (click)="latestUpdateModal = true"
-                        [disabled]="selectedAdapters.length == 0">
-                    Update
-                </button>
-                <button class="btn btn-outline"
-                        (click)="customUpdateModal = true; button.custom = false; button.customErr = false;"
-                        [disabled]="selectedAdapters.length == 0">
-                    Custom Update
-                </button>
-            </div>
-        </div>
     </div>
 
 </div>
 
+<div class="row" *ngIf="(adapterList|json) != '[]'">
+    <div class="col-md-12">
+        <clr-datagrid *ngIf="(adapterList|json) != '[]'" [(clrDgSelected)]="selectedAdapters">
+            <clr-dg-column>Adapter Name</clr-dg-column>
+            <clr-dg-column style="max-width: 200px">Firmware Family Version</clr-dg-column>
+            <clr-dg-column>Controller Version</clr-dg-column>
+            <clr-dg-column>Boot Rom Version</clr-dg-column>
+            <clr-dg-column>UEFI Rom Version</clr-dg-column>
+
+            <clr-dg-row *clrDgItems="let ad of adapterList; let i = index" [clrDgItem]="ad">
+                <clr-dg-cell>
+                    {{ad.name}}
+                </clr-dg-cell>
+                <clr-dg-cell style="max-width: 200px">
+                    {{ad.versionFirmware}}
+                </clr-dg-cell>
+                <clr-dg-cell>
+                    {{ad.versionController}}
+
+                </clr-dg-cell>
+                <clr-dg-cell>
+                    {{ad.versionBootROM}}
+
+                </clr-dg-cell>
+                <clr-dg-cell>
+                    {{ad.versionUEFIROM}}
+
+                </clr-dg-cell>
+
+            </clr-dg-row>
+            <clr-dg-footer>{{adapterList.length}} Adapters</clr-dg-footer>
+        </clr-datagrid>
+    </div>
+    <div class="col-md-12" style="text-align: center;">
+        <button class="btn"
+                (click)="latestUpdateModal = true"
+                [disabled]="selectedAdapters.length == 0 || gettingAdapterList">
+            Update
+        </button>
+        <button class="btn btn-outline"
+                (click)="validateCustomUpdate();"
+                [disabled]="selectedAdapters.length == 0 || gettingAdapterList">
+            Custom Update
+        </button>
+    </div>
+</div>
+
+
+<!--
+        <clr-alert [clrAlertType]="'alert-success'" [clrAlertClosed]="close">
+            <div class="alert-item">
+                <span class="alert-text">
+                    This alert indicates success.
+                </span>
+            </div>
+        </clr-alert>
+
+                    <a role="tooltip" aria-haspopup="true"
+                       *ngIf="statusUpdate(ad.status, 'controller', 'bool')"
+                       [ngClass]="statusUpdate(ad.status, 'controller', 'class')"
+                       [class.tooltip-bottom-right]="!i" class="tooltip tooltip-md">
+                        <clr-icon [attr.shape]="statusUpdate(ad.status, 'controller', 'shape')" size="24"></clr-icon>
+                        <span class="tooltip-content">{{statusUpdate(ad.status, 'controller', 'txt')}}</span>
+                    </a>
+
+
+                    <a style="text-align: right" role="tooltip" aria-haspopup="true"
+                       *ngIf="statusUpdate(ad.status, 'BootROM', 'bool')"
+                       [ngClass]="statusUpdate(ad.status, 'BootROM', 'class')"
+                       [class.tooltip-bottom-left]="i < (adapterList.length - 1)"
+                       [class.tooltip-top-left]="i === (adapterList.length - 1)"
+                       class="tooltip tooltip-md">
+                        <clr-icon [attr.shape]="statusUpdate(ad.status, 'BootROM', 'shape')" size="24"></clr-icon>
+                        <span class="tooltip-content">{{statusUpdate(ad.status, 'BootROM', 'txt')}}</span>
+                    </a>
+
+
+                    <a role="tooltip" aria-haspopup="true"
+                       *ngIf="statusUpdate(ad.status, 'UEFIROM', 'bool')"
+                       [ngClass]="statusUpdate(ad.status, 'UEFIROM', 'class')"
+                       [class.tooltip-bottom-left]="i < (adapterList.length - 1)"
+                       [class.tooltip-top-left]="i === (adapterList.length - 1)"
+                       class="tooltip tooltip-md">
+                        <clr-icon [attr.shape]="statusUpdate(ad.status, 'UEFIROM', 'shape')" size="24"></clr-icon>
+                        <span class="tooltip-content">{{statusUpdate(ad.status, 'UEFIROM', 'txt')}}</span>
+                    </a>
+-->

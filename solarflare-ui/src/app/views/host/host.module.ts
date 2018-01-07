@@ -6,12 +6,13 @@ import {HostComponent} from "./host.component";
 import {OverviewComponent} from "./overview/overview.component";
 import {FwupdateComponent} from "./fwupdate/fwupdate.component";
 import {ConfigComponent} from "./config/config.component";
-import {ClrTabsModule} from "clarity-angular";
+import {ClrAlertModule, ClrTabsModule} from "clarity-angular";
 import {RangePipe} from "../../range.pipe";
 import {ClrModalModule} from "clarity-angular";
 import {ClrDatagridModule} from "clarity-angular";
 import {ClrIconModule} from "clarity-angular";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {HostsService} from "../../services/hosts.service";
 
 @NgModule({
   imports: [
@@ -22,11 +23,15 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
       ClrDatagridModule,
       ClrIconModule,
       FormsModule,
-      ReactiveFormsModule
+      ReactiveFormsModule,
+      ClrAlertModule
   ],
   declarations: [HostComponent, OverviewComponent, FwupdateComponent, ConfigComponent, RangePipe],
     exports:[
         ReactiveFormsModule
+    ],
+    providers:[
+        HostsService
     ]
 })
 export class HostModule { }

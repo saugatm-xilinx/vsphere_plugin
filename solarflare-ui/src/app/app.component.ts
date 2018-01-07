@@ -14,14 +14,14 @@ import {Http} from "@angular/http";
 
 export class AppComponent {
     public hosts: any;
-    public allHostUrl = this.gs.getWebContextPath() + '/rest/services/hosts/';
 
     constructor(public  gs: GlobalsService,
                 private injector: Injector,
                 private refreshService: RefreshService,
                 private i18nService: I18nService,
                 private changeDetector: ChangeDetectorRef,
-                private http: Http) {
+                private http: Http,
+                private as: AppMainService) {
 
         // Refresh handler to be used in plugin mode
         this.gs.getWebPlatform().setGlobalRefreshHandler(this.refresh.bind(this), document);
@@ -37,20 +37,15 @@ export class AppComponent {
     }
 
     ngOnInit(): void {
-        let url = "";
-        if (this.gs.isPluginMode()) {
-            url = this.allHostUrl;
-        } else {
-            url = 'https://10.101.10.7/ui/solarflare/rest/services/hosts/';
-        }
-        this.http.get(url)
+
+        this.as.getHosts()
             .subscribe(
                 data => {
-                    this.hosts = data.json()
+                    this.hosts = data
                 },
                 err => {
                     console.error(err);
-                    this.devMode();
+                    //this.devMode();
                 }
             );
     }
@@ -173,8 +168,6 @@ export class AppComponent {
             "cimProviderVersion": "2222"
         }];
     }
-
-
 
     refresh(): void {
         // This propagates the refresh event to views that have subscribed to the RefreshService

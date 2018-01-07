@@ -1,50 +1,30 @@
 import {Injectable} from "@angular/core";
-import {Http, Headers, Response} from "@angular/http";
-import {Observable} from "rxjs/Observable";
+import {Http, Response} from "@angular/http";
 
-import {GlobalsService, AppAlertService} from "../shared/index";
-import {AppErrorHandler} from "../shared/appErrorHandler";
-import {APP_CONFIG} from "../shared/app-config";
-import {toPromise} from "rxjs/operator/toPromise";
+import {GlobalsService} from "../shared/index";
 
 
 @Injectable()
 export class AppMainService {
-    public current_user = null;
-    public headers = null;
-    public hostList = null;
+
+    public allHostUrl = this.gs.getWebContextPath() + '/rest/services/hosts/';
 
     constructor(public http: Http,
-                public gs: GlobalsService) {
-    }
+                public gs: GlobalsService) {}
 
-    getHeader() {
-        //this.current_user = JSON.parse(sessionStorage.getItem('currentUser'));
-        this.headers = new Headers();
-        this.headers.set('content-type', 'application/json');
-        this.headers.set('Accept', 'application/json');
-        //this.headers.append('Authorization', 'Basic bXN5c0B2c3BoZXJlLmxvY2FsOk1zeXNAMTIz');
-        return this.headers;
-    }
+    public getHosts(url?: string) {
 
-    get(url) {
-        return this.http.get(url, {
-            headers: this.getHeader(),
-            withCredentials : true
-    });
-    }
+        if (this.gs.isPluginMode()) {
+            url = this.allHostUrl;
+        } else {
+            url = 'https://10.101.10.8/ui/solarflare/rest/services/hosts/';
+        }
 
-    public getHosts() {
-        let url = this.gs.getWebContextPath() + '/rest/services/hosts';
+        return this.http.get(url)
+            .map((response:Response) =>{
+            return response.json();
+        });
 
-        this.http.get('https://10.101.10.7/ui/solarflare/rest/services/hosts/')
-            .subscribe(
-                data => { this.hostList = data.json();
-                    this.hostList = Array.of(this.hostList);
-                    return this.hostList;
-                },
-                err => console.error(err)
-            );
     }
 
 }

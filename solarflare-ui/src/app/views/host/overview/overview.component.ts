@@ -3,6 +3,7 @@ import {Router, ActivatedRoute, Params} from '@angular/router';
 import {Http} from "@angular/http";
 import {GlobalsService} from "../../../shared/globals.service";
 import {Subscription} from 'rxjs/Subscription';
+import {HostsService} from "../../../services/hosts.service";
 
 @Component({
     selector: 'app-overview',
@@ -12,13 +13,13 @@ import {Subscription} from 'rxjs/Subscription';
 
 export class OverviewComponent implements OnInit {
     subscription: Subscription;
-    public hostDetailUrl = this.gs.getWebContextPath() + '/rest/services/hosts/';
     public params = {};
     public hostDetail = {};
 
     constructor(private activatedRoute: ActivatedRoute,
                 private http: Http,
-                public gs: GlobalsService) {
+                public gs: GlobalsService,
+                private hs: HostsService) {
         /*      this.activatedRoute.params.subscribe( (params : Params) => {
                   this.params = params;
                   console.log(this.params);
@@ -34,24 +35,15 @@ export class OverviewComponent implements OnInit {
     }
 
     getHostDetail(){
-        this.hostDetail = {};
-        let url = "";
-        if (this.gs.isPluginMode()) {
-            url = this.hostDetailUrl + this.params['id'] + '/';
-        } else {
-            url = 'https://10.101.10.7/ui/solarflare/rest/services/hosts/' + this.params['id'] + '/';
-        }
-
-        this.http.get(url)
+        this.hs.getHostDetails(this.params['id'])
             .subscribe(
                 data => {
-                    this.hostDetail = data.json()
+                    this.hostDetail = data
                 },
                 err => {
                     console.error(err);
-                    this.devMode();
+                    //this.devMode();
                 }
-
             );
     }
 

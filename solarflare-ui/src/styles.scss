@@ -1,6 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 
+
 /* Overide 2 styles in order to adjust wizard (size lg) inside the plugin dialog */
+
 .modal {
     padding: 0px;
 }
@@ -34,48 +36,51 @@
     opacity: 0.6;
 }
 
-span.adaptorName{
+span.adaptorName {
     font-size: 0.75em;
 }
 
-.table-border-right{
-  border-right: 0.5px solid teal;
+.table-border-right {
+    border-right: 0.5px solid teal;
 }
 
-.datagrid-body{
-  overflow-y: inherit;
+.datagrid-body {
+    overflow-y: initial;
 }
 
-.colored:before{
+.colored:before {
     background-color: #62a420 !important;
-  border-color: #62a420 !important;
+    border-color: #62a420 !important;
 }
 
-.UPLOADING{
+.UPLOADING {
     color: forestgreen;
 }
-.UPLOADED{
+
+.UPLOADED {
     color: blue;
-
 }
-.UPLOADING_FAIL{
+
+.UPLOADING_FAIL {
     color: red;
 }
-.VALIDATING{
+
+.VALIDATING {
     color: darkgreen;
-
 }
-.VALIDATED{
+
+.VALIDATED {
     color: green;
-
 }
-.VALIDATION_FAIL{
+
+.VALIDATION_FAIL {
     color: red;
 }
-.DONE{
+
+.DONE {
     color: orange;
 }
 
-div.datagrid-scroll-wrapper{
-    display: block;
+.clr-dg-cell.datagrid-cell {
+    text-indent: -5px;
 }
