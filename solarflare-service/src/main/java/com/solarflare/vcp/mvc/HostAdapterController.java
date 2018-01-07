@@ -110,7 +110,7 @@ public class HostAdapterController {
 
 	}
 
-	@RequestMapping(value = "/tasks/{taskId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/hosts/tasks/{taskId}", method = RequestMethod.GET)
 	@ResponseBody
 	public TaskInfo getTaskInfo(@PathVariable String taskId) throws Exception {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: getTaskInfo");
@@ -120,7 +120,7 @@ public class HostAdapterController {
 		return taskInfo;
 	}
 
-	@RequestMapping(value = "/tasks", method = RequestMethod.GET)
+	@RequestMapping(value = "/hosts/tasks", method = RequestMethod.GET)
 	@ResponseBody
 	public List<TaskInfo> getTasks() throws Exception {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: getTasks");

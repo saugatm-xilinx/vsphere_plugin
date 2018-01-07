@@ -26,6 +26,7 @@ public class UpdateRequestThread implements Runnable {
 	}
 
 	public void run() {
+		logger.info("UpdateRequestThread run method started.");
 		SfCIMService cimService = updateRequest.getCimService();
 		CIMInstance fwInstance = updateRequest.getFwInstance();
 
@@ -53,6 +54,7 @@ public class UpdateRequestThread implements Runnable {
 	}
 
 	private void setTaskState(TaskState taskState, String error) {
+		logger.info("setTaskState TaskId " + updateRequest.getTaskId() + " taskState: " + taskState);
 		// update task state as running
 		Status status = new Status(taskState, error, updateRequest.getFwType());
 		TaskManager taskManager = TaskManager.getInstance();

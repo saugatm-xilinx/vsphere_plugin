@@ -37,6 +37,7 @@ public class TaskManager {
 		return TaskManagerHolder.instance;
 	}
 	public void updateTaskState(String taskId, String adapterId, Status status) {
+		log.info("TaskManager updateTaskState " + taskId + " status " + status);
 		AdapterTask adapterTask = geAdapterTask(taskId, adapterId);
 		if (adapterTask != null) {
 			if (FwType.CONTROLLER.equals(status.getFirmwareType())) {
