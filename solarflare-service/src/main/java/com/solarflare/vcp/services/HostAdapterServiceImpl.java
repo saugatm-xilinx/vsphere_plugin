@@ -213,7 +213,8 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			TaskInfo taskInfo = new TaskInfo();
 			taskInfo.setTaskid(taskID);
 			taskInfo.setHostId(hostId);
-
+			taskManager.addTaskInfo(taskInfo);
+			
 			URL fwImageURL = new URL(fwImagePath);
 			CIMHost cimHost = sfVimService.getCIMHost(hostId);
 			SfCIMService cimService = new SfCIMService(new SfCIMClientService(cimHost));
@@ -244,7 +245,6 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 
 				requestProcessor.addUpdateRequest(updateRequest);
 			}
-			taskManager.addTaskInfo(taskInfo);
 		} catch (Exception e) {
 			throw e;
 		}

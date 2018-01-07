@@ -36,28 +36,48 @@ public class TaskManager {
 	public static final TaskManager getInstance() {
 		return TaskManagerHolder.instance;
 	}
-	public void updateTaskState(String taskId, String adapterId, Status status) {
+
+	/**
+	 * Used to update the state of task
+	 * 
+	 * @param taskId
+	 * @param adapterId
+	 * @param status
+	 */
+	public synchronized void updateTaskState(String taskId, String adapterId, Status status) {
 		log.info("TaskManager updateTaskState " + taskId + " status " + status);
 		AdapterTask adapterTask = geAdapterTask(taskId, adapterId);
 		if (adapterTask != null) {
-			if (FwType.CONTROLLER.equals(status.getFirmwareType())) {
-				adapterTask.setController(status);
+			if (FwType.CONTROLLER.equals(status.getFirmwareType()) && adapterTask.getController() != null) {
+				log.info("updating controller " + adapterTask.getController());
+				adapterTask.getController().setState(status.getState());
+				adapterTask.getController().setErrorMessage(status.getErrorMessage());
+				adapterTask.getController().setTimeStamp(status.getTimeStamp());
 			}
 
-			if (FwType.BOOTROM.equals(status.getFirmwareType())) {
-				adapterTask.setBootROM(status);
+			if (FwType.BOOTROM.equals(status.getFirmwareType()) && adapterTask.getBootROM() != null) {
+				adapterTask.getBootROM().setState(status.getState());
+				adapterTask.getBootROM().setErrorMessage(status.getErrorMessage());
+				adapterTask.getBootROM().setTimeStamp(status.getTimeStamp());
 			}
 
 			if (FwType.UEFIROM.equals(status.getFirmwareType())) {
 				adapterTask.setUefiROM(status);
 			}
+
 		}
+
+		log.debug("AdapterTask after update: " + adapterTask);
+		log.debug("Taskinfo after update: " + getTask(taskId));
 	}
 	private AdapterTask geAdapterTask(String taskId, String adapterId) {
+		log.info("TaskManager geAdapterTask " + taskId + " adapterId " + adapterId);
 		TaskInfo taskInfo = getTask(taskId);
+		log.info("found taskinfo: " + taskInfo);
 		if (taskInfo != null && !taskInfo.getAdapterTasks().isEmpty())
 			for (AdapterTask aTask : taskInfo.getAdapterTasks()) {
 				if (aTask.getAdapterId().equals(adapterId)) {
+					log.info("found adapter task: " + aTask);
 					return aTask;
 				}
 			}
