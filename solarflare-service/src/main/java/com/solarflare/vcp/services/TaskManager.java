@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.solarflare.vcp.exception.SfNotFoundException;
 import com.solarflare.vcp.model.AdapterTask;
+import com.solarflare.vcp.model.FwType;
 import com.solarflare.vcp.model.Status;
 import com.solarflare.vcp.model.TaskInfo;
 import com.solarflare.vcp.model.TaskState;
@@ -34,6 +35,32 @@ public class TaskManager {
 
 	public static final TaskManager getInstance() {
 		return TaskManagerHolder.instance;
+	}
+	public void updateTaskState(String taskId, String adapterId, Status status) {
+		AdapterTask adapterTask = geAdapterTask(taskId, adapterId);
+		if (adapterTask != null) {
+			if (FwType.CONTROLLER.equals(status.getFirmwareType())) {
+				adapterTask.setController(status);
+			}
+
+			if (FwType.BOOTROM.equals(status.getFirmwareType())) {
+				adapterTask.setBootROM(status);
+			}
+
+			if (FwType.UEFIROM.equals(status.getFirmwareType())) {
+				adapterTask.setUefiROM(status);
+			}
+		}
+	}
+	private AdapterTask geAdapterTask(String taskId, String adapterId) {
+		TaskInfo taskInfo = getTask(taskId);
+		if (taskInfo != null && !taskInfo.getAdapterTasks().isEmpty())
+			for (AdapterTask aTask : taskInfo.getAdapterTasks()) {
+				if (aTask.getAdapterId().equals(adapterId)) {
+					return aTask;
+				}
+			}
+		return null;
 	}
 
 	public void updateTask(TaskInfo task) {
@@ -72,7 +99,7 @@ public class TaskManager {
 		return task;
 	}
 
-	public TaskInfo getTaskUpdate(String taskId) throws Exception{
+	public TaskInfo getTaskUpdate(String taskId) throws Exception {
 		log.debug("getTaskUpdate start.");
 		// task id is validated in the method getTaskInfo
 		TaskInfo task = getTaskInfo(taskId);
@@ -82,19 +109,19 @@ public class TaskManager {
 		for (AdapterTask aTask : adapterTasks) {
 			Status controllerStatus = aTask.getController();
 			isTaskDone = isTaskDone(controllerStatus);
-			if(!isTaskDone){
+			if (!isTaskDone) {
 				break;
 			}
-			
+
 			Status bootROMStatus = aTask.getBootROM();
 			isTaskDone = isTaskDone(bootROMStatus);
-			if(!isTaskDone){
+			if (!isTaskDone) {
 				break;
 			}
-			
+
 			Status UEFIStatus = aTask.getUefiROM();
 			isTaskDone = isTaskDone(UEFIStatus);
-			if(!isTaskDone){
+			if (!isTaskDone) {
 				break;
 			}
 		}
@@ -142,22 +169,21 @@ public class TaskManager {
 
 	public List<TaskInfo> getTasks() {
 		List<TaskInfo> tasks = new ArrayList<>();
-		for(String id : taskMap.keySet()){
+		for (String id : taskMap.keySet()) {
 			TaskInfo task = taskMap.get(id);
 			tasks.add(task);
 		}
 		return tasks;
 	}
-	
-	private boolean isTaskDone(Status status){
+
+	private boolean isTaskDone(Status status) {
 		TaskState taskState = null;
 		if (status != null) {
 			taskState = status.getState();
 		}
-		if (taskState != null && !(TaskState.Success.equals(taskState)
-				|| TaskState.Error.equals(taskState))) {
+		if (taskState != null && !(TaskState.Success.equals(taskState) || TaskState.Error.equals(taskState))) {
 			return false;
-			
+
 		}
 		return true;
 	}

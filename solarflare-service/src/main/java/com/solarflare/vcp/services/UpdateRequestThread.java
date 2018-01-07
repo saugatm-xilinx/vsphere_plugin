@@ -1,7 +1,6 @@
 package com.solarflare.vcp.services;
 
 import java.net.URL;
-import java.util.List;
 
 import javax.cim.CIMInstance;
 
@@ -9,13 +8,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.solarflare.vcp.cim.SfCIMService;
-import com.solarflare.vcp.model.AdapterTask;
-import com.solarflare.vcp.model.FwType;
 import com.solarflare.vcp.model.Status;
-import com.solarflare.vcp.model.TaskInfo;
 import com.solarflare.vcp.model.TaskState;
 import com.solarflare.vcp.model.UpdateRequest;
-import com.sun.media.jfxmedia.logging.Logger;
 
 public class UpdateRequestThread implements Runnable {
 
@@ -31,52 +26,30 @@ public class UpdateRequestThread implements Runnable {
 	}
 
 	public void run() {
-		AdapterTask aTask = null;
 		try {
+			setTaskState(TaskState.Running, null);
 
-			TaskInfo taskInfo = updateRequest.getTaskInfo();
-			aTask = getRunningAdapterTask(taskInfo.getAdapterTasks(),updateRequest.getAdapterId());
-			setTaskState(aTask,TaskState.Running,null,updateRequest.getFwType());
-			
 			SfCIMService cimService = updateRequest.getCimService();
 			CIMInstance fwInstance = updateRequest.getFwInstance();
 			CIMInstance nicInstance = updateRequest.getNicInstance();
 			URL fwImagePath = updateRequest.getFwImagePath();
 
 			cimService.updateFirmwareFromURL(fwInstance, nicInstance, fwImagePath);
-				
-			setTaskState(aTask,TaskState.Success,null,updateRequest.getFwType());
-			
-			
+
+			setTaskState(TaskState.Success, null);
+
 		} catch (Exception e) {
-			String errorMsg = "Error updating firmware , error : "+e.getMessage(); 
+			String errorMsg = "Update request failed! Error : " + e.getMessage();
 			logger.error(errorMsg);
-			setTaskState(aTask,TaskState.Error,errorMsg,updateRequest.getFwType());
+			setTaskState(TaskState.Error, errorMsg);
 		}
 	}
-	
-	private void setTaskState(AdapterTask aTask, TaskState taskState, String error, FwType fwType){
-		Status status = new Status(taskState,error,fwType);
-		
-		if(FwType.CONTROLLER.equals(fwType)){
-			aTask.setController(status);
-		}
-		
-		if(FwType.BOOTROM.equals(fwType)){
-			aTask.setBootROM(status);
-		}
-		
-		if(FwType.UEFIROM.equals(fwType)){
-			aTask.setUefiROM(status);
-		}
-		
-	}
-	private AdapterTask getRunningAdapterTask(List<AdapterTask> adapterTasks, String adapterId){
-		for(AdapterTask aTask : adapterTasks){
-			if(aTask.getAdapterId().equals(adapterId)){
-				return aTask;
-			}
-		}
-		return null;
+
+	private void setTaskState(TaskState taskState, String error) {
+		// update task state as running
+		Status status = new Status(taskState, error, updateRequest.getFwType());
+		TaskManager taskManager = TaskManager.getInstance();
+		taskManager.updateTaskState(updateRequest.getTaskId(), updateRequest.getAdapterId(),status);
+
 	}
 }

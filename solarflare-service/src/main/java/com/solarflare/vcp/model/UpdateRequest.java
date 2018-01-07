@@ -18,9 +18,9 @@ public class UpdateRequest {
 	private CIMInstance fwInstance;
 	private ServiceContent serviceContent;
 	private SfCIMService cimService;
-	private TaskInfo taskInfo;
+	private String taskId;
 	private FwType fwType;
-	
+
 	public boolean isCustom() {
 		return isCustom;
 	}
@@ -76,30 +76,23 @@ public class UpdateRequest {
 	public void setServiceContent(ServiceContent serviceContent) {
 		this.serviceContent = serviceContent;
 	}
-	
-	public TaskInfo getTaskInfo() {
-		return taskInfo;
-	}
-	public void setTaskInfo(TaskInfo taskInfo) {
-		this.taskInfo = taskInfo;
-	}
-	
+
 	public SfCIMService getCimService() {
 		return cimService;
 	}
 	public void setCimService(SfCIMService cimService) {
 		this.cimService = cimService;
 	}
+	public String getTaskId() {
+		return taskId;
+	}
+	public void setTaskId(String taskId) {
+		this.taskId = taskId;
+	}
 	@Override
 	public String toString() {
-		return "UpdateRequest [isCustom=" + isCustom + ", hostId=" + hostId + ", adapterId=" + adapterId
-				+ ", fwImagePath=" + fwImagePath + ", header=" + header + ", nicInstance=" + nicInstance
-				+ ", fwInstance=" + fwInstance + ", serviceContent=" + serviceContent + ", cimService=" + cimService
-				+ ", taskInfo=" + taskInfo + ", fwType=" + fwType + "]";
+		return "UpdateRequest [isCustom=" + isCustom + ", hostId=" + hostId + ", adapterId=" + adapterId + ", fwImagePath=" + fwImagePath + ", header=" + header + ", nicInstance=" + nicInstance + ", fwInstance=" + fwInstance + ", serviceContent=" + serviceContent
+				+ ", cimService=" + cimService + ", taskId=" + taskId + ", fwType=" + fwType + "]";
 	}
-	
-	
-	
-	
-	
+
 }
