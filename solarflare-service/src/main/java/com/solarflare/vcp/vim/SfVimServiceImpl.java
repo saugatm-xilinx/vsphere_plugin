@@ -161,6 +161,8 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 
 		try {
 			Map<ManagedObjectReference, Map<String, Object>> hosts = _moRefService.inContainerByType(_conn.getServiceContent().getRootFolder(), "HostSystem", props.toArray(new String[]{}));
+			if (hosts == null || hosts.isEmpty())
+				return hostList;
 
 			for (ManagedObjectReference hostMoRef : hosts.keySet()) {
 				Map<String, Object> hostprops = hosts.get(hostMoRef);

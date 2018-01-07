@@ -135,14 +135,14 @@ public class ConnectionImpl implements Connection {
 
 	@Override
 	public Connection connect(UserSessionService usersessionService, boolean ignoreCert) {
+		// this is used to login method
 		this.ignoreCert = ignoreCert;
 		if (usersessionService != null && usersessionService.getUserSession() != null) {
 
 			com.vmware.vise.usersession.UserSession session = usersessionService.getUserSession();
 
 			if (session != null && session.serversInfo.length > 0 && session.serversInfo[0] != null) {
-				logger.info(LOG_KEY + "usersessionService have Client Id: " + session.clientId + " and userName: "
-						+ session.userName);
+				logger.info(LOG_KEY + "usersessionService have Client Id: " + session.clientId + " and userName: " + session.userName);
 				logger.info(LOG_KEY + "looking session for client id: " + session.clientId);
 
 				ConnectionImpl conn = lookupSessionByClientId(session.clientId);
@@ -152,14 +152,15 @@ public class ConnectionImpl implements Connection {
 					logger.info(LOG_KEY + "session key: " + server.sessionKey);
 					// Create a new Session
 					conn = newSession(session.clientId, session.userName, server);
+					// on this session ignore certificate
+					conn.ignoreCert = ignoreCert;
 				} else {
 					logger.info(LOG_KEY + "session found for client id: " + session.clientId);
 				}
 
 				try {
 					if (!conn.isConnected()) {
-						logger.info(LOG_KEY + "connecting to " + conn.getURL().toString()
-								+ " using user session's cookie: " + conn.getSessionCookie());
+						logger.info(LOG_KEY + "connecting to " + conn.getURL().toString() + " using user session's cookie: " + conn.getSessionCookie());
 
 						conn._connect();
 						logger.info(LOG_KEY + "Connected using session cookie: " + sessionCookie);
@@ -168,8 +169,7 @@ public class ConnectionImpl implements Connection {
 				} catch (Exception e) {
 					Throwable cause = (e.getCause() != null) ? e.getCause() : e;
 					logger.error(LOG_KEY + "connect() failed. " + e.getMessage());
-					throw new ConnectionException("failed to connect: " + e.getMessage() + " : " + cause.getMessage(),
-							cause);
+					throw new ConnectionException("failed to connect: " + e.getMessage() + " : " + cause.getMessage(), cause);
 				}
 			} else {
 				// if logoin() method is not used to connect for unit test then
@@ -257,8 +257,7 @@ public class ConnectionImpl implements Connection {
 			this.vimPort.currentTime(svcInstRef);
 			// TODO: change with debug. as dev vCenter is running in info level
 			// that why it is used with info level.
-			logger.info(LOG_KEY + "Session with clientId= " + this.getClientId() + " and userName: "
-					+ this.getUsername() + " is connected.");
+			logger.info(LOG_KEY + "Session with clientId= " + this.getClientId() + " and userName: " + this.getUsername() + " is connected.");
 			return true;
 		} catch (Throwable t) {
 			logger.error(LOG_KEY + t);
@@ -274,8 +273,7 @@ public class ConnectionImpl implements Connection {
 				_connection.getVimPort().logout(_connection.getServiceContent().getSessionManager());
 			} catch (Exception e) {
 				Throwable cause = e.getCause();
-				throw new ConnectionException(
-						"failed to disconnect properly: " + e.getMessage() + " : " + cause.getMessage(), cause);
+				throw new ConnectionException("failed to disconnect properly: " + e.getMessage() + " : " + cause.getMessage(), cause);
 			} finally {
 				// A connection is very memory intensive, I'm helping the
 				// garbage collector here
@@ -344,8 +342,7 @@ public class ConnectionImpl implements Connection {
 
 	@Override
 	public String toString() {
-		return "ConnectionImpl [url=" + url + ", username=" + username + ", ignoreCert=" + ignoreCert
-				+ ", sessionCookie=" + sessionCookie + ", sessionKey=" + sessionKey + ", clientId=" + clientId + "]";
+		return "ConnectionImpl [url=" + url + ", username=" + username + ", ignoreCert=" + ignoreCert + ", sessionCookie=" + sessionCookie + ", sessionKey=" + sessionKey + ", clientId=" + clientId + "]";
 	}
 
 }
