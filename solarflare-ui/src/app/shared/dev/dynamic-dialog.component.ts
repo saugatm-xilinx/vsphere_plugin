@@ -1,7 +1,7 @@
 import { Component, Input, ViewContainerRef, ViewChild,
          ReflectiveInjector, ComponentFactoryResolver} from '@angular/core';
 import { Action1ModalComponent, EchoModalComponent } from '../../views/modals/index';
-import { EditChassisComponent } from "../../views/modals/edit-chassis.component"; // [removable-chassis-line]
+
 
 /**
  * Dynamic injection of components, used by dialog-box
@@ -12,7 +12,6 @@ import { EditChassisComponent } from "../../views/modals/edit-chassis.component"
    // Add reference to the components here in order to dynamically create them
    entryComponents: [
          Action1ModalComponent,
-         EditChassisComponent,  // [removable-chassis-line]
          EchoModalComponent],
    template: `
     <div #dynamicComponentContainer></div>
