@@ -194,7 +194,7 @@ ${line.separator} Then rename it playerglobal.swc and move it to ${FLEX_HOME}/fr
       Create the war bundle.
       FOR PRODUCTION, replace ng-build by ng-build-prod on the <target> line below.
     -->
-   <target name="make-bundle"  depends="init, ng-build, compile-resources">
+   <target name="make-bundle"  depends="init, ng-build-prod, compile-resources">
       <mkdir dir="${BUILD_DIR}/webapp/"/>
 	  <mkdir dir="${basedir}/../dist" />
       <copy todir="${BUILD_DIR}/webapp">

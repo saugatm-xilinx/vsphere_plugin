@@ -47,28 +47,28 @@
                 <td>{{ad.name}}</td>
                 <td>{{ad.versionController}}</td>
                 <td>
-                    <b style="color:#781DA0;" *ngIf="ad.latestVersion.controlerVersion !== null">
-                        {{ad.latestVersion.controlerVersion}}
+                    <b style="color:#781DA0;" *ngIf="ad.latestVersion.controller !== null">
+                        {{ad.latestVersion.controller}}
                     </b>
-                    <b *ngIf="ad.latestVersion.controlerVersion === null">
+                    <b *ngIf="ad.latestVersion.controller === null">
                         NA
                     </b>
                 </td>
                 <td>{{ad.versionBootROM}}</td>
                 <td>
-                    <b style="color:#781DA0;" *ngIf="ad.latestVersion.bootROMVersion !== null">
-                        {{ad.latestVersion.bootROMVersion}}
+                    <b style="color:#781DA0;" *ngIf="ad.latestVersion.bootROM !== null">
+                        {{ad.latestVersion.bootROM}}
                     </b>
-                    <b *ngIf="ad.latestVersion.bootROMVersion === null">
+                    <b *ngIf="ad.latestVersion.bootROM === null">
                         NA
                     </b>
                 </td>
                 <td>{{ad.versionUEFIROM}}</td>
                 <td>
-                    <b style="color:#781DA0;" *ngIf="ad.latestVersion.uefiVersion !== null">
-                        {{ad.latestVersion.uefiVersion}}
+                    <b style="color:#781DA0;" *ngIf="ad.latestVersion.uefi !== null">
+                        {{ad.latestVersion.uefi}}
                     </b>
-                    <b *ngIf="ad.latestVersion.uefiVersion === null">
+                    <b *ngIf="ad.latestVersion.uefi === null">
                         NA
                     </b>
                 </td>
@@ -306,7 +306,7 @@
             </span>
                 <span *ngIf="output.controller.state === 'Error'">
                 Controller Firmware: Error occurred while updating v{{output.controller.from}}
-                <i *ngIf="output.controller.message !== null">Error: {{output.controller.message}}</i>
+                <i style="color: red;" *ngIf="output.controller.message !== null"><br/>{{output.controller.message}}</i>
             </span>
                 <span *ngIf="output.controller.state === 'Queued' || output.controller.state === 'Running'">
                 Controller Firmware: v{{output.controller.from}} updating ...
@@ -323,7 +323,7 @@
             </span>
                 <span *ngIf="output.bootRom.state === 'Error'">
                 BootROM Firmware: Error occurred while updating v{{output.bootRom.from}}
-                <i *ngIf="output.bootRom.message !== null">Error: {{output.bootRom.message}}</i>
+                <i style="color: red;" *ngIf="output.bootRom.message !== null"><br/>{{output.bootRom.message}}</i>
             </span>
                 <span *ngIf="output.bootRom.state === 'Queued' || output.bootRom.state === 'Running'">
                 BootROM Firmware: v{{output.bootRom.from}} updating ...
@@ -340,7 +340,7 @@
             </span>
                 <span *ngIf="output.uefiRom.state === 'Error'">
                 UefiROM Firmware: Error occurred while updating v{{output.uefiRom.from}}
-                <i *ngIf="output.uefiRom.message !== null">Error: {{output.uefiRom.message}}</i>
+                <i style="color: red;" *ngIf="output.uefiRom.message !== null"><br/>{{output.uefiRom.message}}</i>
             </span>
                 <span *ngIf="output.uefiRom.state === 'Queued' || output.uefiRom.state === 'Running'">
                 UefiROM Firmware: v{{output.uefiRom.from}} updating ...
@@ -356,8 +356,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-outline" type="button" (click)="status.custom.modal = false;
-        status.status = true;reInitStatus();" >Ok</button>
+        <button class="btn btn-outline" type="button" (click)="status.custom.modal = false;status.status = true;" >Ok</button>
     </div>
 </clr-modal>
 
@@ -374,7 +373,7 @@
             </span>
                 <span *ngIf="output.controller.state === 'Error'">
                 Controller Firmware: Error occurred while updating v{{output.controller.from}} to v{{output.controller.to}}
-                <i *ngIf="output.controller.message !== null">{{output.controller.message}}</i>
+                <i style="color: red;" *ngIf="output.controller.message !== null"><br/>{{output.controller.message}}</i>
             </span>
                 <span *ngIf="output.controller.state === 'Queued' || output.controller.state === 'Running'">
                 Controller Firmware: v{{output.controller.from}} updating to v{{output.controller.to}}
@@ -387,7 +386,7 @@
             </span>
                 <span *ngIf="output.bootRom.state === 'Error'">
                 BootROM Firmware: Error occurred while updating v{{output.bootRom.from}} to v{{output.bootRom.to}}
-                <i *ngIf="output.bootRom.message !== null">{{output.bootRom.message}}</i>
+                <i style="color: red;" *ngIf="output.bootRom.message !== null"><br/>{{output.bootRom.message}}</i>
             </span>
                 <span *ngIf="output.bootRom.state === 'Queued' || output.bootRom.state === 'Running'">
                 BootROM Firmware: v{{output.bootRom.from}} updating to v{{output.bootRom.to}}
@@ -400,7 +399,7 @@
             </span>
                 <span *ngIf="output.uefiRom.state === 'Error'">
                 UefiROM Firmware: Error occurred while updating v{{output.uefiRom.from}} to v{{output.uefiRom.to}}
-                <i *ngIf="output.uefiRom.message !== null">{{output.uefiRom.message}}</i>
+                <i style="color: red;" *ngIf="output.uefiRom.message !== null"><br/>{{output.uefiRom.message}}</i>
             </span>
                 <span *ngIf="output.uefiRom.state === 'Queued' || output.uefiRom.state === 'Running'">
                 UefiROM Firmware: v{{output.uefiRom.from}} updating to v{{output.uefiRom.to}}
@@ -416,8 +415,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-outline" type="button" (click)="status.latest.modal = false;
-        status.status = true;reInitStatus();" >Ok</button>
+        <button class="btn btn-outline" type="button" (click)="status.latest.modal = false;status.status = true;" >Ok</button>
     </div>
 </clr-modal>
 
@@ -439,9 +437,10 @@
 
     <div class="col-md-12">
         <div style="text-align: center">
-            <span class="spinner spinner-lg" *ngIf="(adapterList|json) === '[]' ">
+            <span class="spinner spinner-lg" *ngIf="(adapterList|json) === '[]' && !getAdapterListErr ">
             Loading..
             </span>
+            <span class="text-danger" *ngIf="getAdapterListErr"><br/>Error occurred while fetching data</span>
         </div>
     </div>
 

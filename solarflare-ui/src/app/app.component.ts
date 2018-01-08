@@ -13,7 +13,8 @@ import {Http} from "@angular/http";
 })
 
 export class AppComponent {
-    public hosts: any;
+    public hosts = [];
+    public Collapsible = true;
 
     constructor(public  gs: GlobalsService,
                 private injector: Injector,

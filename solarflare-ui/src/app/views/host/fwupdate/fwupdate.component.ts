@@ -53,7 +53,7 @@ export class FwupdateComponent implements OnInit {
         selectedAdapters: [],
         status: null
     };
-
+    public getAdapterListErr = false;
 
     @ViewChild('fileInput') fileInput: ElementRef;
 
@@ -116,6 +116,7 @@ export class FwupdateComponent implements OnInit {
         this.adapterList = [];
         this.status.status = false;
         this.gettingAdapterList = true;
+        this.getAdapterListErr = false;
         this.hs.getAdapters(this.params['id'])
             .subscribe(
                 data => {
@@ -126,6 +127,7 @@ export class FwupdateComponent implements OnInit {
                 err => {
                     console.error(err);
                     this.gettingAdapterList = false;
+                    this.getAdapterListErr = true;
                     //setTimeout(this.devMode(),400);
                 }
             );
@@ -497,19 +499,19 @@ export class FwupdateComponent implements OnInit {
                             let br = task['bootROM'];
                             this.status.latest.output[index].bootRom = FwupdateComponent.returnStatusOutput(br);
                             this.status.latest.output[index].bootRom.from = adapter.versionBootROM;
-                            this.status.latest.output[index].bootRom.to = adapter.latestVersion.bootROMVersion;
+                            this.status.latest.output[index].bootRom.to = adapter.latestVersion.bootROM;
                         }
                         if (task['controller'] !== null) {
                             let br = task['controller'];
                             this.status.latest.output[index].controller = FwupdateComponent.returnStatusOutput(br);
                             this.status.latest.output[index].controller.from = adapter.versionController;
-                            this.status.latest.output[index].controller.to = adapter.latestVersion.controlerVersion;
+                            this.status.latest.output[index].controller.to = adapter.latestVersion.controller;
                         }
                         if (task['uefiROM'] !== null) {
                             let br = task['uefiROM'];
                             this.status.latest.output[index].uefiRom = FwupdateComponent.returnStatusOutput(br);
                             this.status.latest.output[index].uefiRom.from = adapter.versionUEFIROM;
-                            this.status.latest.output[index].uefiRom.to = adapter.latestVersion.uefiVersion;
+                            this.status.latest.output[index].uefiRom.to = adapter.latestVersion.uefi;
                         }
                     }
                 });

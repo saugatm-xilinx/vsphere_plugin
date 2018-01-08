@@ -13,6 +13,8 @@ import { GlobalsService }     from "./shared/index";
 })
 export class AppRoutingComponent implements OnInit, OnDestroy {
    private subscription: Subscription;
+    public hosts = [];
+    public Collapsible = true;
 
    constructor(public gs: GlobalsService,
                private router: Router,
