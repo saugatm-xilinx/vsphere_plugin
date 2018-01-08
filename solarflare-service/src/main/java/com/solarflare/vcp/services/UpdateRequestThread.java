@@ -3,6 +3,7 @@ package com.solarflare.vcp.services;
 import java.net.URL;
 
 import javax.cim.CIMInstance;
+import javax.cim.CIMObjectPath;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,14 +29,14 @@ public class UpdateRequestThread implements Runnable {
 	public void run() {
 		logger.info("UpdateRequestThread run method started.");
 		SfCIMService cimService = updateRequest.getCimService();
-		CIMInstance fwInstance = updateRequest.getFwInstance();
+		CIMObjectPath fwInstance = updateRequest.getFwInstance();
 
 		try {
 			setTaskState(TaskState.Running, null);
 
-			CIMInstance nicInstance = updateRequest.getNicInstance();
+			CIMObjectPath nicInstance = updateRequest.getNicInstance();
 			URL fwImagePath = updateRequest.getFwImagePath();
-
+			logger.info("fwImagePath in thread "+fwImagePath);
 			cimService.updateFirmwareFromURL(fwInstance, nicInstance, fwImagePath);
 
 			setTaskState(TaskState.Success, null);

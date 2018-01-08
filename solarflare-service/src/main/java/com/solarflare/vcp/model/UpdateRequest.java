@@ -3,6 +3,7 @@ package com.solarflare.vcp.model;
 import java.net.URL;
 
 import javax.cim.CIMInstance;
+import javax.cim.CIMObjectPath;
 
 import com.solarflare.vcp.cim.SfCIMService;
 import com.vmware.vim25.ServiceContent;
@@ -14,8 +15,8 @@ public class UpdateRequest {
 	private String adapterId;
 	private URL fwImagePath;
 	private FileHeader header;
-	private CIMInstance nicInstance;
-	private CIMInstance fwInstance;
+	private CIMObjectPath nicInstance;
+	private CIMObjectPath fwInstance;
 	private ServiceContent serviceContent;
 	private SfCIMService cimService;
 	private String taskId;
@@ -59,16 +60,16 @@ public class UpdateRequest {
 	public void setHeader(FileHeader header) {
 		this.header = header;
 	}
-	public CIMInstance getNicInstance() {
+	public CIMObjectPath getNicInstance() {
 		return nicInstance;
 	}
-	public void setNicInstance(CIMInstance nicInstance) {
+	public void setNicInstance(CIMObjectPath nicInstance) {
 		this.nicInstance = nicInstance;
 	}
-	public CIMInstance getFwInstance() {
+	public CIMObjectPath getFwInstance() {
 		return fwInstance;
 	}
-	public void setFwInstance(CIMInstance fwInstance) {
+	public void setFwInstance(CIMObjectPath fwInstance) {
 		this.fwInstance = fwInstance;
 	}
 	public ServiceContent getServiceContent() {

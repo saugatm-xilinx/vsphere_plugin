@@ -8,9 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.cim.CIMInstance;
+import javax.cim.CIMObjectPath;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sblim.cimclient.internal.util.MOF;
 
 import com.solarflare.vcp.cim.CIMConstants;
 import com.solarflare.vcp.cim.CIMHost;
@@ -72,7 +74,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 	public String updateFirmwareToLatest(List<Adapter> adapterList, String hostId) throws Exception {
 
 		String taskID = null;
-		logger.info("Start updating firmware adapter");
+		logger.info("Solarflare:: Start updating firmware adapter");
 		try {
 			// TODO :: validate all adapter before update
 			TaskManager taskManager = TaskManager.getInstance();
@@ -122,7 +124,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 	@Override
 	public String customUpdateFirmwareFromLocal(List<Adapter> adapterList, String hostId, String base64Data) throws Exception {
 
-		logger.info("Start updating firmware adapter");
+		logger.info("Solarflare:: Start updating firmware adapter");
 		String taskID = null;
 		try {
 
@@ -150,27 +152,30 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 																		// is 40
 																		// bytes
 			FileHeader header = cimService.getFileHeader(headerData);
-
+			logger.info("Solarflare:: Header : "+header);
+			
 			boolean controller = false;
 			boolean bootrom = false;
 			CIMInstance fwInstance = null;
 			if (FirmwareType.FIRMWARE_TYPE_MCFW.ordinal() == header.getType()) {
-				logger.info("Updating Controller");
+				logger.info("Solarflare:: Updating Controller");
 				fwInstance = cimService.getFirmwareSoftwareInstallationInstance();
 				controller = true;
 			} else if (FirmwareType.FIRMWARE_TYPE_BOOTROM.ordinal() == header.getType()) {
 				// Get BootROM SF_SoftwareInstallationService instance
-				logger.info("Updating BootROM");
+				logger.info("Solarflare:: Updating BootROM");
 				fwInstance = cimService.getBootROMSoftwareInstallationInstance();
 				bootrom = true;
 			}
 
+			
 			if (fwInstance != null) {
+				
 				String tempFile = cimService.startFwImageSend(fwInstance);
 
 				sendDataInChunks(cimService, fwInstance, tempFile, decodedDataBytes);
 
-				fwImageURL = new URL("file://" + tempFile);
+				fwImageURL = new URL("file:/" + tempFile);
 
 				// Call some CIM method for increasing session validity to 15
 				// min
@@ -205,7 +210,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 	@Override
 	public String customUpdateFirmwareFromURL(List<Adapter> adapterList, String hostId, String fwImagePath) throws Exception {
 
-		logger.info("Start updating firmware adapter");
+		logger.info("Solarflare:: Start updating firmware adapter");
 		String taskID = null;
 		try {
 
@@ -313,8 +318,8 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		}
 		UpdateRequest updateRequest = new UpdateRequest();
 		updateRequest.setAdapterId(adapterId);
-		updateRequest.setFwInstance(fwInstance);
-		updateRequest.setNicInstance(nicInstance);
+		updateRequest.setFwInstance(fwInstance.getObjectPath());
+		updateRequest.setNicInstance(new CIMObjectPath(MOF.objectHandle(nicInstance.getObjectPath(), false, true)));
 		updateRequest.setFwImagePath(fwImageURL);
 		updateRequest.setCimService(cimService);
 		updateRequest.setTaskId(taskInfo.getTaskid());
@@ -353,7 +358,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 
 	private void sendDataInChunks(SfCIMService cimService, CIMInstance fwInstance, String tempFile, byte[] decodedDataBytes) {
 		// Send/write this data totemp file on host
-		logger.info("Sending data in chunks");
+		logger.info("Solarflare::Sending data in chunks");
 		SFBase64 sfBase64 = new SFBase64();
 		int chunkSize = 100000;
 		int index;
@@ -369,7 +374,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			cimService.sendFWImageData(fwInstance, new String(encoded), tempFile);
 		}
 
-		logger.info("Sending data in chunks is complete");
+		logger.info("Solarflare::Sending data in chunks is complete");
 	}
 
 	private void setFirmwareVersions(Adapter adapter, SfCIMService cimService) throws Exception {
@@ -415,5 +420,8 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 
 		adapter.setLatestVersion(frmVesion);
 	}
+	
+	
+	
 
 }

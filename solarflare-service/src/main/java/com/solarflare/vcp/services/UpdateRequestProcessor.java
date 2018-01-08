@@ -12,9 +12,10 @@ public class UpdateRequestProcessor {
 	private static final Log logger = LogFactory.getLog(UpdateRequestProcessor.class);
 	private ExecutorService executor;
 
+	
 	private UpdateRequestProcessor() {
 		logger.info("Thread pool created with size of 8 threads");
-		executor = Executors.newFixedThreadPool(4);
+		executor = Executors.newFixedThreadPool(1);
 	}
 	private static class UpdateRequestProcessorHolder {
 		private static final UpdateRequestProcessor instance = new UpdateRequestProcessor();
@@ -28,7 +29,7 @@ public class UpdateRequestProcessor {
 		logger.info("submitting update request for " + updateRequest.getAdapterId() + " and firmware " + updateRequest.getFwType());
 		if (executor.isShutdown() || executor.isTerminated()) {
 			logger.info("Thread pool is not active! Creating a new one..");
-			executor = Executors.newFixedThreadPool(4);
+			executor = Executors.newFixedThreadPool(1);
 		}
 		UpdateRequestThread updateThread = new UpdateRequestThread();
 		updateThread.setUpdateRequest(updateRequest);
