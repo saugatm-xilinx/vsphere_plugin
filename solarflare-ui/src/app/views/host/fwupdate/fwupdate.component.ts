@@ -458,17 +458,17 @@ export class FwupdateComponent implements OnInit {
         this.status[a].output.forEach((i,j) => {
             if (i['controller'] !== null ){
                 total++;
-                if(i['controller']['state'] === 'Success')
+                if(i['controller']['state'] === 'Success' || i['controller']['state'] === 'Error')
                     current++;
             }
             if (i['bootRom'] !== null ){
                 total++;
-                if(i['bootRom']['state'] === 'Success')
+                if(i['bootRom']['state'] === 'Success' || i['controller']['state'] === 'Error')
                     current++;
             }
             if (i['uefiRom'] !== null ){
                 total++;
-                if(i['uefiRom']['state'] === 'Success')
+                if(i['uefiRom']['state'] === 'Success' || i['controller']['state'] === 'Error')
                     current++;
             }
 
