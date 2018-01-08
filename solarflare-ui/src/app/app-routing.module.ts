@@ -9,6 +9,11 @@ import { SummaryComponent } from "./views/summary/summary.component";
 import { Action1ModalComponent, Action2WizardComponent,
          EchoModalComponent } from "./views/modals/index";
 import { NYIComponent } from "./views/not-implemented-yet/nyi.component";
+// [removable-chassis-code]
+import { EditChassisComponent } from "./views/modals/edit-chassis.component";
+import { ChassisSummaryComponent } from "./views/chassis-summary/chassis-summary.component";
+// [end-chassis-code]
+
 
 import {HostComponent} from "./views/host/host.component";
 
@@ -43,6 +48,12 @@ const appRoutes: Routes = [
    { path: "manage/:id",    component: MonitorComponent },
    { path: "summary/:id",   component: SummaryComponent },
 
+   // [removable-chassis-code]
+   { path: "chassis-summary/:id",   component: ChassisSummaryComponent },
+   { path: "chassis-monitor/:id",   component: NYIComponent },
+   { path: "chassis-manage/:id",    component: NYIComponent },
+   { path: "edit-chassis/:id/:actionUid",   component: EditChassisComponent },
+   // [end-chassis-code]
 
     {
         path: "host/:id", component: HostComponent
@@ -75,6 +86,10 @@ export const routedComponents = [
    Action1ModalComponent,
    Action2WizardComponent,
    EchoModalComponent,
+   // [removable-chassis-code]
+   ChassisSummaryComponent,
+   EditChassisComponent,
+   // [end-chassis-code]
    NYIComponent
 ];
 

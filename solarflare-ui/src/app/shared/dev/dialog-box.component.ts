@@ -3,7 +3,7 @@ import { Component, Input, OnInit, ViewChild } from "@angular/core";
 import { GlobalsService }   from "../../shared/index";
 import { DynamicDialogComponent }  from "./dynamic-dialog.component";
 import { Action1ModalComponent, EchoModalComponent} from "../../views/modals/index";
-
+import { EditChassisComponent } from "../../views/modals/edit-chassis.component"; // [removable-chassis-line]
 
 /**
  * Generic dialog used to wrap modal dialog sub-components in dev mode.
@@ -58,7 +58,12 @@ export class DialogBoxComponent implements OnInit {
    // [removable-chassis-code]
    // Injection of EditChassisComponent
    openEditChassis(context: any, title: string): void {
-
+      this.componentData = {
+         component: EditChassisComponent,
+         inputs: {
+            context: context
+         }
+      };
       this.title = title;
       this.showCancelButton = true;
       this.modalOpened = true;

@@ -11,8 +11,10 @@ AppAlertService, I18nService }   from "../../shared/index";
 import { WebPlatform } from "../../shared/vSphereClientSdkTypes";
 import { DialogBoxComponent }  from "../../shared/dev/dialog-box.component";
 import { UserSettingService } from "../../shared/user-settings.service";
-
-
+// [removable-chassis-code]
+import { Chassis } from "../../services/chassis/chassis.model";
+import { ChassisService } from "../../services/chassis/chassis.service";
+// [end-chassis-code]
 
 @Component({
    selector: "main-view",
@@ -30,6 +32,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
    // [removable-chassis-code]
    refreshChassisList$ = new Subject();
+   chassisList$: Observable<Chassis[]>;
    // [end-chassis-code]
 
    // Note: use @ViewChildren in case you have more than one dialogBox.
@@ -39,6 +42,7 @@ export class MainComponent implements OnInit, OnDestroy {
    // circular dependencies problems in main.component.spec.ts test, else we get this error:
    //   "Failed: Can't resolve all parameters for MainComponent: ([object Object], ?, [object Object], ...)"
    constructor(public gs: GlobalsService,
+               @Inject(forwardRef(() => ChassisService)) private chassisService: ChassisService,  // [removable-chassis-line]
                @Inject(forwardRef(() => EchoService)) private echoService: EchoService,
                private appAlertService: AppAlertService,
                @Inject(forwardRef(() => NavService)) public nav: NavService,
@@ -48,7 +52,16 @@ export class MainComponent implements OnInit, OnDestroy {
 
       this.webPlatform = this.gs.getWebPlatform();
 
-
+      // [removable-chassis-code]
+      this.chassisList$ = this.refreshChassisList$
+            .switchMap(() => {
+               return this.chassisService.getChassisList(true);
+            })
+            .catch(errorMsg => {
+               this.appAlertService.showError(errorMsg);
+               return Observable.of(new Chassis[0]);
+            });
+      // [end-chassis-code]
 
       // Subscribe to refreshService to handle the global refresh action
       this.refreshSubscription = refreshService.refreshObservable$.subscribe(
@@ -61,6 +74,11 @@ export class MainComponent implements OnInit, OnDestroy {
          this.updateTime = new Date().toLocaleTimeString();
       }
 
+      // Reload the chassis data by triggering refreshChassisList$  [removable-chassis-code]
+      if (this.currentTab === 'chassisTab') {
+         this.refreshChassisList$.next();
+      }
+      // [end-chassis-code]
    }
 
    ngOnInit(): void {
@@ -126,6 +144,38 @@ export class MainComponent implements OnInit, OnDestroy {
       this.echoModalOpened = false;
    }
 
+   // [removable-chassis-code]
+   gotoChassis(chassis: Chassis): void {
+      this.nav.showObjectView(chassis.id, "chassis", "summary");
+   }
+
+   editChassis(chassis: Chassis = null): void {
+      const addingChassis: boolean = (chassis === null);
+      const title = addingChassis ? this.i18n.translate("chassis.createAction") :
+            this.i18n.translate("edit.chassis", chassis.name);
+
+      if (this.gs.isPluginMode()) {
+         // URL must include the actionUid because the modal dialog is invoked directly instead of
+         // through a menu action (where actionUid is added automatically)
+         const url = this.gs.getWebContextPath() + "/index.html?view=edit-chassis&actionUid=com.solarflare.vcp.editChassis";
+         this.webPlatform.openModalDialog(title, url, 576, 248, (chassis === null ? null : chassis.id));
+      } else {
+         this.dialogBox.openEditChassis(chassis, title);
+      }
+   }
+
+   deleteChassis(chassis: Chassis): void {
+      if (this.gs.isPluginMode()) {
+         // TODO make delete work in this mode
+         this.appAlertService.showWarning("Delete is not implemented yet in plugin mode");
+      } else {
+         this.chassisService.delete(chassis)
+               .then(res => {
+                  this.refreshService.refreshView();
+               });
+      }
+   }
+   // [end-chassis-code]
 
    isActiveTab(id: string): boolean {
       return (id === this.currentTab);

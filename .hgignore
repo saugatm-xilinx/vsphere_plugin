@@ -85,3 +85,9 @@ typings/
 # dotenv environment variables file
 .env
 .DS_Store
+
+solarflare-ui/src/solarflare
+
+target/
+
+solarflare-ui/dist/*
