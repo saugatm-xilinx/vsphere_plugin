@@ -27,8 +27,8 @@
    
    <!-- custome defind property -->
    <property name="BUILD_PRIFIX" value="solarflare" />
-   <property name="VERSION" value="1.45.0"/>
-   <property name="BUILD_ZIP_DIR" value="${basedir}/../../installer/Third-party-utilities/TomcatServer/webapps" />
+   <property name="VERSION" value="1.97.0"/>
+   <property name="BUILD_ZIP_DIR" value="${basedir}/../../installer/dist/Tomcat_Server/webapps" />
    <property name="PLUGIN_REGISTRATION" value="${basedir}/../../PluginRegistration"/>
    <property name="P_GOLES" value="clean install" />
    <property name="PLUGIN_PATH" value="solarflare-vcp" />
@@ -131,15 +131,16 @@ TO THIS /tools FOLDER."/>
 	</target>
    <target name="copyPluginPackageDir">
       <delete dir="${VSPHERE_SDK_HOME}/vsphere-ui/plugin-packages/solarflare" quiet="true"/>
-	  <delete dir="${BUILD_ZIP_DIR}" quiet="true" />
+	  <delete dir="${BUILD_ZIP_DIR}/solarflare-vcp" quiet="true" />
 	  <mkdir dir="${BUILD_ZIP_DIR}"/>
       <copy todir="${VSPHERE_SDK_HOME}/vsphere-ui/plugin-packages/solarflare">
          <fileset dir="${BUILD_DIR}/solarflare"/>
       </copy>
-	  <zip  destfile="${BUILD_ZIP_DIR}/${BUILD_PRIFIX}-${VERSION}.zip" basedir="${BUILD_DIR}/solarflare"/>
+	  <zip  destfile="${BUILD_ZIP_DIR}/solarflare-vcp/${BUILD_PRIFIX}-${VERSION}.zip" basedir="${BUILD_DIR}/solarflare"/>
    </target>
   
 	<target name="copyRegistrationWar" description="Copy war file in plugin dist directory">
+		<delete dir="${BUILD_ZIP_DIR}/plugin-registration.war" quiet="true"/>
 		<copy todir="${BUILD_ZIP_DIR}/" file="${PLUGIN_REGISTRATION}/target/plugin-registration.war"/>
 	</target>
 

@@ -253,8 +253,13 @@
 <String Id="FilesInUseText" Overridable="yes">The following applications are using files that need to be updated by this setup. Close these applications and then click Retry to continue the installation or Exit to exit it.</String>
 <String Id="FilesInUseTitle" Overridable="yes">{\UI_Font_Title}Files in Use</String>
 <String Id="FilesInUse_Title" Overridable="yes">Setup - [App_Name]</String>
+<String Id="GetHostIPDlg" Overridable="yes">Setup - [App_Name]</String>
+<String Id="GetHostIPDlg_Title" Overridable="yes">{\UI_Font_Title}IP Address</String>
+<String Id="GetHostIPDlg_Description" Overridable="yes">Configuring IP address for plugin.</String>
+<String Id="GetHostIPDlg_Description1" Overridable="yes">Enter the ip address of host machine which can be accessed from vCenter server. </String>
+
 <String Id="InstallDirDlgBrowse" Overridable="yes">&amp;Browse...</String>
-<String Id="InstallDirDlgDescription" Overridable="yes">Where should [App_Name] vSphere client plugin be installed ?</String>
+<String Id="InstallDirDlgDescription" Overridable="yes">Where should [App_Name] be installed ?</String>
 <String Id="InstallDirDlgDescription1" Overridable="yes">Setup will install [App_Name] into the following folder.</String>
 <String Id="InstallDirDlgDescription2" Overridable="yes">To continue, click Next. If you would like to select a different folder, click Browse.</String>
 <String Id="InstallDirDlgTitle" Overridable="yes">{\UI_Font_Title}Destination Folder</String>
@@ -269,6 +274,7 @@
 <String Id="InstallScopeDlgPerUserDescription" Overridable="yes">[App_Name] will be installed in a per-user folder and be available just for your user account. You do not need local Administrator priveleges.</String>
 <String Id="InstallScopeDlgTitle" Overridable="yes">{\UI_Font_Title}Installation Scope</String>
 <String Id="InstallScopeDlg_Title" Overridable="yes">Setup - [App_Name]</String>
+<String Id="IP_label" Overridable="yes">Host IP:</String>
 <String Id="LaunchConditionColorBits" Overridable="yes">The display must be set to a higher color depth in order to install [App_Name] on this system.</String>
 <String Id="LaunchConditionOS" Overridable="yes">[App_Name] cannot be installed on this operating system.</String>
 <String Id="LaunchConditionPhysicalMemory" Overridable="yes">There is not enough physical memory to install [App_Name] on this system.</String>
@@ -501,6 +507,7 @@
 <String Id="UIButtonBack" Overridable="yes">&lt; &amp;Back</String>
 <String Id="UIButtonCancel" Overridable="yes">Cancel</String>
 <String Id="UIButtonFinish" Overridable="yes">&amp;Finish</String>
+<String Id="UIButtonGetIP" Overridable="yes">Get IP Info</String>
 <String Id="UIButtonIgnore" Overridable="yes">&amp;Ignore</String>
 <String Id="UIButtonNext" Overridable="yes">&amp;Next &gt;</String>
 <String Id="UIButtonNo" Overridable="yes">&amp;No</String>
@@ -562,11 +569,6 @@
 <String Id="UIButtonUnregister" Overridable="yes">&amp;Unregister</String>
 <String Id="UnregisterComPlusAssemblies" Overridable="yes">Unregistering COM+ components</String>
 <String Id="UnregisterComPlusAssembliesTemplate" Overridable="yes">DLL: [1]</String>
-<String Id="UserAccountSelection_Option1_label" Overridable="yes">LOCAL SYSTEM account</String>
-<String Id="UserAccountSelection_Option2_Password_label" Overridable="yes">Password: </String>
-<String Id="UserAccountSelection_Option2_Url_label" Overridable="yes">URL:</String>
-<String Id="UserAccountSelection_Option2_Username_label" Overridable="yes">User name: </String>
-<String Id="UserAccountSelection_Option2_label" Overridable="yes">The following user account:</String>
 <String Id="UserExitDescription1" Overridable="yes">[App_Name] setup was interrupted. Your system has not been modified.</String>
 <String Id="UserExitDescription2" Overridable="yes">To install this program at a later time, please run the installation again.</String>
 <String Id="UserExitDescription3" Overridable="yes">Click the Finish button to exit the Setup Wizard.</String>
@@ -584,7 +586,7 @@
 <String Id="VerifyReadyDlgInstall" Overridable="yes">&amp;Install</String>
 <String Id="VerifyReadyDlgInstallText" Overridable="yes">Click Install to begin the installation. Click Back to review or change any of your installation settings. Click Cancel to exit.</String>
 <String Id="VerifyReadyDlgInstallTitle" Overridable="yes">{\UI_Font_Title}Ready to install</String>
-<String Id="VerifyReadyDlgInstallDescription" Overridable="yes">Setup is now ready to begin installing [App_Name] on your computer.</String>
+<String Id="VerifyReadyDlgInstallDescription" Overridable="yes">Setup is now ready to begin installation on your computer.</String>
 <String Id="VerifyReadyDlgRemove" Overridable="yes">&amp;Remove</String>
 <String Id="VerifyReadyDlgRemoveText" Overridable="yes">Click Remove to remove [App_Name] from your computer. Click Back to review or change any of your installation settings. Click Cancel to exit.</String>
 <String Id="VerifyReadyDlgRemoveTitle" Overridable="yes">{\UI_Font_Title}Ready to remove [App_Name]</String>

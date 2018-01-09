@@ -3,7 +3,7 @@
 set nameOfWxiFile=EnvironmentVars.wxi
 
 if %1.==. (
-    set PathToFile=..\..\Third-party-utilities\
+    set PathToFile=..\..\dist\
 	set ProductCode=0F3C8313-A5EA-4432-9264-6BD824909B34
 	set ProductVersion=1.0.0.0
 	goto done
@@ -68,7 +68,7 @@ echo.
 echo - Compiling...
 echo.
 
-candle.exe -arch x64 -v -out "../build/setup.wixobj" "setup.wxs"
+candle.exe -arch x64 -v -out "../build/setup.wixobj" "setup.wxs" -ext WixUtilExtension
 if ERRORLEVEL 1 goto error
 
 candle.exe -arch x64 -v -out "../build/webapps.wixobj" "webapps.wxs"
@@ -90,7 +90,7 @@ echo.
 echo - Linking...
 echo.
 
-light.exe -ext WixUtilExtension.dll -loc "English-US.wxl" -out "../build/setup.msi" -b "%PathToFile%/Tomcat_Server/webapps" "../build/webapps.wixobj" "../build/setup.wixobj" "../build/UserInterface.wixobj" "../build/Common.wixobj" "../build/ErrorText.wixobj" "../build/ProgressText.wixobj" 
+light.exe -ext WixUtilExtension.dll -loc "English-US.wxl" -out "../build/SolarflareVCPInstaller.msi" -b "%PathToFile%/Tomcat_Server/webapps" "../build/webapps.wixobj" "../build/setup.wixobj" "../build/UserInterface.wixobj" "../build/Common.wixobj" "../build/ErrorText.wixobj" "../build/ProgressText.wixobj" 
 if ERRORLEVEL 1 goto error
 
 goto end

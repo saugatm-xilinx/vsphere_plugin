@@ -72,7 +72,7 @@
             <Dialog Id="InstallDirDlg" Width="370" Height="270" Title="!(loc.InstallDirDlg_Title)">
                 <Control Id="Control_1" Text="!(loc.versionStringOnEachDialogPage)" Type="Text" X="15" Y="248" Width="65" Height="12"/>
 				<Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.UIButtonNext)">
-                	<Publish Event="NewDialog" Value="VerifyReadyDlgInstall">1</Publish>
+                	<Publish Event="NewDialog" Value="GetHostIPDlg">1</Publish>
                 </Control>
 				<Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.UIButtonBack)">
                 	<Publish Event="NewDialog" Value="WelcomeDlg">1</Publish>
@@ -113,7 +113,7 @@
                     <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
                 </Control>
 				<Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.UIButtonBack)">
-                    <Publish Event="NewDialog" Value="InstallDirDlg">1</Publish>
+                    <Publish Event="NewDialog" Value="GetHostIPDlg">1</Publish>
                 </Control>
 				<Control Id="Description" Type="Text" X="25" Y="23" Width="290" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.VerifyReadyDlgInstallDescription)" />
 				<Control Id="InstallTitle" Type="Text" X="15" Y="5" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.VerifyReadyDlgInstallTitle)">
@@ -530,6 +530,40 @@
         </UI>
     </Fragment>
 	<Fragment>
+        <UI>
+            <Dialog Id="GetHostIPDlg" Width="370" Height="270" Title="!(loc.GetHostIPDlg)">
+                <Control Id="Control_4" Text="!(loc.versionStringOnEachDialogPage)" Type="Text" X="15" Y="248" Width="65" Height="12"/>
+				
+				<Control Id="Control_3" Property="IP_ADDRESS" Type="Edit" X="100" Y="130" Width="180" Height="17">
+				</Control>
+				
+				
+				<Control Id="Control_2" Text="!(loc.IP_label)" Type="Text" X="50" Y="130" Width="50" Height="20">
+				</Control>
+				<Control Id="Control_1" Text="!(loc.GetHostIPDlg_Description1)" Type="Text" X="30" Y="90" Width="320" Height="30">
+				</Control>
+				<Control Id="GetIP" Type="PushButton" X="80" Y="160" Width="70" Height="17" Default="yes" Text="!(loc.UIButtonGetIP)">
+					<Publish Event="DoAction" Value="GetUserIP"></Publish>                
+                </Control>
+				<Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.UIButtonNext)">
+					<Publish Event="DoAction" Value="IPValidation">1</Publish> 
+					<Publish Event="NewDialog" Value="VerifyReadyDlgInstall">(IP_VALID = "1")</Publish>                
+                </Control>
+				<Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.UIButtonBack)">
+                	<Publish Event="NewDialog" Value="InstallDirDlg"></Publish>
+                 </Control>
+				<Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.UIButtonCancel)">
+                    <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+                </Control>
+				<Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="Image_TopBanner" />
+				<Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+				<Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+				<Control Id="Description" Type="Text" X="25" Y="23" Width="281" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.GetHostIPDlg_Description)" />
+				<Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.GetHostIPDlg_Title)" />
+			</Dialog>
+        </UI>
+    </Fragment>
+	<Fragment>
 		<UI Id="SUFWI_UI">
 			<TextStyle Id="UI_Font_Normal" FaceName="MS Shell Dlg" Size="8"/>
 			<TextStyle Id="UI_Font_Bigger" FaceName="MS Shell Dlg" Size="12" Bold="yes"/>
@@ -547,6 +581,7 @@
 			<DialogRef Id="CancelDlg"/>
 			<DialogRef Id="BrowseDlg"/>
 			<DialogRef Id="InstallDirDlg"/>
+			<DialogRef Id="GetHostIPDlg"/>
 			<DialogRef Id="VerifyReadyDlgInstall"/>
 			<DialogRef Id="OutOfRbDiskDlg"/>
 			<DialogRef Id="OutOfDiskDlg"/>

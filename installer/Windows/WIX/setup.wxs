@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 <?include BuildVars.wxi?>
 <?include EnvironmentVars.wxi?>
 
@@ -7,10 +7,17 @@
 	<Package Id="*" InstallerVersion="200" Description="$(var.PackageDescription)" Comments="$(var.PackageComments)" Platform="x64" InstallPrivileges="elevated" Languages="1033" Compressed="yes"/>
 	
 	<InstallExecuteSequence>
+		<Custom Action="IPValidation" Before="InstallFiles">NOT Installed</Custom>
+		<Custom Action="PropertiesFile" After="ServerStart">NOT Installed</Custom>
+		<Custom Action="SetPropertyForPropertiesFile" Before="InstallInitialize">Not Installed</Custom>
 		<Custom Action="ServerInstall" Before="InstallFinalize">NOT Installed</Custom>
+		<Custom Action="ServerInstallRollback" Before="ServerInstall">NOT Installed</Custom>
 		<Custom Action="ServerStart" After="ServerInstall">NOT Installed</Custom>
+		<Custom Action="ServerStartRollback" After="ServerStart">NOT Installed</Custom>
 		<Custom Action="ServerStop" Before="ServerUninstall">Installed</Custom>
-		<Custom Action="ServerUninstall" Before="RemoveRegistryValues">Installed</Custom>
+		<Custom Action="ServerStopRollback" Before="ServerStop">Installed</Custom>
+		<Custom Action="ServerUninstall" Before="RemoveRegistryValues">Installed AND (REMOVE="ALL")</Custom>
+		<Custom Action="ServerUninstallRollback" Before="ServerUninstall">Installed AND (REMOVE="ALL")</Custom>
 		<Custom Action="LaunchBrowser" After="InstallFinalize">Installed AND (BROWSER_CHECKBOX_PROPERTY="1")</Custom>
 	</InstallExecuteSequence>
 	<AdminExecuteSequence/>
@@ -22,16 +29,18 @@
 	<Property Id="BROWSER" Secure="yes">
         <RegistrySearch Id="IEXPLORE_SEARCH" Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\IEXPLORE.EXE" Type="raw" Win64="yes" />
     </Property>
-	<Property Id="INSTALLDIR">
+	<Property Id="INSTALLDIR" Secure="yes">
 		<RegistrySearch Id="InstallDirectorySearch" Type="raw" Root="HKLM" Key="Software\$(var.AppName)" Name="InstallDir" Win64="yes"/>
 	</Property>
 	<Property Id="BROWSER_CHECKBOX_PROPERTY" Secure="yes"/>
+	<Property Id="IP_ADDRESS" Secure="yes" Admin="yes"/>
+	<Property Id="IP_VALID" Secure="yes" Admin="yes"/>
 	<Property Id="App_Name" Value="$(var.AppName)"/>
 	<Property Id="MsiLogging" Value="v" />
 	<Property Id="DiskPrompt" Value="!(loc.UIDiskPrompt)"/>
-	<Property Id="ARPURLINFOABOUT" Value="http://www.solarFlare.com/"/>
-	<Property Id="ARPURLUPDATEINFO" Value="http://www.solarFlare.com/"/>
-	<Property Id="ARPHELPLINK" Value="http://www.solarFlare.com/"/>
+	<Property Id="ARPURLINFOABOUT" Value="http://www.solarflare.com/"/>
+	<Property Id="ARPURLUPDATEINFO" Value="http://www.solarflare.com/"/>
+	<Property Id="ARPHELPLINK" Value="http://www.solarflare.com/"/>
 	<Property Id="ARPNOREPAIR" Value="1"/>
 	<Property Id="ARPNOMODIFY" Value="1"/>
 	<Property Id="ARPPRODUCTICON" Value="icon.ico"/>
@@ -118,12 +127,16 @@
 	<Feature Id="webapps_dir" Title="webapps" Level="1" Description="webapps folder">
 		<ComponentGroupRef Id="ComponentGroupId" />
 	</Feature>
-	<Feature Id="Server" Title="Server Files" Level="1" Description="Files related to this Installation" Absent="allow" AllowAdvertise="no" TypicalDefault="install" Display="collapse" InstallDefault="local">
+	<Feature Id="Server" Title="Server Files" Level="1" Description="Files related to the server" Absent="allow" AllowAdvertise="no" TypicalDefault="install" Display="collapse" InstallDefault="local">
 		<ComponentRef Id="LICENSE"/>
 		<ComponentRef Id="NOTICE"/>
 		<ComponentRef Id="RELEASE_NOTES"/>
-		<ComponentRef Id="RUNNING.txt"/>
+		<ComponentRef Id="RUNNING.txt"/>		
+	</Feature>
+	<Feature Id="Installer" Title="Installer Files" Level="1" Description="Files related to this Installation" Absent="allow" AllowAdvertise="no" TypicalDefault="install" Display="collapse" InstallDefault="local">
 		<ComponentRef Id="InstallDirectorySearch"/>
+		<ComponentRef Id="RemoveInstallFolder"/>
+		<ComponentRef Id="StartMenuShortcut"/>
 	</Feature>
 	<Directory Id="TARGETDIR" Name="SourceDir">
 		<Directory Id="ProgramFiles64Folder" Name="ProgramFiles64Folder">
@@ -139,7 +152,10 @@
 					<Directory Id="work" Name="work"/>
 				</Directory>
 			</Directory>
-		</Directory>
+			<Directory Id="StartMenuFolder">
+				<Directory Id="StartMenuShortcutDir" Name="$(var.AppName)"/>
+			</Directory>
+		</Directory>		
 	</Directory>
 	<UIRef Id="SUFWI_UI"/>
 	<UIRef Id="SUFWIUI_Common" />
@@ -147,15 +163,28 @@
 	<UIRef Id="SUFUI_ProgressText" />
 	
 	<SetProperty Id="ServerInstall" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\service.bat&quot; install" Sequence="execute" Before="ServerInstall" />
-	<SetProperty Id="ServerUninstall" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\service.bat&quot; remove" Sequence="execute" Before="ServerUninstall" />
+	<SetProperty Id="ServerInstallRollback" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\service.bat&quot; remove" Sequence="execute" Before="ServerInstallRollback" />
 	<SetProperty Id="ServerStart" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\tomcat9.exe&quot; start" Sequence="execute" Before="ServerStart" />
+	<SetProperty Id="ServerStartRollback" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\tomcat9.exe&quot; stop" Sequence="execute" Before="ServerStartRollback" />
 	<SetProperty Id="ServerStop" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\tomcat9.exe&quot; stop" Sequence="execute" Before="ServerStop" />
-
+	<SetProperty Id="ServerStopRollback" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\tomcat9.exe&quot; start" Sequence="execute" Before="ServerStopRollback" />
+	<SetProperty Id="ServerUninstall" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\service.bat&quot; remove" Sequence="execute" Before="ServerUninstall" />
+	<SetProperty Id="ServerUninstallRollback" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\service.bat&quot; install" Sequence="execute" Before="ServerUninstallRollback" />
+	
+	<Binary Id="CustomAction.CA.dll" SourceFile="$(var.PathToFile)\CustomAction.CA.dll"/>
+	<CustomAction Id="GetUserIP" BinaryKey="CustomAction.CA.dll" DllEntry="Get_IPAddress" Execute="immediate" Return="check"/>
+	<CustomAction Id="IPValidation" BinaryKey="CustomAction.CA.dll" DllEntry="Validate_IPAddress" Execute="immediate" Return="check"/>
+	<CustomAction Id="PropertiesFile" BinaryKey="CustomAction.CA.dll" DllEntry="Modify_PropertiesFile" Execute="deferred" Impersonate="no" Return="check"/>
+	<CustomAction Id="SetPropertyForPropertiesFile" Property="PropertiesFile" Value="INSTALLDIR=[INSTALLDIR];IP_ADDRESS=[IP_ADDRESS]"/>
 	<CustomAction Id="ServerInstall" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Impersonate="no" Return="check"/>
+	<CustomAction Id="ServerInstallRollback" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="rollback" Impersonate="no" Return="ignore"/>
 	<CustomAction Id="ServerStart" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Impersonate="no" Return="check"/>
+	<CustomAction Id="ServerStartRollback" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="rollback" Impersonate="no" Return="ignore"/>
 	<CustomAction Id="ServerStop" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Impersonate="no" Return="check"/>
+	<CustomAction Id="ServerStopRollback" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="rollback" Impersonate="no" Return="ignore"/>
 	<CustomAction Id="ServerUninstall" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Impersonate="no" Return="check"/>
-	<CustomAction Id="LaunchBrowser" Property="BROWSER" Execute="immediate" ExeCommand="$(var.URL)" Return="asyncNoWait" />
+	<CustomAction Id="ServerUninstallRollback" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="rollback" Impersonate="no" Return="ignore"/>
+	<CustomAction Id="LaunchBrowser" Property="BROWSER" Execute="immediate" ExeCommand="$(var.URL)" Return="asyncNoWait" />	
 	
 </Product>
 <Fragment>
@@ -164,6 +193,22 @@
 			<RegistryKey Key="Software\$(var.AppName)" Root="HKLM" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
 				<RegistryValue Type="string" Name="InstallDir" Value="[INSTALLDIR]" />
 			</RegistryKey> 
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="INSTALLDIR">
+		<Component Id ="RemoveInstallFolder"  Guid="AA11A32B-9E1E-458A-8C94-3EFEDA77E494" KeyPath="yes" >			
+			<util:RemoveFolderEx On="uninstall" Property="INSTALLDIR" />
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="StartMenuShortcutDir">
+		<Component Id="StartMenuShortcut" Guid="D84FC5FF-58A0-40BF-92CE-5FD447125674">
+			<Shortcut Id="UninstallShortcut"  Name="Uninstall $(var.AppName)" Description="Uninstalls $(var.AppName) and all of its components." Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" />
+			<RemoveFolder Id="RemoveStartMeunShortcutDir" On="uninstall"/>
+			<RegistryValue Root="HKCU" Key="Software\Microsoft\[App_Name]" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
 		</Component>
 	</DirectoryRef>
 </Fragment>
@@ -606,11 +651,6 @@
 		<Component Id="websocket_api.jar" Guid="1FA02746-C54E-4127-A9B7-8C9D4064B180">
 			<File Id="websocket_api.jar" Name="websocket-api.jar" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\lib\websocket-api.jar"/>
 		</Component>
-	</DirectoryRef>
-</Fragment>
-<Fragment>
-	<DirectoryRef Id="logs">
-		
 	</DirectoryRef>
 </Fragment>
 <Fragment>

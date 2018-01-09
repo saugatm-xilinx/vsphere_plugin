@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
    Plugin package manifest for solarflare.
 
    *** STANDARD VERSION FOR PLUGINS WITH JAVA SERVICES (see <bundlesOrder> below) ***
@@ -12,9 +10,7 @@
    version: should match the vCenter extension version
    type: keep "html" for this plugin to be deployed in the vSphere HTML client.
    name: short name displayed in the Administration < Client plugins view
--->
-<pluginPackage id="com.solarflare.vcp" version="1.0.0" type="html" name="Solarflare"
-               description="Solarflare VCP Plugin" vendor="Solarflare">
+--><pluginPackage description="Solarflare VCP Plugin" id="com.solarflare.vcp" name="Solarflare" type="html" vendor="Solarflare" version="1.97.0">
 
    <dependencies>
       <!--
@@ -23,7 +19,7 @@
          so it should be the default if you verified that it is compatible with version 6.0.
          Otherwise put version="6.5.0" to have your plugin loaded only by vSphere Client 6.5.0 and up.
        -->
-      <pluginPackage id="com.vmware.vsphere.client" version="6.0.0" />
+      <pluginPackage id="com.vmware.vsphere.client" version="6.0.0"/>
 
       <!-- you may add dependencies on other plugin packages if necessary -->
    </dependencies>
@@ -33,11 +29,11 @@
          List of jar bundles from the /plugins directory in loading order.
          Bundle Ids must match the Bundle-SymbolicName in each bundle's MANIFEST.MF!
       -->
-      <bundle id="com.google.gson" />
-      <bundle id="com.vmware.wsvim25" />
-	  <bundle id="org.sblim.cimclient221" /> 
-      <bundle id="com.solarflare.vcp.solarflare-service" />
-      <bundle id="com.solarflare.vcp.solarflare-ui" />
+      <bundle id="com.google.gson"/>
+      <bundle id="com.vmware.wsvim25"/>
+	  <bundle id="org.sblim.cimclient221"/> 
+      <bundle id="com.solarflare.vcp.solarflare-service"/>
+      <bundle id="com.solarflare.vcp.solarflare-ui"/>
    </bundlesOrder>
 
 </pluginPackage>
