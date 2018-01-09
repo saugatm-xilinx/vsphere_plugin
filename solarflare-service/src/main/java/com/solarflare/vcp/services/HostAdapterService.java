@@ -3,6 +3,7 @@ package com.solarflare.vcp.services;
 import java.util.List;
 
 import com.solarflare.vcp.model.Adapter;
+import com.solarflare.vcp.model.AdapterOverview;
 import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.HostConfiguration;
 import com.solarflare.vcp.model.NicBootParamInfo;
@@ -74,5 +75,9 @@ public interface HostAdapterService {
 	HostConfiguration getHostConfigurations(String hostId) throws Exception;
 
 	void updateHostConfigurations(HostConfiguration hostConfigurationRequest) throws Exception;
+	
+	AdapterOverview getAdapterOverview(String hostId, String nicId) throws Exception;
+	
+	Adapter getAdapters(String hostId, String nicId) throws Exception ;
 
 }

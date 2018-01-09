@@ -27,6 +27,7 @@ import com.solarflare.vcp.exception.SfInvalidLoginException;
 import com.solarflare.vcp.exception.SfInvalidRequestException;
 import com.solarflare.vcp.exception.SfNotFoundException;
 import com.solarflare.vcp.model.Adapter;
+import com.solarflare.vcp.model.AdapterOverview;
 import com.solarflare.vcp.model.CustomUpdateRequest;
 import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.HostConfiguration;
@@ -197,7 +198,55 @@ public class HostAdapterController {
 
 		timer.stop();
 	}
-
+	// Get Adapter Overview
+	@RequestMapping(value= "/hosts/{hostId}/adapters/{nicId}/overview", method = RequestMethod.GET)
+	@ResponseBody
+	public AdapterOverview getAdapterOverview(@PathVariable String hostId, @PathVariable String nicId) throws Exception
+	{
+		if(hostId == null || hostId.isEmpty())
+		{
+			throw new Exception("hostId should not be null or empty");
+		}
+		else if(nicId == null ||nicId.isEmpty())
+		{
+			throw new Exception("nicId should not be null or empty");
+		}
+		AdapterOverview adapterOverview = null;
+		DummayService service = new DummayService();
+		try
+		{
+			adapterOverview= service.getAdapterOverview(hostId, nicId);
+		}
+		catch(Exception e)
+		{
+			throw e;
+		}
+		return adapterOverview;
+	}
+	@RequestMapping(value= "/hosts/{hostId}/adapters/{nicId}/nics", method = RequestMethod.GET)
+	@ResponseBody
+	public Adapter getAdapterNics(@PathVariable String hostId, @PathVariable String nicId) throws Exception
+	{
+		if(hostId == null || hostId.isEmpty())
+		{
+			throw new Exception("hostId should not be null or empty");
+		}
+		else if(nicId == null ||nicId.isEmpty())
+		{
+			throw new Exception("nicId should not be null or empty");
+		}
+		Adapter adapterOverview = null;
+		DummayService service = new DummayService();
+		try
+		{
+			adapterOverview= service.getAdapters(hostId, nicId);
+		}
+		catch(Exception e)
+		{
+			throw e;
+		}
+		return adapterOverview;
+	}
 	@ExceptionHandler(SfNotFoundException.class)
 	@ResponseBody
 	public Map<String, String> handleException(SfNotFoundException ex, HttpServletResponse response) {

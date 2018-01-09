@@ -27,6 +27,7 @@ import com.solarflare.vcp.helper.MetadataHelper;
 import com.solarflare.vcp.helper.SFBase64;
 import com.solarflare.vcp.helper.VCenterHelper;
 import com.solarflare.vcp.model.Adapter;
+import com.solarflare.vcp.model.AdapterOverview;
 import com.solarflare.vcp.model.AdapterTask;
 import com.solarflare.vcp.model.FileHeader;
 import com.solarflare.vcp.model.FirmwareType;
@@ -42,9 +43,7 @@ import com.solarflare.vcp.model.TaskState;
 import com.solarflare.vcp.model.UpdateRequest;
 import com.solarflare.vcp.vim.SfVimService;
 import com.solarflare.vcp.vim.SfVimServiceImpl;
-import com.solarflare.vcp.vim.connection.Connection;
 import com.solarflare.vcp.vim.connection.ConnectionImpl;
-import com.vmware.vim25.RuntimeFaultFaultMsg;
 
 public class HostAdapterServiceImpl implements HostAdapterService {
 	private static final Log logger = LogFactory.getLog(HostAdapterServiceImpl.class);
@@ -496,5 +495,17 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public AdapterOverview getAdapterOverview(String hostId, String nicId) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Adapter getAdapters(String hostId, String nicId) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
