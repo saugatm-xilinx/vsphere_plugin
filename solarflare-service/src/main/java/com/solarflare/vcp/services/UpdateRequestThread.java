@@ -27,7 +27,8 @@ public class UpdateRequestThread implements Runnable {
 	}
 
 	public void run() {
-		logger.info("UpdateRequestThread run method started.");
+		logger.info("Solarflare:: UpdateRequestThread run method started.");
+		logger.debug("Solarflare:: updateRequest in thread : "+updateRequest);
 		SfCIMService cimService = updateRequest.getCimService();
 		CIMObjectPath fwInstance = updateRequest.getFwInstance();
 
@@ -36,7 +37,6 @@ public class UpdateRequestThread implements Runnable {
 
 			CIMObjectPath nicInstance = updateRequest.getNicInstance();
 			URL fwImagePath = updateRequest.getFwImagePath();
-			logger.info("fwImagePath in thread "+fwImagePath);
 			cimService.updateFirmwareFromURL(fwInstance, nicInstance, fwImagePath);
 
 			setTaskState(TaskState.Success, null);
@@ -55,7 +55,7 @@ public class UpdateRequestThread implements Runnable {
 	}
 
 	private void setTaskState(TaskState taskState, String error) {
-		logger.info("setTaskState TaskId " + updateRequest.getTaskId() + " taskState: " + taskState);
+		logger.info("Solarflare:: setTaskState TaskId " + updateRequest.getTaskId() + " taskState: " + taskState);
 		// update task state as running
 		Status status = new Status(taskState, error, updateRequest.getFwType());
 		TaskManager taskManager = TaskManager.getInstance();

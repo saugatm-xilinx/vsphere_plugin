@@ -19,7 +19,9 @@
 		<constructor-arg index="0" ref="ConnectionImpl"/>
 		<constructor-arg index="1" ref="userSessionService"/>
 	</bean>
-	 <bean name="HostAdapterServiceImpl"	class="com.solarflare.vcp.services.HostAdapterServiceImpl">
+	 <bean name="HostAdapterServiceImpl"	class="com.solarflare.vcp.services.HostAdapterServiceImpl"
+	  init-method="init" destroy-method="shutdown">
 		<constructor-arg index="0" ref="SfVimServiceImpl"/>
+		<property name="threadPoolSize" value ="4" />
 	</bean>
 </beans>

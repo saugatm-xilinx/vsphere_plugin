@@ -40,15 +40,15 @@ public class SfCIMClientService {
 	public SfCIMClientService(CIMHost cimHost) {
 		this.cimHost = cimHost;
 		this.cimClient = getClient(null);
-
 	}
-
+	
 	private static final Log logger = LogFactory.getLog(SfCIMClientService.class);
 
 	public WBEMClient getClient(String cimObjectName) {
 		return getClient(cimObjectName, null);
 	}
 
+	
 	public WBEMClient getClient(String cimObjectName, CIMProperty<?>[] properties) {
 		javax.security.auth.Subject subject = createSubjectFromHost(cimHost);
 		SimpleTimeCounter timer = new SimpleTimeCounter("SolarFlare :: getClient");
@@ -64,7 +64,7 @@ public class SfCIMClientService {
 		timer.stop();
 		return null;
 	}
-
+	
 	public CIMObjectPath getHostObjectPath(CIMProperty<?>[] properties, String cimObjectName) {
 		SimpleTimeCounter timer = new SimpleTimeCounter("SolarFlare :: getHostObjectPath");
 		try {
@@ -79,7 +79,7 @@ public class SfCIMClientService {
 		timer.stop();
 		return null;
 	}
-
+	
 	private javax.security.auth.Subject createSubjectFromHost(CIMHost cimHost) {
 		String user = "";
 		String password = "";

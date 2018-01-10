@@ -25,6 +25,8 @@ import javax.wbem.client.WBEMClient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sblim.cimclient.internal.util.MOF;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.solarflare.vcp.exception.SfUpdateRequestFailed;
 import com.solarflare.vcp.helper.MetadataHelper;
@@ -44,24 +46,32 @@ public class SfCIMService {
 		this.cimClientService = cimClientService;
 	}
 
+	/*
 	// TODO Cleanup : Written for testing
 	public static void main(String[] args) throws WBEMException {
 		String url = "https://10.101.10.3:5989/";
 		String password = "Ibmx#3750c";
 		String user = "root";
 
-		CIMHost cimHost = new CIMHostUser(url, user, password);
+	//	CIMHost cimHost = new CIMHostUser(url, user, password);
 
-		SfCIMClientService cimClientService = new SfCIMClientService(cimHost);
+		//SfCIMClientService cimClientService = new SfCIMClientService(cimHost);
 
-		SfCIMService cimService = new SfCIMService(cimClientService);
+		//SfCIMService cimService = new SfCIMService(cimClientService);
 		// cimService.setCIMClient(cimClient);
 		// cimService.setCimHost(cimHost);
 
-		System.out.println(cimService.getAdapterVersions("vmnic6"));
-		System.out.println(cimService.getNICCardInstance("vmnic6"));
+		//System.out.println(cimService.getAdapterVersions("vmnic6"));
+		//System.out.println(cimService.getNICCardInstance("vmnic6"));
+		
+		
+		ApplicationContext context = new ClassPathXmlApplicationContext("bundle-context.xml");
+		context.getBean("SfVimServiceImpl");
+		System.out.println("TEST");
+		//Resource r = new ClassPathResource("bundle-context.xml");
+	
 	}
-
+*/
 	public WBEMClient getCIMClient() {
 		return this.cimClientService.getCimClient();
 	}
@@ -73,7 +83,8 @@ public class SfCIMService {
 	 * @return All the instances of classname
 	 * @throws WBEMException
 	 */
-	public  Collection<CIMInstance> getAllInstances(final String namespace, final String classname) throws WBEMException {
+	public Collection<CIMInstance> getAllInstances(final String namespace, final String classname)
+			throws WBEMException {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getAllInstances");
 		WBEMClient client = getCIMClient();
 		CIMObjectPath objectPath = this.cimClientService.getHostObjectPath(null, classname);
@@ -92,8 +103,9 @@ public class SfCIMService {
 	 * @return Instance of Controller Software Installation Service
 	 * @throws WBEMException
 	 */
-	public  CIMInstance getFirmwareSoftwareInstallationInstance() throws WBEMException {
-		Collection<CIMInstance> instances = getAllInstances(CIMConstants.CIM_NAMESPACE, CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE);
+	public CIMInstance getFirmwareSoftwareInstallationInstance() throws WBEMException {
+		Collection<CIMInstance> instances = getAllInstances(CIMConstants.CIM_NAMESPACE,
+				CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE);
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getFirmwareSoftwareInstallationInstance");
 		logger.info("Solarflare::Getting Firmware Software Installation Instance");
 		CIMInstance svc_mcfw_inst = null;
@@ -113,10 +125,11 @@ public class SfCIMService {
 	 * @return Instance of BootROM Software Installation Service
 	 * @throws WBEMException
 	 */
-	public  CIMInstance getBootROMSoftwareInstallationInstance() throws WBEMException {
+	public CIMInstance getBootROMSoftwareInstallationInstance() throws WBEMException {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getBootROMSoftwareInstallationInstance");
 		logger.info("Solarflare::Getting BootROM Software Installation Instance");
-		Collection<CIMInstance> instances = getAllInstances(CIMConstants.CIM_NAMESPACE, CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE);
+		Collection<CIMInstance> instances = getAllInstances(CIMConstants.CIM_NAMESPACE,
+				CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE);
 		CIMInstance svc_bootrom_inst = null;
 
 		for (CIMInstance inst : instances) {
@@ -135,7 +148,7 @@ public class SfCIMService {
 	 * @return
 	 * @throws WBEMException
 	 */
-	private  CIMInstance getEthernatePortInstance(String deviceId) throws WBEMException {
+	private CIMInstance getEthernatePortInstance(String deviceId) throws WBEMException {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getEthernatePortInstance");
 		CIMInstance ethernateInstance = null;
 		String cimClass = "SF_EthernetPort";
@@ -155,7 +168,8 @@ public class SfCIMService {
 	}
 
 	@SuppressWarnings("unchecked")
-	private  CloseableIterator<CIMInstance> getAssociators(CIMObjectPath objectPath, String associationClass, String resultClass, String role) throws WBEMException {
+	private CloseableIterator<CIMInstance> getAssociators(CIMObjectPath objectPath, String associationClass,
+			String resultClass, String role) throws WBEMException {
 
 		return getCIMClient().associators(objectPath, associationClass, resultClass, role, null, true, true, null);
 
@@ -167,13 +181,14 @@ public class SfCIMService {
 	 * @return NIC Card instance for given deviceId
 	 * @throws WBEMException
 	 */
-	public  CIMInstance getNICCardInstance(String deviceId) throws WBEMException {
+	public CIMInstance getNICCardInstance(String deviceId) throws WBEMException {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getNICCardInstance");
 		// Get EthernatePort Instance
 		CIMInstance ethernateInstance = getEthernatePortInstance(deviceId);
 
 		// Get SF_ControlledBy instance through association
-		CloseableIterator<CIMInstance> inst = getAssociators(ethernateInstance.getObjectPath(), "SF_ControlledBy", null, "Dependent");
+		CloseableIterator<CIMInstance> inst = getAssociators(ethernateInstance.getObjectPath(), "SF_ControlledBy", null,
+				"Dependent");
 		CIMInstance controlledByInstance = inst.next();
 
 		// Get SF_ControllerSoftwareIdentity instance through association
@@ -182,7 +197,8 @@ public class SfCIMService {
 
 		// Get SF_CardRealizesController and NICCard instance through
 		// association
-		inst = getAssociators(controlledByInstance.getObjectPath(), "SF_CardRealizesController", "SF_NICCard", "Dependent");
+		inst = getAssociators(controlledByInstance.getObjectPath(), "SF_CardRealizesController", "SF_NICCard",
+				"Dependent");
 		CIMInstance nicCardIntance = inst.next();
 		timer.stop();
 		return nicCardIntance;
@@ -194,7 +210,7 @@ public class SfCIMService {
 	 * @return Adapter Versions for given deviceId
 	 * @throws WBEMException
 	 */
-	public  Map<String, String> getAdapterVersions(String deviceId) throws WBEMException {
+	public Map<String, String> getAdapterVersions(String deviceId) throws WBEMException {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getAdapterVersions");
 		logger.info("Solarflare::Getting Adapter Versions for Device Id : " + deviceId);
 		Map<String, String> versions = new HashMap<String, String>();
@@ -202,11 +218,13 @@ public class SfCIMService {
 		CIMInstance ethernateInstance = getEthernatePortInstance(deviceId);
 
 		// Get SF_ControlledBy instance through association
-		CloseableIterator<CIMInstance> inst = getAssociators(ethernateInstance.getObjectPath(), CIMConstants.SF_CONTROLLED_BY, null, "Dependent");
+		CloseableIterator<CIMInstance> inst = getAssociators(ethernateInstance.getObjectPath(),
+				CIMConstants.SF_CONTROLLED_BY, null, "Dependent");
 		CIMInstance controlledByInstance = inst.next();
 
 		// Get SF_ControllerSoftwareIdentity instance through association
-		inst = getAssociators(controlledByInstance.getObjectPath(), CIMConstants.SF_CONTROLLER_SOFTWARE_IDENTITY, null, "Dependent");
+		inst = getAssociators(controlledByInstance.getObjectPath(), CIMConstants.SF_CONTROLLER_SOFTWARE_IDENTITY, null,
+				"Dependent");
 
 		while (inst.hasNext()) {
 			CIMInstance instance = inst.next();
@@ -266,11 +284,14 @@ public class SfCIMService {
 		return valid;
 	}
 
-	public  String getLatestControllerFWImageVersion(URL pluginURL, SfCIMService cimService, CIMInstance fwInstance, CIMInstance nicInstance) throws MalformedURLException, RuntimeFaultFaultMsg, URISyntaxException, WBEMException {
+	public String getLatestControllerFWImageVersion(URL pluginURL, SfCIMService cimService, CIMInstance fwInstance,
+			CIMInstance nicInstance)
+			throws MalformedURLException, RuntimeFaultFaultMsg, URISyntaxException, WBEMException {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getLatestControllerFWImageVersion");
 		String versionString = "0.0.0.0";
 
-		SfFirmware file = MetadataHelper.getMetaDataForAdapter(pluginURL, cimService, fwInstance, nicInstance, FwType.CONTROLLER);
+		SfFirmware file = MetadataHelper.getMetaDataForAdapter(pluginURL, cimService, fwInstance, nicInstance,
+				FwType.CONTROLLER);
 		if (file != null) {
 			versionString = file.getVersionString();
 		}
@@ -278,10 +299,13 @@ public class SfCIMService {
 		return versionString;
 	}
 
-	public  String getLatestBootROMFWImageVersion(URL pluginURL, SfCIMService cimService, CIMInstance bootROMInstance, CIMInstance nicInstance) throws MalformedURLException, RuntimeFaultFaultMsg, URISyntaxException, WBEMException {
+	public String getLatestBootROMFWImageVersion(URL pluginURL, SfCIMService cimService, CIMInstance bootROMInstance,
+			CIMInstance nicInstance)
+			throws MalformedURLException, RuntimeFaultFaultMsg, URISyntaxException, WBEMException {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getLatestBootROMFWImageVersion");
 		String versionString = "0.0.0.0";
-		SfFirmware file = MetadataHelper.getMetaDataForAdapter(pluginURL, cimService, bootROMInstance, nicInstance, FwType.BOOTROM);
+		SfFirmware file = MetadataHelper.getMetaDataForAdapter(pluginURL, cimService, bootROMInstance, nicInstance,
+				FwType.BOOTROM);
 		if (file != null) {
 			versionString = file.getVersionString();
 		}
@@ -342,7 +366,8 @@ public class SfCIMService {
 	 * @return True is given Firmware image file is compatible with nicInstance
 	 * @throws Exception
 	 */
-	public  boolean isCustomFWImageCompatible(CIMInstance fwInst, CIMInstance nicInstance, FileHeader header) throws Exception {
+	public boolean isCustomFWImageCompatible(CIMInstance fwInst, CIMInstance nicInstance, FileHeader header)
+			throws Exception {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: isCustomFWImageCompatible");
 		boolean isCompatible = false;
 
@@ -375,7 +400,7 @@ public class SfCIMService {
 	 * @param nicInstance
 	 * @return
 	 */
-	public  Map<String, String> getRequiredFwImageName(CIMInstance fw_inst, CIMInstance nicInstance) {
+	public Map<String, String> getRequiredFwImageName(CIMInstance fw_inst, CIMInstance nicInstance) {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getRequiredFwImageName");
 		logger.info("Solarflare::Getting Required Firmware Image Version");
 		Map<String, String> params = new HashMap<>();
@@ -383,13 +408,16 @@ public class SfCIMService {
 		try {
 			WBEMClient client = getCIMClient();
 
-			CIMArgument<CIMObjectPath> cimTarget = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET, new CIMDataType(nicInstance.getClassName()), new CIMObjectPath(MOF.objectHandle(nicInstance.getObjectPath(), false, true)));
+			CIMArgument<CIMObjectPath> cimTarget = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET,
+					new CIMDataType(nicInstance.getClassName()),
+					new CIMObjectPath(MOF.objectHandle(nicInstance.getObjectPath(), false, true)));
 
-			CIMArgument<?>[] cimArguments = {cimTarget}; // input parameters
+			CIMArgument<?>[] cimArguments = { cimTarget }; // input parameters
 			CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
 																		// parameters
 
-			Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.GET_FW_IMAGE_NAME, cimArguments, cimArgumentsOut);
+			Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.GET_FW_IMAGE_NAME, cimArguments,
+					cimArgumentsOut);
 			int statusCode = Integer.parseInt(status.toString());
 			if (statusCode == 0) {
 
@@ -398,7 +426,8 @@ public class SfCIMService {
 				for (int i = 0; i < cimArgumentsOut.length; i++) {
 					if (cimArgumentsOut[i] != null) {
 						params.put(cimArgumentsOut[i].getName(), cimArgumentsOut[i].getValue().toString());
-						logger.info("Solarflare::getRequiredFwImageName:=> " + cimArgumentsOut[i].getName() + " = " + cimArgumentsOut[i].getValue().toString());
+						logger.info("Solarflare::getRequiredFwImageName:=> " + cimArgumentsOut[i].getName() + " = "
+								+ cimArgumentsOut[i].getValue().toString());
 					}
 				}
 			} else {
@@ -459,14 +488,15 @@ public class SfCIMService {
 		return header;
 	}
 
-	private  String getLatestLogErrorMessage() {
+	private String getLatestLogErrorMessage() {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getLatestLogErrorMessage");
 		String errMsg = null;
 		CIMInstance logErrorInstance = null;
 		try {
 			CIMInstance pLogInstance = getProviderLogInstance();
 
-			CloseableIterator<CIMInstance> inst = getAssociators(pLogInstance.getObjectPath(), CIMConstants.SF_LOG_MANAGES_RECORD, null, "Log");
+			CloseableIterator<CIMInstance> inst = getAssociators(pLogInstance.getObjectPath(),
+					CIMConstants.SF_LOG_MANAGES_RECORD, null, "Log");
 
 			int maxRecordID = -1;
 			while (inst.hasNext()) {
@@ -493,7 +523,7 @@ public class SfCIMService {
 		return errMsg;
 	}
 
-	private  CIMInstance getProviderLogInstance() throws WBEMException {
+	private CIMInstance getProviderLogInstance() throws WBEMException {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getProviderLogInstance");
 		CIMInstance plInstance = null;
 		String cimClass = CIMConstants.SF_PROVIDER_LOG;
@@ -518,29 +548,42 @@ public class SfCIMService {
 	 * @return true if Firmware is updated successfully
 	 * @throws Exception
 	 */
-	public  boolean updateFirmwareFromURL(CIMObjectPath softwareIntsallationInstance, CIMObjectPath nic, URL fwImagePath) throws Exception {
+	public boolean updateFirmwareFromURL(CIMObjectPath softwareIntsallationInstance, CIMObjectPath nic, URL fwImagePath)
+			throws Exception {
+
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: updateFirmwareFromURL");
+		logger.debug("Solarflare:: updateFirmwareFromURL called with input : SfInstance " + softwareIntsallationInstance
+				+ " NIC : " + nic + " fwImagePath : " + fwImagePath);
 		WBEMClient client = getCIMClient();
 		String pMethodName = CIMConstants.INSTALL_FROM_URI;
-		
-		//logger.info("Solarflare::Updating nic object: " + nic.getObjectPath());
+
+		// logger.info("Solarflare::Updating nic object: " +
+		// nic.getObjectPath());
 		logger.info("Solarflare::Updating nic object: " + nic);
-		//CIMArgument<CIMObjectPath> target = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET, new CIMDataType(nic.getClassName()), new CIMObjectPath(MOF.objectHandle(nic.getObjectPath(), false, true)));
-		CIMArgument<CIMObjectPath> target = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET, new CIMDataType("SF_NICCard"), nic);
-		CIMArgument<String> uri = new CIMArgument<String>(CIMConstants.URI, CIMDataType.STRING_T, fwImagePath.toString());
+		// CIMArgument<CIMObjectPath> target = new
+		// CIMArgument<CIMObjectPath>(CIMConstants.TARGET, new
+		// CIMDataType(nic.getClassName()), new
+		// CIMObjectPath(MOF.objectHandle(nic.getObjectPath(), false, true)));
+		CIMArgument<CIMObjectPath> target = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET,
+				new CIMDataType("SF_NICCard"), nic);
+		CIMArgument<String> uri = new CIMArgument<String>(CIMConstants.URI, CIMDataType.STRING_T,
+				fwImagePath.toString());
 
-		Integer[] options = new Integer[]{3};
-		CIMArgument<?> installOptions = new CIMArgument<Integer[]>(CIMConstants.INSTALL_OPTIONS, CIMDataType.UINT16_ARRAY_T, options);
+		Integer[] options = new Integer[] { 3 };
+		CIMArgument<?> installOptions = new CIMArgument<Integer[]>(CIMConstants.INSTALL_OPTIONS,
+				CIMDataType.UINT16_ARRAY_T, options);
 
-		String[] optionValues = new String[]{"x"};
+		String[] optionValues = new String[] { "x" };
 		// TODO will use SFBase64 to encode and generate checksum
-		CIMArgument<?> installOptionsValues = new CIMArgument<String[]>(CIMConstants.INSTALL_OPTIONS_VALUES, CIMDataType.STRING_ARRAY_T, optionValues);
+		CIMArgument<?> installOptionsValues = new CIMArgument<String[]>(CIMConstants.INSTALL_OPTIONS_VALUES,
+				CIMDataType.STRING_ARRAY_T, optionValues);
 
-		CIMArgument<?>[] pInputArguments = {target, uri, installOptions, installOptionsValues};
+		CIMArgument<?>[] pInputArguments = { target, uri, installOptions, installOptionsValues };
 		CIMArgument<?>[] pOutputArguments = new CIMArgument<?>[10];
 
 		try {
-			Object status = client.invokeMethod(softwareIntsallationInstance, pMethodName, pInputArguments, pOutputArguments);
+			Object status = client.invokeMethod(softwareIntsallationInstance, pMethodName, pInputArguments,
+					pOutputArguments);
 			logger.info("Solarflare::status: " + status);
 
 			int statusCode = Integer.parseInt(status.toString());
@@ -568,19 +611,21 @@ public class SfCIMService {
 	 * @param data
 	 * @param filePath
 	 */
-	public  void sendFWImageData(CIMInstance fw_inst, String data, String filePath) {
+	public void sendFWImageData(CIMInstance fw_inst, String data, String filePath) {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: sendFWImageData");
 		logger.info("Solarflare::Send Firmware Image Send");
 
 		try {
 			WBEMClient client = getCIMClient();
-			CIMArgument<?> cimFilePath = new CIMArgument<String>(CIMConstants.FILE_NAME, CIMDataType.STRING_T, filePath);
+			CIMArgument<?> cimFilePath = new CIMArgument<String>(CIMConstants.FILE_NAME, CIMDataType.STRING_T,
+					filePath);
 			CIMArgument<?> cimFileData = new CIMArgument<String>(CIMConstants.BASE64STR, CIMDataType.STRING_T, data);
-			CIMArgument<?>[] cimArguments = {cimFilePath, cimFileData};
+			CIMArgument<?>[] cimArguments = { cimFilePath, cimFileData };
 			CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
 																		// parameters
 
-			Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.SEND_FW_IMAGE_DATA, cimArguments, cimArgumentsOut);
+			Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.SEND_FW_IMAGE_DATA, cimArguments,
+					cimArgumentsOut);
 			int statusCode = Integer.parseInt(status.toString());
 			logger.info("Solarflare::Status Code : " + statusCode);
 			if (statusCode == 0) {
@@ -600,7 +645,7 @@ public class SfCIMService {
 	 * @param fw_inst
 	 * @return temp file name created at Host
 	 */
-	public  String startFwImageSend(CIMInstance fw_inst) {
+	public String startFwImageSend(CIMInstance fw_inst) {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: startFwImageSend");
 		String filePath = null;
 		logger.info("Solarflare::Start Firmware Image Send");
@@ -610,7 +655,8 @@ public class SfCIMService {
 			CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
 																		// parameters
 
-			Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.START_FW_IMAGE_SEND, null, cimArgumentsOut);
+			Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.START_FW_IMAGE_SEND, null,
+					cimArgumentsOut);
 			int statusCode = Integer.parseInt(status.toString());
 			if (statusCode == 0) {
 
@@ -638,15 +684,16 @@ public class SfCIMService {
 	 * @param tempFilePath
 	 * @return
 	 */
-	public  boolean removeFwImage(CIMObjectPath fw_inst, String tempFilePath) {
+	public boolean removeFwImage(CIMObjectPath fw_inst, String tempFilePath) {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: removeFwImage");
 		boolean isRemoved = false;
 		logger.info("Solarflare::Remove FW Image file");
 
 		try {
 			WBEMClient client = getCIMClient();
-			CIMArgument<?> cimFilePath = new CIMArgument<String>(CIMConstants.FILE_NAME, CIMDataType.STRING_T, tempFilePath);
-			CIMArgument<?>[] cimArguments = {cimFilePath};
+			CIMArgument<?> cimFilePath = new CIMArgument<String>(CIMConstants.FILE_NAME, CIMDataType.STRING_T,
+					tempFilePath);
+			CIMArgument<?>[] cimArguments = { cimFilePath };
 			CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
 																		// parameters
 
@@ -674,7 +721,7 @@ public class SfCIMService {
 	 * @param nicInstance
 	 * @param filePath
 	 */
-	public  void getLocalFwImageVersion(CIMInstance fw_inst, CIMInstance nicInstance, String filePath) {
+	public void getLocalFwImageVersion(CIMInstance fw_inst, CIMInstance nicInstance, String filePath) {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getLocalFwImageVersion");
 		logger.info("Solarflare::Getting Local Firmware Image Version");
 
@@ -682,14 +729,18 @@ public class SfCIMService {
 			WBEMClient client = getCIMClient();
 
 			// Create type for nicInstance and set input parameter
-			CIMArgument<CIMObjectPath> cimTarget = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET, new CIMDataType(nicInstance.getClassName()), new CIMObjectPath(MOF.objectHandle(nicInstance.getObjectPath(), false, true)));
-			CIMArgument<?> cimFilePath = new CIMArgument<String>(CIMConstants.FILE_NAME, CIMDataType.STRING_T, filePath);
-			CIMArgument<?>[] cimArguments = {cimTarget, cimFilePath}; // input
+			CIMArgument<CIMObjectPath> cimTarget = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET,
+					new CIMDataType(nicInstance.getClassName()),
+					new CIMObjectPath(MOF.objectHandle(nicInstance.getObjectPath(), false, true)));
+			CIMArgument<?> cimFilePath = new CIMArgument<String>(CIMConstants.FILE_NAME, CIMDataType.STRING_T,
+					filePath);
+			CIMArgument<?>[] cimArguments = { cimTarget, cimFilePath }; // input
 																		// parameters
 			CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
 																		// parameters
 
-			Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.GET_LOCAL_FW_IMAGE_VERSION, cimArguments, cimArgumentsOut);
+			Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.GET_LOCAL_FW_IMAGE_VERSION,
+					cimArguments, cimArgumentsOut);
 			int statusCode = Integer.parseInt(status.toString());
 			if (statusCode == 0) {
 
@@ -697,7 +748,8 @@ public class SfCIMService {
 
 				for (int i = 0; i < cimArgumentsOut.length; i++) {
 					if (cimArgumentsOut[i] != null) {
-						System.out.println(cimArgumentsOut[i].getName() + " : " + cimArgumentsOut[i].getValue().toString());
+						System.out.println(
+								cimArgumentsOut[i].getName() + " : " + cimArgumentsOut[i].getValue().toString());
 					}
 				}
 			} else {
@@ -711,4 +763,15 @@ public class SfCIMService {
 		timer.stop();
 	}
 
+	/**
+	 * This method is used to create session with CIM client
+	 */
+	public void getProperty() {
+		WBEMClient client = getCIMClient();
+		try {
+			String property = client.getProperty("CIM-XML");
+		} catch (Exception e) {
+
+		}
+	}
 }

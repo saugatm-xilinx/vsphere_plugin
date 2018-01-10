@@ -82,7 +82,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 
 	@Override
 	public String getPluginURL(String pluginKey) throws Exception {
-		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getPluginURL");
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getPluginURL");
 		if (extensionURL == null || extensionURL.isEmpty()) {
 			Connection _conn = getSession();
 			ManagedObjectReference extensionManager = _conn.getServiceContent().getExtensionManager();
@@ -105,7 +105,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 	@Override
 	public Host getHostSummary(String hostId) throws Exception {
 		Host host = new Host();
-		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getHostSummary");
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getHostSummary");
 		List<String> props = new ArrayList<>();
 		props.add("configManager.imageConfigManager");
 		props.add("hardware.pciDevice");
@@ -147,7 +147,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 	 */
 	@Override
 	public List<Host> getAllHosts() throws Exception {
-		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getAllHosts");
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getAllHosts");
 		List<Host> hostList = new ArrayList<>();
 
 		List<String> props = new ArrayList<>();
@@ -200,7 +200,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 	@Override
 	public List<Adapter> getHostAdapters(String hostId) throws Exception, RuntimeFaultFaultMsg {
 
-		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getHostAdapters");
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getHostAdapters");
 		List<String> props = new ArrayList<>();
 		props.add("configManager.imageConfigManager");
 		props.add("hardware.pciDevice");
@@ -222,7 +222,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 	}
 
 	private List<Adapter> getAdapters(Map<String, Object> hostprops, String hostId) {
-		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getAdapters");
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getAdapters");
 		List<Adapter> adapters = new ArrayList<>();
 
 		// Get PCI devices (key for this is hardware.pciDevice and return
@@ -266,7 +266,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 
 	@Override
 	public CIMHost getCIMHost(String hostId) throws Exception {
-		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getCIMHost");
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getCIMHost");
 		logger.info(LOG_KEY + "Getting CIM ticket object for host : " + hostId);
 		Connection _conn = getSession();
 		HostServiceTicket ticket = _conn.getVimPort().acquireCimServicesTicket(getManagedObjectReference("HostSystem", hostId));

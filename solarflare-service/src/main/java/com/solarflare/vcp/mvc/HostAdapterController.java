@@ -49,7 +49,7 @@ public class HostAdapterController {
 	@RequestMapping(value = "/hosts/{hostId}", method = RequestMethod.GET)
 	@ResponseBody
 	public Host getHostAdapterInfo(@PathVariable String hostId) throws Exception {
-		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: getHostAdapterInfo");
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getHostAdapterInfo");
 		logger.info("Start getting host overview by host id :" + hostId);
 
 		if (hostId == null || hostId.isEmpty()) {
@@ -64,7 +64,7 @@ public class HostAdapterController {
 	@RequestMapping(value = "/hosts", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Host> getHostList() throws Exception {
-		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: getHostList");
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getHostList");
 		logger.info("Start getting host list");
 		List<Host> hostList = hostAdapterService.getHostList();
 		logger.debug("End getting host list");
@@ -75,7 +75,7 @@ public class HostAdapterController {
 	@RequestMapping(value = "/hosts/{hostId}/adapters", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Adapter> listAdapter(@PathVariable String hostId) throws Exception {
-		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: listAdapter");
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - listAdapter");
 		logger.info("Getting list of host adapters for host :" + hostId);
 		if (hostId == null || hostId.isEmpty()) {
 			throw new SfInvalidRequestException("Host id is invalid");
@@ -90,7 +90,7 @@ public class HostAdapterController {
 	@RequestMapping(value = "/hosts/{hostId}/adapters/latest", method = RequestMethod.POST)
 	@ResponseBody
 	public String updateFirmwareToLatest(@RequestBody String adapterList, @PathVariable String hostId) throws Exception {
-		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: updateFirmwareToLatest");
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Update - updateFirmwareToLatest");
 		if (adapterList == null || adapterList.isEmpty()) {
 			throw new SfInvalidRequestException("Adapter is not selected to update.");
 		}
@@ -134,7 +134,7 @@ public class HostAdapterController {
 	@RequestMapping(value = "/hosts/{hostId}/adapters/updateCustomWithUrl", method = RequestMethod.POST)
 	@ResponseBody
 	public String updateCustomWithUrl(@RequestBody String adapters, @PathVariable String hostId) throws Exception {
-		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: updateCustomWithUrl");
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Update - updateCustomWithUrl");
 		if (hostId == null || hostId.isEmpty()) {
 			throw new SfInvalidRequestException("Host id is invalid");
 		}
@@ -152,7 +152,7 @@ public class HostAdapterController {
 	@RequestMapping(value = "/hosts/{hostId}/adapters/updateCustomWithBinary", method = RequestMethod.POST)
 	@ResponseBody
 	public String updateCustomWithBinary(@RequestBody String adapters, @PathVariable String hostId) throws Exception {
-		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: updateCustomWithBinary");
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Update - updateCustomWithBinary");
 		logger.info("start getting file as string content");
 		Gson gson = new Gson();
 		CustomUpdateRequest customUpdateRequest = gson.fromJson(adapters, CustomUpdateRequest.class);
