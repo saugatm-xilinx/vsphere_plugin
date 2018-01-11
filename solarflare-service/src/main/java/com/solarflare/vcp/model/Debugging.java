@@ -2,99 +2,89 @@ package com.solarflare.vcp.model;
 
 public class Debugging {
 
-	private boolean isMaskDriver;
-	private boolean isMaskUtils;
-	private boolean isMaskMgmt;
-	private boolean isMaskUplink;
-	private boolean isMaskTransmit;
-	private boolean isMaskReceive;
-	private boolean isMaskHardware;
-	private boolean isMaskEventQueue;
-	private boolean isMaskRSS;
-	private boolean isMaskPort;
-	private boolean isMaskIntrupt;
-	private boolean isMaskCommonCode;
-	public boolean isMaskDriver() {
-		return isMaskDriver;
+	private boolean isDriver;
+	private boolean isUtils;
+	private boolean isMgmt;
+	private boolean isUplink;
+	private boolean isTransmit;
+	private boolean isReceive;
+	private boolean isHardware;
+	private boolean isEventQueue;
+	private boolean isRSS;
+	private boolean isPort;
+	private boolean isInterrupt;
+	private boolean isCommonCode;
+	public boolean isDriver() {
+		return isDriver;
 	}
-	public void setMaskDriver(boolean isMaskDriver) {
-		this.isMaskDriver = isMaskDriver;
+	public void setDriver(boolean isDriver) {
+		this.isDriver = isDriver;
 	}
-	public boolean isMaskUtils() {
-		return isMaskUtils;
+	public boolean isUtils() {
+		return isUtils;
 	}
-	public void setMaskUtils(boolean isMaskUtils) {
-		this.isMaskUtils = isMaskUtils;
+	public void setUtils(boolean isUtils) {
+		this.isUtils = isUtils;
 	}
-	public boolean isMaskMgmt() {
-		return isMaskMgmt;
+	public boolean isMgmt() {
+		return isMgmt;
 	}
-	public void setMaskMgmt(boolean isMaskMgmt) {
-		this.isMaskMgmt = isMaskMgmt;
+	public void setMgmt(boolean isMgmt) {
+		this.isMgmt = isMgmt;
 	}
-	public boolean isMaskUplink() {
-		return isMaskUplink;
+	public boolean isUplink() {
+		return isUplink;
 	}
-	public void setMaskUplink(boolean isMaskUplink) {
-		this.isMaskUplink = isMaskUplink;
+	public void setUplink(boolean isUplink) {
+		this.isUplink = isUplink;
 	}
-	public boolean isMaskTransmit() {
-		return isMaskTransmit;
+	public boolean isTransmit() {
+		return isTransmit;
 	}
-	public void setMaskTransmit(boolean isMaskTransmit) {
-		this.isMaskTransmit = isMaskTransmit;
+	public void setTransmit(boolean isTransmit) {
+		this.isTransmit = isTransmit;
 	}
-	public boolean isMaskReceive() {
-		return isMaskReceive;
+	public boolean isReceive() {
+		return isReceive;
 	}
-	public void setMaskReceive(boolean isMaskReceive) {
-		this.isMaskReceive = isMaskReceive;
+	public void setReceive(boolean isReceive) {
+		this.isReceive = isReceive;
 	}
-	public boolean isMaskHardware() {
-		return isMaskHardware;
+	public boolean isHardware() {
+		return isHardware;
 	}
-	public void setMaskHardware(boolean isMaskHardware) {
-		this.isMaskHardware = isMaskHardware;
+	public void setHardware(boolean isHardware) {
+		this.isHardware = isHardware;
 	}
-	public boolean isMaskEventQueue() {
-		return isMaskEventQueue;
+	public boolean isEventQueue() {
+		return isEventQueue;
 	}
-	public void setMaskEventQueue(boolean isMaskEventQueue) {
-		this.isMaskEventQueue = isMaskEventQueue;
+	public void setEventQueue(boolean isEventQueue) {
+		this.isEventQueue = isEventQueue;
 	}
-	public boolean isMaskRSS() {
-		return isMaskRSS;
+	public boolean isRSS() {
+		return isRSS;
 	}
-	public void setMaskRSS(boolean isMaskRSS) {
-		this.isMaskRSS = isMaskRSS;
+	public void setRSS(boolean isRSS) {
+		this.isRSS = isRSS;
 	}
-	public boolean isMaskPort() {
-		return isMaskPort;
+	public boolean isPort() {
+		return isPort;
 	}
-	public void setMaskPort(boolean isMaskPort) {
-		this.isMaskPort = isMaskPort;
+	public void setPort(boolean isPort) {
+		this.isPort = isPort;
 	}
-	public boolean isMaskIntrupt() {
-		return isMaskIntrupt;
+	public boolean isCommonCode() {
+		return isCommonCode;
 	}
-	public void setMaskIntrupt(boolean isMaskIntrupt) {
-		this.isMaskIntrupt = isMaskIntrupt;
+	public void setCommonCode(boolean isCommonCode) {
+		this.isCommonCode = isCommonCode;
 	}
-	public boolean isMaskCommonCode() {
-		return isMaskCommonCode;
+	public boolean isInterrupt() {
+		return isInterrupt;
 	}
-	public void setMaskCommonCode(boolean isMaskCommonCode) {
-		this.isMaskCommonCode = isMaskCommonCode;
+	public void setInterrupt(boolean isInterrupt) {
+		this.isInterrupt = isInterrupt;
 	}
-	@Override
-	public String toString() {
-		return "Debugging [isMaskDriver=" + isMaskDriver + ", isMaskUtils=" + isMaskUtils + ", isMaskMgmt=" + isMaskMgmt
-				+ ", isMaskUplink=" + isMaskUplink + ", isMaskTransmit=" + isMaskTransmit + ", isMaskReceive="
-				+ isMaskReceive + ", isMaskHardware=" + isMaskHardware + ", isMaskEventQueue=" + isMaskEventQueue
-				+ ", isMaskRSS=" + isMaskRSS + ", isMaskPort=" + isMaskPort + ", isMaskIntrupt=" + isMaskIntrupt
-				+ ", isMaskCommonCode=" + isMaskCommonCode + "]";
-	}
-
-	
 	
 }

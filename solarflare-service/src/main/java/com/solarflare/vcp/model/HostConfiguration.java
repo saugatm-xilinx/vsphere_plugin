@@ -10,7 +10,7 @@ public class HostConfiguration implements Serializable {
 	private static final long serialVersionUID = 3255818571331912468L;
 	
 	private NetQueue netQueue;
-	private Debugging debugging;
+	private Debugging debuggingMask;
 	private Overlay overlay;
 	public NetQueue getNetQueue() {
 		return netQueue;
@@ -18,12 +18,7 @@ public class HostConfiguration implements Serializable {
 	public void setNetQueue(NetQueue netQueue) {
 		this.netQueue = netQueue;
 	}
-	public Debugging getDebugging() {
-		return debugging;
-	}
-	public void setDebugging(Debugging debugging) {
-		this.debugging = debugging;
-	}
+	
 	public Overlay getOverlay() {
 		return overlay;
 	}
@@ -32,7 +27,13 @@ public class HostConfiguration implements Serializable {
 	}
 	@Override
 	public String toString() {
-		return "HostConfiguration [netQueue=" + netQueue + ", debugging=" + debugging + ", overlay=" + overlay + "]";
+		return "HostConfiguration [netQueue=" + netQueue + ", debugging=" + debuggingMask + ", overlay=" + overlay + "]";
+	}
+	public Debugging getDebuggingMask() {
+		return debuggingMask;
+	}
+	public void setDebuggingMask(Debugging debuggingMask) {
+		this.debuggingMask = debuggingMask;
 	}
 	
 	

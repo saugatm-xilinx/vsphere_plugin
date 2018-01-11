@@ -73,15 +73,15 @@ public class DummayService implements HostAdapterService {
 		netQueue.setRss(4);
 
 		Debugging debugging = new Debugging();
-		debugging.setMaskUtils(true);
-		debugging.setMaskReceive(true);
+		debugging.setUtils(true);
+		debugging.setReceive(true);
 
 		Overlay overlay = new Overlay();
 		overlay.setGeneveOffloadEnable(true);
 		overlay.setVxlanOffloadEnable(true);
 
 		hostConfiguration.setNetQueue(netQueue);
-		hostConfiguration.setDebugging(debugging);
+		hostConfiguration.setDebuggingMask(debugging);
 		hostConfiguration.setOverlay(overlay);
 		return hostConfiguration;
 	}
