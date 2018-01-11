@@ -15,15 +15,12 @@ import javax.net.ssl.SSLSocketFactory;
 
 public class CertThumbprint {
 
+	/*
 	public static void main(String[] args) throws Exception {
 		System.out.println(getSHAFingerprint("localhost", 8443));
-		// F4:74:EB:21:11:88:25:AC:DB:7F:1A:6C:F3:05:85:04:BB:F1:EB:52
-		// f4:74:eb:21:11:88:25:ac:db:7f:1a:6c:f3:05:85:04:bb:f1:eb:52
-		// F4:74:EB:21:11:88:25:AC:DB:7F:1A:6C:F3:05:85:04:BB:F1:EB:52
 		System.out.println("done!!!");
-
 	}
-
+	*/
 	public static String getSHAFingerprint(String host, int port) throws Exception {
 		HostnameVerifier hv = new HostnameVerifier() {
 			public boolean verify(String urlHostName, SSLSession session) {
@@ -37,7 +34,10 @@ public class CertThumbprint {
 
 		SSLSocket socket = (SSLSocket) sf.createSocket(host, port);
 
-		return getSHA1(socket.getSession());
+		String sha1 = getSHA1(socket.getSession());
+		if (sha1 != null)
+			sha1 = sha1.toUpperCase();
+		return sha1;
 
 	}
 
