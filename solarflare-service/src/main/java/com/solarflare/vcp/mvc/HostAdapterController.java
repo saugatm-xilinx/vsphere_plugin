@@ -193,9 +193,8 @@ public class HostAdapterController {
 		}
 		Gson gson = new Gson();
 		HostConfiguration hostConfigurationRequest = gson.fromJson(hostConfiguration, HostConfiguration.class);
-
-		hostAdapterService.updateHostConfigurations(hostConfigurationRequest);
-
+		DummayService service = new DummayService();
+		service.updateHostConfigurations(hostConfigurationRequest);
 		timer.stop();
 	}
 	// Get Adapter Overview

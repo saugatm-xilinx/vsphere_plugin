@@ -15,6 +15,8 @@ import com.solarflare.vcp.model.VMNIC;
 
 public class DummayService implements HostAdapterService {
 
+	static List<HostConfiguration> hostconfig = new ArrayList<>();
+	
 	@Override
 	public List<Host> getHostList() throws Exception {
 		// TODO Auto-generated method stub
@@ -67,29 +69,34 @@ public class DummayService implements HostAdapterService {
 	public HostConfiguration getHostConfigurations(String hostId) throws Exception {
 
 		HostConfiguration hostConfiguration = new HostConfiguration();
+		if(hostconfig.size() == 0 )
+		{
+			NetQueue netQueue = new NetQueue();
+			netQueue.setNetQueueCount(8);
+			netQueue.setRss(4);
 
-		NetQueue netQueue = new NetQueue();
-		netQueue.setNetQueueCount(8);
-		netQueue.setRss(4);
+			Debugging debugging = new Debugging();
+			debugging.setUtils(true);
+			debugging.setReceive(true);
 
-		Debugging debugging = new Debugging();
-		debugging.setUtils(true);
-		debugging.setReceive(true);
+			Overlay overlay = new Overlay();
+			overlay.setGeneveOffloadEnable(true);
+			overlay.setVxlanOffloadEnable(true);
 
-		Overlay overlay = new Overlay();
-		overlay.setGeneveOffloadEnable(true);
-		overlay.setVxlanOffloadEnable(true);
-
-		hostConfiguration.setNetQueue(netQueue);
-		hostConfiguration.setDebuggingMask(debugging);
-		hostConfiguration.setOverlay(overlay);
+			hostConfiguration.setNetQueue(netQueue);
+			hostConfiguration.setDebuggingMask(debugging);
+			hostConfiguration.setOverlay(overlay);
+		}
+		else
+		{
+			return hostconfig.get(0);
+		}
 		return hostConfiguration;
 	}
 
 	@Override
 	public void updateHostConfigurations(HostConfiguration hostConfigurationRequest) throws Exception {
-		// TODO Auto-generated method stub
-
+		hostconfig.add(hostConfigurationRequest);
 	}
 	
 	@Override
