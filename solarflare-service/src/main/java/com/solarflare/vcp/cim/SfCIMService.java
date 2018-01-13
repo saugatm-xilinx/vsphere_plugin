@@ -25,8 +25,6 @@ import javax.wbem.client.WBEMClient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sblim.cimclient.internal.util.MOF;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.solarflare.vcp.exception.SfUpdateRequestFailed;
 import com.solarflare.vcp.helper.MetadataHelper;
@@ -47,31 +45,28 @@ public class SfCIMService {
 	}
 
 	/*
-	// TODO Cleanup : Written for testing
-	public static void main(String[] args) throws WBEMException {
-		String url = "https://10.101.10.3:5989/";
-		String password = "Ibmx#3750c";
-		String user = "root";
-
-	//	CIMHost cimHost = new CIMHostUser(url, user, password);
-
-		//SfCIMClientService cimClientService = new SfCIMClientService(cimHost);
-
-		//SfCIMService cimService = new SfCIMService(cimClientService);
-		// cimService.setCIMClient(cimClient);
-		// cimService.setCimHost(cimHost);
-
-		//System.out.println(cimService.getAdapterVersions("vmnic6"));
-		//System.out.println(cimService.getNICCardInstance("vmnic6"));
-		
-		
-		ApplicationContext context = new ClassPathXmlApplicationContext("bundle-context.xml");
-		context.getBean("SfVimServiceImpl");
-		System.out.println("TEST");
-		//Resource r = new ClassPathResource("bundle-context.xml");
-	
-	}
-*/
+	 * // TODO Cleanup : Written for testing public static void main(String[]
+	 * args) throws WBEMException { String url = "https://10.101.10.3:5989/";
+	 * String password = "Ibmx#3750c"; String user = "root";
+	 * 
+	 * // CIMHost cimHost = new CIMHostUser(url, user, password);
+	 * 
+	 * //SfCIMClientService cimClientService = new SfCIMClientService(cimHost);
+	 * 
+	 * //SfCIMService cimService = new SfCIMService(cimClientService); //
+	 * cimService.setCIMClient(cimClient); // cimService.setCimHost(cimHost);
+	 * 
+	 * //System.out.println(cimService.getAdapterVersions("vmnic6"));
+	 * //System.out.println(cimService.getNICCardInstance("vmnic6"));
+	 * 
+	 * 
+	 * ApplicationContext context = new
+	 * ClassPathXmlApplicationContext("bundle-context.xml");
+	 * context.getBean("SfVimServiceImpl"); System.out.println("TEST");
+	 * //Resource r = new ClassPathResource("bundle-context.xml");
+	 * 
+	 * }
+	 */
 	public WBEMClient getCIMClient() {
 		return this.cimClientService.getCimClient();
 	}
@@ -774,4 +769,5 @@ public class SfCIMService {
 
 		}
 	}
+
 }

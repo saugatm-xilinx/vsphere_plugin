@@ -2,7 +2,6 @@ package com.solarflare.vcp.services;
 
 import java.net.URL;
 
-import javax.cim.CIMInstance;
 import javax.cim.CIMObjectPath;
 
 import org.apache.commons.logging.Log;

@@ -2,7 +2,6 @@ package com.solarflare.vcp.model;
 
 import java.net.URL;
 
-import javax.cim.CIMInstance;
 import javax.cim.CIMObjectPath;
 
 import com.solarflare.vcp.cim.SfCIMService;

@@ -17,7 +17,6 @@ import com.solarflare.vcp.model.Adapter;
 import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.VMNIC;
 import com.solarflare.vcp.vim.connection.Connection;
-import com.solarflare.vcp.vim.connection.ConnectionImpl;
 import com.solarflare.vcp.vim.helpers.GetMOREF;
 import com.solarflare.vcp.vim.helpers.SfVimServiceHelper;
 import com.vmware.vim25.ArrayOfHostPciDevice;

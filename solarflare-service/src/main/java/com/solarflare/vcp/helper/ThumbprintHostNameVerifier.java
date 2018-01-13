@@ -2,12 +2,13 @@
 
 package com.solarflare.vcp.helper;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLSession;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSession;
 
 /**
  * Host name verifier by thumbprint

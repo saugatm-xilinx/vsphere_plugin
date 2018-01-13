@@ -1,8 +1,5 @@
 package com.solarflare.vcp.services;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,11 +13,7 @@ import javax.cim.CIMObjectPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sblim.cimclient.internal.util.MOF;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.solarflare.vcp.cim.CIMConstants;
 import com.solarflare.vcp.cim.CIMHost;
 import com.solarflare.vcp.cim.SfCIMClientService;
@@ -44,9 +37,7 @@ import com.solarflare.vcp.model.TaskInfo;
 import com.solarflare.vcp.model.TaskState;
 import com.solarflare.vcp.model.UpdateRequest;
 import com.solarflare.vcp.vim.SfVimService;
-import com.solarflare.vcp.vim.SfVimServiceImpl;
 import com.solarflare.vcp.vim.SimpleTimeCounter;
-import com.solarflare.vcp.vim.connection.ConnectionImpl;
 
 public class HostAdapterServiceImpl implements HostAdapterService {
 	private static final Log logger = LogFactory.getLog(HostAdapterServiceImpl.class);
@@ -68,17 +59,18 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		this.sfVimService = sfVimService;
 	}
 
-	public void init(){
+	public void init() {
 		logger.info("init method called ");
 		UpdateRequestProcessor updateRequestProcessor = UpdateRequestProcessor.getInstance();
 		updateRequestProcessor.init(threadPoolSize);
 	}
-	
-	public void shutdown(){
+
+	public void shutdown() {
 		logger.info("shutdown method called ");
 		UpdateRequestProcessor updateRequestProcessor = UpdateRequestProcessor.getInstance();
 		updateRequestProcessor.shutdown();
 	}
+
 	@Override
 	public List<Host> getHostList() throws Exception {
 		List<Host> hostList = null;
@@ -117,7 +109,8 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			taskInfo.setHostId(hostId);
 			taskManager.addTaskInfo(taskInfo);
 			CIMHost cimHost = sfVimService.getCIMHost(hostId);
-			//CIMHost cimHost = new SfVimServiceImpl().getCIMHost(hostId, "testingOnly");
+			// CIMHost cimHost = new SfVimServiceImpl().getCIMHost(hostId,
+			// "testingOnly");
 			SfCIMService cimService = new SfCIMService(new SfCIMClientService(cimHost));
 
 			// Call some CIM method for increasing session validity to 15 min
@@ -135,7 +128,8 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 					String latest = VCenterHelper.getLatestVersion(currentVersion, latestVersion);
 					if (latest.equals(latestVersion)) {
 						// update controller
-						logger.debug("Updating Controller of adapter " + adapter.getName() + "to version "+latestVersion);
+						logger.debug(
+								"Updating Controller of adapter " + adapter.getName() + "to version " + latestVersion);
 						URL fWImageURL = null; // for latest update this is null
 						UpdateRequest updateRequest = createUpdateRequest(adapter, cimService, taskInfo,
 								FwType.CONTROLLER, fWImageURL);
@@ -146,7 +140,8 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 					latestVersion = fwVersion.getBootROM();
 					latest = VCenterHelper.getLatestVersion(currentVersion, latestVersion);
 					if (latest.equals(latestVersion)) {
-						logger.debug("Updating BootROM of adapter " + adapter.getName() + "to version "+latestVersion);
+						logger.debug(
+								"Updating BootROM of adapter " + adapter.getName() + "to version " + latestVersion);
 						URL fWImageURL = null; // for latest update this is null
 						UpdateRequest updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.BOOTROM,
 								fWImageURL);
@@ -198,19 +193,22 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 
 			boolean controller = false;
 			boolean bootrom = false;
+			boolean isFwApplicable = false;
 			CIMInstance fwInstance = null;
 			if (FirmwareType.FIRMWARE_TYPE_MCFW.ordinal() == header.getType()) {
 				logger.debug("Solarflare:: Updating Controller");
 				fwInstance = cimService.getFirmwareSoftwareInstallationInstance();
 				controller = true;
+				isFwApplicable = true;
 			} else if (FirmwareType.FIRMWARE_TYPE_BOOTROM.ordinal() == header.getType()) {
 				// Get BootROM SF_SoftwareInstallationService instance
 				logger.debug("Solarflare:: Updating BootROM");
 				fwInstance = cimService.getBootROMSoftwareInstallationInstance();
 				bootrom = true;
+				isFwApplicable = true;
 			}
 
-			if (fwInstance != null) {
+			if (isFwApplicable && fwInstance != null) {
 
 				String tempFile = cimService.startFwImageSend(fwInstance);
 
@@ -221,7 +219,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 				// Call some CIM method for increasing session validity to 15
 				// min
 				cimService.getProperty();
-				
+
 				UpdateRequestProcessor requestProcessor = UpdateRequestProcessor.getInstance();
 				for (Adapter adapter : adapterList) {
 					if (isValidated(adapter, taskInfo)) {
@@ -242,7 +240,23 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 				}
 
 			} else {
-				logger.error("Fail to get CIM Firmware Instance");
+				String errMsg = null;
+				if (isFwApplicable) {
+					errMsg = "Fail to get CIM Firmware Instance";
+				} else {
+					errMsg = "Invalid Firmware File";
+
+				}
+
+				Status conntrollerStatus = new Status(TaskState.Error, errMsg, FwType.CONTROLLER);
+				Status bootROMStatus = new Status(TaskState.Error, errMsg, FwType.BOOTROM);
+				for (Adapter adapter : adapterList) {
+					AdapterTask aTask = getAdapterTask(taskInfo, adapter.getId());
+					aTask.setController(conntrollerStatus);
+					aTask.setBootROM(bootROMStatus);
+				}
+
+				logger.error(errMsg);
 			}
 
 		} catch (Exception e) {
@@ -271,40 +285,60 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 
 			URL fwImageURL = new URL(fwImagePath);
 			CIMHost cimHost = sfVimService.getCIMHost(hostId);
-			//CIMHost cimHost = new SfVimServiceImpl().getCIMHost(hostId, "testingOnly");
+			// CIMHost cimHost = new SfVimServiceImpl().getCIMHost(hostId,
+			// "testingOnly");
 			SfCIMService cimService = new SfCIMService(new SfCIMClientService(cimHost));
+			// Call some CIM method for increasing session validity to 15 min
+			cimService.getProperty();
 
 			boolean controller = false;
 			boolean bootrom = false;
 			boolean readComplete = false;
 			byte[] headerData = cimService.readData(fwImageURL, readComplete);
 			FileHeader header = cimService.getFileHeader(headerData);
-			logger.debug("Solarflare:: Header : "+header);
+			boolean isFwApplicable = false;
+			logger.debug("Solarflare:: Header : " + header);
 			if (FirmwareType.FIRMWARE_TYPE_MCFW.ordinal() == header.getType()) {
 				logger.debug("Solarflare:: Updating Controller");
 				controller = true;
+				isFwApplicable = true;
 			} else if (FirmwareType.FIRMWARE_TYPE_BOOTROM.ordinal() == header.getType()) {
 				logger.debug("Solarflare:: Updating BootROM");
 				bootrom = true;
+				isFwApplicable = true;
 			}
 
-			// Call some CIM method for increasing session validity to 15 min
-			cimService.getProperty();
-			
-			UpdateRequestProcessor requestProcessor = UpdateRequestProcessor.getInstance();
-			for (Adapter adapter : adapterList) {
-				if (isValidated(adapter, taskInfo)) {
-					UpdateRequest updateRequest = null;
-					if (controller) {
-						updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.CONTROLLER,
-								fwImageURL);
-					}
-					if (bootrom) {
-						updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.BOOTROM, fwImageURL);
-					}
+			if (isFwApplicable) {
 
-					requestProcessor.addUpdateRequest(updateRequest);
+				UpdateRequestProcessor requestProcessor = UpdateRequestProcessor.getInstance();
+				for (Adapter adapter : adapterList) {
+					if (isValidated(adapter, taskInfo)) {
+						UpdateRequest updateRequest = null;
+						if (controller) {
+							updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.CONTROLLER,
+									fwImageURL);
+						}
+						if (bootrom) {
+							updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.BOOTROM,
+									fwImageURL);
+						}
+
+						requestProcessor.addUpdateRequest(updateRequest);
+					}
 				}
+			} else {
+				String errMsg = null;
+				errMsg = "Invalid Firmware File";
+				Status conntrollerStatus = new Status(TaskState.Error, errMsg, FwType.CONTROLLER);
+				Status bootROMStatus = new Status(TaskState.Error, errMsg, FwType.BOOTROM);
+				for (Adapter adapter : adapterList) {
+					AdapterTask aTask = getAdapterTask(taskInfo, adapter.getId());
+					aTask.setController(conntrollerStatus);
+					aTask.setBootROM(bootROMStatus);
+				}
+
+				logger.error(errMsg);
+
 			}
 		} catch (Exception e) {
 			timer.stop();
@@ -438,7 +472,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 	}
 
 	private void setFirmwareVersions(Adapter adapter, SfCIMService cimService) throws Exception {
-		logger.info("Solarflare:: setFirmwareVersions for adapter : "+adapter.getName());
+		logger.info("Solarflare:: setFirmwareVersions for adapter : " + adapter.getName());
 		String deviceId = adapter.getChildren().get(0).getName();
 		Map<String, String> versions = cimService.getAdapterVersions(deviceId);
 
@@ -482,42 +516,38 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 
 		adapter.setLatestVersion(frmVesion);
 	}
-/*
-	//TODO : Clean up
-	public static void main(String[] args) throws Exception {
-		
-		FileInputStream fRead = new FileInputStream(new File("D:\\Projects\\SolarFlare\\adapterList.txt"));
-		byte[] ch = new byte[1925];
-		int numData = fRead.read(ch);
-		// System.out.println("numData : "+numData);
 
-		String adapterList = new String(ch);
-		// System.out.println("adapterList : "+adapterList);
-		// System.exit(0);
-		Gson gson = new Gson();
-		Type listType = new TypeToken<List<Adapter>>() {
-		}.getType();
-
-		List<Adapter> adapter = gson.fromJson(adapterList, listType);
-
-		ConnectionImpl conn = new ConnectionImpl("https://10.101.10.8/sdk", "msys@vsphere.local", "Msys@123", true);
-		conn._login();
-		SfVimServiceImpl service = new SfVimServiceImpl(conn, null);
-		
-		HostAdapterServiceImpl obj = new HostAdapterServiceImpl(service);
-		for (int i = 0; i < 5; i++) {
-			System.out.println("Updating : " + i);
-			String id = obj.updateFirmwareToLatest(adapter, "host-14");
-			System.out.println("--===============--> " + id);
-			// obj.updateFirmwareToLatest(adapter, "host-14");
-			// obj.updateFirmwareToLatest(adapter, "host-14");
-			// obj.customUpdateFirmwareFromURL(adapter, "host-14",
-			// "http://10.101.10.132/customFw/v6.2.5.1000/mcfw.dat");
-			// System.out.println("--------------------------------------------");
-			// obj.getHostAdapters("host-14");
-		}
-	}
-	*/
+	/*
+	 * //TODO : Clean up public static void main(String[] args) throws Exception
+	 * {
+	 * 
+	 * FileInputStream fRead = new FileInputStream(new
+	 * File("D:\\Projects\\SolarFlare\\adapterList.txt")); byte[] ch = new
+	 * byte[1925]; int numData = fRead.read(ch); //
+	 * System.out.println("numData : "+numData);
+	 * 
+	 * String adapterList = new String(ch); //
+	 * System.out.println("adapterList : "+adapterList); // System.exit(0); Gson
+	 * gson = new Gson(); Type listType = new TypeToken<List<Adapter>>() {
+	 * }.getType();
+	 * 
+	 * List<Adapter> adapter = gson.fromJson(adapterList, listType);
+	 * 
+	 * ConnectionImpl conn = new ConnectionImpl("https://10.101.10.8/sdk",
+	 * "msys@vsphere.local", "Msys@123", true); conn._login(); SfVimServiceImpl
+	 * service = new SfVimServiceImpl(conn, null);
+	 * 
+	 * HostAdapterServiceImpl obj = new HostAdapterServiceImpl(service); for
+	 * (int i = 0; i < 5; i++) { System.out.println("Updating : " + i); String
+	 * id = obj.updateFirmwareToLatest(adapter, "host-14");
+	 * System.out.println("--===============--> " + id); //
+	 * obj.updateFirmwareToLatest(adapter, "host-14"); //
+	 * obj.updateFirmwareToLatest(adapter, "host-14"); //
+	 * obj.customUpdateFirmwareFromURL(adapter, "host-14", //
+	 * "http://10.101.10.132/customFw/v6.2.5.1000/mcfw.dat"); //
+	 * System.out.println("--------------------------------------------"); //
+	 * obj.getHostAdapters("host-14"); } }
+	 */
 	private boolean isValidated(Adapter adapter, TaskInfo taskInfo) {
 		if (SFC9220_deviceID.equals(adapter.getDeviceId())) {
 			String adapterId = adapter.getId();

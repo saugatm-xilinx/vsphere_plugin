@@ -30,7 +30,6 @@ public class UpdateRequestProcessor {
 		
 		if (poolSize <= 0) {
 			poolSize = 1;
-			;
 		}
 		if (poolSize > DEFAULT_POOL_SIZE) {
 			poolSize = DEFAULT_POOL_SIZE;
@@ -47,7 +46,7 @@ public class UpdateRequestProcessor {
 				+ updateRequest.getFwType());
 		if (executor == null || executor.isShutdown() || executor.isTerminated()) {
 			logger.info("Thread pool is not active! Creating a new one..");
-			executor = Executors.newFixedThreadPool(1);
+			executor = Executors.newFixedThreadPool(DEFAULT_POOL_SIZE); // TODO this is not reachable 
 		}
 		UpdateRequestThread updateThread = new UpdateRequestThread();
 		updateThread.setUpdateRequest(updateRequest);
