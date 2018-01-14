@@ -6,7 +6,7 @@ import {HostComponent} from "./host.component";
 import {OverviewComponent} from "./overview/overview.component";
 import {FwupdateComponent} from "./fwupdate/fwupdate.component";
 import {ConfigComponent} from "./config/config.component";
-import {ClrAlertModule, ClrTabsModule} from "clarity-angular";
+import {ClrAlertModule, ClrFormsModule, ClrTabsModule} from "clarity-angular";
 import {RangePipe} from "../../range.pipe";
 import {ClrModalModule} from "clarity-angular";
 import {ClrDatagridModule} from "clarity-angular";
@@ -24,7 +24,8 @@ import {HostsService} from "../../services/hosts.service";
       ClrIconModule,
       FormsModule,
       ReactiveFormsModule,
-      ClrAlertModule
+      ClrAlertModule,
+      ClrFormsModule
   ],
   declarations: [HostComponent, OverviewComponent, FwupdateComponent, ConfigComponent, RangePipe],
     exports:[

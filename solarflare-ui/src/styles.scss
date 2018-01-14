@@ -84,3 +84,126 @@ span.adaptorName {
 .clr-dg-cell.datagrid-cell {
     text-indent: -5px;
 }
+
+
+.appLoader{
+    -webkit-box-direction: normal;
+    -webkit-box-flex: 0;
+    -webkit-box-orient: vertical;
+    background-color: rgb(238, 238, 238);
+    box-sizing: border-box;
+    color: rgb(86, 86, 86);
+    display: flex;
+    flex-basis: auto;
+    flex-direction: column;
+    flex-grow: 0;
+    flex-shrink: 0;
+    font-family: Metropolis, "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    font-size: 13.999919891357422px;
+    font-weight: normal;
+    min-height: 100%;
+    letter-spacing: normal;
+    line-height: 24px;
+    min-width: 48px;
+    order: -1;
+    padding-top: 24px;
+    transition-delay: 0s;
+    transition-duration: 0.2s;
+    transition-property: width;
+    transition-timing-function: ease-in-out;
+    width: 240px;
+    will-change: width;
+}
+
+.appLoaderContent{
+    -webkit-box-direction: normal;
+    -webkit-box-flex: 1;
+    -webkit-box-orient: vertical;
+  border-top: 1px solid rgba(86, 86, 86, 0.2);
+  box-sizing: border-box;
+    color: rgb(86, 86, 86);
+    display: flex;
+    flex-basis: auto;
+    flex-direction: column;
+    flex-grow: 1;
+    flex-shrink: 1;
+    font-family: Metropolis, "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    font-size: 13.999919891357422px;
+    font-weight: normal;
+    letter-spacing: normal;
+    line-height: 24px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-top: 12px;
+    width: 240px;
+    text-align: center;
+}
+
+.appLoaderButton{
+  -webkit-appearance: none;
+  -webkit-box-align: center;
+  -webkit-box-direction: normal;
+  -webkit-box-flex: 0;
+  -webkit-box-pack: start;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0);
+  border-image-outset: 0px;
+  border-image-repeat: stretch;
+  border-image-slice: 100%;
+  border-image-source: none;
+  border-image-width: 1;
+  border-radius: 0px;
+  border: 0px none rgb(0, 0, 0);
+  box-sizing: border-box;
+  color: rgb(0, 0, 0);
+  cursor: pointer;
+  display: flex;
+  flex-basis: 36px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  font-family: Metropolis, "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+  font-size: 13.999919891357422px;
+  font-stretch: normal;
+  font-style: normal;
+  font-variant-caps: normal;
+  font-weight: normal;
+  height: 36px;
+  justify-content: flex-start;
+  letter-spacing: normal;
+  line-height: 24px;
+  margin: -24px 0px 0px;
+  outline-offset: 0px;
+  overflow-x: visible;
+  overflow-y: visible;
+  padding: 0px;
+  text-align: center;
+  text-indent: 0px;
+  text-shadow: none;
+  text-transform: none;
+  width: 240px;
+  word-spacing: 0px;
+  writing-mode: horizontal-tb;
+}
+
+
+.hide{
+  display: none !important;
+}
+
+.tooltipConfig>span{
+  opacity: 1 !important;
+  visibility: inherit !important;
+  background: #c92100 !important;
+  min-width: 250px !important;
+}
+
+.debugMask{
+  padding-top: 15px;
+  display: block;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

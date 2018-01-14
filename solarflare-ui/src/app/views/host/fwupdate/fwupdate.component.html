@@ -32,8 +32,8 @@
                     Adapter Name
                 </th>
                 <th colspan="2" class="table-border-right">Controller Version</th>
-                <th colspan="2" class="table-border-right">Boot Rom Version</th>
-                <th colspan="2">UEFI Rom Version</th>
+                <th colspan="2" class="table-border-right">Boot ROM Version</th>
+                <th colspan="2">UEFI ROM Version</th>
             </tr>
             <tr>
                 <th class="table-border-right">Current</th>
@@ -97,8 +97,8 @@
         <clr-datagrid>
             <clr-dg-column>Adapter Name</clr-dg-column>
             <clr-dg-column>Controller Version</clr-dg-column>
-            <clr-dg-column>Boot Rom Version</clr-dg-column>
-            <clr-dg-column>UEFI Rom Version</clr-dg-column>
+            <clr-dg-column>Boot ROM Version</clr-dg-column>
+            <clr-dg-column>UEFI ROM Version</clr-dg-column>
 
             <clr-dg-column>Later Version Available</clr-dg-column>
 
@@ -440,7 +440,9 @@
             <span class="spinner spinner-lg" *ngIf="(adapterList|json) === '[]' && !getAdapterListErr ">
             Loading..
             </span>
-            <span class="text-danger" *ngIf="getAdapterListErr"><br/>Error occurred while fetching data</span>
+            <span class="text-danger" *ngIf="getAdapterListErr"><br/>
+                <clr-icon shape="error-standard" style="margin: 0 auto"></clr-icon>
+                Error occurred while fetching data</span>
         </div>
     </div>
 
@@ -452,8 +454,8 @@
             <clr-dg-column>Adapter Name</clr-dg-column>
             <clr-dg-column style="max-width: 200px">Firmware Family Version</clr-dg-column>
             <clr-dg-column>Controller Version</clr-dg-column>
-            <clr-dg-column>Boot Rom Version</clr-dg-column>
-            <clr-dg-column>UEFI Rom Version</clr-dg-column>
+            <clr-dg-column>Boot ROM Version</clr-dg-column>
+            <clr-dg-column>UEFI ROM Version</clr-dg-column>
 
             <clr-dg-row *clrDgItems="let ad of adapterList; let i = index" [clrDgItem]="ad">
                 <clr-dg-cell>

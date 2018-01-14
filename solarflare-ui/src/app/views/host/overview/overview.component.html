@@ -6,7 +6,7 @@
             <img src="../solarflare/assets/images/sf-logo.png" width="140px">
             <div style="text-align: right;">
                 <div class="btn-group">
-                    <button class="btn" (click)="getHostDetail()">Refresh</button>
+                    <button class="btn" (click)="hostDetail = {};getHostDetail()">Refresh</button>
                     <button class="btn btn-info">Help</button>
                 </div>
             </div>
@@ -16,9 +16,12 @@
 
     <div class="col-md-12">
         <div style="text-align: center">
-            <span class="spinner spinner-lg" *ngIf="(hostDetail|json) === '{}' ">
+            <span class="spinner spinner-lg" *ngIf="(hostDetail|json) === '{}' && !getOverviewErr ">
             Loading..
             </span>
+            <span class="text-danger" *ngIf="getOverviewErr"><br/>
+                <clr-icon shape="error-standard" style="margin: 0 auto"></clr-icon>
+                Error occurred while fetching data</span>
         </div>
 
         <div class="row" *ngIf="(hostDetail|json) !== '{}' ">

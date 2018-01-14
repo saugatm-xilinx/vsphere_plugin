@@ -1,37 +1,53 @@
 <!-- Top left floating icon used to toggle the dev UI components in all views -->
 <div *ngIf="!gs.isPluginMode()" style="float: left; position: absolute; z-index: 3;">
-   <a (click)="gs.toggleDevUI()" class="tooltip tooltip-sm tooltip-bottom-right"
-      role="tooltip" aria-haspopup="true" href="javascript://">
-      <clr-icon [attr.shape]="gs.showDevUI() ? 'remove' : 'plus-circle'" size="16"
-                [attr.class]="gs.showDevUI() ? 'is-inverse' : ''"></clr-icon>
-      <span class="tooltip-content">{{gs.showDevUI() ? "Remove dev UI" : "Show dev UI"}}</span>
-   </a>
+    <a (click)="gs.toggleDevUI()" class="tooltip tooltip-sm tooltip-bottom-right"
+       role="tooltip" aria-haspopup="true" href="javascript://">
+        <clr-icon [attr.shape]="gs.showDevUI() ? 'remove' : 'plus-circle'" size="16"
+                  [attr.class]="gs.showDevUI() ? 'is-inverse' : ''"></clr-icon>
+        <span class="tooltip-content">{{gs.showDevUI() ? "Remove dev UI" : "Show dev UI"}}</span>
+    </a>
 
 </div>
 
 <div class="main-container">
     <div class="content-container">
-        <clr-vertical-nav [clrVerticalNavCollapsible]="Collapsible">
+        <div class="appLoader" *ngIf="hosts.length === 0">
+            <button class="nav-trigger appLoaderButton" type="button">
+            </button>
+            <div class="appLoaderContent" *ngIf="!getHostsErr">
+                <span class="spinner spinner-inline" style="margin: 0 auto"></span>
+                    <span>
+                    Loading...
+                </span>
+            </div>
+            <div class="appLoaderContent" *ngIf="getHostsErr">
+                <clr-icon shape="error-standard" style="margin: 0 auto"></clr-icon>
+                <span>
+                    Error Occurred
+                </span>
+            </div>
+        </div>
+        <clr-vertical-nav *ngIf="hosts.length !== 0" [clrVerticalNavCollapsible]="Collapsible">
             <clr-vertical-nav-group *ngFor="let host of hosts"
-                    routerLink="/host/{{host.id}}" routerLinkActive="active">
+                                    routerLink="/host/{{host.id}}" routerLinkActive="active">
                 <clr-icon shape="host" clrVerticalNavIcon></clr-icon>
-                    {{host.name}}
+                {{host.name}}
                 <clr-vertical-nav-group-children>
-                    <div style="margin-left:6px;" >
-                    <clr-vertical-nav-group *ngFor="let adaptor of host.children"
-                                            routerLink="/adaptor/{{adaptor.id}}"
-                                            routerLinkActive="active">
-                        <img src="../solarflare/assets/images/adaptor.png" width="20px"/>
-                        <span class="adaptorName"> {{adaptor.name}} </span>
-                        <clr-vertical-nav-group-children>
-                            <a clrVerticalNavLink *ngFor="let nic of adaptor.children"
-                               routerLink="nic/{{nic.id}}"
-                               routerLinkActive="active">
-                                <img src="../solarflare/assets/images/port.png" width="15px"/>
-                                {{nic.name}}
-                            </a>
-                        </clr-vertical-nav-group-children>
-                    </clr-vertical-nav-group>
+                    <div style="margin-left:6px;">
+                        <clr-vertical-nav-group *ngFor="let adaptor of host.children"
+                                                routerLink="/adaptor/{{adaptor.id}}"
+                                                routerLinkActive="active">
+                            <img src="../solarflare/assets/images/adaptor.png" width="20px"/>
+                            <span class="adaptorName"> {{adaptor.name}} </span>
+                            <clr-vertical-nav-group-children>
+                                <a clrVerticalNavLink *ngFor="let nic of adaptor.children"
+                                   routerLink="nic/{{nic.id}}"
+                                   routerLinkActive="active">
+                                    <img src="../solarflare/assets/images/port.png" width="15px"/>
+                                    {{nic.name}}
+                                </a>
+                            </clr-vertical-nav-group-children>
+                        </clr-vertical-nav-group>
                     </div>
                 </clr-vertical-nav-group-children>
             </clr-vertical-nav-group>

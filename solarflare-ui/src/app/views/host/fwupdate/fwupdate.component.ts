@@ -14,8 +14,6 @@ import {Observable} from "rxjs/Observable";
     styleUrls: ['./fwupdate.component.scss']
 })
 export class FwupdateComponent implements OnInit {
-    subscription: Subscription;
-    public hostAdaptersListUrl = this.gs.getWebContextPath() + '/rest/services/hosts/';
     public latestUpdateModal = false;
     public customUpdateModal = false;
     public params = {};
@@ -51,14 +49,13 @@ export class FwupdateComponent implements OnInit {
             obs: null
         },
         selectedAdapters: [],
-        status: null
+        status: false
     };
     public getAdapterListErr = false;
 
     @ViewChild('fileInput') fileInput: ElementRef;
 
     constructor(private activatedRoute: ActivatedRoute,
-                private http: Http,
                 private gs: GlobalsService,
                 private fb: FormBuilder,
                 private inj: Injector,
@@ -108,7 +105,7 @@ export class FwupdateComponent implements OnInit {
                 obs: null
             },
             selectedAdapters: [],
-            status: null
+            status: false
         };
     }
 
@@ -437,11 +434,12 @@ export class FwupdateComponent implements OnInit {
 
     getLatestUpdateStatus(adapters: object, taskId: string) {
 
-        let obs = Observable.interval(1000)
+        let obs = Observable.interval(3000)
             .switchMap(() => this.hs.getStatus(taskId).map((data) => data))
             .subscribe((data) => {
                     if (this.status.status === true) {
                         this.status.status = false;
+                        this.processStatusLatest(data, adapters);
                         obs.unsubscribe();
                     }else{
                         this.processStatusLatest(data, adapters);
@@ -472,7 +470,7 @@ export class FwupdateComponent implements OnInit {
                     current++;
             }
 
-            if (total !== 0 && total === current)
+            if (total !== 0 && (this.status[a].output.length === (j + 1)) && total === current)
                 this.status.status = true;
         });
     }
@@ -521,11 +519,12 @@ export class FwupdateComponent implements OnInit {
 
     getCustomUpdateStatus(adapters: object, taskId: string) {
         this.getAdapterList();
-        let obs = Observable.interval(1000)
+        let obs = Observable.interval(3000)
             .switchMap(() => this.hs.getStatus(taskId).map((data) => data))
             .subscribe((data) => {
                     if (this.status.status === true) {
                         this.status.status = false;
+                        this.processStatusCustom(data, adapters);
                         obs.unsubscribe();
                     }else{
                         this.processStatusCustom(data, adapters);

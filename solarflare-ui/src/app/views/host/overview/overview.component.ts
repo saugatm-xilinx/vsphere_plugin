@@ -1,8 +1,6 @@
-import {Component, OnInit, OnDestroy} from '@angular/core';
-import {Router, ActivatedRoute, Params} from '@angular/router';
-import {Http} from "@angular/http";
+import {Component, OnInit} from '@angular/core';
+import { ActivatedRoute, Params} from '@angular/router';
 import {GlobalsService} from "../../../shared/globals.service";
-import {Subscription} from 'rxjs/Subscription';
 import {HostsService} from "../../../services/hosts.service";
 
 @Component({
@@ -12,19 +10,14 @@ import {HostsService} from "../../../services/hosts.service";
 })
 
 export class OverviewComponent implements OnInit {
-    subscription: Subscription;
     public params = {};
     public hostDetail = {};
+    public getOverviewErr = false;
 
     constructor(private activatedRoute: ActivatedRoute,
-                private http: Http,
                 public gs: GlobalsService,
                 private hs: HostsService) {
-        /*      this.activatedRoute.params.subscribe( (params : Params) => {
-                  this.params = params;
-                  console.log(this.params);
 
-              });*/
         this.activatedRoute.parent.params.subscribe((params: Params) => {
             this.params = params;
         });
@@ -35,6 +28,7 @@ export class OverviewComponent implements OnInit {
     }
 
     getHostDetail(){
+        this.getOverviewErr = false;
         this.hs.getHostDetails(this.params['id'])
             .subscribe(
                 data => {
@@ -42,6 +36,7 @@ export class OverviewComponent implements OnInit {
                 },
                 err => {
                     console.error(err);
+                    this.getOverviewErr = true;
                     //this.devMode();
                 }
             );

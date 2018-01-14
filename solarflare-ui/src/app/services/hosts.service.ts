@@ -109,4 +109,36 @@ export class HostsService {
             });
     }
 
+    public getConfiguration(hostId: string, url?: string) {
+
+        if (this.gs.isPluginMode()) {
+            url = this.hostDetailUrl + hostId + '/configuration/';
+        } else {
+            url = 'https://10.101.10.8/ui/solarflare/rest/services/hosts/' +
+                hostId + '/configuration/';
+        }
+
+        return this.http.get(url)
+            .map((response:Response) =>{
+                return response.json();
+            });
+
+    }
+
+    public putConfiguration(hostId: string, payload: object, url?: string) {
+
+        if (this.gs.isPluginMode()) {
+            url = this.hostDetailUrl + hostId + '/configuration/';
+        } else {
+            url = 'https://10.101.10.8/ui/solarflare/rest/services/hosts/' +
+                hostId + '/configuration/';
+        }
+
+        return this.http.post(url, payload)
+            .map((response:Response) =>{
+                return response.json();
+            });
+
+    }
+
 }

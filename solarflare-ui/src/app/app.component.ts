@@ -1,9 +1,7 @@
 import {Component, Injector, ChangeDetectorRef} from "@angular/core";
-
 import {GlobalsService, RefreshService, I18nService} from "./shared/index";
 import {ActionDevService} from "./services/testing/action-dev.service";
 import {AppMainService} from "./services/app-main.service";
-import {Http} from "@angular/http";
 
 @Component({
     selector: "my-app",
@@ -15,13 +13,13 @@ import {Http} from "@angular/http";
 export class AppComponent {
     public hosts = [];
     public Collapsible = true;
+    public getHostsErr = false;
 
     constructor(public  gs: GlobalsService,
                 private injector: Injector,
                 private refreshService: RefreshService,
                 private i18nService: I18nService,
                 private changeDetector: ChangeDetectorRef,
-                private http: Http,
                 private as: AppMainService) {
 
         // Refresh handler to be used in plugin mode
@@ -38,7 +36,11 @@ export class AppComponent {
     }
 
     ngOnInit(): void {
+        this.getHosts();
+    }
 
+    getHosts() {
+        this.getHostsErr = false;
         this.as.getHosts()
             .subscribe(
                 data => {
@@ -46,12 +48,13 @@ export class AppComponent {
                 },
                 err => {
                     console.error(err);
-                    //this.devMode();
+                    //setTimeout(this.devMode(),500);
+                    this.getHostsErr = true;
                 }
             );
     }
 
-    devMode(){
+    devMode() {
         this.hosts = [{
             "type": "HOST",
             "id": "host-9",

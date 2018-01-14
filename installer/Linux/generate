@@ -1,0 +1,101 @@
+#!/bin/bash
+#
+# Copyright 2017 Solarflare
+#
+# Author: Ashish Koushik (ashish.koushik@msystechnologies.com)
+#
+# Description:
+# This script builds both rpm's and deb's for VCP.
+#
+
+# ----------------------------------------------------------------------------
+#   Load Current Dir in a var.
+# ----------------------------------------------------------------------------
+#
+current_dir=$(dirname `readlink -f $0`)
+# ----------------------------------------------------------------------------
+
+
+# ----------------------------------------------------------------------------
+#   Installer Argument Count Check.
+#   Expected input form user are int or float numericals for software version
+# ----------------------------------------------------------------------------
+#
+if [ "$#" -ne 2 ]; then
+  echo 'Runtime arguments were found to be missing.'
+  echo 'Please re-run the generator with appropriate values'
+  echo ''
+  echo '$ ./generate <vcp-version> <installer-release-version>'
+  echo 'Example: $ ./generate 2.0 1.0 '
+  echo ''
+  echo 'Note: Release version should always be incremental for each build'
+  echo ''
+  exit 1
+fi
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+#   Installer Argument Validity Check.
+#   Expected input form user are int or float numericals for software version
+# ----------------------------------------------------------------------------
+#
+test='^[0-9]+([.][0-9]+)?$'
+
+if ! [[ $1 =~ $test && $2 =~ $test ]]; then
+  echo "Expected number for both Software and Build Version"
+  echo "Example: '2.9' "
+  exit 1
+fi
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+#   Create and establish required directory structure for building RPM.
+# ----------------------------------------------------------------------------
+#
+mkdir -p $current_dir/RPM/src/vcp/var/lib/tomcat/webapps
+mkdir -p $current_dir/RPM/src/vcp/usr/bin
+# ----------------------------------------------------------------------------
+
+
+# ----------------------------------------------------------------------------
+#   Create and establish required directory structure for,
+#   Logging RPM and DEB build process.
+# ----------------------------------------------------------------------------
+#
+mkdir -p $current_dir/build/logs
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+#   Copy all required files from parent-source to src directories for building.
+# ----------------------------------------------------------------------------
+#
+echo $current_dir/RPM/src/vcp/var/lib/tomcat/webapps \
+     | xargs -n 1 cp -R source/vcp/*
+
+echo $current_dir/RPM/src/vcp/usr/bin \
+     | xargs -n 1 cp -R source/utility/*
+
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+#   Copy all required files from parent-source to src directories for building.
+# ----------------------------------------------------------------------------
+#
+chmod a+x $current_dir/RPM/buildrpm.sh 
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+#   Build RM and check logs parent-dir/build/logs.
+# ----------------------------------------------------------------------------
+#
+cd $current_dir/RPM
+echo "Building RPM's... Please Wait..."
+./buildrpm.sh $1 $2 > $current_dir/build/logs/rpm_`date | tr ' ' '_'`.log 2>&1
+
+if [ $? -ne 0 ]; then
+  echo "Oops! Looks like Enterprise Linux build (rpm) was a failure."
+  echo "Use '$ ./generate <ver> <rel>' "
+  echo "Check build/logs for more details"
+fi
+# ----------------------------------------------------------------------------
+exit 0

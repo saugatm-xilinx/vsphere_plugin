@@ -1,3 +1,258 @@
-<p>
-  config works!
-</p>
+<clr-modal [clrModalSize]="'md'" [(clrModalOpen)]="submitted">
+    <h3 class="modal-title">Confirm Restart</h3>
+    <div class="modal-body">
+        <h6>Driver needs to be restarted to see the effect of the changes</h6>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-outline" type="button"
+                (click)="submitted = false">Cancel
+        </button>
+        <button class="btn btn-primary" type="button"
+                (click)="hostConfig.get('restart').setValue(true);onSubmit(hostConfig.value)">Restart
+        </button>
+    </div>
+</clr-modal>
+
+<div class="row">
+
+    <div class="col-md-12">
+
+        <div style="padding:20px;" class="container-fluid">
+            <img src="../solarflare/assets/images/sf-logo.png" width="140px">
+            <div style="text-align: right;">
+                <div class="btn-group">
+                    <button class="btn" (click)="getConfiguration()">Refresh</button>
+                    <button class="btn btn-info">Help</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-md-12">
+        <div style="text-align: center">
+            <span class="spinner spinner-lg" *ngIf="!err.getConfiguration && (config|json) === '{}'">
+            Loading..
+            </span>
+            <span class="text-danger" *ngIf="err.getConfiguration"><br/>
+                <clr-icon shape="error-standard" style="margin: 0 auto"></clr-icon>
+                Error occurred while fetching data</span>
+        </div>
+
+        <div *ngIf="(config|json) !== '{}' ">
+            <form class="form" [formGroup]="hostConfig" (ngSubmit)="submitted = true;" >
+            <section class="form-block">
+                <label>Net Queue</label>
+                <div formGroupName="netQueue">
+                    <div class="form-group row" style="min-height: 30px; ">
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                            <label for="netQueueCount" style="padding-top: 12px;">Net Queue Count</label>
+                            <div style="font-size: 0.76em;">Count includes default queue</div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                            <label for="netQueueCount"
+                                   aria-haspopup="true"
+                                   role="tooltip"
+                                   class="tooltip tooltip-validation tooltip-sm"
+                                   [class.invalid]="hostConfig.get('netQueue').get('netQueueCount').invalid
+                        && (hostConfig.get('netQueue').get('netQueueCount').dirty ||
+                        hostConfig.get('netQueue').get('netQueueCount').touched)"
+                                   [class.tooltipConfig]="hostConfig.get('netQueue').get('netQueueCount').invalid
+                        && (hostConfig.get('netQueue').get('netQueueCount').dirty ||
+                        hostConfig.get('netQueue').get('netQueueCount').touched)">
+                                <span class="tooltip-content">
+                                    Net Queue Count value required
+                                </span>
+                            </label>
+                            <div class="btn-group">
+                                <button class="btn" id="netQueueCountbtn" (click)="btn.netQueue.count = true;"
+                                        *ngIf="!btn.netQueue.count">
+                                    {{hostConfig.get('netQueue').get('netQueueCount').value}}
+                                </button>
+                                <input formControlName="netQueueCount" id="netQueueCount"
+                                       style="width: 40px;text-align: center;"
+                                       *ngIf="btn.netQueue.count"
+                                       type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row" style="min-height: 30px; ">
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                            <label for="qrss" style="padding-top: 12px;">RSS</label>
+                            <div style="font-size: 0.76em;">Value of 1 disables RSS</div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                            <label for="qrss"
+                                   aria-haspopup="true"
+                                   role="tooltip"
+                                   class="tooltip tooltip-validation tooltip-sm"
+                                   [class.invalid]="(hostConfig.get('netQueue').get('rss').invalid
+                        && (hostConfig.get('netQueue').get('rss').dirty ||
+                        hostConfig.get('netQueue').get('rss').touched)) && !hostConfig.get('netQueue').get('maxNumpCPU').value"
+                                   [class.tooltipConfig]="(hostConfig.get('netQueue').get('rss').invalid
+                        && (hostConfig.get('netQueue').get('rss').dirty ||
+                        hostConfig.get('netQueue').get('rss').touched)) && !hostConfig.get('netQueue').get('maxNumpCPU').value">
+                                <span class="tooltip-content">
+                                    Value of 1 disables RSS or select Max number of vCPU's
+                                </span>
+                            </label>
+                            <div class="btn-group">
+                                <button class="btn" id="netCountQrss" (click)="btn.netQueue.rss = true;"
+                                        *ngIf="!btn.netQueue.rss"
+                                        [disabled]="hostConfig.get('netQueue').get('maxNumpCPU').value">
+                                    {{hostConfig.get('netQueue').get('rss').value}}
+                                </button>
+                                <input formControlName="rss" id="qrss"
+                                       style="width: 40px;text-align: center;"
+                                       *ngIf="btn.netQueue.rss"
+                                       type="number"
+                                       [attr.disabled]="hostConfig.get('netQueue').get('maxNumpCPU').value?'true':null">
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                            <div class="checkbox-inline" style="padding-top: 15px;">
+                                <input type="checkbox" class="checkbox" formControlName="maxNumpCPU" id="maxNumpCPU">
+                                <label for="maxNumpCPU">Max number of pCPU</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="form-block">
+                <label>Debugging</label>
+                <div formGroupName="debuggingMask">
+                    <div class="form-group row" style="min-height: 30px; ">
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <div class="checkbox-inline debugMask">
+                                Debug Mask
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <div class="checkbox-inline debugMask">
+                                <input type="checkbox" class="checkbox" formControlName="driver" id="driver">
+                                <label for="driver">Driver</label>
+                            </div>
+                            <div class="checkbox-inline debugMask">
+                                <input type="checkbox" class="checkbox" formControlName="utils" id="utils">
+                                <label for="utils">Utils</label>
+                            </div>
+                            <div class="checkbox-inline debugMask">
+                                <input type="checkbox" class="checkbox" formControlName="mgmt" id="mgmt">
+                                <label for="mgmt">Management</label>
+                            </div>
+                            <div class="checkbox-inline debugMask">
+                                <input type="checkbox" class="checkbox" formControlName="uplink" id="uplink">
+                                <label for="uplink">Uplink</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <div class="checkbox-inline debugMask">
+                                <input type="checkbox" class="checkbox" formControlName="transmit" id="transmit">
+                                <label for="transmit">Transmit</label>
+                            </div>
+                            <div class="checkbox-inline debugMask">
+                                <input type="checkbox" class="checkbox" formControlName="receive" id="receive">
+                                <label for="receive">Receive</label>
+                            </div>
+                            <div class="checkbox-inline debugMask">
+                                <input type="checkbox" class="checkbox" formControlName="hardware" id="hardware">
+                                <label for="hardware">Hardware</label>
+                            </div>
+                            <div class="checkbox-inline debugMask">
+                                <input type="checkbox" class="checkbox" formControlName="eventQueue" id="eventqueue">
+                                <label for="eventqueue">Event Queue</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <div class="checkbox-inline debugMask">
+                                <input type="checkbox" class="checkbox" formControlName="rss" id="rss">
+                                <label for="rss">RSS</label>
+                            </div>
+                            <div class="checkbox-inline debugMask">
+                                <input type="checkbox" class="checkbox" formControlName="port" id="port">
+                                <label for="port">Port</label>
+                            </div>
+                            <div class="checkbox-inline debugMask">
+                                <input type="checkbox" class="checkbox" formControlName="interrupt" id="interrupt">
+                                <label for="interrupt">Interrupt</label>
+                            </div>
+                            <div class="checkbox-inline debugMask">
+                                <input type="checkbox" class="checkbox" formControlName="commonCode" id="commonCode">
+                                <label for="commonCode">Common Code</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="form-block">
+                <label>Debugging</label>
+                <div formGroupName="overlay">
+                    <div class="form-group row" style="min-height: 30px; ">
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <div class="checkbox-inline debugMask">
+                                VxLAN Offload
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <div class="checkbox-inline debugMask">
+                                    <div class="radio">
+                                        <input type="radio" formControlName="vxlanOffloadEnable"
+                                               name="vxlanOffloadEnable" [value]="true" id="vxlanOffloadEnable">
+                                        <label for="vxlanOffloadEnable">Enable</label>
+                                    </div>
+                                <div class="radio">
+                                    <input type="radio" formControlName="vxlanOffloadEnable"
+                                           name="vxlanOffloadEnable" [value]="false" id="vxlanOffloadDisable">
+                                    <label for="vxlanOffloadDisable">Disable</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row" style="min-height: 30px; ">
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <div class="checkbox-inline debugMask">
+                                GENEVE Offload
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <div class="checkbox-inline debugMask">
+                                <div class="radio">
+                                    <input type="radio" formControlName="geneveOffloadEnable"
+                                           name="geneveOffloadEnable" [value]="true" id="geneveOffloadEnable">
+                                    <label for="geneveOffloadEnable">Enable</label>
+                                </div>
+                                <div class="radio">
+                                    <input type="radio" formControlName="geneveOffloadEnable"
+                                           name="geneveOffloadEnable" [value]="false" id="geneveOffloadDisable">
+                                    <label for="geneveOffloadDisable">Disable</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="form-block">
+                <div style="display: flex; justify-content: space-between; width: 70%;margin: 0 auto;">
+                    <button class="btn btn-outline-primary"
+                            type="button" [disabled]="submitted" (click)="restoreConfig()" >Restore
+                    </button>
+                    <button class="btn btn-outline-secondary"
+                            type="button" [disabled]="submitted" (click)="defaultConfig()" >Defaults
+                    </button>
+                    <button class="btn btn-primary"
+                            type="submit"
+                            [disabled]="submitted || (!hostConfig.dirty || hostConfig.invalid)" >Apply
+                    </button>
+                </div>
+                <div style=" width: 90%;margin: 0 auto; text-align: right;"
+                     *ngIf="!(submitted || (!hostConfig.dirty || hostConfig.invalid))">
+                    <span style="font-size: smalller;">
+                        You need to apply for changes to take effect
+                    </span>
+                </div>
+            </section>
+        </form>
+        </div>
+    </div>
+
+</div>

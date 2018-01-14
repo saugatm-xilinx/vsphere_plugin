@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+if [[ $(id -u) -ne 0 ]] ; then echo "Please run as root" ; exit 1 ; fi
+
+
+function usage()
+{
+    echo "Please run this command using an argument: --ip <IP_ADDRESS>"
+    echo "e.g. sf_vcp_register --ip 192.145.1.3"
+}
+
+if [[ $# -eq 0 ]]; then usage ; exit 1; fi
+
+PARAM=`echo $1`
+VALUE=`echo $2`
+
+case $PARAM in
+    -h | --help)
+        usage
+        exit 1
+        ;;
+    --ip)
+        IP_ADDRESS=$VALUE
+        ;;
+    *)
+        echo "ERROR: unknown parameter \"$PARAM\""
+        usage
+        exit 1
+        ;;
+esac
+shift
+
+if [[ "$IP_ADDRESS" == "" ]]; then
+   usage
+   exit 1
+fi
+
+sed -i -e "s/pluginHost=.*/pluginHost=$IP_ADDRESS/" /var/lib/tomcat/webapps/plugin-registration/WEB-INF/registerPlugin.properties
+
+if [ $? -ne 0 ]; then
+  echo "Oops! Please contact your administrator "
+  exit 1
+fi
+
+echo "Please visit http://$IP_ADDRESS/plugin-registration/registration.html to register the plugin"
+
+systemctl restart tomcat
+
+exit 0
