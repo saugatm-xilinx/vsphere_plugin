@@ -15,7 +15,7 @@ import com.solarflare.vcp.model.VMNIC;
 
 public class DummayService implements HostAdapterService {
 
-	static List<HostConfiguration> hostconfig = new ArrayList<>();
+	static final List<HostConfiguration> hostconfig = new ArrayList<>();
 	
 	@Override
 	public List<Host> getHostList() throws Exception {
@@ -68,9 +68,10 @@ public class DummayService implements HostAdapterService {
 	@Override
 	public HostConfiguration getHostConfigurations(String hostId) throws Exception {
 
-		HostConfiguration hostConfiguration = new HostConfiguration();
+		HostConfiguration hostConfiguration = null;
 		if(hostconfig.size() == 0 )
 		{
+			hostConfiguration = new HostConfiguration();
 			NetQueue netQueue = new NetQueue();
 			netQueue.setNetQueueCount(8);
 			netQueue.setRss(4);

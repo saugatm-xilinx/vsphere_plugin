@@ -12,6 +12,14 @@ public class HostConfiguration implements Serializable {
 	private NetQueue netQueue;
 	private Debugging debuggingMask;
 	private Overlay overlay;
+	private boolean restart;
+	
+	public boolean isRestart() {
+		return restart;
+	}
+	public void setRestart(boolean restart) {
+		this.restart = restart;
+	}
 	public NetQueue getNetQueue() {
 		return netQueue;
 	}
@@ -25,16 +33,19 @@ public class HostConfiguration implements Serializable {
 	public void setOverlay(Overlay overlay) {
 		this.overlay = overlay;
 	}
-	@Override
-	public String toString() {
-		return "HostConfiguration [netQueue=" + netQueue + ", debugging=" + debuggingMask + ", overlay=" + overlay + "]";
-	}
+	
 	public Debugging getDebuggingMask() {
 		return debuggingMask;
 	}
 	public void setDebuggingMask(Debugging debuggingMask) {
 		this.debuggingMask = debuggingMask;
 	}
+	@Override
+	public String toString() {
+		return "HostConfiguration [netQueue=" + netQueue + ", debuggingMask=" + debuggingMask + ", overlay=" + overlay
+				+ ", restart=" + restart + "]";
+	}
+	
 	
 	
 }

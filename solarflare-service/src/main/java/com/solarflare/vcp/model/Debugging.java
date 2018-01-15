@@ -2,89 +2,97 @@ package com.solarflare.vcp.model;
 
 public class Debugging {
 
-	private boolean isDriver;
-	private boolean isUtils;
-	private boolean isMgmt;
-	private boolean isUplink;
-	private boolean isTransmit;
-	private boolean isReceive;
-	private boolean isHardware;
-	private boolean isEventQueue;
-	private boolean isRSS;
-	private boolean isPort;
-	private boolean isInterrupt;
-	private boolean isCommonCode;
+	private boolean driver;
+	private boolean utils;
+	private boolean mgmt;
+	private boolean uplink;
+	private boolean transmit;
+	private boolean receive;
+	private boolean hardware;
+	private boolean eventQueue;
+	private boolean rss;
+	private boolean port;
+	private boolean interrupt;
+	private boolean commonCode;
 	public boolean isDriver() {
-		return isDriver;
+		return driver;
 	}
-	public void setDriver(boolean isDriver) {
-		this.isDriver = isDriver;
+	public void setDriver(boolean driver) {
+		this.driver = driver;
 	}
 	public boolean isUtils() {
-		return isUtils;
+		return utils;
 	}
-	public void setUtils(boolean isUtils) {
-		this.isUtils = isUtils;
+	public void setUtils(boolean utils) {
+		this.utils = utils;
 	}
 	public boolean isMgmt() {
-		return isMgmt;
+		return mgmt;
 	}
-	public void setMgmt(boolean isMgmt) {
-		this.isMgmt = isMgmt;
+	public void setMgmt(boolean mgmt) {
+		this.mgmt = mgmt;
 	}
 	public boolean isUplink() {
-		return isUplink;
+		return uplink;
 	}
-	public void setUplink(boolean isUplink) {
-		this.isUplink = isUplink;
+	public void setUplink(boolean uplink) {
+		this.uplink = uplink;
 	}
 	public boolean isTransmit() {
-		return isTransmit;
+		return transmit;
 	}
-	public void setTransmit(boolean isTransmit) {
-		this.isTransmit = isTransmit;
+	public void setTransmit(boolean transmit) {
+		this.transmit = transmit;
 	}
 	public boolean isReceive() {
-		return isReceive;
+		return receive;
 	}
-	public void setReceive(boolean isReceive) {
-		this.isReceive = isReceive;
+	public void setReceive(boolean receive) {
+		this.receive = receive;
 	}
 	public boolean isHardware() {
-		return isHardware;
+		return hardware;
 	}
-	public void setHardware(boolean isHardware) {
-		this.isHardware = isHardware;
+	public void setHardware(boolean hardware) {
+		this.hardware = hardware;
 	}
 	public boolean isEventQueue() {
-		return isEventQueue;
+		return eventQueue;
 	}
-	public void setEventQueue(boolean isEventQueue) {
-		this.isEventQueue = isEventQueue;
+	public void setEventQueue(boolean eventQueue) {
+		this.eventQueue = eventQueue;
 	}
-	public boolean isRSS() {
-		return isRSS;
+	public boolean isRss() {
+		return rss;
 	}
-	public void setRSS(boolean isRSS) {
-		this.isRSS = isRSS;
+	public void setRss(boolean rss) {
+		this.rss = rss;
 	}
 	public boolean isPort() {
-		return isPort;
+		return port;
 	}
-	public void setPort(boolean isPort) {
-		this.isPort = isPort;
-	}
-	public boolean isCommonCode() {
-		return isCommonCode;
-	}
-	public void setCommonCode(boolean isCommonCode) {
-		this.isCommonCode = isCommonCode;
+	public void setPort(boolean port) {
+		this.port = port;
 	}
 	public boolean isInterrupt() {
-		return isInterrupt;
+		return interrupt;
 	}
-	public void setInterrupt(boolean isInterrupt) {
-		this.isInterrupt = isInterrupt;
+	public void setInterrupt(boolean interrupt) {
+		this.interrupt = interrupt;
 	}
+	public boolean isCommonCode() {
+		return commonCode;
+	}
+	public void setCommonCode(boolean commonCode) {
+		this.commonCode = commonCode;
+	}
+	@Override
+	public String toString() {
+		return "Debugging [driver=" + driver + ", utils=" + utils + ", mgmt=" + mgmt + ", uplink=" + uplink
+				+ ", transmit=" + transmit + ", receive=" + receive + ", hardware=" + hardware + ", eventQueue="
+				+ eventQueue + ", rss=" + rss + ", port=" + port + ", interrupt=" + interrupt + ", commonCode="
+				+ commonCode + "]";
+	}
+	
 	
 }

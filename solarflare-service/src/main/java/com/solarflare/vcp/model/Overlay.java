@@ -2,25 +2,24 @@ package com.solarflare.vcp.model;
 
 public class Overlay {
 	
-	private boolean isVxlanOffloadEnable;
-	private boolean isGeneveOffloadEnable;
-	
+	private boolean vxlanOffloadEnable;
+	private boolean geneveOffloadEnable;
 	public boolean isVxlanOffloadEnable() {
-		return isVxlanOffloadEnable;
+		return vxlanOffloadEnable;
 	}
-	public void setVxlanOffloadEnable(boolean isVxlanOffloadEnable) {
-		this.isVxlanOffloadEnable = isVxlanOffloadEnable;
+	public void setVxlanOffloadEnable(boolean vxlanOffloadEnable) {
+		this.vxlanOffloadEnable = vxlanOffloadEnable;
 	}
 	public boolean isGeneveOffloadEnable() {
-		return isGeneveOffloadEnable;
+		return geneveOffloadEnable;
 	}
-	public void setGeneveOffloadEnable(boolean isGeneveOffloadEnable) {
-		this.isGeneveOffloadEnable = isGeneveOffloadEnable;
+	public void setGeneveOffloadEnable(boolean geneveOffloadEnable) {
+		this.geneveOffloadEnable = geneveOffloadEnable;
 	}
 	@Override
 	public String toString() {
-		return "Overlay [isVxlanOffloadEnable=" + isVxlanOffloadEnable + ", isGeneveOffloadEnable="
-				+ isGeneveOffloadEnable + "]";
+		return "Overlay [vxlanOffloadEnable=" + vxlanOffloadEnable + ", geneveOffloadEnable=" + geneveOffloadEnable
+				+ "]";
 	}
 	
 	

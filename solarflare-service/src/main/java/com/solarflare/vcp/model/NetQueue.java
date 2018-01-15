@@ -4,7 +4,7 @@ public class NetQueue {
 
 	private int netQueueCount;
 	private int rss;
-	private boolean isMaxNumCPU;
+	private boolean maxNumpCPU;
 	
 	
 	public int getNetQueueCount() {
@@ -20,13 +20,15 @@ public class NetQueue {
 		this.rss = rss;
 	}
 	public boolean isMaxNumpCPU() {
-		return isMaxNumCPU;
+		return maxNumpCPU;
 	}
-	public void setMaxNumpCPU(boolean isMaxNumpCPU) {
-		this.isMaxNumCPU = isMaxNumpCPU;
+	public void setMaxNumpCPU(boolean maxNumpCPU) {
+		this.maxNumpCPU = maxNumpCPU;
 	}
 	@Override
 	public String toString() {
-		return "NetQueue [netQueueCount=" + netQueueCount + ", rss=" + rss + ", isMaxNumpCPU=" + isMaxNumCPU + "]";
+		return "NetQueue [netQueueCount=" + netQueueCount + ", rss=" + rss + ", maxNumpCPU=" + maxNumpCPU + "]";
 	}
+	
+	
 }
