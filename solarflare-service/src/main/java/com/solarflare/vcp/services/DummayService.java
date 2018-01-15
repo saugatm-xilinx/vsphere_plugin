@@ -1,7 +1,9 @@
 package com.solarflare.vcp.services;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.solarflare.vcp.model.Adapter;
 import com.solarflare.vcp.model.AdapterOverview;
@@ -15,7 +17,7 @@ import com.solarflare.vcp.model.VMNIC;
 
 public class DummayService implements HostAdapterService {
 
-	static final List<HostConfiguration> hostconfig = new ArrayList<>();
+	static final Map<String,HostConfiguration> hostconfig = new HashMap<>();
 	
 	@Override
 	public List<Host> getHostList() throws Exception {
@@ -90,14 +92,14 @@ public class DummayService implements HostAdapterService {
 		}
 		else
 		{
-			return hostconfig.get(0);
+			return hostconfig.get("1");
 		}
 		return hostConfiguration;
 	}
 
 	@Override
 	public void updateHostConfigurations(HostConfiguration hostConfigurationRequest) throws Exception {
-		hostconfig.add(hostConfigurationRequest);
+		hostconfig.put("1",hostConfigurationRequest);
 	}
 	
 	@Override

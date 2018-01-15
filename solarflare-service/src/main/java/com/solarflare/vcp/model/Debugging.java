@@ -14,6 +14,14 @@ public class Debugging {
 	private boolean port;
 	private boolean interrupt;
 	private boolean commonCode;
+	private boolean filter;
+	
+	public boolean isFilter() {
+		return filter;
+	}
+	public void setFilter(boolean filter) {
+		this.filter = filter;
+	}
 	public boolean isDriver() {
 		return driver;
 	}
@@ -86,13 +94,13 @@ public class Debugging {
 	public void setCommonCode(boolean commonCode) {
 		this.commonCode = commonCode;
 	}
+	
 	@Override
 	public String toString() {
 		return "Debugging [driver=" + driver + ", utils=" + utils + ", mgmt=" + mgmt + ", uplink=" + uplink
 				+ ", transmit=" + transmit + ", receive=" + receive + ", hardware=" + hardware + ", eventQueue="
 				+ eventQueue + ", rss=" + rss + ", port=" + port + ", interrupt=" + interrupt + ", commonCode="
-				+ commonCode + "]";
+				+ commonCode + ", filter=" + filter + "]";
 	}
-	
 	
 }
