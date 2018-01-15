@@ -26,7 +26,8 @@ export class ConfigComponent implements OnInit {
             "port": false,
             "interrupt": false,
             "commonCode": false,
-            "driver": false
+            "driver": false,
+            "filter": false
         },
         "overlay": {"vxlanOffloadEnable": true, "geneveOffloadEnable": true},
         "restart": false
@@ -72,7 +73,8 @@ export class ConfigComponent implements OnInit {
                 "port": false,
                 "interrupt": false,
                 "commonCode": false,
-                "driver": true
+                "driver": true,
+                "filter": false
             },
             "overlay": {"vxlanOffloadEnable": true, "geneveOffloadEnable": true},
             "restart": false
@@ -116,26 +118,6 @@ export class ConfigComponent implements OnInit {
             );
     }
 
-    devMode() {
-        this.devModeConfig = {
-            "netQueue": {"netQueueCount": 8, "rss": 4, "maxNumpCPU": false},
-            "debugging": {
-                "maskUtils": true,
-                "maskMgmt": false,
-                "maskUplink": false,
-                "maskTransmit": false,
-                "maskReceive": true,
-                "maskHardware": false,
-                "maskEventQueue": false,
-                "maskRSS": false,
-                "maskPort": false,
-                "maskIntrupt": false,
-                "maskCommonCode": false,
-                "maskDriver": false
-            },
-            "overlay": {"vxlanOffloadEnable": true, "geneveOffloadEnable": true}
-        };
-    }
 
     createConfigForm() {
         this.hostConfig = new FormGroup({
@@ -156,7 +138,8 @@ export class ConfigComponent implements OnInit {
                 port: new FormControl('', Validators.required),
                 interrupt: new FormControl('', Validators.required),
                 commonCode: new FormControl('', Validators.required),
-                driver: new FormControl('', Validators.required)
+                driver: new FormControl('', Validators.required),
+                filter: new FormControl('', Validators.required)
             }),
             overlay: new FormGroup({
                 vxlanOffloadEnable: new FormControl('', Validators.required),
