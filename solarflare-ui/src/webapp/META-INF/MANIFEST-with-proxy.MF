@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: solarflare-ui
+Bundle-SymbolicName: com.solarflare.vcp.solarflare-ui
+Bundle-Version: 1.0.0
+Bundle-Vendor: VMware
+Web-ContextPath: vsphere-client/solarflare
+Import-Package: org.mitre.dsmiley.httpproxy

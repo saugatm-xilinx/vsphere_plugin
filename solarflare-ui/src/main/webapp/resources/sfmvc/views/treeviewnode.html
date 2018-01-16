@@ -1,7 +1,0 @@
-<ul>
-	<li ng-repeat="node in node.$scope.nodeChildren" ng-class="headClass(node)">
-	<i class="tree-has-children" ng-class="arrowClass(node)" ng-click="selectNodeHead(node)"></i>
-		<div class="tree-label" ng-class="selectedClass()"
-			ng-click="selectNodeLabel(node)" tree-transclude></div> 
-			<treeitem ng-if="nodeExpanded()"></treeitem></li>
-</ul>
