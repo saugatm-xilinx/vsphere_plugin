@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="build" name="firmware-packaging-tool">
+	<property environment="env" />
+	<property name="ECLIPSE_HOME" value="C:/Users/msys/Downloads/eclipse-java-luna-SR2-win32-x86_64/eclipse/" />
+	<property name="debuglevel" value="source,lines,vars" />
+	<property name="target" value="1.8" />
+	<property name="source" value="1.8" />
+	<path id="firmware-packaging-tool.classpath">
+		<pathelement location="bin" />
+		<pathelement location="libs/gson-2.3.1.jar" />
+	</path>
+	<target name="init">
+		<mkdir dir="bin" />
+		<copy includeemptydirs="false" todir="bin">
+			<fileset dir="src">
+				<exclude name="**/*.launch" />
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+	</target>
+	<target name="clean">
+		<delete dir="bin" />
+		<delete dir="target" />
+	</target>
+	<target depends="clean" name="cleanall" />
+	<target depends="build-subprojects,build-project,build-jar" name="build" />
+	<target name="build-subprojects" />
+	<pathconvert property="mf.classpath" pathsep=" ">
+	    <path refid="firmware-packaging-tool.classpath" />
+	    <flattenmapper />
+	</pathconvert>
+	<target depends="init" name="build-project">
+		<echo message="${ant.project.name}: ${ant.file}" />
+		<javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+			<src path="src" />
+			<classpath refid="firmware-packaging-tool.classpath" />
+		</javac>
+	</target>
+	<target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects" />
+	<target name="build-jar" depends="build-project"> 
+		<echo level="info" message="build jar" />
+		<mkdir dir="target" />
+		<delete file = "MANIFEST.MF" />
+		<manifest file = "MANIFEST.MF">
+            <attribute name = "Main-Class" value = "com.solarflare.firmware.Runner" />
+            <attribute name = "Class-Path" value = "${mf.classpath}"/>
+        </manifest>
+		<jar  destfile="target/${ant.project.name}.jar" basedir="bin" manifest = "MANIFEST.MF"/>
+		<copy todir="target">
+		    <fileset dir="libs">
+		      <exclude name="junit*" />
+		      <include name="*.jar"/>
+		      <include name="*.zip"/>
+		    </fileset>
+		  </copy>
+	</target>
+</project>
