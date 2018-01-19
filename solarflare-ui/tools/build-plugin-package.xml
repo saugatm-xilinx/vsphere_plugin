@@ -20,7 +20,7 @@
    <property name="VSPHERE_SDK_HOME" value="${env.VSPHERE_SDK_HOME}"/>
    <property name="BUILD_DIR" value="${basedir}/../target"/>
    <property name="SERVICE_DIR" value="${basedir}/../../solarflare-service"/>
-
+    <property name="FIRMWARE_TOOL_DIR" value="${basedir}/../../firmware-packaging-tool" />
    <!-- Conditional build variables -->
    <property name="USE_HTTP_PROXY" value="${useHttpProxy}"/>
    <property name="NO_JAVA" value="${noJava}"/>
@@ -33,6 +33,8 @@
    <property name="P_GOLES" value="clean install" />
    <property name="PLUGIN_PATH" value="solarflare-vcp" />
    <property name="CLASSES" value="${SERVICE_DIR}/target/classes" />
+   <property name="FIRMWARE_JAR" value="${FIRMWARE_TOOL_DIR}/target/firmware-packaging-tool.jar" />
+    <property name="DEFAULT_FIRMWARE_PATH" value="${basedir}/../../installer/dist/Tomcat_Server/webapps/firmware"/>
   
    <target name="build" depends="buildCheck, buildUiWar, buildServiceJar, run_utility, createPluginPackageDir,
          createPluginProxyPackageDir, createPluginNoJavaPackageDir, mvnWindowsSetup, mvnUnixSetup, runMvnGoals,copyPluginPackageDir, copyRegistrationWar">
@@ -63,6 +65,13 @@
 			<pathelement path="${CLASSES}"/>
 		</classpath>
 	  </java>
+      <java classname="com.solarflare.firmware.Runner" fork="true" failonerror="yes">
+           <arg value="${DEFAULT_FIRMWARE_PATH}"/>
+           <classpath>
+               <pathelement path="${FIRMWARE_JAR}"/>
+           </classpath>
+       </java>
+
    </target>
    <!-- Edit plugin package before copy-->
 	
