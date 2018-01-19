@@ -25,7 +25,7 @@ import com.vmware.vim25.RuntimeFaultFaultMsg;
 
 public class MetadataHelper {
 
-	private static BinaryFiles metadata;
+	//private static BinaryFiles metadata;
 
 	public static BinaryFiles getMetadata(URL filePath) throws MalformedURLException {
 
@@ -41,6 +41,7 @@ public class MetadataHelper {
 
 	public static SfFirmware getMetaDataForAdapter(URL pluginURL, SfCIMService cimService, CIMInstance sfFWInstance, CIMInstance nicInstance, FwType fwType) throws MalformedURLException, RuntimeFaultFaultMsg {
 
+		BinaryFiles metadata = null;
 		SfFirmware metaDatafile = null;
 
 		Map<String, String> params = cimService.getRequiredFwImageName(sfFWInstance, nicInstance);

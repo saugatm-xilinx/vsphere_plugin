@@ -492,10 +492,10 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 
 		String latestControllerVersion = cimService.getLatestControllerFWImageVersion(pluginURL, cimService, fwInstance,
 				niCimInstance);
-
+		// Set the latest version available. No need to compare with current
 		// Get latest version otherwise blank value if both are equal
-		String latestVersion = VCenterHelper.getLatestVersion(controllerVersion, latestControllerVersion);
-		logger.debug("Getting latest version of controller is :" + latestVersion);
+		//String latestVersion = VCenterHelper.getLatestVersion(controllerVersion, latestControllerVersion);
+		//logger.debug("Getting latest version of controller is :" + latestVersion);
 		// Check for latest version available
 		FirmwareVersion frmVesion = new FirmwareVersion();
 
@@ -505,9 +505,10 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		CIMInstance bootROMInstance = cimService.getBootROMSoftwareInstallationInstance();
 		String latestBootRomVersion = cimService.getLatestBootROMFWImageVersion(pluginURL, cimService, bootROMInstance,
 				niCimInstance);
-		logger.debug("Getting latest version of BootRom is :" + latestBootRomVersion);
-		String finalLatestBootVersion = VCenterHelper.getLatestVersion(bootROMVersion, latestBootRomVersion);
-		frmVesion.setBootROM(finalLatestBootVersion);
+		// Set the latest version available. No need to compare with current
+		//logger.debug("Getting latest version of BootRom is :" + latestBootRomVersion);
+		//String finalLatestBootVersion = VCenterHelper.getLatestVersion(bootROMVersion, latestBootRomVersion);
+		frmVesion.setBootROM(latestBootRomVersion);
 
 		// Put dummy latest versions for UEFI and Firmware family
 		frmVesion.setUefi(UEFIROMVersion); // setting current as latest for now
