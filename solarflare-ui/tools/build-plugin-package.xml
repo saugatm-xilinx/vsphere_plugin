@@ -34,9 +34,10 @@
    <property name="PLUGIN_PATH" value="solarflare-vcp" />
    <property name="CLASSES" value="${SERVICE_DIR}/target/classes" />
    <property name="FIRMWARE_JAR" value="${FIRMWARE_TOOL_DIR}/target/firmware-packaging-tool.jar" />
-    <property name="DEFAULT_FIRMWARE_PATH" value="${basedir}/../../installer/dist/Tomcat_Server/webapps/firmware"/>
+   <property name="DEFAULT_FIRMWARE_PATH" value="D:/temp"/>
+   <property name="FIRMWARE_COPY_TO" value="${basedir}/../../installer/dist/Tomcat_Server/webapps/firmware"/>
   
-   <target name="build" depends="buildCheck, buildUiWar, buildServiceJar, run_utility, createPluginPackageDir,
+   <target name="build" depends="buildCheck, buildUiWar, buildServiceJar, build-firmware-packaging-tool, run_utility, createPluginPackageDir,
          createPluginProxyPackageDir, createPluginNoJavaPackageDir, mvnWindowsSetup, mvnUnixSetup, runMvnGoals,copyPluginPackageDir, copyRegistrationWar">
       <echo level="info">*** You must restart the Virgo server to use the new plugin package! ***</echo>
    </target>
@@ -55,6 +56,10 @@
 
    <target name="buildServiceJar" if="${NORMAL_BUILD}">
       <ant antfile="${SERVICE_DIR}/tools/build-java.xml" dir="${SERVICE_DIR}/tools" inheritAll="false"/>
+   </target>
+   
+   <target name="build-firmware-packaging-tool" if="${NORMAL_BUILD}">
+      <ant antfile="${FIRMWARE_TOOL_DIR}/build.xml" dir="${FIRMWARE_TOOL_DIR}" inheritAll="false"/>
    </target>
    
    <target name="run_utility">
@@ -151,6 +156,11 @@ TO THIS /tools FOLDER."/>
 	<target name="copyRegistrationWar" description="Copy war file in plugin dist directory">
 		<delete dir="${BUILD_ZIP_DIR}/plugin-registration.war" quiet="true"/>
 		<copy todir="${BUILD_ZIP_DIR}/" file="${PLUGIN_REGISTRATION}/target/plugin-registration.war"/>
+		<copy todir="${FIRMWARE_COPY_TO}">
+			<fileset dir="${DEFAULT_FIRMWARE_PATH}">
+			<include name="**/*.*"/>
+      </fileset>
+		</copy>
 	</target>
 
 </project>
