@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- WARNING: Eclipse auto-generated file.
-              Any modifications will be overwritten.
-              To include a user specific buildfile here, simply create one in the same
-              directory with the processing instruction <?eclipse.ant.import?>
-              as the first entry and export the buildfile again. -->
 <project basedir="." default="build" name="firmware-packaging-tool">
 	<property environment="env" />
-	<property name="ECLIPSE_HOME" value="C:/Users/msys/Downloads/eclipse-java-luna-SR2-win32-x86_64/eclipse/" />
 	<property name="debuglevel" value="source,lines,vars" />
 	<property name="target" value="1.8" />
 	<property name="source" value="1.8" />
+	<property name="firmware-jar" value="firmware.jar"/>
 	<path id="firmware-packaging-tool.classpath">
 		<pathelement location="bin" />
 		<pathelement location="libs/gson-2.3.1.jar" />
+		<pathelement location="${ant.project.name}.jar" />
 	</path>
-	<target name="init">
+	<path id="firmware-and-external-jar.classpath">
+			<pathelement location="libs/gson-2.3.1.jar" />
+			<pathelement location="bin/${firmware-jar}" />
+	</path>
+<!-- init -->
+	<target name="init" depends="cleanall, clean">
 		<mkdir dir="bin" />
+		<mkdir dir="target" />
 		<copy includeemptydirs="false" todir="bin">
 			<fileset dir="src">
 				<exclude name="**/*.launch" />
@@ -23,15 +25,19 @@
 			</fileset>
 		</copy>
 	</target>
+<!-- clean -->
 	<target name="clean">
 		<delete dir="bin" />
 		<delete dir="target" />
+		<delete file="MANIFEST.MF" />
 	</target>
 	<target depends="clean" name="cleanall" />
-	<target depends="build-subprojects,build-project,build-jar" name="build" />
+	
+<!-- build -->
+	<target depends="build-subprojects,build-project, build-jar" name="build" />
 	<target name="build-subprojects" />
 	<pathconvert property="mf.classpath" pathsep=" ">
-	    <path refid="firmware-packaging-tool.classpath" />
+	    <path refid="firmware-and-external-jar.classpath" />
 	    <flattenmapper />
 	</pathconvert>
 	<target depends="init" name="build-project">
@@ -41,22 +47,14 @@
 			<classpath refid="firmware-packaging-tool.classpath" />
 		</javac>
 	</target>
-	<target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects" />
-	<target name="build-jar" depends="build-project"> 
+	<target name="build-jar" depends="build-project"> 	
 		<echo level="info" message="build jar" />
-		<mkdir dir="target" />
-		<delete file = "MANIFEST.MF" />
-		<manifest file = "MANIFEST.MF">
-            <attribute name = "Main-Class" value = "com.solarflare.firmware.Runner" />
-            <attribute name = "Class-Path" value = "${mf.classpath}"/>
-        </manifest>
-		<jar  destfile="target/${ant.project.name}.jar" basedir="bin" manifest = "MANIFEST.MF"/>
-		<copy todir="target">
-		    <fileset dir="libs">
-		      <exclude name="junit*" />
-		      <include name="*.jar"/>
-		      <include name="*.zip"/>
-		    </fileset>
-		  </copy>
+		<jar destfile="target\${ant.project.name}.jar" basedir="bin">
+		    <zipgroupfileset dir="libs" includes="*.jar" />
+		    <manifest>
+		    	<attribute name = "Main-Class" value = "com.solarflare.firmware.Runner" />
+		    	<attribute name = "Class-Path" value = "${mf.classpath}"/>
+		    </manifest>
+		</jar>
 	</target>
 </project>
