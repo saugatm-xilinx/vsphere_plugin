@@ -16,6 +16,7 @@ import com.solarflare.firmware.model.BinaryFiles;
 import com.solarflare.firmware.model.BootROM;
 import com.solarflare.firmware.model.Controller;
 import com.solarflare.firmware.model.FileHeader;
+import com.solarflare.firmware.model.FirmwareType;
 import com.solarflare.firmware.model.SfFirmware;
 
 public class MetadataGeneratorHelper {
@@ -25,9 +26,9 @@ public class MetadataGeneratorHelper {
 	static int basePathLastIndex ; 
 	static String FILE_SEPARATOR = File.separator;
 	
-	public static void generateMetadataJSON(File filePath) throws Exception
+	public static void generateMetadataJSON(File filePath, int lastIndex) throws Exception
 	{
-		basePathLastIndex = filePath.getAbsolutePath().lastIndexOf(FILE_SEPARATOR);
+		basePathLastIndex = lastIndex;
 		searchAndCreateMetae("dat", filePath);
 		Gson gson = new Gson();
 		String json = gson.toJson(meta);
@@ -49,37 +50,10 @@ public class MetadataGeneratorHelper {
 				{
 					
 					String path = fil.getParent();
-					String relativePath = FILE_SEPARATOR + path.substring(basePathLastIndex+1, path.length());
-					String parantDir = path.substring(path.lastIndexOf(FILE_SEPARATOR)+1,path.length());
-					
-					if(parantDir.equalsIgnoreCase("bootrom"))
+					String relativePath = FILE_SEPARATOR+"firmware"+path.substring(basePathLastIndex, path.length());
+					FileHeader header = getFileHeader(readData(fil, false));
+					if (FirmwareType.FIRMWARE_TYPE_MCFW.ordinal() == header.getType()) 
 					{
-						System.out.println(fil.getName());
-						FileHeader header = getFileHeader(readData(fil, false));
-						SfFirmware sfFirmware = new SfFirmware();
-						sfFirmware.setName(fil.getName());
-						sfFirmware.setType(""+header.getType());
-						sfFirmware.setSubtype(""+header.getSubtype());
-						sfFirmware.setVersionString(header.getVersionString());
-						sfFirmware.setPath(relativePath+FILE_SEPARATOR+fil.getName());
-						
-						if(meta != null && meta.getBootROM() != null)
-						{
-							meta.getBootROM().getFiles().add(sfFirmware);
-						}
-						else
-						{
-							List<SfFirmware> sfFirmwareList = new ArrayList<>();
-							sfFirmwareList.add(sfFirmware);
-							bootRom.setFiles(sfFirmwareList);
-							meta.setBootROM(bootRom);
-						}
-						
-					}
-					else if(parantDir.equalsIgnoreCase("controller"))
-					{
-						System.out.println(fil.getName());
-						FileHeader header = getFileHeader(readData(fil, false));
 						SfFirmware sfFirmware = new SfFirmware();
 						sfFirmware.setName(fil.getName());
 						sfFirmware.setType(""+header.getType());
@@ -97,6 +71,25 @@ public class MetadataGeneratorHelper {
 							sfFirmwareList.add(sfFirmware);
 							controller.setFiles(sfFirmwareList);
 							meta.setController(controller);
+						}
+					} else if (FirmwareType.FIRMWARE_TYPE_BOOTROM.ordinal() == header.getType()) {
+						SfFirmware sfFirmware = new SfFirmware();
+						sfFirmware.setName(fil.getName());
+						sfFirmware.setType(""+header.getType());
+						sfFirmware.setSubtype(""+header.getSubtype());
+						sfFirmware.setVersionString(header.getVersionString());
+						sfFirmware.setPath(relativePath+FILE_SEPARATOR+fil.getName());
+						
+						if(meta != null && meta.getBootROM() != null)
+						{
+							meta.getBootROM().getFiles().add(sfFirmware);
+						}
+						else
+						{
+							List<SfFirmware> sfFirmwareList = new ArrayList<>();
+							sfFirmwareList.add(sfFirmware);
+							bootRom.setFiles(sfFirmwareList);
+							meta.setBootROM(bootRom);
 						}
 					}
 				}
@@ -178,7 +171,7 @@ public class MetadataGeneratorHelper {
 	
 	 private static void writeUsingFileWriter(String data, String path) 
 	 {
-	        File file = new File(path+FILE_SEPARATOR+ "firmware-metadata.json");
+	        File file = new File(path+FILE_SEPARATOR+ "FirmwareMetadata.json");
 	        try ( FileWriter fr = new FileWriter(file))
 	        {
 	            fr.write(data);
