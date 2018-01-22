@@ -20,6 +20,7 @@ public class SfVimServiceHelper {
 	public static final String CIM = "cim";
 	public static final String SFC = "sfc";
 	public static final short SOLARFLARE_VENDOR_ID = 6436;
+	// TODO : Add logger and null check
 
 	public static int getAdapterCount(List<HostPciDevice> sfDevices) {
 		Set<String> adapters = new HashSet<>();
@@ -108,6 +109,7 @@ public class SfVimServiceHelper {
 	public static String getAdapterId(String hostName, String pciId) {
 		String adapterId = null;
 		if (hostName != null && pciId != null) {
+			// TODO : Review Comment : Use constants instead of hard coding
 			adapterId = hostName + "::" + pciId.split("\\.")[0];
 		}
 		return adapterId;
@@ -119,49 +121,56 @@ public class SfVimServiceHelper {
 		Map<String, List<VMNIC>> vmNICmap = new HashMap<>();
 		for (HostPciDevice pciDevice : pciDevices) {
 			PhysicalNic pNIC = pNICs.get(pciDevice.getId());
-			String id = SfVimServiceHelper.getAdapterId(hostName, pciDevice.getId());
+			if (pNIC == null) {
+				// TODO : add log and skip
+			} else {
+				String id = SfVimServiceHelper.getAdapterId(hostName, pciDevice.getId());
 
-			VMNIC vmNIC = new VMNIC();
-			vmNIC.setName(pNIC.getDevice());
-			vmNIC.setId(pNIC.getDevice());
-			vmNIC.setDeviceName(pciDevice.getDeviceName());
-			vmNIC.setMacAddress(pNIC.getMac());
-			vmNIC.setPciId(pciDevice.getId());
-			vmNIC.setPciFunction(Byte.toString(pciDevice.getFunction()));
-			vmNIC.setPciBusNumber(Byte.toString(pciDevice.getBus()));
+				VMNIC vmNIC = new VMNIC();
+				vmNIC.setName(pNIC.getDevice());
+				vmNIC.setId(pNIC.getDevice());
+				vmNIC.setDeviceName(pciDevice.getDeviceName());
+				vmNIC.setMacAddress(pNIC.getMac());
+				vmNIC.setPciId(pciDevice.getId());
+				vmNIC.setPciFunction(Byte.toString(pciDevice.getFunction()));
+				vmNIC.setPciBusNumber(Byte.toString(pciDevice.getBus()));
 
-			List<VMNIC> vmNICList = vmNICmap.get(id);
-			if (vmNICList == null) {
-				vmNICList = new ArrayList<>();
+				List<VMNIC> vmNICList = vmNICmap.get(id);
+				if (vmNICList == null) {
+					vmNICList = new ArrayList<>();
 
+				}
+
+				vmNICList.add(vmNIC);
+				vmNICmap.put(id, vmNICList);
 			}
-
-			vmNICList.add(vmNIC);
-			vmNICmap.put(id, vmNICList);
-
 		}
 
 		return vmNICmap;
 	}
 
-	public static int getPortCount(List<Adapter> adapters){
+	public static int getPortCount(List<Adapter> adapters) {
 		int portCount = 0;
-		for(Adapter adp : adapters){
-			if(adp.getChildren() != null){
-			portCount += adp.getChildren().size();
+		for (Adapter adp : adapters) {
+			if (adp.getChildren() != null) {
+				portCount += adp.getChildren().size();
 			}
 		}
 		return portCount;
 	}
-	
+
 	public static String getMinMacAddress(List<VMNIC> nicList) {
-		String[] macAddresses = new String[nicList.size()];
-		int i=0;
-		for(VMNIC nic : nicList){
-			macAddresses[i++] = nic.getMacAddress();
+		if (nicList != null) {
+			String[] macAddresses = new String[nicList.size()];
+			int i = 0;
+			for (VMNIC nic : nicList) {
+				macAddresses[i++] = nic.getMacAddress();
+			}
+			Arrays.sort(macAddresses);
+			// TODO : Review Comment : Use constants
+			String plainMinMac = macAddresses[0].replaceAll(":", "");
+			return plainMinMac;
 		}
-		Arrays.sort(macAddresses);
-		String plainMinMac = macAddresses[0].replaceAll(":", "");
-		return plainMinMac;
+		return null;
 	}
 }

@@ -169,6 +169,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 				HostSystemConnectionState state = (HostSystemConnectionState) hostprops.get("runtime.connectionState");
 
 				if (!state.equals(HostSystemConnectionState.DISCONNECTED)) {
+					//TODO : Review Comment - Add debug logs for Host found
 					Host host = new Host();
 					host.setId(hostMoRef.getValue());
 					// Get name
@@ -221,6 +222,8 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 	}
 
 	private List<Adapter> getAdapters(Map<String, Object> hostprops, String hostId) {
+		 // TODO : Review Comment : Add null check 
+		//TODO : Review Comment - Add debug logs for Host found
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getAdapters");
 		List<Adapter> adapters = new ArrayList<>();
 

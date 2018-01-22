@@ -38,36 +38,41 @@ public class SfCIMService {
 
 	private static final Log logger = LogFactory.getLog(SfCIMService.class);
 
+	
 	SfCIMClientService cimClientService;
 
 	public SfCIMService(SfCIMClientService cimClientService) {
 		this.cimClientService = cimClientService;
 	}
 
-	/*
-	 * // TODO Cleanup : Written for testing public static void main(String[]
-	 * args) throws WBEMException { String url = "https://10.101.10.3:5989/";
-	 * String password = "Ibmx#3750c"; String user = "root";
-	 * 
-	 * // CIMHost cimHost = new CIMHostUser(url, user, password);
-	 * 
-	 * //SfCIMClientService cimClientService = new SfCIMClientService(cimHost);
-	 * 
-	 * //SfCIMService cimService = new SfCIMService(cimClientService); //
-	 * cimService.setCIMClient(cimClient); // cimService.setCimHost(cimHost);
-	 * 
-	 * //System.out.println(cimService.getAdapterVersions("vmnic6"));
-	 * //System.out.println(cimService.getNICCardInstance("vmnic6"));
-	 * 
-	 * 
-	 * ApplicationContext context = new
-	 * ClassPathXmlApplicationContext("bundle-context.xml");
-	 * context.getBean("SfVimServiceImpl"); System.out.println("TEST");
-	 * //Resource r = new ClassPathResource("bundle-context.xml");
-	 * 
-	 * }
-	 */
+	// TODO Cleanup : Written for testing
+	public static void main(String[] args) throws WBEMException {
+		String url = "https://10.101.10.3:5989/";
+		String password = "Ibmx#3750c";
+		String user = "root";
+		String deviceID = "vmnic4";
+		CIMHost cimHost = new CIMHostUser(url, user, password);
+
+		 SfCIMClientService cimClientService = new SfCIMClientService(cimHost);
+
+		SfCIMService cimService = new SfCIMService(cimClientService);
+		//cimService.setCIMClient(cimClient);
+		//cimService.setCimHost(cimHost);
+
+		System.out.println(cimService.getAdapterVersions(deviceID));
+        CIMInstance controller = cimService.getFirmwareSoftwareInstallationInstance();
+        CIMInstance bootROM  = cimService.getBootROMSoftwareInstallationInstance();
+		CIMInstance nic = cimService.getNICCardInstance(deviceID);
+		cimService.getRequiredFwImageName(bootROM, nic);
+		//System.out.println();
+
+        
+        
+
+	}
+
 	public WBEMClient getCIMClient() {
+		//TODO : Review Comment : Add Null check
 		return this.cimClientService.getCimClient();
 	}
 
@@ -107,6 +112,7 @@ public class SfCIMService {
 
 		for (CIMInstance inst : instances) {
 
+			//TODO : Review Comment : use constants and check for null
 			if (inst.getProperty("Name").getValue().equals(CIMConstants.SVC_MCFW_NAME)) {
 				svc_mcfw_inst = inst;
 			}
@@ -128,7 +134,7 @@ public class SfCIMService {
 		CIMInstance svc_bootrom_inst = null;
 
 		for (CIMInstance inst : instances) {
-
+			//TODO : Review Comment : use constants and check for null
 			if (inst.getProperty("Name").getValue().equals(CIMConstants.SVC_BOOTROM_NAME)) {
 				svc_bootrom_inst = inst;
 			}
@@ -146,11 +152,13 @@ public class SfCIMService {
 	private CIMInstance getEthernatePortInstance(String deviceId) throws WBEMException {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getEthernatePortInstance");
 		CIMInstance ethernateInstance = null;
+		//TODO : Review Comment : use constants
 		String cimClass = "SF_EthernetPort";
 
 		// Get SF_EthernetPort instance
 		Collection<CIMInstance> instances = getAllInstances(CIMConstants.CIM_NAMESPACE, cimClass);
 		for (CIMInstance inst : instances) {
+			//TODO : Review Comment : use constants and check for null
 			String devId = (String) inst.getProperty("DeviceID").getValue();
 			// String macAddress = (String)
 			// inst.getProperty("PermanentAddress").getValue();
@@ -178,6 +186,7 @@ public class SfCIMService {
 	 */
 	public CIMInstance getNICCardInstance(String deviceId) throws WBEMException {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getNICCardInstance");
+		//TODO : Review Comment : check for null - input param
 		// Get EthernatePort Instance
 		CIMInstance ethernateInstance = getEthernatePortInstance(deviceId);
 
@@ -206,8 +215,11 @@ public class SfCIMService {
 	 * @throws WBEMException
 	 */
 	public Map<String, String> getAdapterVersions(String deviceId) throws WBEMException {
+		//TODO : Review Comment : Check for null input param
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getAdapterVersions");
 		logger.info("Solarflare::Getting Adapter Versions for Device Id : " + deviceId);
+		
+		
 		Map<String, String> versions = new HashMap<String, String>();
 		// Get EthernatePort Instance
 		CIMInstance ethernateInstance = getEthernatePortInstance(deviceId);
@@ -223,9 +235,10 @@ public class SfCIMService {
 
 		while (inst.hasNext()) {
 			CIMInstance instance = inst.next();
+			//TODO : Review Comment : use constants and check for null
 			String versionString = instance.getProperty("VersionString").getValue().toString();
 			if (versionString == null) {
-				versionString = "0.0.0.0";
+				versionString = "0.0.0.0"; //TODO : Review Comment : use constants
 			}
 			String description = instance.getProperty("Description").getValue().toString();
 			if (CIMConstants.DESC_CONTROLLER.equals(description)) {
@@ -235,6 +248,7 @@ public class SfCIMService {
 			}
 
 			// Adding dummy values for below
+			//TODO : Review Comment : use constants for dummy
 			versions.put(CIMConstants.FIRMARE_VERSION, "1.1.1.0");
 			versions.put(CIMConstants.UEFI_ROM_VERSION, "1.1.1.0");
 		}
@@ -283,6 +297,7 @@ public class SfCIMService {
 			CIMInstance nicInstance)
 			throws MalformedURLException, RuntimeFaultFaultMsg, URISyntaxException, WBEMException {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getLatestControllerFWImageVersion");
+		//TODO : Review Comment : use constants 
 		String versionString = "0.0.0.0";
 
 		SfFirmware file = MetadataHelper.getMetaDataForAdapter(pluginURL, cimService, fwInstance, nicInstance,
@@ -298,6 +313,7 @@ public class SfCIMService {
 			CIMInstance nicInstance)
 			throws MalformedURLException, RuntimeFaultFaultMsg, URISyntaxException, WBEMException {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getLatestBootROMFWImageVersion");
+		//TODO : Review Comment : use constants
 		String versionString = "0.0.0.0";
 		SfFirmware file = MetadataHelper.getMetaDataForAdapter(pluginURL, cimService, bootROMInstance, nicInstance,
 				FwType.BOOTROM);
@@ -549,6 +565,7 @@ public class SfCIMService {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: updateFirmwareFromURL");
 		logger.debug("Solarflare:: updateFirmwareFromURL called with input : SfInstance " + softwareIntsallationInstance
 				+ " NIC : " + nic + " fwImagePath : " + fwImagePath);
+		//TODO : Review Comment :check for null input
 		WBEMClient client = getCIMClient();
 		String pMethodName = CIMConstants.INSTALL_FROM_URI;
 

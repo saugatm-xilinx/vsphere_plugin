@@ -21,6 +21,7 @@ public class SFBase64 {
     ///
     public int base64_enc_size(int src_size)
     {
+    	// TODO : Review Comment : Check for null input
         return (src_size / 3 + (src_size % 3 > 0 ? 1 : 0)) * 4 +
                ((3 - src_size % 3) % 3) + 1;
     }
@@ -35,6 +36,7 @@ public class SFBase64 {
     public byte[] base64_encode(byte[] src,
                                int src_size)
     {
+    	// TODO : Review Comment : 
     	int destSize = base64_enc_size(src_size);
     	byte[] dst =  new byte[destSize];
     	int i;

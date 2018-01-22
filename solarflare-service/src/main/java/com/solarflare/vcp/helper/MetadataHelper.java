@@ -26,6 +26,7 @@ import com.vmware.vim25.RuntimeFaultFaultMsg;
 public class MetadataHelper {
 
 	//private static BinaryFiles metadata;
+	 // TODO : Review Comment : Use logger and check for nulls
 
 	public static BinaryFiles getMetadata(URL filePath) throws MalformedURLException {
 

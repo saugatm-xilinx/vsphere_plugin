@@ -37,7 +37,9 @@ import com.solarflare.vcp.model.TaskInfo;
 import com.solarflare.vcp.model.TaskState;
 import com.solarflare.vcp.model.UpdateRequest;
 import com.solarflare.vcp.vim.SfVimService;
+import com.solarflare.vcp.vim.SfVimServiceImpl;
 import com.solarflare.vcp.vim.SimpleTimeCounter;
+import com.solarflare.vcp.vim.connection.ConnectionImpl;
 
 public class HostAdapterServiceImpl implements HostAdapterService {
 	private static final Log logger = LogFactory.getLog(HostAdapterServiceImpl.class);
@@ -101,13 +103,19 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		String taskID = null;
 		logger.info("Solarflare:: updateFirmwareToLatest");
 		try {
-			// TODO :: validate all adapter before update
+			// TODO :: Review Comment : validate all adapter before update
+			// TODO : Review Comment : Repetitive code : Put below lines of code
+			// in private method and return TaskInfo
 			TaskManager taskManager = TaskManager.getInstance();
 			taskID = taskManager.getTaskId();
 			TaskInfo taskInfo = new TaskInfo();
 			taskInfo.setTaskid(taskID);
 			taskInfo.setHostId(hostId);
 			taskManager.addTaskInfo(taskInfo);
+
+			// TODO : Review Comment : write private method to return
+			// cimService. Use the same in all updates
+			// TODO : Review Comment : Try Caching cimHost to check performance
 			CIMHost cimHost = sfVimService.getCIMHost(hostId);
 			// CIMHost cimHost = new SfVimServiceImpl().getCIMHost(hostId,
 			// "testingOnly");
@@ -165,6 +173,8 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		String taskID = null;
 		try {
 
+			// TODO : Repetitive code : Put below lines of code in private
+			// method and return TaskInfo
 			TaskManager taskManager = TaskManager.getInstance();
 			taskID = taskManager.getTaskId();
 			TaskInfo taskInfo = new TaskInfo();
@@ -175,6 +185,9 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 
 			// CIMHost cimHost = new SfVimService().getCIMHost(hostId,
 			// "TestingOnly");
+
+			// TODO : Review Comment : write private method to return
+			// cimService. Use the same in all updates
 			CIMHost cimHost = sfVimService.getCIMHost(hostId);
 			SfCIMService cimService = new SfCIMService(new SfCIMClientService(cimHost));
 
@@ -276,6 +289,8 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		String taskID = null;
 		try {
 
+			// TODO : Repetitive code : Put below lines of code in private
+			// method and return TaskInfo
 			TaskManager taskManager = TaskManager.getInstance();
 			taskID = taskManager.getTaskId();
 			TaskInfo taskInfo = new TaskInfo();
@@ -284,6 +299,8 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			taskManager.addTaskInfo(taskInfo);
 
 			URL fwImageURL = new URL(fwImagePath);
+			// TODO : Review Comment : write private method to return
+			// cimService. Use the same in all updates
 			CIMHost cimHost = sfVimService.getCIMHost(hostId);
 			// CIMHost cimHost = new SfVimServiceImpl().getCIMHost(hostId,
 			// "testingOnly");
@@ -494,8 +511,11 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 				niCimInstance);
 		// Set the latest version available. No need to compare with current
 		// Get latest version otherwise blank value if both are equal
-		//String latestVersion = VCenterHelper.getLatestVersion(controllerVersion, latestControllerVersion);
-		//logger.debug("Getting latest version of controller is :" + latestVersion);
+		// String latestVersion =
+		// VCenterHelper.getLatestVersion(controllerVersion,
+		// latestControllerVersion);
+		// logger.debug("Getting latest version of controller is :" +
+		// latestVersion);
 		// Check for latest version available
 		FirmwareVersion frmVesion = new FirmwareVersion();
 
@@ -506,8 +526,10 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		String latestBootRomVersion = cimService.getLatestBootROMFWImageVersion(pluginURL, cimService, bootROMInstance,
 				niCimInstance);
 		// Set the latest version available. No need to compare with current
-		//logger.debug("Getting latest version of BootRom is :" + latestBootRomVersion);
-		//String finalLatestBootVersion = VCenterHelper.getLatestVersion(bootROMVersion, latestBootRomVersion);
+		// logger.debug("Getting latest version of BootRom is :" +
+		// latestBootRomVersion);
+		// String finalLatestBootVersion =
+		// VCenterHelper.getLatestVersion(bootROMVersion, latestBootRomVersion);
 		frmVesion.setBootROM(latestBootRomVersion);
 
 		// Put dummy latest versions for UEFI and Firmware family
@@ -518,48 +540,55 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		adapter.setLatestVersion(frmVesion);
 	}
 
-	/*
-	 * //TODO : Clean up public static void main(String[] args) throws Exception
-	 * {
-	 * 
-	 * FileInputStream fRead = new FileInputStream(new
-	 * File("D:\\Projects\\SolarFlare\\adapterList.txt")); byte[] ch = new
-	 * byte[1925]; int numData = fRead.read(ch); //
-	 * System.out.println("numData : "+numData);
-	 * 
-	 * String adapterList = new String(ch); //
-	 * System.out.println("adapterList : "+adapterList); // System.exit(0); Gson
-	 * gson = new Gson(); Type listType = new TypeToken<List<Adapter>>() {
-	 * }.getType();
-	 * 
-	 * List<Adapter> adapter = gson.fromJson(adapterList, listType);
-	 * 
-	 * ConnectionImpl conn = new ConnectionImpl("https://10.101.10.8/sdk",
-	 * "msys@vsphere.local", "Msys@123", true); conn._login(); SfVimServiceImpl
-	 * service = new SfVimServiceImpl(conn, null);
-	 * 
-	 * HostAdapterServiceImpl obj = new HostAdapterServiceImpl(service); for
-	 * (int i = 0; i < 5; i++) { System.out.println("Updating : " + i); String
-	 * id = obj.updateFirmwareToLatest(adapter, "host-14");
-	 * System.out.println("--===============--> " + id); //
-	 * obj.updateFirmwareToLatest(adapter, "host-14"); //
-	 * obj.updateFirmwareToLatest(adapter, "host-14"); //
-	 * obj.customUpdateFirmwareFromURL(adapter, "host-14", //
-	 * "http://10.101.10.132/customFw/v6.2.5.1000/mcfw.dat"); //
-	 * System.out.println("--------------------------------------------"); //
-	 * obj.getHostAdapters("host-14"); } }
-	 */
+	// TODO : Clean up
+	public static void main(String[] args) throws Exception {
+
+		// FileInputStream fRead = new FileInputStream(new
+		// File("D:\\Projects\\SolarFlare\\adapterList.txt"));
+		// byte[] ch = new byte[1925];
+		// int numData = fRead.read(ch);
+		// System.out.println("numData : "+numData);
+
+		/*
+		 * String adapterList = new String(ch); //
+		 * System.out.println("adapterList : "+adapterList); // System.exit(0);
+		 * Gson gson = new Gson(); Type listType = new
+		 * TypeToken<List<Adapter>>() { }.getType();
+		 * 
+		 * List<Adapter> adapter = gson.fromJson(adapterList, listType);
+		 */
+		ConnectionImpl conn = new ConnectionImpl("https://10.101.10.8/sdk", "msys@vsphere.local", "Msys@123", true);
+		conn._login();
+		SfVimServiceImpl service = new SfVimServiceImpl(conn, null);
+
+		HostAdapterServiceImpl obj = new HostAdapterServiceImpl(service);
+		obj.getHostList();
+		/*
+		for (int i = 0; i < 5; i++) {
+			System.out.println("Updating : " + i);
+			String id = obj.updateFirmwareToLatest(adapter, "host-14");
+			System.out.println("--===============--> " + id); //
+			obj.updateFirmwareToLatest(adapter, "host-14"); //
+			obj.updateFirmwareToLatest(adapter, "host-14"); //
+			obj.customUpdateFirmwareFromURL(adapter, "host-14", //
+					"http://10.101.10.132/customFw/v6.2.5.1000/mcfw.dat"); //
+			System.out.println("--------------------------------------------"); //
+			obj.getHostAdapters("host-14");
+		}*/
+	}
+
 	private boolean isValidated(Adapter adapter, TaskInfo taskInfo) {
+		// TODO : Need to refactor/cleanup
 		if (SFC9220_deviceID.equals(adapter.getDeviceId())) {
 			String adapterId = adapter.getId();
 			AdapterTask aTask = getAdapterTask(taskInfo, adapterId);
 
 			Status status = new Status(TaskState.Error, "Adapter Type Not Supported", FwType.CONTROLLER);
-			aTask.setController(status);
+			// aTask.setController(status);
 
 			status = new Status(TaskState.Error, "Adapter Type Not Supported", FwType.BOOTROM);
-			aTask.setBootROM(status);
-			return false;
+			// aTask.setBootROM(status);
+			return true;
 		}
 		return true;
 	}

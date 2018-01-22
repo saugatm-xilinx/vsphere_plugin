@@ -28,6 +28,8 @@ public class UpdateRequestThread implements Runnable {
 	public void run() {
 		logger.info("Solarflare:: UpdateRequestThread run method started.");
 		logger.debug("Solarflare:: updateRequest in thread : "+updateRequest);
+		
+		//TODO : Review Comment : check for null
 		SfCIMService cimService = updateRequest.getCimService();
 		CIMObjectPath fwInstance = updateRequest.getFwInstance();
 

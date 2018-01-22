@@ -3,10 +3,12 @@ package com.solarflare.vcp.helper;
 public class VCenterHelper {
 
 	public static String getLatestVersion(String version1, String version2) {
+		// TODO : Review Comment : Check for null input
 		// removing non digit characters
 		String removedNonDigitChar1 = removeNonDigitChar(version1);
 		String removedNonDigitChar2 = removeNonDigitChar(version2);
 
+		// TODO : Review Comment : Check for null
 		String versionAr1[] = removedNonDigitChar1.split("\\.");
 		String versionAr2[] = removedNonDigitChar2.split("\\.");
 		// Consider the version like this 1.1.1.1
