@@ -7,7 +7,9 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {AppComponent} from "../../../app.component";
 import {HostsService} from "../../../services/hosts.service";
 import {Observable} from "rxjs/Observable";
-
+//TODO: review comments - components should not have this much line code in a single file.
+// Break code in smaller chunck and may create a helper/service to serve functionality.
+// Ideal code line should be 200-300 max in a single file
 @Component({
     selector: 'app-fwupdate',
     templateUrl: './fwupdate.component.html',

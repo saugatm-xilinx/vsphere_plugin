@@ -2,6 +2,7 @@ import {Component, Injector, ChangeDetectorRef} from "@angular/core";
 import {GlobalsService, RefreshService, I18nService} from "./shared/index";
 import {ActionDevService} from "./services/testing/action-dev.service";
 import {AppMainService} from "./services/app-main.service";
+//TODO: review comment:- Many linting issues in entire project.
 
 @Component({
     selector: "my-app",
@@ -34,7 +35,7 @@ export class AppComponent {
         // In plugin mode the current locale is passed as parameter
         this.i18nService.initLocale("en");
     }
-
+//TODO: reivew comment - implement onInit in the class.
     ngOnInit(): void {
         this.getHosts();
     }
@@ -53,7 +54,9 @@ export class AppComponent {
                 }
             );
     }
-
+//TODO: review comments- Create a localDev file/class and put all local development code there. AppComponent 
+//is having devMode function. This gets added in bundle files during 
+//build process. Better to keep mock data in a file and add/remove its dependency as per environment mode - prod or dev.
     devMode() {
         this.hosts = [{
             "type": "HOST",

@@ -3,7 +3,9 @@ import {ActivatedRoute, Params} from '@angular/router';
 import {GlobalsService} from "../../../shared/globals.service";
 import {HostsService} from "../../../services/hosts.service";
 import {FormBuilder, FormGroup, FormControl, Validators} from "@angular/forms";
-
+//TODO :- reveiw comments - It would be best if import is done via a absolute path.
+// Define all modules paths in tsconfig.json file. This will help in managing file import.
+    
 @Component({
     selector: 'app-config',
     templateUrl: './config.component.html',

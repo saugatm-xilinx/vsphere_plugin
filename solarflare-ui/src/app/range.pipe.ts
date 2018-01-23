@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-
+//TODO: review comments - create pipes directiory in shared module and move there.  
 @Pipe({
     name: 'range',
     pure: false

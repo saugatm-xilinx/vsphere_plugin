@@ -25,11 +25,13 @@ export class AppRoutingComponent implements OnInit, OnDestroy {
    ngOnInit(): void {
       const path = this.location.path();
       console.log("app.component path = " + path);
-
+//TODO: review comments -  declare these as readonly at class level.
       const FORWARD_SLASH_ENCODED2 = "%252F";
       const FORWARD_SLASH_ENCODED = /%2F/g;
 
       // Extract query parameters and navigate to view
+      //TODO: review comments - create AutoUnsubscribeObservable 
+      //Decorator which could be added in each component by default. There are chances of missing unsubscribe observable in components
       this.subscription = this.route.queryParams.subscribe(
          (param: any) => {
             const view = param["view"];
