@@ -46,7 +46,7 @@ public class UpdateRequestProcessor {
 				+ updateRequest.getFwType());
 		if (executor == null || executor.isShutdown() || executor.isTerminated()) {
 			logger.info("Thread pool is not active! Creating a new one..");
-			executor = Executors.newFixedThreadPool(DEFAULT_POOL_SIZE); // TODO this is not reachable 
+			executor = Executors.newFixedThreadPool(DEFAULT_POOL_SIZE); 
 		}
 		UpdateRequestThread updateThread = new UpdateRequestThread();
 		updateThread.setUpdateRequest(updateRequest);
@@ -61,9 +61,7 @@ public class UpdateRequestProcessor {
 			try {
 				executor.awaitTermination(10,TimeUnit.MINUTES);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				//TODO : Review Comment : Add logger and remove printStackTrace()
-				e.printStackTrace();
+				logger.error(e.getMessage());
 			}
 		}
 				

@@ -81,6 +81,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 
 	@Override
 	public String getPluginURL(String pluginKey) throws Exception {
+		logger.info("getPluginURL() called with pluginKey : " + pluginKey); 
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getPluginURL");
 		if (extensionURL == null || extensionURL.isEmpty()) {
 			Connection _conn = getSession();
@@ -103,6 +104,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 	 */
 	@Override
 	public Host getHostSummary(String hostId) throws Exception {
+		logger.info("getHostSummary() hostId : " +  hostId);
 		Host host = new Host();
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getHostSummary");
 		List<String> props = new ArrayList<>();
@@ -117,7 +119,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 
 		ManagedObjectReference hostMoRef = getManagedObjectReference("HostSystem", hostId);
 
-		Map<String, Object> hostprops = _moRefService.entityProps(hostMoRef, props.toArray(new String[]{}));
+		Map<String, Object> hostprops = _moRefService.entityProps(hostMoRef, props.toArray(new String[] {}));
 
 		// Get name
 		String name = (String) hostprops.get("name");
@@ -130,7 +132,8 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 		host.setPortCount(SfVimServiceHelper.getPortCount(adapters));
 
 		// Get Version of CIM provider and Driver
-		ManagedObjectReference imageConfigManager = (ManagedObjectReference) hostprops.get("configManager.imageConfigManager");
+		ManagedObjectReference imageConfigManager = (ManagedObjectReference) hostprops
+				.get("configManager.imageConfigManager");
 
 		List<SoftwarePackage> softwarePackage = _conn.getVimPort().fetchSoftwarePackages(imageConfigManager);
 		host.setCimProviderVersion(SfVimServiceHelper.getCimProviderVersion(softwarePackage));
@@ -160,7 +163,8 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 		GetMOREF _moRefService = new GetMOREF(_conn.getVimPort(), _conn.getServiceContent());
 
 		try {
-			Map<ManagedObjectReference, Map<String, Object>> hosts = _moRefService.inContainerByType(_conn.getServiceContent().getRootFolder(), "HostSystem", props.toArray(new String[]{}));
+			Map<ManagedObjectReference, Map<String, Object>> hosts = _moRefService.inContainerByType(
+					_conn.getServiceContent().getRootFolder(), "HostSystem", props.toArray(new String[] {}));
 			if (hosts == null || hosts.isEmpty())
 				return hostList;
 
@@ -169,7 +173,6 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 				HostSystemConnectionState state = (HostSystemConnectionState) hostprops.get("runtime.connectionState");
 
 				if (!state.equals(HostSystemConnectionState.DISCONNECTED)) {
-					//TODO : Review Comment - Add debug logs for Host found
 					Host host = new Host();
 					host.setId(hostMoRef.getValue());
 					// Get name
@@ -177,7 +180,11 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 					host.setName(name);
 					List<Adapter> adapters = getAdapters(hostprops, hostMoRef.getValue());
 					host.setChildren(adapters);
+					logger.debug("Adding '" + name + "' host to hostList");
 					hostList.add(host);
+				}else{
+					String name = (String) hostprops.get("name");
+					logger.error("Host : '" + name + "' is in Disconnected state");
 				}
 			}
 		} catch (InvalidPropertyFaultMsg | RuntimeFaultFaultMsg e) {
@@ -213,7 +220,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 
 		ManagedObjectReference hostMoRef = getManagedObjectReference("HostSystem", hostId);
 
-		Map<String, Object> hostprops = _moRefService.entityProps(hostMoRef, props.toArray(new String[]{}));
+		Map<String, Object> hostprops = _moRefService.entityProps(hostMoRef, props.toArray(new String[] {}));
 
 		List<Adapter> adapters = getAdapters(hostprops, hostId);
 
@@ -222,8 +229,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 	}
 
 	private List<Adapter> getAdapters(Map<String, Object> hostprops, String hostId) {
-		 // TODO : Review Comment : Add null check 
-		//TODO : Review Comment - Add debug logs for Host found
+		
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getAdapters");
 		List<Adapter> adapters = new ArrayList<>();
 
@@ -235,25 +241,29 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 		// Get Physical Nics
 		ArrayOfPhysicalNic arrayOfPhysicalNic = (ArrayOfPhysicalNic) hostprops.get("config.network.pnic");
 
-		Map<String, PhysicalNic> sfPhysicalNics = SfVimServiceHelper.getSfPhysicalNic(arrayOfPhysicalNic.getPhysicalNic(), sfDeviceIds);
+		Map<String, PhysicalNic> sfPhysicalNics = SfVimServiceHelper
+				.getSfPhysicalNic(arrayOfPhysicalNic.getPhysicalNic(), sfDeviceIds);
 
 		Map<String, List<VMNIC>> vmNICMap = SfVimServiceHelper.mergeToVMNICObject(sfDevices, sfPhysicalNics, hostId);
 		Map<String, Adapter> adapterMap = new HashMap<>();
 		for (HostPciDevice pciDevice : sfDevices) {
 			String id = SfVimServiceHelper.getAdapterId(hostId, pciDevice.getId());
-			Adapter adapter = adapterMap.get(id);
-			if (adapter == null) {
-				adapter = new Adapter();
-			}
-			adapter.setName(pciDevice.getDeviceName());
-			adapter.setId(id);
-			adapter.setDeviceId(Short.toString(pciDevice.getDeviceId()));
-			adapter.setSubSystemDeviceId(Short.toString(pciDevice.getSubDeviceId()));
-			adapter.setVendorId(Short.toString(pciDevice.getVendorId()));
-			adapter.setSubSystemVendorId(Short.toString(pciDevice.getSubVendorId()));
-			adapter.setChildren(vmNICMap.get(id));
+			List<VMNIC> vmNICs = vmNICMap.get(id);
+			if (vmNICs != null) {
+				Adapter adapter = adapterMap.get(id);
+				if (adapter == null) {
+					adapter = new Adapter();
+				}
+				adapter.setName(pciDevice.getDeviceName());
+				adapter.setId(id);
+				adapter.setDeviceId(Short.toString(pciDevice.getDeviceId()));
+				adapter.setSubSystemDeviceId(Short.toString(pciDevice.getSubDeviceId()));
+				adapter.setVendorId(Short.toString(pciDevice.getVendorId()));
+				adapter.setSubSystemVendorId(Short.toString(pciDevice.getSubVendorId()));
+				adapter.setChildren(vmNICs);
 
-			adapterMap.put(id, adapter);
+				adapterMap.put(id, adapter);
+			}
 		}
 		// Set adapter name including device name and mac address
 		for (Adapter adapter : adapterMap.values()) {
@@ -271,21 +281,11 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getCIMHost");
 		logger.info(LOG_KEY + "Getting CIM ticket object for host : " + hostId);
 		Connection _conn = getSession();
-		HostServiceTicket ticket = _conn.getVimPort().acquireCimServicesTicket(getManagedObjectReference("HostSystem", hostId));
+		HostServiceTicket ticket = _conn.getVimPort()
+				.acquireCimServicesTicket(getManagedObjectReference("HostSystem", hostId));
 		String url = CIM_SCHEME + ticket.getHost() + ":" + ticket.getPort() + "/";
 		timer.stop();
 		return new CIMHostSession(url, ticket.getSessionId());
-	}
-
-	// TODO : Cleanup : for testing only
-	public CIMHost getCIMHost(String hostId, String temp) throws Exception {
-		logger.info(LOG_KEY + "Getting CIM ticket object for host : " + hostId);
-		String url = "https://10.101.10.3:5989/";
-		String password = "Ibmx#3750c";
-		String user = "root";
-
-		CIMHost cimHost = new CIMHostUser(url, user, password);
-		return cimHost;
 	}
 
 	private ManagedObjectReference getManagedObjectReference(String type, String value) {

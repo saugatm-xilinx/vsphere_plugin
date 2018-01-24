@@ -11,6 +11,9 @@ import java.util.Map;
 
 import javax.cim.CIMInstance;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
@@ -25,11 +28,10 @@ import com.vmware.vim25.RuntimeFaultFaultMsg;
 
 public class MetadataHelper {
 
-	//private static BinaryFiles metadata;
-	 // TODO : Review Comment : Use logger and check for nulls
+	private static final Log logger = LogFactory.getLog(MetadataHelper.class);
 
 	public static BinaryFiles getMetadata(URL filePath) throws MalformedURLException {
-
+		logger.info("getMetadata called with URL : " + filePath);
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 		byte[] jsonData = readData(filePath, true);
@@ -40,8 +42,10 @@ public class MetadataHelper {
 		return fwMetaData;
 	}
 
-	public static SfFirmware getMetaDataForAdapter(URL pluginURL, SfCIMService cimService, CIMInstance sfFWInstance, CIMInstance nicInstance, FwType fwType) throws MalformedURLException, RuntimeFaultFaultMsg {
-
+	public static SfFirmware getMetaDataForAdapter(URL pluginURL, SfCIMService cimService, CIMInstance sfFWInstance,
+			CIMInstance nicInstance, FwType fwType) throws MalformedURLException, RuntimeFaultFaultMsg {
+		logger.info("getMetaDataForAdapter called for input params pluginURL : " + pluginURL + " FwType : "+fwType);
+		
 		BinaryFiles metadata = null;
 		SfFirmware metaDatafile = null;
 
@@ -70,7 +74,6 @@ public class MetadataHelper {
 			// TODO code for UEFI ROM
 		}
 
-		// TODO: latest version
 		for (SfFirmware file : files) {
 			int type = Integer.parseInt(file.getType());
 			int subType = Integer.parseInt(file.getSubtype());
@@ -78,9 +81,7 @@ public class MetadataHelper {
 				metaDatafile = file;
 			}
 		}
-
 		return metaDatafile;
-
 	}
 
 	private static byte[] readData(URL toDownload, boolean readComplete) {
@@ -89,20 +90,20 @@ public class MetadataHelper {
 		try {
 			byte[] chunk = new byte[1000];
 			int bytesRead;
-			InputStream stream = toDownload.openStream();
-			if (readComplete) {
-				while ((bytesRead = stream.read(chunk)) > 0) {
+			if (toDownload != null) {
+				InputStream stream = toDownload.openStream();
+				if (readComplete) {
+					while ((bytesRead = stream.read(chunk)) > 0) {
+						outputStream.write(chunk, 0, bytesRead);
+					}
+				} else {
+					bytesRead = stream.read(chunk);
 					outputStream.write(chunk, 0, bytesRead);
 				}
-			} else {
-				bytesRead = stream.read(chunk);
-				outputStream.write(chunk, 0, bytesRead);
 			}
 		} catch (IOException e) {
 			return null;
 		}
-
 		return outputStream.toByteArray();
 	}
-
 }

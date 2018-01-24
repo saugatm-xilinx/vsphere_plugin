@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.solarflare.vcp.model.Adapter;
 import com.solarflare.vcp.model.VMNIC;
 import com.vmware.vim25.HostPciDevice;
@@ -15,14 +18,16 @@ import com.vmware.vim25.PhysicalNic;
 import com.vmware.vim25.SoftwarePackage;
 
 public class SfVimServiceHelper {
+	private static final Log logger = LogFactory.getLog(SfVimServiceHelper.class);
 	public static final String VENDOR_SOLARFLARE = "Solarflare";
 	public static final String SLF = "SLF";
 	public static final String CIM = "cim";
 	public static final String SFC = "sfc";
 	public static final short SOLARFLARE_VENDOR_ID = 6436;
-	// TODO : Add logger and null check
+	public static final String ADAPETR_ID_SEPARATOR = "::";
 
 	public static int getAdapterCount(List<HostPciDevice> sfDevices) {
+		logger.info("getAdapterCount() called");
 		Set<String> adapters = new HashSet<>();
 		for (HostPciDevice sfDevice : sfDevices) {
 			adapters.add(Short.toString(sfDevice.getDeviceId()));
@@ -31,17 +36,18 @@ public class SfVimServiceHelper {
 	}
 
 	public static String getDriverVersion(List<SoftwarePackage> softwarePackages) {
+		logger.info("getDriverVersion() called");
 		for (SoftwarePackage softwarePackage : softwarePackages) {
 			List<String> vendors = Arrays.asList(new String[] { SLF, VENDOR_SOLARFLARE });
 			if (vendors.contains(softwarePackage.getVendor()) && softwarePackage.getName().contains("net")) {
 				return softwarePackage.getVersion();
 			}
-
 		}
 		return null;
 	}
 
 	public static String getCimProviderVersion(List<SoftwarePackage> softwarePackages) {
+		logger.info("getCimProviderVersion() called");
 		for (SoftwarePackage softwarePackage : softwarePackages) {
 			List<String> vendors = Arrays.asList(new String[] { SLF, VENDOR_SOLARFLARE });
 			if (vendors.contains(softwarePackage.getVendor()) && softwarePackage.getName().contains(CIM)) {
@@ -109,11 +115,9 @@ public class SfVimServiceHelper {
 	public static String getAdapterId(String hostName, String pciId) {
 		String adapterId = null;
 		if (hostName != null && pciId != null) {
-			// TODO : Review Comment : Use constants instead of hard coding
-			adapterId = hostName + "::" + pciId.split("\\.")[0];
+			adapterId = hostName + ADAPETR_ID_SEPARATOR + pciId.split("\\.")[0];
 		}
 		return adapterId;
-
 	}
 
 	public static Map<String, List<VMNIC>> mergeToVMNICObject(List<HostPciDevice> pciDevices,
@@ -122,7 +126,7 @@ public class SfVimServiceHelper {
 		for (HostPciDevice pciDevice : pciDevices) {
 			PhysicalNic pNIC = pNICs.get(pciDevice.getId());
 			if (pNIC == null) {
-				// TODO : add log and skip
+				logger.debug("pNIC is NULL. Skip merge for this");
 			} else {
 				String id = SfVimServiceHelper.getAdapterId(hostName, pciDevice.getId());
 
@@ -138,14 +142,11 @@ public class SfVimServiceHelper {
 				List<VMNIC> vmNICList = vmNICmap.get(id);
 				if (vmNICList == null) {
 					vmNICList = new ArrayList<>();
-
 				}
-
 				vmNICList.add(vmNIC);
 				vmNICmap.put(id, vmNICList);
 			}
 		}
-
 		return vmNICmap;
 	}
 
@@ -167,7 +168,6 @@ public class SfVimServiceHelper {
 				macAddresses[i++] = nic.getMacAddress();
 			}
 			Arrays.sort(macAddresses);
-			// TODO : Review Comment : Use constants
 			String plainMinMac = macAddresses[0].replaceAll(":", "");
 			return plainMinMac;
 		}

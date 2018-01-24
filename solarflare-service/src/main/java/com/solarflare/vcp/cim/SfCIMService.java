@@ -38,64 +38,53 @@ public class SfCIMService {
 
 	private static final Log logger = LogFactory.getLog(SfCIMService.class);
 
-	
 	SfCIMClientService cimClientService;
+	final String DUMMY_VERSION_STRING = "0.0.0.0";
 
 	public SfCIMService(SfCIMClientService cimClientService) {
 		this.cimClientService = cimClientService;
 	}
 
-	// TODO Cleanup : Written for testing
-	public static void main(String[] args) throws WBEMException {
-		String url = "https://10.101.10.3:5989/";
-		String password = "Ibmx#3750c";
-		String user = "root";
-		String deviceID = "vmnic4";
-		CIMHost cimHost = new CIMHostUser(url, user, password);
-
-		 SfCIMClientService cimClientService = new SfCIMClientService(cimHost);
-
-		SfCIMService cimService = new SfCIMService(cimClientService);
-		//cimService.setCIMClient(cimClient);
-		//cimService.setCimHost(cimHost);
-
-		System.out.println(cimService.getAdapterVersions(deviceID));
-        CIMInstance controller = cimService.getFirmwareSoftwareInstallationInstance();
-        CIMInstance bootROM  = cimService.getBootROMSoftwareInstallationInstance();
-		CIMInstance nic = cimService.getNICCardInstance(deviceID);
-		cimService.getRequiredFwImageName(bootROM, nic);
-		//System.out.println();
-
-        
-        
-
-	}
-
 	public WBEMClient getCIMClient() {
-		//TODO : Review Comment : Add Null check
-		return this.cimClientService.getCimClient();
+		if (this.cimClientService != null) {
+			return this.cimClientService.getCimClient();
+		} else {
+			logger.error("SfCIMClientService is null.");
+			return null;
+		}
 	}
 
 	/**
 	 * 
 	 * @param namespace
 	 * @param classname
-	 * @return All the instances of classname
+	 * @return
 	 * @throws WBEMException
 	 */
 	public Collection<CIMInstance> getAllInstances(final String namespace, final String classname)
 			throws WBEMException {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getAllInstances");
 		WBEMClient client = getCIMClient();
-		CIMObjectPath objectPath = this.cimClientService.getHostObjectPath(null, classname);
+		if (this.cimClientService != null) {
+			CIMObjectPath objectPath = this.cimClientService.getHostObjectPath(null, classname);
 
-		final List<CIMInstance> results = new LinkedList<CIMInstance>();
-		CloseableIterator<CIMInstance> enumeration = client.enumerateInstances(objectPath, true, true, true, null);
-		while (enumeration.hasNext()) {
-			results.add(enumeration.next());
+			final List<CIMInstance> results = new LinkedList<CIMInstance>();
+			if (client != null) {
+				CloseableIterator<CIMInstance> enumeration = client.enumerateInstances(objectPath, true, true, true,
+						null);
+				while (enumeration.hasNext()) {
+					results.add(enumeration.next());
+				}
+				timer.stop();
+				return results;
+			} else {
+				logger.error("CIMClient is null.");
+			}
+		} else {
+			logger.error("SfCIMClientService is null.");
 		}
 		timer.stop();
-		return results;
+		return null;
 	}
 
 	/**
@@ -109,11 +98,10 @@ public class SfCIMService {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getFirmwareSoftwareInstallationInstance");
 		logger.info("Solarflare::Getting Firmware Software Installation Instance");
 		CIMInstance svc_mcfw_inst = null;
-
+		Object namePropValue = null;
 		for (CIMInstance inst : instances) {
-
-			//TODO : Review Comment : use constants and check for null
-			if (inst.getProperty("Name").getValue().equals(CIMConstants.SVC_MCFW_NAME)) {
+			namePropValue = inst.getProperty("Name").getValue();
+			if (namePropValue != null && namePropValue.equals(CIMConstants.SVC_MCFW_NAME)) {
 				svc_mcfw_inst = inst;
 			}
 		}
@@ -132,10 +120,10 @@ public class SfCIMService {
 		Collection<CIMInstance> instances = getAllInstances(CIMConstants.CIM_NAMESPACE,
 				CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE);
 		CIMInstance svc_bootrom_inst = null;
-
+		Object namePropValue = null;
 		for (CIMInstance inst : instances) {
-			//TODO : Review Comment : use constants and check for null
-			if (inst.getProperty("Name").getValue().equals(CIMConstants.SVC_BOOTROM_NAME)) {
+			namePropValue = inst.getProperty("Name").getValue();
+			if (namePropValue != null && namePropValue.equals(CIMConstants.SVC_BOOTROM_NAME)) {
 				svc_bootrom_inst = inst;
 			}
 		}
@@ -152,20 +140,26 @@ public class SfCIMService {
 	private CIMInstance getEthernatePortInstance(String deviceId) throws WBEMException {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getEthernatePortInstance");
 		CIMInstance ethernateInstance = null;
-		//TODO : Review Comment : use constants
-		String cimClass = "SF_EthernetPort";
+		if (deviceId != null && !deviceId.isEmpty()) {
 
-		// Get SF_EthernetPort instance
-		Collection<CIMInstance> instances = getAllInstances(CIMConstants.CIM_NAMESPACE, cimClass);
-		for (CIMInstance inst : instances) {
-			//TODO : Review Comment : use constants and check for null
-			String devId = (String) inst.getProperty("DeviceID").getValue();
-			// String macAddress = (String)
-			// inst.getProperty("PermanentAddress").getValue();
-			if (devId != null && devId.equals(deviceId)) {
-				ethernateInstance = inst;
+			String cimClass = CIMConstants.SF_ETHERNET_PORT;
+
+			// Get SF_EthernetPort instance
+			Collection<CIMInstance> instances = getAllInstances(CIMConstants.CIM_NAMESPACE, cimClass);
+			for (CIMInstance inst : instances) {
+
+				String devId = (String) inst.getProperty("DeviceID").getValue();
+				// String macAddress = (String)
+				// inst.getProperty("PermanentAddress").getValue();
+				if (devId != null && devId.equals(deviceId)) {
+					ethernateInstance = inst;
+				}
 			}
+
+		} else {
+			logger.error("Input deviceId is null");
 		}
+
 		timer.stop();
 		return ethernateInstance;
 	}
@@ -186,24 +180,35 @@ public class SfCIMService {
 	 */
 	public CIMInstance getNICCardInstance(String deviceId) throws WBEMException {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getNICCardInstance");
-		//TODO : Review Comment : check for null - input param
-		// Get EthernatePort Instance
-		CIMInstance ethernateInstance = getEthernatePortInstance(deviceId);
+		CIMInstance nicCardIntance = null;
 
-		// Get SF_ControlledBy instance through association
-		CloseableIterator<CIMInstance> inst = getAssociators(ethernateInstance.getObjectPath(), "SF_ControlledBy", null,
-				"Dependent");
-		CIMInstance controlledByInstance = inst.next();
+		if (deviceId != null && !deviceId.isEmpty()) {
 
-		// Get SF_ControllerSoftwareIdentity instance through association
-		inst = getAssociators(controlledByInstance.getObjectPath(), "SF_ControllerSoftwareIdentity", null, "Dependent");
-		// CIMInstance controllerSoftwareIdentityInstance = inst.next();
+			// Get EthernatePort Instance
+			CIMInstance ethernateInstance = getEthernatePortInstance(deviceId);
+			if (ethernateInstance != null) {
 
-		// Get SF_CardRealizesController and NICCard instance through
-		// association
-		inst = getAssociators(controlledByInstance.getObjectPath(), "SF_CardRealizesController", "SF_NICCard",
-				"Dependent");
-		CIMInstance nicCardIntance = inst.next();
+				// Get SF_ControlledBy instance through association
+				CloseableIterator<CIMInstance> inst = getAssociators(ethernateInstance.getObjectPath(),
+						"SF_ControlledBy", null, "Dependent");
+				CIMInstance controlledByInstance = inst.next();
+
+				// Get SF_ControllerSoftwareIdentity instance through
+				// association
+				inst = getAssociators(controlledByInstance.getObjectPath(), "SF_ControllerSoftwareIdentity", null,
+						"Dependent");
+
+				// Get SF_CardRealizesController and NICCard instance through
+				// association
+				inst = getAssociators(controlledByInstance.getObjectPath(), "SF_CardRealizesController", "SF_NICCard",
+						"Dependent");
+				nicCardIntance = inst.next();
+			} else {
+				logger.error("EthernatePort Instance is null");
+			}
+		} else {
+			logger.error("Input deviceId is null");
+		}
 		timer.stop();
 		return nicCardIntance;
 	}
@@ -215,45 +220,60 @@ public class SfCIMService {
 	 * @throws WBEMException
 	 */
 	public Map<String, String> getAdapterVersions(String deviceId) throws WBEMException {
-		//TODO : Review Comment : Check for null input param
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getAdapterVersions");
 		logger.info("Solarflare::Getting Adapter Versions for Device Id : " + deviceId);
-		
-		
 		Map<String, String> versions = new HashMap<String, String>();
-		// Get EthernatePort Instance
-		CIMInstance ethernateInstance = getEthernatePortInstance(deviceId);
 
-		// Get SF_ControlledBy instance through association
-		CloseableIterator<CIMInstance> inst = getAssociators(ethernateInstance.getObjectPath(),
-				CIMConstants.SF_CONTROLLED_BY, null, "Dependent");
-		CIMInstance controlledByInstance = inst.next();
+		if (deviceId != null && !deviceId.isEmpty()) {
 
-		// Get SF_ControllerSoftwareIdentity instance through association
-		inst = getAssociators(controlledByInstance.getObjectPath(), CIMConstants.SF_CONTROLLER_SOFTWARE_IDENTITY, null,
-				"Dependent");
+			// Get EthernatePort Instance
+			CIMInstance ethernateInstance = getEthernatePortInstance(deviceId);
+			if (ethernateInstance != null) {
+				// Get SF_ControlledBy instance through association
+				CloseableIterator<CIMInstance> inst = getAssociators(ethernateInstance.getObjectPath(),
+						CIMConstants.SF_CONTROLLED_BY, null, "Dependent");
+				CIMInstance controlledByInstance = inst.next();
 
-		while (inst.hasNext()) {
-			CIMInstance instance = inst.next();
-			//TODO : Review Comment : use constants and check for null
-			String versionString = instance.getProperty("VersionString").getValue().toString();
-			if (versionString == null) {
-				versionString = "0.0.0.0"; //TODO : Review Comment : use constants
+				// Get SF_ControllerSoftwareIdentity instance through
+				// association
+				inst = getAssociators(controlledByInstance.getObjectPath(),
+						CIMConstants.SF_CONTROLLER_SOFTWARE_IDENTITY, null, "Dependent");
+
+				while (inst.hasNext()) {
+					CIMInstance instance = inst.next();
+					String versionString = getVersionStringProp(instance);
+					Object descriptionObj = instance.getProperty("Description").getValue();
+					String description = descriptionObj != null ? descriptionObj.toString() : null;
+					if (CIMConstants.DESC_CONTROLLER.equals(description)) {
+						versions.put(CIMConstants.CONTROLLER_VERSION, versionString);
+					} else if (CIMConstants.DESC_BOOT_ROM.equals(description)) {
+						versions.put(CIMConstants.BOOT_ROM_VERSION, versionString);
+					}
+
+				}
+
+			} else {
+				logger.error("EthernatePort Instance is null");
 			}
-			String description = instance.getProperty("Description").getValue().toString();
-			if (CIMConstants.DESC_CONTROLLER.equals(description)) {
-				versions.put(CIMConstants.CONTROLLER_VERSION, versionString);
-			} else if (CIMConstants.DESC_BOOT_ROM.equals(description)) {
-				versions.put(CIMConstants.BOOT_ROM_VERSION, versionString);
-			}
-
-			// Adding dummy values for below
-			//TODO : Review Comment : use constants for dummy
-			versions.put(CIMConstants.FIRMARE_VERSION, "1.1.1.0");
-			versions.put(CIMConstants.UEFI_ROM_VERSION, "1.1.1.0");
+		} else {
+			logger.error("Input deviceId is null");
 		}
+		// Adding dummy values for below
+		versions.put(CIMConstants.FIRMARE_VERSION, DUMMY_VERSION_STRING);
+		versions.put(CIMConstants.UEFI_ROM_VERSION, DUMMY_VERSION_STRING);
 		timer.stop();
 		return versions;
+	}
+
+	private String getVersionStringProp(CIMInstance instance) {
+		String versionString = CIMConstants.DEFAULT_VERSION;
+		Object versionStringObj = instance.getProperty("VersionString").getValue();
+
+		if (versionStringObj != null) {
+			versionString = versionStringObj.toString();
+		}
+
+		return versionString;
 	}
 
 	/**
@@ -297,8 +317,7 @@ public class SfCIMService {
 			CIMInstance nicInstance)
 			throws MalformedURLException, RuntimeFaultFaultMsg, URISyntaxException, WBEMException {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getLatestControllerFWImageVersion");
-		//TODO : Review Comment : use constants 
-		String versionString = "0.0.0.0";
+		String versionString = CIMConstants.DEFAULT_VERSION;
 
 		SfFirmware file = MetadataHelper.getMetaDataForAdapter(pluginURL, cimService, fwInstance, nicInstance,
 				FwType.CONTROLLER);
@@ -313,8 +332,7 @@ public class SfCIMService {
 			CIMInstance nicInstance)
 			throws MalformedURLException, RuntimeFaultFaultMsg, URISyntaxException, WBEMException {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getLatestBootROMFWImageVersion");
-		//TODO : Review Comment : use constants
-		String versionString = "0.0.0.0";
+		String versionString = CIMConstants.DEFAULT_VERSION;
 		SfFirmware file = MetadataHelper.getMetaDataForAdapter(pluginURL, cimService, bootROMInstance, nicInstance,
 				FwType.BOOTROM);
 		if (file != null) {
@@ -351,17 +369,22 @@ public class SfCIMService {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
 		try {
-			byte[] chunk = new byte[1000];
-			int bytesRead;
-			InputStream stream = toDownload.openStream();
-			if (readComplete) {
-				while ((bytesRead = stream.read(chunk)) > 0) {
+			if (toDownload != null) {
+				byte[] chunk = new byte[1000];
+				int bytesRead;
+				InputStream stream = toDownload.openStream();
+				if (readComplete) {
+					while ((bytesRead = stream.read(chunk)) > 0) {
+						outputStream.write(chunk, 0, bytesRead);
+					}
+				} else {
+					bytesRead = stream.read(chunk);
 					outputStream.write(chunk, 0, bytesRead);
 				}
 			} else {
-				bytesRead = stream.read(chunk);
-				outputStream.write(chunk, 0, bytesRead);
+				logger.error("URL is null");
 			}
+
 		} catch (IOException e) {
 			return null;
 		}
@@ -383,15 +406,24 @@ public class SfCIMService {
 		boolean isCompatible = false;
 
 		Map<String, String> params = getRequiredFwImageName(fwInst, nicInstance);
-		int currentType = Integer.parseInt(params.get(CIMConstants.TYPE));
-		int currentSubType = Integer.parseInt(params.get(CIMConstants.SUB_TYPE));
+		int currentType = 0, currentSubType = 0;
+		if (params != null) {
+			currentType = Integer.parseInt(params.get(CIMConstants.TYPE));
+			currentSubType = Integer.parseInt(params.get(CIMConstants.SUB_TYPE));
+		}
+
 		logger.info("Solarflare::Current firmware type : " + currentType);
 		logger.info("Solarflare::Current firmware subtype : " + currentSubType);
 
-		// FileHeader header = getFileHeader(bytes);
-		logger.info("Solarflare::Headers: " + header);
-		int newType = header.getType();
-		int newSubType = header.getSubtype();
+		int newType = 0, newSubType = 0;
+		if (header != null) {
+			logger.info("Solarflare::Headers: " + header);
+			newType = header.getType();
+			newSubType = header.getSubtype();
+		} else {
+			logger.error("FileHeader is null");
+		}
+
 		logger.info("Solarflare::New Type:" + newType);
 		logger.info("Solarflare::New Subtype:" + newSubType);
 
@@ -417,36 +449,41 @@ public class SfCIMService {
 		Map<String, String> params = new HashMap<>();
 
 		try {
-			WBEMClient client = getCIMClient();
+			if (fw_inst != null && nicInstance != null) {
+				WBEMClient client = getCIMClient();
 
-			CIMArgument<CIMObjectPath> cimTarget = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET,
-					new CIMDataType(nicInstance.getClassName()),
-					new CIMObjectPath(MOF.objectHandle(nicInstance.getObjectPath(), false, true)));
+				CIMArgument<CIMObjectPath> cimTarget = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET,
+						new CIMDataType(nicInstance.getClassName()),
+						new CIMObjectPath(MOF.objectHandle(nicInstance.getObjectPath(), false, true)));
 
-			CIMArgument<?>[] cimArguments = { cimTarget }; // input parameters
-			CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
-																		// parameters
+				CIMArgument<?>[] cimArguments = { cimTarget }; // input
+																// parameters
+				CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
+																			// parameters
 
-			Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.GET_FW_IMAGE_NAME, cimArguments,
-					cimArgumentsOut);
-			int statusCode = Integer.parseInt(status.toString());
-			if (statusCode == 0) {
+				Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.GET_FW_IMAGE_NAME,
+						cimArguments, cimArgumentsOut);
+				int statusCode = Integer.parseInt(status.toString());
+				if (statusCode == 0) {
 
-				logger.info("Solarflare::'GetRequiredFwImageName' method invoked successfully!");
+					logger.info("Solarflare::'GetRequiredFwImageName' method invoked successfully!");
 
-				for (int i = 0; i < cimArgumentsOut.length; i++) {
-					if (cimArgumentsOut[i] != null) {
-						params.put(cimArgumentsOut[i].getName(), cimArgumentsOut[i].getValue().toString());
-						logger.info("Solarflare::getRequiredFwImageName:=> " + cimArgumentsOut[i].getName() + " = "
-								+ cimArgumentsOut[i].getValue().toString());
+					for (int i = 0; i < cimArgumentsOut.length; i++) {
+						if (cimArgumentsOut[i] != null) {
+							params.put(cimArgumentsOut[i].getName(), cimArgumentsOut[i].getValue().toString());
+							logger.info("Solarflare::getRequiredFwImageName:=> " + cimArgumentsOut[i].getName() + " = "
+									+ cimArgumentsOut[i].getValue().toString());
+						}
 					}
+				} else {
+					String errMsg = getLatestLogErrorMessage();
+					logger.error(errMsg);
+					throw new Exception(errMsg);
 				}
-			} else {
-				String errMsg = getLatestLogErrorMessage();
-				logger.error(errMsg);
-				throw new Exception(errMsg);
-			}
 
+			} else {
+				logger.error("Input Params are null");
+			}
 		} catch (Exception e) {
 			logger.error("Failed to get required Firmware Image Name for given NIC instance! " + e.getMessage());
 		}
@@ -565,21 +602,14 @@ public class SfCIMService {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: updateFirmwareFromURL");
 		logger.debug("Solarflare:: updateFirmwareFromURL called with input : SfInstance " + softwareIntsallationInstance
 				+ " NIC : " + nic + " fwImagePath : " + fwImagePath);
-		//TODO : Review Comment :check for null input
 		WBEMClient client = getCIMClient();
 		String pMethodName = CIMConstants.INSTALL_FROM_URI;
 
-		// logger.info("Solarflare::Updating nic object: " +
-		// nic.getObjectPath());
 		logger.info("Solarflare::Updating nic object: " + nic);
-		// CIMArgument<CIMObjectPath> target = new
-		// CIMArgument<CIMObjectPath>(CIMConstants.TARGET, new
-		// CIMDataType(nic.getClassName()), new
-		// CIMObjectPath(MOF.objectHandle(nic.getObjectPath(), false, true)));
 		CIMArgument<CIMObjectPath> target = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET,
 				new CIMDataType("SF_NICCard"), nic);
 		CIMArgument<String> uri = new CIMArgument<String>(CIMConstants.URI, CIMDataType.STRING_T,
-				fwImagePath.toString());
+				fwImagePath != null ? fwImagePath.toString() : null);
 
 		Integer[] options = new Integer[] { 3 };
 		CIMArgument<?> installOptions = new CIMArgument<Integer[]>(CIMConstants.INSTALL_OPTIONS,
@@ -597,24 +627,26 @@ public class SfCIMService {
 			Object status = client.invokeMethod(softwareIntsallationInstance, pMethodName, pInputArguments,
 					pOutputArguments);
 			logger.info("Solarflare::status: " + status);
+			if(status != null){
+				int statusCode = Integer.parseInt(status.toString());
+				if (statusCode == 0) {
+					logger.info("Solarflare::'InstallFromURI' method invoked successfully!");
+					return true;
 
-			int statusCode = Integer.parseInt(status.toString());
-			if (statusCode == 0) {
-				logger.info("Solarflare::'InstallFromURI' method invoked successfully!");
-				return true;
-
-			} else {
-				String errMsg = getLatestLogErrorMessage();
-				logger.error(errMsg);
-				throw new SfUpdateRequestFailed(errMsg);
+				} else {
+					String errMsg = getLatestLogErrorMessage();
+					logger.error(errMsg);
+					throw new SfUpdateRequestFailed(errMsg);
+				}
 			}
-
+			
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw e;
 		} finally {
 			timer.stop();
 		}
+		return false;
 	}
 
 	/**
@@ -628,23 +660,34 @@ public class SfCIMService {
 		logger.info("Solarflare::Send Firmware Image Send");
 
 		try {
-			WBEMClient client = getCIMClient();
-			CIMArgument<?> cimFilePath = new CIMArgument<String>(CIMConstants.FILE_NAME, CIMDataType.STRING_T,
-					filePath);
-			CIMArgument<?> cimFileData = new CIMArgument<String>(CIMConstants.BASE64STR, CIMDataType.STRING_T, data);
-			CIMArgument<?>[] cimArguments = { cimFilePath, cimFileData };
-			CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
-																		// parameters
+			if (fw_inst != null) {
+				WBEMClient client = getCIMClient();
+				CIMArgument<?> cimFilePath = new CIMArgument<String>(CIMConstants.FILE_NAME, CIMDataType.STRING_T,
+						filePath);
+				CIMArgument<?> cimFileData = new CIMArgument<String>(CIMConstants.BASE64STR, CIMDataType.STRING_T,
+						data);
+				CIMArgument<?>[] cimArguments = { cimFilePath, cimFileData };
+				CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
+																			// parameters
 
-			Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.SEND_FW_IMAGE_DATA, cimArguments,
-					cimArgumentsOut);
-			int statusCode = Integer.parseInt(status.toString());
-			logger.info("Solarflare::Status Code : " + statusCode);
-			if (statusCode == 0) {
-				logger.info("Solarflare::'SendFwImageData' method invoked successfully!");
+				Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.SEND_FW_IMAGE_DATA,
+						cimArguments, cimArgumentsOut);
+				int statusCode = -1;
+				if (status != null) {
+					statusCode = Integer.parseInt(status.toString());
+					logger.info("Solarflare::Status Code : " + statusCode);
+					if (statusCode == 0) {
+						logger.info("Solarflare::'SendFwImageData' method invoked successfully!");
+					} else {
+						String errMsg = getLatestLogErrorMessage();
+						throw new Exception(errMsg);
+					}
+				} else {
+					logger.error("status returned is null");
+				}
+
 			} else {
-				String errMsg = getLatestLogErrorMessage();
-				throw new Exception(errMsg);
+				logger.error("Input param fw_inst is null");
 			}
 		} catch (Exception e) {
 			logger.error("Failed to Send Firmware Image Data! " + e.getMessage());
@@ -663,23 +706,34 @@ public class SfCIMService {
 		logger.info("Solarflare::Start Firmware Image Send");
 
 		try {
-			WBEMClient client = getCIMClient();
-			CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
-																		// parameters
+			if (fw_inst != null) {
+				WBEMClient client = getCIMClient();
+				CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
+																			// parameters
 
-			Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.START_FW_IMAGE_SEND, null,
-					cimArgumentsOut);
-			int statusCode = Integer.parseInt(status.toString());
-			if (statusCode == 0) {
+				Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.START_FW_IMAGE_SEND, null,
+						cimArgumentsOut);
+				int statusCode = -1;
+				if (status != null) {
+					statusCode = Integer.parseInt(status.toString());
+					if (statusCode == 0) {
 
-				logger.info("Solarflare::'StartFwImageSend' method invoked successfully!");
+						logger.info("Solarflare::'StartFwImageSend' method invoked successfully!");
 
-				if (cimArgumentsOut[0] != null) {
-					filePath = cimArgumentsOut[0].getValue().toString();
+						if (cimArgumentsOut[0] != null) {
+							filePath = cimArgumentsOut[0].getValue().toString();
+						}
+					} else {
+						String errMsg = getLatestLogErrorMessage();
+						throw new Exception(errMsg);
+					}
+
+				} else {
+					logger.error("status returned is null");
 				}
+
 			} else {
-				String errMsg = getLatestLogErrorMessage();
-				throw new Exception(errMsg);
+				logger.error("Input param fw_inst is null");
 			}
 
 		} catch (Exception e) {
@@ -738,37 +792,43 @@ public class SfCIMService {
 		logger.info("Solarflare::Getting Local Firmware Image Version");
 
 		try {
-			WBEMClient client = getCIMClient();
+			if (fw_inst != null && nicInstance != null) {
+				WBEMClient client = getCIMClient();
 
-			// Create type for nicInstance and set input parameter
-			CIMArgument<CIMObjectPath> cimTarget = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET,
-					new CIMDataType(nicInstance.getClassName()),
-					new CIMObjectPath(MOF.objectHandle(nicInstance.getObjectPath(), false, true)));
-			CIMArgument<?> cimFilePath = new CIMArgument<String>(CIMConstants.FILE_NAME, CIMDataType.STRING_T,
-					filePath);
-			CIMArgument<?>[] cimArguments = { cimTarget, cimFilePath }; // input
-																		// parameters
-			CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
-																		// parameters
+				// Create type for nicInstance and set input parameter
+				CIMArgument<CIMObjectPath> cimTarget = new CIMArgument<CIMObjectPath>(CIMConstants.TARGET,
+						new CIMDataType(nicInstance.getClassName()),
+						new CIMObjectPath(MOF.objectHandle(nicInstance.getObjectPath(), false, true)));
+				CIMArgument<?> cimFilePath = new CIMArgument<String>(CIMConstants.FILE_NAME, CIMDataType.STRING_T,
+						filePath);
+				CIMArgument<?>[] cimArguments = { cimTarget, cimFilePath }; // input
+																			// parameters
+				CIMArgument<?>[] cimArgumentsOut = new CIMArgument<?>[5]; // output
+																			// parameters
 
-			Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.GET_LOCAL_FW_IMAGE_VERSION,
-					cimArguments, cimArgumentsOut);
-			int statusCode = Integer.parseInt(status.toString());
-			if (statusCode == 0) {
+				Object status = client.invokeMethod(fw_inst.getObjectPath(), CIMConstants.GET_LOCAL_FW_IMAGE_VERSION,
+						cimArguments, cimArgumentsOut);
+				int statusCode = -1;
+				if (status != null) {
+					statusCode = Integer.parseInt(status.toString());
+					if (statusCode == 0) {
 
-				logger.info("Solarflare::'GetLocalFwImageVersion' method invoked successfully!");
+						logger.info("Solarflare::'GetLocalFwImageVersion' method invoked successfully!");
 
-				for (int i = 0; i < cimArgumentsOut.length; i++) {
-					if (cimArgumentsOut[i] != null) {
-						System.out.println(
-								cimArgumentsOut[i].getName() + " : " + cimArgumentsOut[i].getValue().toString());
+						for (int i = 0; i < cimArgumentsOut.length; i++) {
+							if (cimArgumentsOut[i] != null) {
+								System.out.println(cimArgumentsOut[i].getName() + " : "
+										+ cimArgumentsOut[i].getValue().toString());
+							}
+						}
+					} else {
+						String errMsg = getLatestLogErrorMessage();
+						throw new Exception(errMsg);
 					}
 				}
 			} else {
-				String errMsg = getLatestLogErrorMessage();
-				throw new Exception(errMsg);
+				logger.error("Input params is null");
 			}
-
 		} catch (Exception e) {
 			logger.error("Failed to get required Firmware Image Name for given NIC instance! " + e.getMessage());
 		}

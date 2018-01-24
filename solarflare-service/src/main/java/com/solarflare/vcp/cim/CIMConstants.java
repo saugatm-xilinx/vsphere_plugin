@@ -17,7 +17,7 @@ public interface CIMConstants
     String SF_CONTROLLED_BY = "SF_ControlledBy";
     String SF_CONTROLLER_SOFTWARE_IDENTITY = "SF_ControllerSoftwareIdentity";
     String SF_PROVIDER_LOG = "SF_ProviderLog";
-    
+    String  SF_ETHERNET_PORT = "SF_EthernetPort";
     //Description for Controller and Boot ROM versions
     String DESC_CONTROLLER = "NIC MC Firmware";
     String DESC_BOOT_ROM = "NIC BootROM";

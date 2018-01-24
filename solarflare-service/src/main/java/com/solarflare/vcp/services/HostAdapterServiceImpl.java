@@ -1,5 +1,8 @@
 package com.solarflare.vcp.services;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +17,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sblim.cimclient.internal.util.MOF;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.solarflare.vcp.cim.CIMConstants;
 import com.solarflare.vcp.cim.CIMHost;
 import com.solarflare.vcp.cim.SfCIMClientService;
@@ -88,12 +93,13 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 	public Host getHostById(String hostId) throws Exception {
 		Host host = null;
 		try {
-			host = sfVimService.getHostSummary(hostId);
+			if (hostId != null && !hostId.isEmpty()) {
+				host = sfVimService.getHostSummary(hostId);
+			}
 		} catch (Exception e) {
 			throw e;
 		}
 		return host;
-
 	}
 
 	@Override
@@ -103,26 +109,11 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		String taskID = null;
 		logger.info("Solarflare:: updateFirmwareToLatest");
 		try {
-			// TODO :: Review Comment : validate all adapter before update
-			// TODO : Review Comment : Repetitive code : Put below lines of code
-			// in private method and return TaskInfo
-			TaskManager taskManager = TaskManager.getInstance();
-			taskID = taskManager.getTaskId();
-			TaskInfo taskInfo = new TaskInfo();
-			taskInfo.setTaskid(taskID);
-			taskInfo.setHostId(hostId);
-			taskManager.addTaskInfo(taskInfo);
+			TaskInfo taskInfo = createTask(hostId);
+			taskID = taskInfo.getTaskid();
 
-			// TODO : Review Comment : write private method to return
-			// cimService. Use the same in all updates
 			// TODO : Review Comment : Try Caching cimHost to check performance
-			CIMHost cimHost = sfVimService.getCIMHost(hostId);
-			// CIMHost cimHost = new SfVimServiceImpl().getCIMHost(hostId,
-			// "testingOnly");
-			SfCIMService cimService = new SfCIMService(new SfCIMClientService(cimHost));
-
-			// Call some CIM method for increasing session validity to 15 min
-			cimService.getProperty();
+			SfCIMService cimService = getCIMService(hostId);
 
 			UpdateRequestProcessor requestProcessor = UpdateRequestProcessor.getInstance();
 
@@ -173,23 +164,12 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		String taskID = null;
 		try {
 
-			// TODO : Repetitive code : Put below lines of code in private
-			// method and return TaskInfo
-			TaskManager taskManager = TaskManager.getInstance();
-			taskID = taskManager.getTaskId();
-			TaskInfo taskInfo = new TaskInfo();
-			taskInfo.setTaskid(taskID);
-			taskInfo.setHostId(hostId);
-			taskManager.addTaskInfo(taskInfo);
+			TaskInfo taskInfo = createTask(hostId);
+			taskID = taskInfo.getTaskid();
+
 			URL fwImageURL = null;
 
-			// CIMHost cimHost = new SfVimService().getCIMHost(hostId,
-			// "TestingOnly");
-
-			// TODO : Review Comment : write private method to return
-			// cimService. Use the same in all updates
-			CIMHost cimHost = sfVimService.getCIMHost(hostId);
-			SfCIMService cimService = new SfCIMService(new SfCIMClientService(cimHost));
+			SfCIMService cimService = getCIMService(hostId);
 
 			byte[] dataBytes = base64Data.getBytes();
 			// Decode this data using java's decoder
@@ -228,10 +208,6 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 				sendDataInChunks(cimService, fwInstance, tempFile, decodedDataBytes);
 
 				fwImageURL = new URL("file:/" + tempFile);
-
-				// Call some CIM method for increasing session validity to 15
-				// min
-				cimService.getProperty();
 
 				UpdateRequestProcessor requestProcessor = UpdateRequestProcessor.getInstance();
 				for (Adapter adapter : adapterList) {
@@ -289,24 +265,11 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		String taskID = null;
 		try {
 
-			// TODO : Repetitive code : Put below lines of code in private
-			// method and return TaskInfo
-			TaskManager taskManager = TaskManager.getInstance();
-			taskID = taskManager.getTaskId();
-			TaskInfo taskInfo = new TaskInfo();
-			taskInfo.setTaskid(taskID);
-			taskInfo.setHostId(hostId);
-			taskManager.addTaskInfo(taskInfo);
+			TaskInfo taskInfo = createTask(hostId);
+			taskID = taskInfo.getTaskid();
 
 			URL fwImageURL = new URL(fwImagePath);
-			// TODO : Review Comment : write private method to return
-			// cimService. Use the same in all updates
-			CIMHost cimHost = sfVimService.getCIMHost(hostId);
-			// CIMHost cimHost = new SfVimServiceImpl().getCIMHost(hostId,
-			// "testingOnly");
-			SfCIMService cimService = new SfCIMService(new SfCIMClientService(cimHost));
-			// Call some CIM method for increasing session validity to 15 min
-			cimService.getProperty();
+			SfCIMService cimService = getCIMService(hostId);
 
 			boolean controller = false;
 			boolean bootrom = false;
@@ -370,12 +333,13 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 	public List<Adapter> getHostAdapters(String hostId) throws Exception {
 
 		List<Adapter> adapters = new ArrayList<>();
-		adapters = sfVimService.getHostAdapters(hostId);
-		CIMHost cimHost = sfVimService.getCIMHost(hostId);
+		if (hostId != null && !hostId.isEmpty()) {
+			adapters = sfVimService.getHostAdapters(hostId);
+			SfCIMService cimService = getCIMService(hostId);
 
-		SfCIMService cimService = new SfCIMService(new SfCIMClientService(cimHost));
-		for (Adapter adapter : adapters) {
-			setFirmwareVersions(adapter, cimService);
+			for (Adapter adapter : adapters) {
+				setFirmwareVersions(adapter, cimService);
+			}
 		}
 		return adapters;
 
@@ -402,6 +366,24 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 	public void updateHostConfigurations(HostConfiguration hostConfigurationRequest) throws Exception {
 		// TODO Auto-generated method stub
 
+	}
+
+	private TaskInfo createTask(String hostId) {
+		TaskManager taskManager = TaskManager.getInstance();
+		String taskID = taskManager.getTaskId();
+		TaskInfo taskInfo = new TaskInfo();
+		taskInfo.setTaskid(taskID);
+		taskInfo.setHostId(hostId);
+		taskManager.addTaskInfo(taskInfo);
+		return taskInfo;
+	}
+
+	private SfCIMService getCIMService(String hostId) throws Exception {
+		CIMHost cimHost = sfVimService.getCIMHost(hostId);
+		SfCIMService cimService = new SfCIMService(new SfCIMClientService(cimHost));
+		// Call some CIM method for increasing session validity to 15 min
+		cimService.getProperty();
+		return cimService;
 	}
 
 	private UpdateRequest createUpdateRequest(Adapter adapter, SfCIMService cimService, TaskInfo taskInfo,
@@ -509,14 +491,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 
 		String latestControllerVersion = cimService.getLatestControllerFWImageVersion(pluginURL, cimService, fwInstance,
 				niCimInstance);
-		// Set the latest version available. No need to compare with current
-		// Get latest version otherwise blank value if both are equal
-		// String latestVersion =
-		// VCenterHelper.getLatestVersion(controllerVersion,
-		// latestControllerVersion);
-		// logger.debug("Getting latest version of controller is :" +
-		// latestVersion);
-		// Check for latest version available
+
 		FirmwareVersion frmVesion = new FirmwareVersion();
 
 		frmVesion.setController(latestControllerVersion);
@@ -525,11 +500,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		CIMInstance bootROMInstance = cimService.getBootROMSoftwareInstallationInstance();
 		String latestBootRomVersion = cimService.getLatestBootROMFWImageVersion(pluginURL, cimService, bootROMInstance,
 				niCimInstance);
-		// Set the latest version available. No need to compare with current
-		// logger.debug("Getting latest version of BootRom is :" +
-		// latestBootRomVersion);
-		// String finalLatestBootVersion =
-		// VCenterHelper.getLatestVersion(bootROMVersion, latestBootRomVersion);
+
 		frmVesion.setBootROM(latestBootRomVersion);
 
 		// Put dummy latest versions for UEFI and Firmware family
@@ -538,43 +509,6 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 														// latest for now
 
 		adapter.setLatestVersion(frmVesion);
-	}
-
-	// TODO : Clean up
-	public static void main(String[] args) throws Exception {
-
-		// FileInputStream fRead = new FileInputStream(new
-		// File("D:\\Projects\\SolarFlare\\adapterList.txt"));
-		// byte[] ch = new byte[1925];
-		// int numData = fRead.read(ch);
-		// System.out.println("numData : "+numData);
-
-		/*
-		 * String adapterList = new String(ch); //
-		 * System.out.println("adapterList : "+adapterList); // System.exit(0);
-		 * Gson gson = new Gson(); Type listType = new
-		 * TypeToken<List<Adapter>>() { }.getType();
-		 * 
-		 * List<Adapter> adapter = gson.fromJson(adapterList, listType);
-		 */
-		ConnectionImpl conn = new ConnectionImpl("https://10.101.10.8/sdk", "msys@vsphere.local", "Msys@123", true);
-		conn._login();
-		SfVimServiceImpl service = new SfVimServiceImpl(conn, null);
-
-		HostAdapterServiceImpl obj = new HostAdapterServiceImpl(service);
-		obj.getHostList();
-		/*
-		for (int i = 0; i < 5; i++) {
-			System.out.println("Updating : " + i);
-			String id = obj.updateFirmwareToLatest(adapter, "host-14");
-			System.out.println("--===============--> " + id); //
-			obj.updateFirmwareToLatest(adapter, "host-14"); //
-			obj.updateFirmwareToLatest(adapter, "host-14"); //
-			obj.customUpdateFirmwareFromURL(adapter, "host-14", //
-					"http://10.101.10.132/customFw/v6.2.5.1000/mcfw.dat"); //
-			System.out.println("--------------------------------------------"); //
-			obj.getHostAdapters("host-14");
-		}*/
 	}
 
 	private boolean isValidated(Adapter adapter, TaskInfo taskInfo) {
