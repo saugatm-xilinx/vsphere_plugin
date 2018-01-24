@@ -90,7 +90,7 @@ echo.
 echo - Linking...
 echo.
 
-light.exe -ext WixUtilExtension.dll -loc "English-US.wxl" -out "../build/SolarflareVCPInstaller.msi" -b "%PathToFile%/Tomcat_Server/webapps" "../build/webapps.wixobj" "../build/setup.wixobj" "../build/UserInterface.wixobj" "../build/Common.wixobj" "../build/ErrorText.wixobj" "../build/ProgressText.wixobj" 
+light.exe -ext WixUtilExtension.dll -loc "English-US.wxl" -out "../build/Solarflare_VCP_%ProductVersion%_Installer.msi" -b "%PathToFile%/Tomcat_Server/webapps" "../build/webapps.wixobj" "../build/setup.wixobj" "../build/UserInterface.wixobj" "../build/Common.wixobj" "../build/ErrorText.wixobj" "../build/ProgressText.wixobj" 
 if ERRORLEVEL 1 goto error
 
 goto end

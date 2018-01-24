@@ -21,7 +21,9 @@
 		<Custom Action="LaunchBrowser" After="InstallFinalize">Installed AND (BROWSER_CHECKBOX_PROPERTY="1")</Custom>
 	</InstallExecuteSequence>
 	<AdminExecuteSequence/>
-	<InstallUISequence/>
+	<InstallUISequence>
+		<Custom Action="GetUserIP" Before="CostFinalize"></Custom>
+	</InstallUISequence>
 	<AdminUISequence/>
 	<AdvertiseExecuteSequence/>
 	<Media Id="1" DiskPrompt="Disk 1" Cabinet="setup.cab" EmbedCab="yes" CompressionLevel="mszip"/>
@@ -52,6 +54,8 @@
 	<Property Id="MSIFACT_INSTALLDIR" Value="INSTALLDIR"/>
 	<Property Id="PIDTemplate" Value="&lt;####-####-####-####&gt;"/>
 
+	<EnsureTable Id="ComboBox"/>
+	
 	<Feature Id="bin" Title="bin" Level="1" Description="bin folder" Absent="allow" AllowAdvertise="no" TypicalDefault="install" Display="collapse" InstallDefault="local">
 		<ComponentRef Id="bootstrap.jar"/>
 		<ComponentRef Id="catalina.bat"/>
