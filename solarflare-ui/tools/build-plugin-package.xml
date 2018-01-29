@@ -27,17 +27,18 @@
    
    <!-- custome defind property -->
    <property name="BUILD_PRIFIX" value="solarflare" />
-   <property name="VERSION" value="1.97.0"/>
+   <property name="VERSION" value="1.110.0"/>
    <property name="BUILD_ZIP_DIR" value="${basedir}/../../installer/dist/Tomcat_Server/webapps" />
    <property name="PLUGIN_REGISTRATION" value="${basedir}/../../PluginRegistration"/>
    <property name="P_GOLES" value="clean install" />
    <property name="PLUGIN_PATH" value="solarflare-vcp" />
    <property name="CLASSES" value="${SERVICE_DIR}/target/classes" />
    <property name="FIRMWARE_JAR" value="${FIRMWARE_TOOL_DIR}/target/firmware-packaging-tool.jar" />
-   <property name="DEFAULT_FIRMWARE_PATH" value="D:/temp"/>
    <property name="FIRMWARE_COPY_TO" value="${basedir}/../../installer/dist/Tomcat_Server/webapps/firmware"/>
-  
-   <target name="build" depends="buildCheck, buildUiWar, buildServiceJar, build-firmware-packaging-tool, run_utility, createPluginPackageDir,
+	<target name="firmware">
+		<input message="Enter firmware binary file directory path :" addproperty="DEFAULT_FIRMWARE_PATH"/>
+	</target>
+   <target name="build" depends="firmware, buildCheck, buildUiWar, buildServiceJar, build-firmware-packaging-tool, run_utility, createPluginPackageDir,
          createPluginProxyPackageDir, createPluginNoJavaPackageDir, mvnWindowsSetup, mvnUnixSetup, runMvnGoals,copyPluginPackageDir, copyRegistrationWar">
       <echo level="info">*** You must restart the Virgo server to use the new plugin package! ***</echo>
    </target>
@@ -63,20 +64,19 @@
    </target>
    
    <target name="run_utility">
-    <java classname="com.solarflare.vcp.helper.XMLUtility" fork="true" failonerror="yes">
-		<arg value="${VERSION}"/>
-		<arg value="./plugin-package.xml"/>
-		<classpath>
-			<pathelement path="${CLASSES}"/>
-		</classpath>
-	  </java>
-      <java classname="com.solarflare.firmware.Runner" fork="true" failonerror="yes">
+		<java classname="com.solarflare.vcp.helper.XMLUtility" fork="true" failonerror="yes">
+			<arg value="${VERSION}"/>
+			<arg value="./plugin-package.xml"/>
+			<classpath>
+				<pathelement path="${CLASSES}"/>
+			</classpath>
+		</java>
+		<java classname="com.solarflare.firmware.Runner" fork="true" failonerror="yes">
            <arg value="${DEFAULT_FIRMWARE_PATH}"/>
-           <classpath>
+			<classpath>
                <pathelement path="${FIRMWARE_JAR}"/>
-           </classpath>
-       </java>
-
+			</classpath>
+		</java>
    </target>
    <!-- Edit plugin package before copy-->
 	
