@@ -520,13 +520,13 @@ export class FwupdateComponent implements OnInit {
     }
 
     getCustomUpdateStatus(adapters: object, taskId: string) {
-        this.getAdapterList();
         let obs = Observable.interval(3000)
             .switchMap(() => this.hs.getStatus(taskId).map((data) => data))
             .subscribe((data) => {
                     if (this.status.status === true) {
                         this.status.status = false;
                         this.processStatusCustom(data, adapters);
+                        this.getAdapterList();
                         obs.unsubscribe();
                     }else{
                         this.processStatusCustom(data, adapters);
