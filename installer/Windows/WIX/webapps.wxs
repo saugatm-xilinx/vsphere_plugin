@@ -8,19 +8,19 @@
     </Fragment>
     <Fragment>
         <ComponentGroup Id="ComponentGroupId">
-            <Component Id="cmpC618065A4CC62AAE75176771AD1A66B7" Directory="webapps_dir" Guid="{E6C5DAC8-C2FA-4BEB-93FA-D9EEB7B1303E}">
+            <Component Id="cmpC618065A4CC62AAE75176771AD1A66B7" Directory="webapps_dir" Guid="{67A1DBF8-3D59-4E3C-8691-169F1A121EA4}">
                 <File Id="filFA8BB631D8ABA9B7BFD5A730C2FFCC09" KeyPath="yes" Source="SourceDir\plugin-registration.war" />
             </Component>
-            <Component Id="cmpC00FD776743F5B445EE1A0AC34AE1425" Directory="dirBA01446B316FACDCE6E11AA154840D31" Guid="{1F1B04FD-D428-4848-9319-5F8A0F723EF1}">
+            <Component Id="cmpC00FD776743F5B445EE1A0AC34AE1425" Directory="dirBA01446B316FACDCE6E11AA154840D31" Guid="{93D138D6-987D-4E11-84E5-0BE8726F0C3D}">
                 <File Id="filD63D168A7BD24BE4AE43D28E0DFF0476" KeyPath="yes" Source="SourceDir\firmware\firmware\FirmwareMetadata.json" />
             </Component>
-            <Component Id="cmp49846F9F58099F7B8B16B21FE5D8ACF1" Directory="dirB8560897C06B8BB8D66B01D5682596DD" Guid="{279E1C28-D3C9-42DC-9797-0C63924FC724}">
+            <Component Id="cmp49846F9F58099F7B8B16B21FE5D8ACF1" Directory="dirB8560897C06B8BB8D66B01D5682596DD" Guid="{8874116E-11DC-4EFC-B0F2-1B82546934D0}">
                 <File Id="fil2FAD32DD661B3B6D4E1D5DE0BE8DD0F7" KeyPath="yes" Source="SourceDir\firmware\firmware\bootrom\SFC9140.dat" />
             </Component>
-            <Component Id="cmp5316A7C490915D6604791C91B0330CD8" Directory="dirAEC4ABE1E5A19DD897E5BB57A4361315" Guid="{9CF1AC5F-0894-4DC5-B84B-2CFDE5629F18}">
+            <Component Id="cmp5316A7C490915D6604791C91B0330CD8" Directory="dirAEC4ABE1E5A19DD897E5BB57A4361315" Guid="{B7A44F8D-4B59-4FA8-BE97-E36954A49DD4}">
                 <File Id="filFE610BE46E3C4A923C7EEC556A075437" KeyPath="yes" Source="SourceDir\firmware\firmware\controller\mcfw.dat" />
             </Component>
-            <Component Id="cmp527F7D79F7C4738BEBBCF89A3190443D" Directory="dir1D036038AA53327BE8D23C8A8515AE1D" Guid="{BCCF7CBA-D22F-4436-8AF3-D32BA35EEF4C}">
+            <Component Id="cmp527F7D79F7C4738BEBBCF89A3190443D" Directory="dir1D036038AA53327BE8D23C8A8515AE1D" Guid="{F1892E9C-6743-42C6-B0B9-2F48CE8F406B}">
                 <File Id="fil2D8F1F0B1F7BA230870F523B7DFBBD63" KeyPath="yes" Source="SourceDir\solarflare-vcp\solarflare-1.107.0.zip" />
             </Component>
         </ComponentGroup>
