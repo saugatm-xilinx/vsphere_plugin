@@ -24,6 +24,7 @@ import com.solarflare.vcp.model.BootROM;
 import com.solarflare.vcp.model.Controller;
 import com.solarflare.vcp.model.FwType;
 import com.solarflare.vcp.model.SfFirmware;
+import com.solarflare.vcp.model.UEFIROM;
 import com.vmware.vim25.RuntimeFaultFaultMsg;
 
 public class MetadataHelper {
@@ -69,9 +70,9 @@ public class MetadataHelper {
 			BootROM bootROM = metadata.getBootROM();
 			files = bootROM.getFiles();
 		}
-
 		if (FwType.UEFIROM.equals(fwType)) {
-			// TODO code for UEFI ROM
+			UEFIROM uefiROM = metadata.getUefiROM();
+			files = uefiROM.getFiles();
 		}
 
 		for (SfFirmware file : files) {
