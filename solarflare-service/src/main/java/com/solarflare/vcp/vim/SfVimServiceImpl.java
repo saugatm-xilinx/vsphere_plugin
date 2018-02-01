@@ -283,10 +283,10 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 		CIMHost cimHost = null;
 		
 		cimHost = cimHostCache.get(hostId);
-		if(cimHost!=null){
+		/*if(cimHost!=null){
 			logger.info(LOG_KEY + "Returning CIM Host object from cache for host : " + hostId);
 			return cimHost;
-		}
+		}*/
 		
 		logger.info(LOG_KEY + "Getting CIM ticket object for host : " + hostId);
 		Connection _conn = getSession();
