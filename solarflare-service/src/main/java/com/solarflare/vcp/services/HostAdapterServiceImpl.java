@@ -146,6 +146,18 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 								fWImageURL);
 						requestProcessor.addUpdateRequest(updateRequest);
 					}
+					
+					currentVersion = adapter.getVersionUEFIROM();
+					latestVersion = fwVersion.getUefi();
+					latest = VCenterHelper.getLatestVersion(currentVersion, latestVersion);
+					if (latest.equals(latestVersion)) {
+						logger.debug(
+								"Updating UEFI ROM of adapter " + adapter.getName() + "to version " + latestVersion);
+						URL fWImageURL = null; // for latest update this is null
+						UpdateRequest updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.UEFIROM,
+								fWImageURL);
+						requestProcessor.addUpdateRequest(updateRequest);
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -186,18 +198,25 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 
 			boolean controller = false;
 			boolean bootrom = false;
+			boolean uefirom = false;
 			boolean isFwApplicable = false;
 			CIMInstance fwInstance = null;
 			if (FirmwareType.FIRMWARE_TYPE_MCFW.ordinal() == header.getType()) {
 				logger.debug("Solarflare:: Updating Controller");
-				fwInstance = cimService.getFirmwareSoftwareInstallationInstance();
+				fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_MCFW_NAME);
 				controller = true;
 				isFwApplicable = true;
 			} else if (FirmwareType.FIRMWARE_TYPE_BOOTROM.ordinal() == header.getType()) {
 				// Get BootROM SF_SoftwareInstallationService instance
 				logger.debug("Solarflare:: Updating BootROM");
-				fwInstance = cimService.getBootROMSoftwareInstallationInstance();
+				fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_BOOTROM_NAME);
 				bootrom = true;
+				isFwApplicable = true;
+			}else if(FirmwareType.FIRMWARE_TYPE_UEFIROM.ordinal() == header.getType()){
+				// Get UEFI ROM SF_SoftwareInstallationService instance
+				logger.debug("Solarflare:: Updating UEFI ROM");
+				fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
+				uefirom = true;
 				isFwApplicable = true;
 			}
 
@@ -221,6 +240,10 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 							updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.BOOTROM,
 									fwImageURL);
 						}
+						if (uefirom) {
+							updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.UEFIROM,
+									fwImageURL);
+						}
 
 						updateRequest.setCustom(true); // temp file is created
 						updateRequest.setTempFilePath(tempFile);
@@ -239,12 +262,13 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 
 				Status conntrollerStatus = new Status(TaskState.Error, errMsg, FwType.CONTROLLER);
 				Status bootROMStatus = new Status(TaskState.Error, errMsg, FwType.BOOTROM);
+				Status uefiROMStatus = new Status(TaskState.Error, errMsg, FwType.UEFIROM);
 				for (Adapter adapter : adapterList) {
 					AdapterTask aTask = getAdapterTask(taskInfo, adapter.getId());
 					aTask.setController(conntrollerStatus);
 					aTask.setBootROM(bootROMStatus);
+					aTask.setUefiROM(uefiROMStatus);
 				}
-
 				logger.error(errMsg);
 			}
 
@@ -254,7 +278,6 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		}
 		timer.stop();
 		return taskID;
-
 	}
 
 	@Override
@@ -273,6 +296,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 
 			boolean controller = false;
 			boolean bootrom = false;
+			boolean uefirom = false;
 			boolean readComplete = false;
 			byte[] headerData = cimService.readData(fwImageURL, readComplete);
 			FileHeader header = cimService.getFileHeader(headerData);
@@ -285,6 +309,10 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			} else if (FirmwareType.FIRMWARE_TYPE_BOOTROM.ordinal() == header.getType()) {
 				logger.debug("Solarflare:: Updating BootROM");
 				bootrom = true;
+				isFwApplicable = true;
+			}else if (FirmwareType.FIRMWARE_TYPE_UEFIROM.ordinal() == header.getType()) {
+				logger.debug("Solarflare:: Updating UEFI ROM");
+				uefirom = true;
 				isFwApplicable = true;
 			}
 
@@ -302,7 +330,10 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 							updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.BOOTROM,
 									fwImageURL);
 						}
-
+						if (uefirom) {
+							updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.UEFIROM,
+									fwImageURL);
+						}
 						requestProcessor.addUpdateRequest(updateRequest);
 					}
 				}
@@ -311,14 +342,14 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 				errMsg = "Invalid Firmware File";
 				Status conntrollerStatus = new Status(TaskState.Error, errMsg, FwType.CONTROLLER);
 				Status bootROMStatus = new Status(TaskState.Error, errMsg, FwType.BOOTROM);
+				Status uefiROMStatus = new Status(TaskState.Error, errMsg, FwType.UEFIROM);
 				for (Adapter adapter : adapterList) {
 					AdapterTask aTask = getAdapterTask(taskInfo, adapter.getId());
 					aTask.setController(conntrollerStatus);
 					aTask.setBootROM(bootROMStatus);
+					aTask.setUefiROM(uefiROMStatus);
 				}
-
 				logger.error(errMsg);
-
 			}
 		} catch (Exception e) {
 			timer.stop();
@@ -397,12 +428,13 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		Status status = new Status(TaskState.Queued, null, fwType);
 		if (FwType.CONTROLLER.equals(fwType)) {
 			aTask.setController(status);
-			fwInstance = cimService.getFirmwareSoftwareInstallationInstance();
+			fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_MCFW_NAME);
 		} else if (FwType.BOOTROM.equals(fwType)) {
 			aTask.setBootROM(status);
-			fwInstance = cimService.getBootROMSoftwareInstallationInstance();
+			fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_BOOTROM_NAME);
 		} else if (FwType.UEFIROM.equals(fwType)) {
 			aTask.setUefiROM(status);
+			fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
 		}
 		if (fwImageURL == null) {
 			fwImageURL = getImageURL(fwInstance, nicInstance, cimService, fwType);
@@ -485,26 +517,31 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		adapter.setVersionUEFIROM(UEFIROMVersion);
 
 		// Get version from image binary for controller
-		CIMInstance fwInstance = cimService.getFirmwareSoftwareInstallationInstance();
+		CIMInstance fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_MCFW_NAME);
 		CIMInstance niCimInstance = cimService.getNICCardInstance(deviceId);
 		URL pluginURL = new URL(sfVimService.getPluginURL(CIMConstants.PLUGIN_KEY));
 
-		String latestControllerVersion = cimService.getLatestControllerFWImageVersion(pluginURL, cimService, fwInstance,
-				niCimInstance);
+		String latestControllerVersion = cimService.getLatestFWImageVersion(pluginURL, cimService, fwInstance,
+				niCimInstance,FwType.CONTROLLER);
 
 		FirmwareVersion frmVesion = new FirmwareVersion();
 
 		frmVesion.setController(latestControllerVersion);
 
 		// Get version from image binary for BootRom
-		CIMInstance bootROMInstance = cimService.getBootROMSoftwareInstallationInstance();
-		String latestBootRomVersion = cimService.getLatestBootROMFWImageVersion(pluginURL, cimService, bootROMInstance,
-				niCimInstance);
+		CIMInstance bootROMInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_BOOTROM_NAME);
+		String latestBootROMVersion = cimService.getLatestFWImageVersion(pluginURL, cimService, bootROMInstance,
+				niCimInstance,FwType.BOOTROM);
 
-		frmVesion.setBootROM(latestBootRomVersion);
+		frmVesion.setBootROM(latestBootROMVersion);
 
-		// Put dummy latest versions for UEFI and Firmware family
-		frmVesion.setUefi(UEFIROMVersion); // setting current as latest for now
+		// Get version from image binary for BootRom
+		CIMInstance uefiROMInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
+		String latestUefiROMVersion = cimService.getLatestFWImageVersion(pluginURL, cimService, uefiROMInstance,
+				niCimInstance,FwType.UEFIROM);
+		frmVesion.setUefi(latestUefiROMVersion);
+
+		// Put dummy latest versions for Firmware family
 		frmVesion.setFirmewareFamily(firmwareVersion); // setting current as
 														// latest for now
 

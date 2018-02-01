@@ -11,6 +11,7 @@ public interface CIMConstants
     
     String SVC_BOOTROM_NAME = "BootROM";
     String SVC_MCFW_NAME = "Firmware";
+    String SVC_UEFI_NAME= "UEFIROM";
     
     // SolarFlare CIM Classes
     String SF_SOFTWARE_INSTALLATION_SERVICE = "SF_SoftwareInstallationService";
@@ -21,6 +22,7 @@ public interface CIMConstants
     //Description for Controller and Boot ROM versions
     String DESC_CONTROLLER = "NIC MC Firmware";
     String DESC_BOOT_ROM = "NIC BootROM";
+    String DESC_UEFI_ROM = "NIC UEFIROM";
     
     // Different versions for adapter
     String CONTROLLER_VERSION = "ControllerVersion";

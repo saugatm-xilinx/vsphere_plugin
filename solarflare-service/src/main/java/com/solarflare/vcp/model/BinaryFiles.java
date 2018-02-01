@@ -10,6 +10,15 @@ public class BinaryFiles implements Serializable {
 	private static final long serialVersionUID = -3013944344069991065L;
 	private Controller controller;
 	private BootROM bootROM;
+	private UEFIROM uefiROM;
+
+	public UEFIROM getUefiROM() {
+		return uefiROM;
+	}
+
+	public void setUefiROM(UEFIROM uefiROM) {
+		this.uefiROM = uefiROM;
+	}
 
 	public Controller getController() {
 		return controller;
@@ -29,6 +38,8 @@ public class BinaryFiles implements Serializable {
 
 	@Override
 	public String toString() {
-		return "BinaryFiles [controller=" + controller + ", bootROM=" + bootROM + "]";
+		return "BinaryFiles [controller=" + controller + ", bootROM=" + bootROM + ", uefiROM=" + uefiROM + "]";
 	}
+
+	
 }

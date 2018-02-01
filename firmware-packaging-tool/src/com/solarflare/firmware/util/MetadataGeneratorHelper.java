@@ -19,16 +19,19 @@ import com.solarflare.firmware.model.Controller;
 import com.solarflare.firmware.model.FileHeader;
 import com.solarflare.firmware.model.FirmwareType;
 import com.solarflare.firmware.model.SfFirmware;
+import com.solarflare.firmware.model.UEFIROM;
 
 public class MetadataGeneratorHelper
 {
     static BinaryFiles metaModel = new BinaryFiles();
     static Controller controller = new Controller();
     static BootROM bootROM = new BootROM();
+    static UEFIROM uefiROM = new UEFIROM();
     static String FILE_SEPARATOR = "/";
     static int basePathLastIndex;
     static String METADATA_JSON = "FirmwareMetadata.json";
     static String BINARY_FILE_EXTENTION = "dat"; 
+    static String FIRMWARE = "firmware";
 
     /**
      * Generate JSON file for firmware metadata information
@@ -67,8 +70,18 @@ public class MetadataGeneratorHelper
                 {
 
                     String path = fil.getParent();
-                    String relativePath = FILE_SEPARATOR + "firmware" + FILE_SEPARATOR
-                            + path.substring(basePathLastIndex + 1, path.length());
+                   
+                    String relativePath="";
+                    if(basePathLastIndex == path.length())
+                    {
+                     relativePath = FILE_SEPARATOR + FIRMWARE;
+                    }
+                    else
+                    {
+                      relativePath = FILE_SEPARATOR + FIRMWARE + FILE_SEPARATOR
+                                 + path.substring(basePathLastIndex + 1, path.length());
+                    }
+                    
                     FileHeader header = getFileHeader(readData(fil, false));
                     if (FirmwareType.FIRMWARE_TYPE_MCFW.ordinal() == header.getType())
                     {
@@ -112,6 +125,28 @@ public class MetadataGeneratorHelper
                             sfFirmwareList.add(sfFirmware);
                             bootROM.setFiles(sfFirmwareList);
                             metaModel.setBootROM(bootROM);
+                        }
+                    }
+                    else if (FirmwareType.FIRMWARE_TYPE_UEFIROM.ordinal() == header.getType())
+                    {
+                        // For UEFI ROM binary file
+                        SfFirmware sfFirmware = new SfFirmware();
+                        sfFirmware.setName(fil.getName());
+                        sfFirmware.setType("" + header.getType());
+                        sfFirmware.setSubtype("" + header.getSubtype());
+                        sfFirmware.setVersionString(header.getVersionString());
+                        sfFirmware.setPath(relativePath + FILE_SEPARATOR + fil.getName());
+
+                        if (metaModel != null && metaModel.getUefiROM() != null)
+                        {
+                            metaModel.getUefiROM().getFiles().add(sfFirmware);
+                        }
+                        else
+                        {
+                            List<SfFirmware> sfFirmwareList = new ArrayList<>();
+                            sfFirmwareList.add(sfFirmware);
+                            uefiROM.setFiles(sfFirmwareList);
+                            metaModel.setUefiROM(uefiROM);
                         }
                     }
                 }

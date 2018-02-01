@@ -42,6 +42,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 	private String extensionURL;
 	private Connection connection;
 	private UserSessionService userSessionService;
+	private static final Map<String,CIMHost> cimHostCache = new HashMap<>();
 
 	public UserSessionService getUserSessionService() {
 		return userSessionService;
@@ -279,13 +280,24 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 	@Override
 	public CIMHost getCIMHost(String hostId) throws Exception {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getCIMHost");
+		CIMHost cimHost = null;
+		
+		cimHost = cimHostCache.get(hostId);
+		if(cimHost!=null){
+			logger.info(LOG_KEY + "Returning CIM Host object from cache for host : " + hostId);
+			return cimHost;
+		}
+		
 		logger.info(LOG_KEY + "Getting CIM ticket object for host : " + hostId);
 		Connection _conn = getSession();
 		HostServiceTicket ticket = _conn.getVimPort()
 				.acquireCimServicesTicket(getManagedObjectReference("HostSystem", hostId));
 		String url = CIM_SCHEME + ticket.getHost() + ":" + ticket.getPort() + "/";
 		timer.stop();
-		return new CIMHostSession(url, ticket.getSessionId());
+		cimHost = new CIMHostSession(url, ticket.getSessionId());
+		//Add cimHost to cache
+		cimHostCache.put(hostId,cimHost);
+		return cimHost;
 	}
 
 	private ManagedObjectReference getManagedObjectReference(String type, String value) {

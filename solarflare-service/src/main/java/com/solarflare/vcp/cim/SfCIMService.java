@@ -86,49 +86,28 @@ public class SfCIMService {
 		timer.stop();
 		return null;
 	}
-
+		
 	/**
 	 * 
-	 * @return Instance of Controller Software Installation Service
+	 * @param firmwareTypeName
+	 * @return Instance of Software Installation Service for given Firmware Type 
 	 * @throws WBEMException
 	 */
-	public CIMInstance getFirmwareSoftwareInstallationInstance() throws WBEMException {
+	public CIMInstance getSoftwareInstallationInstance(String firmwareTypeName) throws WBEMException {
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getSoftwareInstallationInstance");
+		logger.info("Solarflare::Getting Software Installation Instance for firmware type : " + firmwareTypeName);
 		Collection<CIMInstance> instances = getAllInstances(CIMConstants.CIM_NAMESPACE,
 				CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE);
-		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getFirmwareSoftwareInstallationInstance");
-		logger.info("Solarflare::Getting Firmware Software Installation Instance");
-		CIMInstance svc_mcfw_inst = null;
+		CIMInstance svc_inst = null;
 		Object namePropValue = null;
 		for (CIMInstance inst : instances) {
 			namePropValue = inst.getProperty("Name").getValue();
-			if (namePropValue != null && namePropValue.equals(CIMConstants.SVC_MCFW_NAME)) {
-				svc_mcfw_inst = inst;
+			if (namePropValue != null && namePropValue.equals(firmwareTypeName)) {
+				svc_inst = inst;
 			}
 		}
 		timer.stop();
-		return svc_mcfw_inst;
-	}
-
-	/**
-	 * 
-	 * @return Instance of BootROM Software Installation Service
-	 * @throws WBEMException
-	 */
-	public CIMInstance getBootROMSoftwareInstallationInstance() throws WBEMException {
-		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getBootROMSoftwareInstallationInstance");
-		logger.info("Solarflare::Getting BootROM Software Installation Instance");
-		Collection<CIMInstance> instances = getAllInstances(CIMConstants.CIM_NAMESPACE,
-				CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE);
-		CIMInstance svc_bootrom_inst = null;
-		Object namePropValue = null;
-		for (CIMInstance inst : instances) {
-			namePropValue = inst.getProperty("Name").getValue();
-			if (namePropValue != null && namePropValue.equals(CIMConstants.SVC_BOOTROM_NAME)) {
-				svc_bootrom_inst = inst;
-			}
-		}
-		timer.stop();
-		return svc_bootrom_inst;
+		return svc_inst;
 	}
 
 	/**
@@ -248,10 +227,10 @@ public class SfCIMService {
 						versions.put(CIMConstants.CONTROLLER_VERSION, versionString);
 					} else if (CIMConstants.DESC_BOOT_ROM.equals(description)) {
 						versions.put(CIMConstants.BOOT_ROM_VERSION, versionString);
+					} else if (CIMConstants.DESC_UEFI_ROM.equals(description)) {
+						versions.put(CIMConstants.UEFI_ROM_VERSION, versionString);
 					}
-
 				}
-
 			} else {
 				logger.error("EthernatePort Instance is null");
 			}
@@ -260,7 +239,7 @@ public class SfCIMService {
 		}
 		// Adding dummy values for below
 		versions.put(CIMConstants.FIRMARE_VERSION, DUMMY_VERSION_STRING);
-		versions.put(CIMConstants.UEFI_ROM_VERSION, DUMMY_VERSION_STRING);
+
 		timer.stop();
 		return versions;
 	}
@@ -312,35 +291,21 @@ public class SfCIMService {
 
 		return valid;
 	}
-
-	public String getLatestControllerFWImageVersion(URL pluginURL, SfCIMService cimService, CIMInstance fwInstance,
-			CIMInstance nicInstance)
+	
+	public String getLatestFWImageVersion(URL pluginURL, SfCIMService cimService, CIMInstance bootROMInstance,
+			CIMInstance nicInstance, FwType fwType)
 			throws MalformedURLException, RuntimeFaultFaultMsg, URISyntaxException, WBEMException {
-		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getLatestControllerFWImageVersion");
-		String versionString = CIMConstants.DEFAULT_VERSION;
-
-		SfFirmware file = MetadataHelper.getMetaDataForAdapter(pluginURL, cimService, fwInstance, nicInstance,
-				FwType.CONTROLLER);
-		if (file != null) {
-			versionString = file.getVersionString();
-		}
-		timer.stop();
-		return versionString;
-	}
-
-	public String getLatestBootROMFWImageVersion(URL pluginURL, SfCIMService cimService, CIMInstance bootROMInstance,
-			CIMInstance nicInstance)
-			throws MalformedURLException, RuntimeFaultFaultMsg, URISyntaxException, WBEMException {
-		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getLatestBootROMFWImageVersion");
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getLatestFWImageVersion");
 		String versionString = CIMConstants.DEFAULT_VERSION;
 		SfFirmware file = MetadataHelper.getMetaDataForAdapter(pluginURL, cimService, bootROMInstance, nicInstance,
-				FwType.BOOTROM);
+				fwType);
 		if (file != null) {
 			versionString = file.getVersionString();
 		}
 		timer.stop();
 		return versionString;
 	}
+	
 
 	/**
 	 * 
@@ -627,7 +592,7 @@ public class SfCIMService {
 			Object status = client.invokeMethod(softwareIntsallationInstance, pMethodName, pInputArguments,
 					pOutputArguments);
 			logger.info("Solarflare::status: " + status);
-			if(status != null){
+			if (status != null) {
 				int statusCode = Integer.parseInt(status.toString());
 				if (statusCode == 0) {
 					logger.info("Solarflare::'InstallFromURI' method invoked successfully!");
@@ -639,7 +604,7 @@ public class SfCIMService {
 					throw new SfUpdateRequestFailed(errMsg);
 				}
 			}
-			
+
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw e;
@@ -846,5 +811,5 @@ public class SfCIMService {
 
 		}
 	}
-
+	
 }
