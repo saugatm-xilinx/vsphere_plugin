@@ -463,12 +463,12 @@ export class FwupdateComponent implements OnInit {
             }
             if (i['bootRom'] !== null ){
                 total++;
-                if(i['bootRom']['state'] === 'Success' || i['controller']['state'] === 'Error')
+                if(i['bootRom']['state'] === 'Success' || i['bootRom']['state'] === 'Error')
                     current++;
             }
             if (i['uefiRom'] !== null ){
                 total++;
-                if(i['uefiRom']['state'] === 'Success' || i['controller']['state'] === 'Error')
+                if(i['uefiRom']['state'] === 'Success' || i['uefiRom']['state'] === 'Error')
                     current++;
             }
 

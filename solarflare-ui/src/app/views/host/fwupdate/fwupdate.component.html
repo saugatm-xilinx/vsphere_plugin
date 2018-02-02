@@ -333,17 +333,17 @@
 
             <div *ngIf="output.uefiRom !== null">
                 <span *ngIf="output.uefiRom.state === 'Success' && output.uefiRom.to ">
-                UefiROM Firmware: v{{output.uefiRom.from}} updated to v{{output.uefiRom.to}}
+                UEFIROM Firmware: v{{output.uefiRom.from}} updated to v{{output.uefiRom.to}}
             </span>
                 <span *ngIf="output.uefiRom.state === 'Success' && !output.uefiRom.to ">
-                UefiROM Firmware: v{{output.uefiRom.from}} updating ...
+                UEFIROM Firmware: v{{output.uefiRom.from}} updating ...
             </span>
                 <span *ngIf="output.uefiRom.state === 'Error'">
-                UefiROM Firmware: Error occurred while updating v{{output.uefiRom.from}}
+                UEFIROM Firmware: Error occurred while updating v{{output.uefiRom.from}}
                 <i style="color: red;" *ngIf="output.uefiRom.message !== null"><br/>{{output.uefiRom.message}}</i>
             </span>
                 <span *ngIf="output.uefiRom.state === 'Queued' || output.uefiRom.state === 'Running'">
-                UefiROM Firmware: v{{output.uefiRom.from}} updating ...
+                UEFIROM Firmware: v{{output.uefiRom.from}} updating ...
             </span>
                 <br/>
             </div>
