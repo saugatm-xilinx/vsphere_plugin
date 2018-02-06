@@ -13,7 +13,8 @@
 		<Custom Action="ServerInstall" Before="InstallFinalize">NOT Installed</Custom>
 		<Custom Action="ServerInstallRollback" Before="ServerInstall">NOT Installed</Custom>
 		<Custom Action="ServerStart" After="ServerInstall">NOT Installed</Custom>
-		<Custom Action="ServerStartRollback" After="ServerStart">NOT Installed</Custom>
+		<Custom Action="ServerStartRollback" Before="ServerStart">NOT Installed</Custom>
+		<Custom Action="ServiceStartAuto" After="ServerStart">NOT Installed</Custom>
 		<Custom Action="ServerStop" Before="ServerUninstall">Installed</Custom>
 		<Custom Action="ServerStopRollback" Before="ServerStop">Installed</Custom>
 		<Custom Action="ServerUninstall" Before="RemoveRegistryValues">Installed AND (REMOVE="ALL")</Custom>
@@ -170,6 +171,7 @@
 	<SetProperty Id="ServerInstallRollback" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\service.bat&quot; remove" Sequence="execute" Before="ServerInstallRollback" />
 	<SetProperty Id="ServerStart" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\tomcat9.exe&quot; start" Sequence="execute" Before="ServerStart" />
 	<SetProperty Id="ServerStartRollback" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\tomcat9.exe&quot; stop" Sequence="execute" Before="ServerStartRollback" />
+	<SetProperty Id="ServiceStartAuto" Value="&quot;[WindowsFolder]system32\sc.exe&quot; config Tomcat9 start=auto" Sequence="execute" Before="ServiceStartAuto" />
 	<SetProperty Id="ServerStop" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\tomcat9.exe&quot; stop" Sequence="execute" Before="ServerStop" />
 	<SetProperty Id="ServerStopRollback" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\tomcat9.exe&quot; start" Sequence="execute" Before="ServerStopRollback" />
 	<SetProperty Id="ServerUninstall" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\service.bat&quot; remove" Sequence="execute" Before="ServerUninstall" />
@@ -184,12 +186,13 @@
 	<CustomAction Id="ServerInstallRollback" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="rollback" Impersonate="no" Return="ignore"/>
 	<CustomAction Id="ServerStart" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Impersonate="no" Return="check"/>
 	<CustomAction Id="ServerStartRollback" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="rollback" Impersonate="no" Return="ignore"/>
+	<CustomAction Id="ServiceStartAuto" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Impersonate="no" Return="check"/>
 	<CustomAction Id="ServerStop" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Impersonate="no" Return="check"/>
 	<CustomAction Id="ServerStopRollback" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="rollback" Impersonate="no" Return="ignore"/>
 	<CustomAction Id="ServerUninstall" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Impersonate="no" Return="check"/>
 	<CustomAction Id="ServerUninstallRollback" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="rollback" Impersonate="no" Return="ignore"/>
 	<CustomAction Id="LaunchBrowser" Property="BROWSER" Execute="immediate" ExeCommand="$(var.URL)" Return="asyncNoWait" />	
-	
+
 </Product>
 <Fragment>
 	<DirectoryRef Id="TARGETDIR">

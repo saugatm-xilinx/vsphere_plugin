@@ -106,17 +106,8 @@ namespace CustomActions
         {
             string InstallFolder = session.CustomActionData["INSTALLDIR"];
             string file = InstallFolder + "Tomcat_Server\\webapps\\plugin-registration\\WEB-INF\\registerPlugin.properties";
-            string Dirpath = InstallFolder + "Tomcat_Server\\webapps\\plugin-registration\\WEB-INF";
 
-            // Adding access permission to the current directory (Dirpath)           
-            DirectoryInfo dInfo = new DirectoryInfo(Dirpath);
-            DirectorySecurity dSecurity = dInfo.GetAccessControl();
-            dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null),
-                                                     FileSystemRights.FullControl,
-                                                     InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit,
-                                                     PropagationFlags.NoPropagateInherit, AccessControlType.Allow)
-                                                     );
-            dInfo.SetAccessControl(dSecurity);
+            System.Threading.Thread.Sleep(5000);
 
             try
             {
@@ -128,12 +119,16 @@ namespace CustomActions
                     // Replacing 'localhost' with the given 'ip'
                     rows = rows.Replace("localhost", ip);
                     File.WriteAllText(file, rows);
-                    session.Log("registerPlugin properties file updated successfully");
+                    session.Log("registerPlugin.properties file updated successfully");
+                    return ActionResult.Success;
                 }
                 else
-                    session.Log("Properties file doesn't exist");
+                {
+                    session.Log("registerPlugin.properties file doesn't exist");
+                    return ActionResult.Failure;
+                }
 
-                return ActionResult.Success;
+
             }
             catch (Exception ex)
             {
