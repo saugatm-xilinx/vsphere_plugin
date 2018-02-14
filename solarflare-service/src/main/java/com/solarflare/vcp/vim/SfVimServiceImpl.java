@@ -13,6 +13,8 @@ import org.springframework.beans.factory.InitializingBean;
 import com.solarflare.vcp.cim.CIMHost;
 import com.solarflare.vcp.cim.CIMHostSession;
 import com.solarflare.vcp.cim.CIMHostUser;
+import com.solarflare.vcp.cim.SfCIMClientService;
+import com.solarflare.vcp.cim.SfCIMService;
 import com.solarflare.vcp.model.Adapter;
 import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.VMNIC;
@@ -42,7 +44,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 	private String extensionURL;
 	private Connection connection;
 	private UserSessionService userSessionService;
-	private static final Map<String,CIMHost> cimHostCache = new HashMap<>();
+	private static final Map<String, CIMHost> cimHostCache = new HashMap<>();
 
 	public UserSessionService getUserSessionService() {
 		return userSessionService;
@@ -82,7 +84,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 
 	@Override
 	public String getPluginURL(String pluginKey) throws Exception {
-		logger.info("getPluginURL() called with pluginKey : " + pluginKey); 
+		logger.info("getPluginURL() called with pluginKey : " + pluginKey);
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getPluginURL");
 		if (extensionURL == null || extensionURL.isEmpty()) {
 			Connection _conn = getSession();
@@ -105,7 +107,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 	 */
 	@Override
 	public Host getHostSummary(String hostId) throws Exception {
-		logger.info("getHostSummary() hostId : " +  hostId);
+		logger.info("getHostSummary() hostId : " + hostId);
 		Host host = new Host();
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getHostSummary");
 		List<String> props = new ArrayList<>();
@@ -183,7 +185,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 					host.setChildren(adapters);
 					logger.debug("Adding '" + name + "' host to hostList");
 					hostList.add(host);
-				}else{
+				} else {
 					String name = (String) hostprops.get("name");
 					logger.error("Host : '" + name + "' is in Disconnected state");
 				}
@@ -230,7 +232,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 	}
 
 	private List<Adapter> getAdapters(Map<String, Object> hostprops, String hostId) {
-		
+
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getAdapters");
 		List<Adapter> adapters = new ArrayList<>();
 
@@ -269,7 +271,10 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 		// Set adapter name including device name and mac address
 		for (Adapter adapter : adapterMap.values()) {
 			String minMacAddress = SfVimServiceHelper.getMinMacAddress(adapter.getChildren());
-			String adapterName = adapter.getName() + "-" + minMacAddress;
+			// VSPPLUG-154 - Using "Part Number" Field for adapter name
+			String deviceId = adapter.getChildren().get(0).getName();
+			String partNumber = getPartNumber(hostId, deviceId);
+			String adapterName = partNumber + "-" + minMacAddress;
 			adapter.setName(adapterName);
 			adapters.add(adapter);
 		}
@@ -277,17 +282,33 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 		return adapters;
 	}
 
+	private String getPartNumber(String hostId, String deviceId) {
+		CIMHost cimHost;
+		String partNumber = null;
+		try {
+			cimHost = getCIMHost(hostId);
+			SfCIMService cimService = new SfCIMService(new SfCIMClientService(cimHost));
+			partNumber = cimService.getPartNumber(deviceId);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return partNumber;
+	}
+
 	@Override
 	public CIMHost getCIMHost(String hostId) throws Exception {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getCIMHost");
 		CIMHost cimHost = null;
-		
+
 		cimHost = cimHostCache.get(hostId);
-		/*if(cimHost!=null){
-			logger.info(LOG_KEY + "Returning CIM Host object from cache for host : " + hostId);
-			return cimHost;
-		}*/
-		
+		/*
+		 * if(cimHost!=null){ logger.info(LOG_KEY +
+		 * "Returning CIM Host object from cache for host : " + hostId); return
+		 * cimHost; }
+		 */
+
 		logger.info(LOG_KEY + "Getting CIM ticket object for host : " + hostId);
 		Connection _conn = getSession();
 		HostServiceTicket ticket = _conn.getVimPort()
@@ -295,8 +316,8 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 		String url = CIM_SCHEME + ticket.getHost() + ":" + ticket.getPort() + "/";
 		timer.stop();
 		cimHost = new CIMHostSession(url, ticket.getSessionId());
-		//Add cimHost to cache
-		cimHostCache.put(hostId,cimHost);
+		// Add cimHost to cache
+		cimHostCache.put(hostId, cimHost);
 		return cimHost;
 	}
 

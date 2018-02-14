@@ -86,11 +86,11 @@ public class SfCIMService {
 		timer.stop();
 		return null;
 	}
-		
+
 	/**
 	 * 
 	 * @param firmwareTypeName
-	 * @return Instance of Software Installation Service for given Firmware Type 
+	 * @return Instance of Software Installation Service for given Firmware Type
 	 * @throws WBEMException
 	 */
 	public CIMInstance getSoftwareInstallationInstance(String firmwareTypeName) throws WBEMException {
@@ -291,7 +291,7 @@ public class SfCIMService {
 
 		return valid;
 	}
-	
+
 	public String getLatestFWImageVersion(URL pluginURL, SfCIMService cimService, CIMInstance bootROMInstance,
 			CIMInstance nicInstance, FwType fwType)
 			throws MalformedURLException, RuntimeFaultFaultMsg, URISyntaxException, WBEMException {
@@ -305,7 +305,6 @@ public class SfCIMService {
 		timer.stop();
 		return versionString;
 	}
-	
 
 	/**
 	 * 
@@ -811,5 +810,30 @@ public class SfCIMService {
 
 		}
 	}
-	
+
+	/**
+	 * Return Part Number for given deviceID 
+	 * @param deviceId
+	 * @return Part Number
+	 */
+	public String getPartNumber(String deviceId) {
+		String partNumber = null;
+		if (null == deviceId || deviceId.isEmpty()) {
+			logger.info("deviceId is null");
+		} else {
+			try {
+				CIMInstance nicCardInstance = getNICCardInstance(deviceId);
+				Object partNumberObj = nicCardInstance.getProperty("PartNumber").getValue();
+
+				if (partNumberObj != null) {
+					partNumber = partNumberObj.toString();
+				}
+
+			} catch (WBEMException e) {
+				logger.error("Error in getiing Part Number for deviceId : " + deviceId + ", Error : " + e.getMessage());
+			}
+
+		}
+		return partNumber;
+	}
 }
