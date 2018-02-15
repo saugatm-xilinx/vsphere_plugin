@@ -28,17 +28,15 @@
             </div>
         </div>
         <clr-vertical-nav *ngIf="hosts.length !== 0" [clrVerticalNavCollapsible]="Collapsible">
-            <clr-vertical-nav-group *ngFor="let host of hosts"
-                                    routerLink="/host/{{host.id}}" routerLinkActive="active">
+            <clr-vertical-nav-group *ngFor="let host of hosts">
                 <clr-icon shape="host" clrVerticalNavIcon></clr-icon>
-                {{host.name}}
+                <a routerLink="/host/{{host.id}}" routerLinkActive="active"> {{host.name}}</a>
                 <clr-vertical-nav-group-children>
                     <div style="margin-left:6px;">
-                        <clr-vertical-nav-group *ngFor="let adaptor of host.children"
-                                                routerLink="/adaptor/{{adaptor.id}}"
-                                                routerLinkActive="active">
+                        <clr-vertical-nav-group *ngFor="let adaptor of host.children">
                             <img src="../solarflare/assets/images/adaptor.png" width="20px"/>
-                            <span class="adaptorName"> {{adaptor.name}} </span>
+                            <span class="adaptorName" routerLink="/adapter/{{host.id}}/{{adaptor.id}}/overview"
+                                  routerLinkActive="active"> {{adaptor.name}} </span>
                             <clr-vertical-nav-group-children>
                                 <a clrVerticalNavLink *ngFor="let nic of adaptor.children"
                                    routerLink="nic/{{nic.id}}"

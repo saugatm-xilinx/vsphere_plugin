@@ -1,48 +1,30 @@
-import {Component, ElementRef, ViewChild, OnInit, OnDestroy, Injector, Input} from '@angular/core';
-import {Router, ActivatedRoute, Params} from '@angular/router';
-import {Http} from "@angular/http";
-import {GlobalsService} from "../../../shared/globals.service";
-import {Subscription} from 'rxjs/Subscription';
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {AppComponent} from "../../../app.component";
-import {HostsService} from "../../../services/hosts.service";
+import { Component, ElementRef, ViewChild, OnInit, OnDestroy, Injector, Input } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
+import { AdapterService } from "../../../services/adapter.service";
+import { GlobalsService } from "../../../shared/globals.service";
+import { HostsService } from "../../../services/hosts.service";
+import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import {Observable} from "rxjs/Observable";
 
-//  TODO: review comments - components should not have this much line code in a single file.
-//  Break code in smaller chunck and may create a helper/service to serve functionality.
-//  Ideal code line should be 200-300 max in a single file
-//  F/w Update component functionality requires this amount of code and helper methods
-//  has been implemented wherever possible.
-
 @Component({
-    selector: 'app-fwupdate',
-    templateUrl: './fwupdate.component.html',
-    styleUrls: ['./fwupdate.component.scss']
+  selector: 'app-fwupdate',
+  templateUrl: './fwupdate.component.html',
+  styleUrls: ['./fwupdate.component.scss']
 })
 export class FwupdateComponent implements OnInit {
+    public params = {};
+    public adapter = {};
+    public adapters = [];
+    public gettingAdapterList = false;
+    public getAdapterListErr = false;
     public latestUpdateModal = false;
     public customUpdateModal = false;
-    public params = {};
-    public adapterList = [];
     public button = {
         latest: false,
         custom: false,
         latestErr: false,
         customErr: false
     };
-    public updatable = {
-        latest: true,
-        custom: true
-    };
-    public selectedAdapters = [];
-    public validateLatestUpdateModal = false;
-    public validateCustomUpdateModal = false;
-    public customSelectUrl = false;
-    customUploadFile: FormGroup;
-    customUploadUrl: FormGroup;
-    public hosts = [];
-    public gettingAdapterList = false;
-    public close = false;
     public status = {
         latest: {
             modal: false,
@@ -57,21 +39,53 @@ export class FwupdateComponent implements OnInit {
         selectedAdapters: [],
         status: false
     };
-    public getAdapterListErr = false;
+    public customSelectUrl = false;
+    customUploadFile: FormGroup;
+    customUploadUrl: FormGroup;
+
 
     @ViewChild('fileInput') fileInput: ElementRef;
 
     constructor(private activatedRoute: ActivatedRoute,
-                private gs: GlobalsService,
+              public gs: GlobalsService,
                 private fb: FormBuilder,
-                private inj: Injector,
-                private hs: HostsService) {
-        this.activatedRoute.parent.params.subscribe((params: Params) => {
-            this.params = params;
-        });
+                private as: AdapterService,
+              private hs: HostsService) {
+      this.activatedRoute.parent.params.subscribe((params: Params) => {
+          this.params = params;
+      });
         this.createFormFile();
         this.createFormUrl();
-        this.hosts = this.inj.get(AppComponent).hosts;
+  }
+
+    getAdapterList() {
+        this.getAdapterListErr = false;
+        this.hs.getAdapters(this.params['hostid'])
+            .subscribe(
+                data => {
+                    this.findAdapter(data);
+                    this.gettingAdapterList = false;
+                    this.updateStatus(data);
+                },
+                err => {
+                    console.error(err);
+                    this.gettingAdapterList = false;
+                    this.getAdapterListErr = true;
+                }
+            );
+    }
+
+    findAdapter(data) {
+      data.forEach((adapter, index) => {
+          if (adapter.id === this.params['adapterid']) {
+              this.adapter = adapter;
+              this.adapters = [adapter];
+          }
+      })
+    }
+
+    ngOnInit() {
+        this.getAdapterList();
     }
 
     static returnStatusOutput(br) {
@@ -115,27 +129,6 @@ export class FwupdateComponent implements OnInit {
         };
     }
 
-    getAdapterList() {
-        this.adapterList = [];
-        this.status.status = false;
-        this.gettingAdapterList = true;
-        this.getAdapterListErr = false;
-        this.hs.getAdapters(this.params['id'])
-            .subscribe(
-                data => {
-                    this.adapterList = data;
-                    this.gettingAdapterList = false;
-                    this.updateStatus(data);
-                },
-                err => {
-                    console.error(err);
-                    this.gettingAdapterList = false;
-                    this.getAdapterListErr = true;
-                    // setTimeout(this.devMode(),400);
-                }
-            );
-    }
-
     updateStatus(data) {
         if (this.status.custom.output && this.status.custom.output.length > 0) {
             this.status.custom.output.forEach((op, i) => {
@@ -156,87 +149,17 @@ export class FwupdateComponent implements OnInit {
         }
     }
 
-    ngOnInit() {
-        this.getAdapterList();
-        // this.devMode();
-    }
-
-    validateLatestUpdate(remove: string) {
-        let updatable = 0, invalid = 0;
-        const filterdAdapters = [];
-        this.selectedAdapters.forEach((value, index) => {
-            if (value.laterVersionAvailable) {
-                updatable++;
-            } else {
-                invalid++;
-            }
-        });
-        if (remove === 'remove') {
-            this.selectedAdapters.forEach((value, index) => {
-                if (value.laterVersionAvailable) {
-                    filterdAdapters.push(value);
-                }
-            });
-            this.selectedAdapters = filterdAdapters;
-            this.validateLatestUpdateModal = false;
-            if (this.selectedAdapters && this.selectedAdapters.length !== 0) {
-                this.latestUpdateModal = true;
-                return true;
-            }
-        }
-
-        updatable !== 0 ? this.updatable.latest = true : this.updatable.latest = false;
-
-        if (invalid === 0 && updatable !== 0) {
-            this.latestUpdateModal = true;
-            return true;
-        } else {
-            this.validateLatestUpdateModal = true;
-            return false;
-        }
-    }
-
-    validateCustomUpdate() {
-        const sa = this.selectedAdapters;
-        let updatable = 0;
-        if (sa.length === 0) {
-            return false
-        }
-        const model = sa[0];
-        sa.forEach(item => {
-            if (model['deviceId'] !== item['deviceId']) {
-                updatable--;
-            }
-        });
-
-        if (updatable === 0) {
-            this.updatable.custom = true;
-            this.customUpdateModal = true;
-            this.button.custom = false;
-            this.button.customErr = false;
-            this.validateCustomUpdateModal = false;
-            return true;
-        } else {
-            this.updatable.custom = false;
-            this.customUpdateModal = false;
-            this.validateCustomUpdateModal = true;
-            setTimeout(() => {
-                this.close = true;
-            }, 3000);
-            return false;
-        }
-    }
-
     latestUpdate() {
-        this.hs.latestUpdate(this.params['id'], this.selectedAdapters)
+
+        this.hs.latestUpdate(this.params['hostid'], [this.adapter])
             .subscribe(
                 data => {
                     this.reInitStatus();
 
                     this.latestUpdateModal = false;
                     this.status.latest.modal = true;
-                    this.status.selectedAdapters = this.selectedAdapters;
-                    this.getLatestUpdateStatus(this.selectedAdapters, data.taskId);
+                    this.status.selectedAdapters.push(this.adapter);
+                    this.getLatestUpdateStatus([this.adapter], data.taskId);
 
                     this.getAdapterList();
                     this.button.latest = false;
@@ -280,29 +203,24 @@ export class FwupdateComponent implements OnInit {
     }
 
     onSubmitFile() {
-        if (!this.validateCustomUpdate()) {
-            return false;
-        }
-
         this.button.custom = true;
         const formModel = this.customUploadFile.value;
 
         const payload = {
             "url": null,
             "base64Data": formModel.fwFile.value,
-            "adapters": this.selectedAdapters
+            "adapters": [this.adapter]
         };
 
-        this.hs.onSubmitFile(this.params['id'], payload)
+        this.hs.onSubmitFile(this.params['hostid'], payload)
             .subscribe(
                 data => {
                     this.reInitStatus();
                     this.customUpdateModal = false;
                     this.status.custom.modal = true;
-                    this.status.selectedAdapters = this.selectedAdapters;
-                    this.getCustomUpdateStatus(this.selectedAdapters, data.taskId);
+                    this.status.selectedAdapters.push(this.adapter);
+                    this.getCustomUpdateStatus([this.adapter], data.taskId);
 
-                    // this.getAdapterList();
                     this.button.custom = false;
                     this.button.customErr = false;
                     this.clearFile();
@@ -322,17 +240,13 @@ export class FwupdateComponent implements OnInit {
 
     onSubmitUrl() {
 
-        if (!this.validateCustomUpdate()) {
-            return false;
-        }
-
         this.button.custom = true;
         const formModel = this.customUploadUrl.value;
 
         const payload = {
             "url": formModel.urlProtocol + formModel.url,
             "base64Data": null,
-            "adapters": this.selectedAdapters
+            "adapters": [this.adapter]
         };
 
         this.hs.onSubmitUrl(this.params['id'], payload)
@@ -341,10 +255,9 @@ export class FwupdateComponent implements OnInit {
                     this.reInitStatus();
                     this.customUpdateModal = false;
                     this.status.custom.modal = true;
-                    this.status.selectedAdapters = this.selectedAdapters;
-                    this.getCustomUpdateStatus(this.selectedAdapters, data.taskId);
+                    this.status.selectedAdapters.push(this.adapter);
+                    this.getCustomUpdateStatus([this.adapter], data.taskId);
 
-                    // this.getAdapterList();
                     this.button.custom = false;
                     this.button.customErr = false;
                     this.customUploadUrl.get('url').setValue('');
@@ -443,12 +356,10 @@ export class FwupdateComponent implements OnInit {
     }
 
     processStatusLatest(status, adapters) {
-        // this.status.latest.output = [];
+
         this.updateStatusOutput('latest');
-        // this.status.latest.data = status.adapterTasks;
 
         adapters.forEach((adapter, index) => {
-            // console.log(adapter);
 
             this.status.latest.output[index] = {
                 id: adapter.id,
@@ -505,12 +416,10 @@ export class FwupdateComponent implements OnInit {
     }
 
     processStatusCustom(status, adapters) {
-        // this.status.custom.output = [];
+
         this.updateStatusOutput('custom');
-        // this.status.custom.data = status.adapterTasks;
 
         adapters.forEach((adapter, index) => {
-            // console.log(adapter);
 
             this.status.custom.output[index] = {
                 id: adapter.id,
@@ -543,6 +452,3 @@ export class FwupdateComponent implements OnInit {
         });
     }
 }
-
-
-

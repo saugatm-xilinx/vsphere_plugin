@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {GlobalsService} from "../shared/globals.service";
-import {Http, Headers, Response} from "@angular/http";
-import {Observable} from "rxjs/Observable";
+import {Http, Response} from "@angular/http";
+
 
 
 @Injectable()
@@ -11,7 +11,7 @@ export class HostsService {
   constructor(private gs: GlobalsService,
               private http: Http) { }
 
-  public getHostDetails(hostId:string, url?:string){
+    public getHostDetails(hostId: string, url?: string) {
 
       if (this.gs.isPluginMode()) {
           url = this.hostDetailUrl + hostId + '/';
@@ -21,7 +21,7 @@ export class HostsService {
       }
 
       return this.http.get(url)
-          .map((response:Response) =>{
+          .map((response: Response) => {
           return response.json();
       });
 
@@ -37,13 +37,13 @@ export class HostsService {
         }
 
         return this.http.get(url)
-            .map((response:Response) =>{
+            .map((response: Response) => {
             return response.json();
         });
 
     }
 
-    public onSubmitFile(hostId: string, payload: object, url?:string){
+    public onSubmitFile(hostId: string, payload: object, url?: string) {
 
         if (this.gs.isPluginMode()) {
             url = this.hostDetailUrl + hostId + '/adapters/updateCustomWithBinary';
@@ -53,12 +53,12 @@ export class HostsService {
         }
 
         return this.http.post(url, payload)
-            .map((response:Response) =>{
+            .map((response: Response) => {
             return response.json();
         });
     }
 
-    public onSubmitUrl(hostId: string, payload: object, url?:string){
+    public onSubmitUrl(hostId: string, payload: object, url?: string) {
 
         if (this.gs.isPluginMode()) {
             url = this.hostDetailUrl + hostId + '/adapters/updateCustomWithUrl';
@@ -68,12 +68,12 @@ export class HostsService {
         }
 
         return this.http.post(url, payload)
-            .map((response:Response) =>{
+            .map((response: Response) => {
             return response.json();
         });
     }
 
-    public latestUpdate(hostId: string, adapters: object, url?:string) {
+    public latestUpdate(hostId: string, adapters: object, url?: string) {
 
         if (this.gs.isPluginMode()) {
             url = this.hostDetailUrl + hostId + '/adapters/latest';
@@ -83,16 +83,16 @@ export class HostsService {
         }
 
         return this.http.post(url, adapters)
-            .map((response:Response) =>{
-            try{
+            .map((response: Response) => {
+            try {
                 return response.json();
-            }catch (e){
+            }catch (e) {
                 return response;
             }
         });
     }
 
-    public getStatus(taskId: string){
+    public getStatus(taskId: string) {
 
         let url: string;
         if (this.gs.isPluginMode()) {
@@ -102,7 +102,7 @@ export class HostsService {
         }
 
         return this.http.get(url)
-            .map((response:Response) =>{
+            .map((response: Response) => {
                 return response.json();
             }).catch(error => {
                 return error;
@@ -119,7 +119,7 @@ export class HostsService {
         }
 
         return this.http.get(url)
-            .map((response:Response) =>{
+            .map((response: Response) => {
                 return response.json();
             });
 
@@ -135,7 +135,7 @@ export class HostsService {
         }
 
         return this.http.post(url, payload)
-            .map((response:Response) =>{
+            .map((response: Response) => {
                 return response.json();
             });
 

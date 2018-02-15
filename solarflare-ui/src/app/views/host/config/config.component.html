@@ -93,7 +93,7 @@
                         && (hostConfig.get('netQueue').get('rss').dirty ||
                         hostConfig.get('netQueue').get('rss').touched)) && !hostConfig.get('netQueue').get('maxNumpCPU').value">
                                 <span class="tooltip-content">
-                                    Value of 1 disables RSS or select Max number of vCPU's
+                                    Value of 1 disables RSS
                                 </span>
                             </label>
                             <div class="btn-group">
@@ -109,12 +109,12 @@
                                        [attr.disabled]="hostConfig.get('netQueue').get('maxNumpCPU').value?'true':null">
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+<!--                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
                             <div class="checkbox-inline" style="padding-top: 15px;">
                                 <input type="checkbox" class="checkbox" formControlName="maxNumpCPU" id="maxNumpCPU">
                                 <label for="maxNumpCPU">Max number of pCPU</label>
                             </div>
-                        </div>
+                        </div>-->
                     </div>
                 </div>
             </section>
@@ -258,5 +258,4 @@
         </form>
         </div>
     </div>
-
 </div>

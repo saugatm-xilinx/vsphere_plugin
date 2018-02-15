@@ -26,6 +26,7 @@ import { InMemoryDataService } from "./services/chassis/in-memory-data.service";
 // [end-chassis-code]
 import {UserSettingService} from "app/shared/user-settings.service";
 import {HostModule} from "./views/host/host.module";
+import {AdapterModule} from "./views/adapter/adapter.module";
 import {HTTP_INTERCEPTORS, HttpClient, HttpHandler} from "@angular/common/http";
 import {AppMainService} from "./services/app-main.service";
 
@@ -46,7 +47,8 @@ import {AppMainService} from "./services/app-main.service";
          delay: 0
       }),
       // [end-chassis-code]
-       HostModule
+       HostModule,
+       AdapterModule
    ],
    declarations: [
       AppComponent,

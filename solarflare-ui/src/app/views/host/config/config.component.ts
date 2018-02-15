@@ -1,11 +1,12 @@
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Params} from '@angular/router';
-import {GlobalsService} from "../../../shared/globals.service";
-import {HostsService} from "../../../services/hosts.service";
-import {FormBuilder, FormGroup, FormControl, Validators} from "@angular/forms";
-//TODO :- reveiw comments - It would be best if import is done via a absolute path.
+import { Component, OnInit} from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
+import { HostsService} from "../../../services/hosts.service";
+import { GlobalsService } from "../../../shared/globals.service";
+import { FormBuilder, FormGroup, FormControl, Validators } from "@angular/forms";
+// TODO :- reveiw comments - It would be best if import is done via a absolute path.
 // Define all modules paths in tsconfig.json file. This will help in managing file import.
-    
+// Import definitions are auto generated as plugin paths are relatively packaged with vmware web client.
+
 @Component({
     selector: 'app-config',
     templateUrl: './config.component.html',
@@ -59,30 +60,6 @@ export class ConfigComponent implements OnInit {
         this.createConfigForm();
     }
 
-    loadConfig(){
-        this.err.getConfiguration = false;
-        this.config = {
-            "netQueue": {"netQueueCount": 4, "rss": 1, "maxNumpCPU": true},
-            "debuggingMask": {
-                "utils": true,
-                "mgmt": true,
-                "uplink": false,
-                "transmit": false,
-                "receive": false,
-                "hardware": false,
-                "eventQueue": false,
-                "rss": false,
-                "port": false,
-                "interrupt": false,
-                "commonCode": false,
-                "driver": true,
-                "filter": false
-            },
-            "overlay": {"vxlanOffloadEnable": true, "geneveOffloadEnable": true},
-            "restart": false
-        };
-    }
-
     ngOnInit() {
         this.getConfiguration();
     }
@@ -112,14 +89,9 @@ export class ConfigComponent implements OnInit {
                 err => {
                     console.error(err);
                     this.err.getConfiguration = true;
-                    // COMMENT THIS SECTION IN PROD - START
-                    //this.loadConfig();
-                    //this.restoreConfig();
-                    // COMMENT THIS SECTION IN PROD - END
                 }
             );
     }
-
 
     createConfigForm() {
         this.hostConfig = new FormGroup({
@@ -162,15 +134,10 @@ export class ConfigComponent implements OnInit {
     }
 
     onSubmit(form) {
-
         this.submitted = false;
-
-        //console.log(form);
-
         this.hs.putConfiguration(this.params['id'], form)
             .subscribe(
                 data => {
-                    //console.log(data);
                     this.getConfiguration();
                 },
                 err => {
@@ -179,5 +146,4 @@ export class ConfigComponent implements OnInit {
                 }
             );
     }
-
 }

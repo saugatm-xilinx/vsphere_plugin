@@ -27,7 +27,7 @@ export class OverviewComponent implements OnInit {
         this.getHostDetail();
     }
 
-    getHostDetail(){
+    getHostDetail() {
         this.getOverviewErr = false;
         this.hs.getHostDetails(this.params['id'])
             .subscribe(
@@ -37,22 +37,8 @@ export class OverviewComponent implements OnInit {
                 err => {
                     console.error(err);
                     this.getOverviewErr = true;
-                    //this.devMode();
                 }
             );
-    }
-
-    devMode() {
-        this.hostDetail = {
-            "type": "HOST",
-            "id": "host-9",
-            "name": "10.101.10.3",
-            "children": [],
-            "adapterCount": "2",
-            "portCount": "1",
-            "driverVersion": "444",
-            "cimProviderVersion": "2222"
-        };
     }
 
 }

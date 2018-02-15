@@ -1,8 +1,8 @@
-import {Component, Injector, ChangeDetectorRef} from "@angular/core";
+import {Component, Injector, ChangeDetectorRef, OnInit} from "@angular/core";
 import {GlobalsService, RefreshService, I18nService} from "./shared/index";
 import {ActionDevService} from "./services/testing/action-dev.service";
 import {AppMainService} from "./services/app-main.service";
-//TODO: review comment:- Many linting issues in entire project.
+// TODO: review comment:- Many linting issues in entire project.
 
 @Component({
     selector: "my-app",
@@ -11,7 +11,7 @@ import {AppMainService} from "./services/app-main.service";
     providers: []
 })
 
-export class AppComponent {
+export class AppComponent implements OnInit {
     public hosts = [];
     public Collapsible = true;
     public getHostsErr = false;
@@ -35,7 +35,7 @@ export class AppComponent {
         // In plugin mode the current locale is passed as parameter
         this.i18nService.initLocale("en");
     }
-//TODO: reivew comment - implement onInit in the class.
+// TODO: reivew comment - implement onInit in the class.
     ngOnInit(): void {
         this.getHosts();
     }
@@ -49,132 +49,13 @@ export class AppComponent {
                 },
                 err => {
                     console.error(err);
-                    //setTimeout(this.devMode(),500);
                     this.getHostsErr = true;
                 }
             );
     }
-//TODO: review comments- Create a localDev file/class and put all local development code there. AppComponent 
-//is having devMode function. This gets added in bundle files during 
-//build process. Better to keep mock data in a file and add/remove its dependency as per environment mode - prod or dev.
-    devMode() {
-        this.hosts = [{
-            "type": "HOST",
-            "id": "host-9",
-            "name": "10.101.10.3",
-            "children": [{
-                "name": "Solarflare SFC9220",
-                "type": "ADAPTER",
-                "id": "Solarflare SFC9220",
-                "versionController": null,
-                "versionBootROM": null,
-                "versionUEFIROM": null,
-                "versionFirmware": null,
-                "fileData": null,
-                "children": [{
-                    "type": "NIC",
-                    "id": "key-vim.host.PhysicalNic-vmnic4",
-                    "name": "vmnic4",
-                    "deviceId": "2563",
-                    "deviceName": "SFC9220",
-                    "subSystemDeviceId": null,
-                    "vendorId": "6436",
-                    "vendorName": "Solarflare",
-                    "subSystemVendorId": null,
-                    "driverName": null,
-                    "driverVersion": null,
-                    "macAddress": null,
-                    "status": null,
-                    "interfaceName": null,
-                    "portSpeed": null,
-                    "currentMTU": null,
-                    "maxMTU": null,
-                    "pciId": "0000:82:00.0",
-                    "pciFunction": null,
-                    "pciBusNumber": null
-                }, {
-                    "type": "NIC",
-                    "id": "key-vim.host.PhysicalNic-vmnic5",
-                    "name": "vmnic5",
-                    "deviceId": "2563",
-                    "deviceName": "SFC9220",
-                    "subSystemDeviceId": null,
-                    "vendorId": "6436",
-                    "vendorName": "Solarflare",
-                    "subSystemVendorId": null,
-                    "driverName": null,
-                    "driverVersion": null,
-                    "macAddress": null,
-                    "status": null,
-                    "interfaceName": null,
-                    "portSpeed": null,
-                    "currentMTU": null,
-                    "maxMTU": null,
-                    "pciId": "0000:82:00.1",
-                    "pciFunction": null,
-                    "pciBusNumber": null
-                }],
-                "laterVersionAvailable": false
-            }, {
-                "name": "Solarflare SFC9140",
-                "type": "ADAPTER",
-                "id": "Solarflare SFC9140",
-                "versionController": null,
-                "versionBootROM": null,
-                "versionUEFIROM": null,
-                "versionFirmware": null,
-                "fileData": null,
-                "children": [{
-                    "type": "NIC",
-                    "id": "key-vim.host.PhysicalNic-vmnic6",
-                    "name": "vmnic6",
-                    "deviceId": "2339",
-                    "deviceName": "SFC9140",
-                    "subSystemDeviceId": null,
-                    "vendorId": "6436",
-                    "vendorName": "Solarflare",
-                    "subSystemVendorId": null,
-                    "driverName": null,
-                    "driverVersion": null,
-                    "macAddress": null,
-                    "status": null,
-                    "interfaceName": null,
-                    "portSpeed": null,
-                    "currentMTU": null,
-                    "maxMTU": null,
-                    "pciId": "0000:04:00.0",
-                    "pciFunction": null,
-                    "pciBusNumber": null
-                }, {
-                    "type": "NIC",
-                    "id": "key-vim.host.PhysicalNic-vmnic7",
-                    "name": "vmnic7",
-                    "deviceId": "2339",
-                    "deviceName": "SFC9140",
-                    "subSystemDeviceId": null,
-                    "vendorId": "6436",
-                    "vendorName": "Solarflare",
-                    "subSystemVendorId": null,
-                    "driverName": null,
-                    "driverVersion": null,
-                    "macAddress": null,
-                    "status": null,
-                    "interfaceName": null,
-                    "portSpeed": null,
-                    "currentMTU": null,
-                    "maxMTU": null,
-                    "pciId": "0000:04:00.1",
-                    "pciFunction": null,
-                    "pciBusNumber": null
-                }],
-                "laterVersionAvailable": false
-            }],
-            "adapterCount": "2",
-            "portCount": "1",
-            "driverVersion": "444",
-            "cimProviderVersion": "2222"
-        }];
-    }
+// TODO: review comments- Create a localDev file/class and put all local development code there. AppComponent
+// is having devMode function. This gets added in bundle files during
+// build process. Better to keep mock data in a file and add/remove its dependency as per environment mode - prod or dev.
 
     refresh(): void {
         // This propagates the refresh event to views that have subscribed to the RefreshService

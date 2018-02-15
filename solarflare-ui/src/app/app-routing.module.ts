@@ -14,8 +14,8 @@ import { EditChassisComponent } from "./views/modals/edit-chassis.component";
 import { ChassisSummaryComponent } from "./views/chassis-summary/chassis-summary.component";
 // [end-chassis-code]
 
-
 import {HostComponent} from "./views/host/host.component";
+import {AdapterComponent} from "./views/adapter/adapter.component";
 
 /**
  * Supported routes and associated components
@@ -57,6 +57,9 @@ const appRoutes: Routes = [
 
     {
         path: "host/:id", component: HostComponent
+    },
+    {
+        path: "adapter/:id", component: AdapterComponent
     }
 ];
 

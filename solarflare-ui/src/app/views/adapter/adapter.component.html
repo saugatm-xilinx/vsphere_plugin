@@ -1,0 +1,13 @@
+<clr-tabs>
+  <clr-tab>
+    <button (click)="redirect('overview')" clrTabLink id="overview">Overview</button>
+    <clr-tab-content id="overview" *clrIfActive="true">
+    </clr-tab-content>
+  </clr-tab>
+  <clr-tab>
+    <button (click)="redirect('fwupdate')" id="fwupdate" clrTabLink>Firmware Update</button>
+    <clr-tab-content id="fwupdate" *clrIfActive>
+    </clr-tab-content>
+  </clr-tab>
+</clr-tabs>
+<router-outlet></router-outlet>

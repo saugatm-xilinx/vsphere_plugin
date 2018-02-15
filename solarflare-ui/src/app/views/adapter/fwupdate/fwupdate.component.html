@@ -43,7 +43,7 @@
                 <th class="table-border-right">Current</th>
                 <th style="color:#781DA0;">Latest</th>
             </tr>
-            <tr *ngFor="let ad of selectedAdapters">
+            <tr *ngFor="let ad of adapters">
                 <td>{{ad.name}}</td>
                 <td>{{ad.versionController}}</td>
                 <td>
@@ -87,59 +87,6 @@
             </span>
             <span class="spinner spinner-sm" *ngIf="button.latest"></span>
         </button>
-    </div>
-</clr-modal>
-
-<clr-modal [clrModalSize]="'lg'" [(clrModalOpen)]="validateLatestUpdateModal">
-    <h3 class="modal-title">Later version(s) not found for adapters</h3>
-    <div class="modal-body">
-
-        <clr-datagrid>
-            <clr-dg-column>Adapter Name</clr-dg-column>
-            <clr-dg-column>Controller Version</clr-dg-column>
-            <clr-dg-column>Boot ROM Version</clr-dg-column>
-            <clr-dg-column>UEFI ROM Version</clr-dg-column>
-
-            <clr-dg-column>Later Version Available</clr-dg-column>
-
-            <clr-dg-row *clrDgItems="let ad of selectedAdapters"
-                        [clrDgItem]="ad"
-                        [ngStyle]="{'background-color': ad.laterVersionAvailable === true ? '' : '#adcb' }">
-                <clr-dg-cell>{{ad.name}}</clr-dg-cell>
-                <clr-dg-cell>{{ad.versionController}}</clr-dg-cell>
-                <clr-dg-cell>{{ad.versionBootROM}}</clr-dg-cell>
-                <clr-dg-cell>{{ad.versionUEFIROM}}</clr-dg-cell>
-                <clr-dg-cell>
-                    <span *ngIf="!ad.laterVersionAvailable">
-                        <b style="font-size: large">No</b>
-                    </span>
-                    <span *ngIf="ad.laterVersionAvailable">
-                        Yes
-                    </span>
-                </clr-dg-cell>
-            </clr-dg-row>
-        </clr-datagrid>
-        <h6> Remove adaptors without latest updates to continue</h6>
-
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-outline" type="button"
-                (click)="validateLatestUpdateModal = false">Cancel
-        </button>
-        <button class="btn btn-primary" type="button" *ngIf="updatable.latest"
-                (click)="validateLatestUpdate('remove')">Remove and continue
-        </button>
-    </div>
-</clr-modal>
-
-<clr-modal [clrModalSize]="'md'" [(clrModalOpen)]="validateCustomUpdateModal">
-    <h3 class="modal-title">Incompatible adapters selected</h3>
-    <div class="modal-body">
-
-        <h6> Please select adapters of the same family type.</h6>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-outline" type="button" (click)="validateCustomUpdateModal = false;" >Ok</button>
     </div>
 </clr-modal>
 
@@ -203,7 +150,7 @@
                 <div class="form-group row">
                     <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                         <div class="select">
-                            <select id="urlProtocal" formControlName="urlProtocol">
+                            <select id="urlProtocol" formControlName="urlProtocol">
                                 <option selected value="">Select URL Protocol</option>
                                 <option value="http://">http://</option>
                                 <option value="https://">https://</option>
@@ -427,7 +374,7 @@
             <img src="../solarflare/assets/images/sf-logo.png" width="140px">
             <div style="text-align: right;">
                 <div class="btn-group">
-                    <button class="btn" (click)="getAdapterList()">Refresh</button>
+                    <button class="btn" (click)="adapter = {};getAdapterList()">Refresh</button>
                     <button class="btn btn-info">Help</button>
                 </div>
             </div>
@@ -437,10 +384,10 @@
 
     <div class="col-md-12">
         <div style="text-align: center">
-            <span class="spinner spinner-lg" *ngIf="(adapterList|json) === '[]' && !getAdapterListErr ">
+            <span class="spinner spinner-lg" *ngIf="(adapter|json) === '{}' && !getOverviewErr ">
             Loading..
             </span>
-            <span class="text-danger" *ngIf="getAdapterListErr"><br/>
+            <span class="text-danger" *ngIf="getOverviewErr"><br/>
                 <clr-icon shape="error-standard" style="margin: 0 auto"></clr-icon>
                 Error occurred while fetching data</span>
         </div>
@@ -448,82 +395,47 @@
 
 </div>
 
-<div class="row" *ngIf="(adapterList|json) != '[]'">
-    <div class="col-md-12">
-        <clr-datagrid *ngIf="(adapterList|json) != '[]'" [(clrDgSelected)]="selectedAdapters">
-            <clr-dg-column>Adapter Name</clr-dg-column>
-            <clr-dg-column>Controller Version</clr-dg-column>
-            <clr-dg-column>Boot ROM Version</clr-dg-column>
-            <clr-dg-column>UEFI ROM Version</clr-dg-column>
-
-            <clr-dg-row *clrDgItems="let ad of adapterList; let i = index" [clrDgItem]="ad">
-                <clr-dg-cell>
-                    {{ad.name}}
-                </clr-dg-cell>
-                <clr-dg-cell>
-                    {{ad.versionController}}
-                </clr-dg-cell>
-                <clr-dg-cell>
-                    {{ad.versionBootROM}}
-                </clr-dg-cell>
-                <clr-dg-cell>
-                    {{ad.versionUEFIROM}}
-                </clr-dg-cell>
-            </clr-dg-row>
-            <clr-dg-footer>{{adapterList.length}} Adapters</clr-dg-footer>
-        </clr-datagrid>
-    </div>
-    <div class="col-md-12" style="text-align: center;">
-        <button class="btn"
-                (click)="latestUpdateModal = true"
-                [disabled]="selectedAdapters.length == 0 || gettingAdapterList">
-            Update
-        </button>
-        <button class="btn btn-outline"
-                (click)="validateCustomUpdate();"
-                [disabled]="selectedAdapters.length == 0 || gettingAdapterList">
-            Custom Update
-        </button>
+<div class="row" *ngIf="(adapter|json) !== '{}' ">
+    <div class="container-fluid">
+        <div style="padding: 10px;">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Firmware Type</th>
+                    <th>Installed Version</th>
+                    <th>Latest Version</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Controller Version</td>
+                    <td>{{adapter.versionController}}</td>
+                    <td>{{adapter.latestVersion.controller}}</td>
+                </tr>
+                <tr>
+                    <td>BootROM Version</td>
+                    <td>{{adapter.versionBootROM}}</td>
+                    <td>{{adapter.latestVersion.bootROM}}</td>
+                </tr>
+                <tr>
+                    <td>UEFI ROM</td>
+                    <td>{{adapter.versionUEFIROM}}</td>
+                    <td>{{adapter.latestVersion.uefi}}</td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="col-md-12" style="text-align: center;">
+                <button class="btn"
+                        (click)="latestUpdateModal = true"
+                        [disabled]="gettingAdapterList">
+                    Update to Latest
+                </button>
+                <button class="btn btn-outline"
+                        (click)="customUpdateModal = true;"
+                        [disabled]="gettingAdapterList">
+                    Custom Update
+                </button>
+            </div>
+        </div>
     </div>
 </div>
-
-
-<!--
-        <clr-alert [clrAlertType]="'alert-success'" [clrAlertClosed]="close">
-            <div class="alert-item">
-                <span class="alert-text">
-                    This alert indicates success.
-                </span>
-            </div>
-        </clr-alert>
-
-                    <a role="tooltip" aria-haspopup="true"
-                       *ngIf="statusUpdate(ad.status, 'controller', 'bool')"
-                       [ngClass]="statusUpdate(ad.status, 'controller', 'class')"
-                       [class.tooltip-bottom-right]="!i" class="tooltip tooltip-md">
-                        <clr-icon [attr.shape]="statusUpdate(ad.status, 'controller', 'shape')" size="24"></clr-icon>
-                        <span class="tooltip-content">{{statusUpdate(ad.status, 'controller', 'txt')}}</span>
-                    </a>
-
-
-                    <a style="text-align: right" role="tooltip" aria-haspopup="true"
-                       *ngIf="statusUpdate(ad.status, 'BootROM', 'bool')"
-                       [ngClass]="statusUpdate(ad.status, 'BootROM', 'class')"
-                       [class.tooltip-bottom-left]="i < (adapterList.length - 1)"
-                       [class.tooltip-top-left]="i === (adapterList.length - 1)"
-                       class="tooltip tooltip-md">
-                        <clr-icon [attr.shape]="statusUpdate(ad.status, 'BootROM', 'shape')" size="24"></clr-icon>
-                        <span class="tooltip-content">{{statusUpdate(ad.status, 'BootROM', 'txt')}}</span>
-                    </a>
-
-
-                    <a role="tooltip" aria-haspopup="true"
-                       *ngIf="statusUpdate(ad.status, 'UEFIROM', 'bool')"
-                       [ngClass]="statusUpdate(ad.status, 'UEFIROM', 'class')"
-                       [class.tooltip-bottom-left]="i < (adapterList.length - 1)"
-                       [class.tooltip-top-left]="i === (adapterList.length - 1)"
-                       class="tooltip tooltip-md">
-                        <clr-icon [attr.shape]="statusUpdate(ad.status, 'UEFIROM', 'shape')" size="24"></clr-icon>
-                        <span class="tooltip-content">{{statusUpdate(ad.status, 'UEFIROM', 'txt')}}</span>
-                    </a>
--->

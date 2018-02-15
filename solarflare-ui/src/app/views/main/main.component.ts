@@ -167,6 +167,7 @@ export class MainComponent implements OnInit, OnDestroy {
    deleteChassis(chassis: Chassis): void {
       if (this.gs.isPluginMode()) {
          // TODO make delete work in this mode
+          // Clarity Chassis code
          this.appAlertService.showWarning("Delete is not implemented yet in plugin mode");
       } else {
          this.chassisService.delete(chassis)
