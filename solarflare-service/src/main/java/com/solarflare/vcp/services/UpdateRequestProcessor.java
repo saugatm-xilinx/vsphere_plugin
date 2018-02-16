@@ -1,5 +1,6 @@
 package com.solarflare.vcp.services;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -7,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.solarflare.vcp.model.Adapter;
 import com.solarflare.vcp.model.UpdateRequest;
 
 public class UpdateRequestProcessor {
@@ -50,6 +52,19 @@ public class UpdateRequestProcessor {
 		}
 		UpdateRequestThread updateThread = new UpdateRequestThread();
 		updateThread.setUpdateRequest(updateRequest);
+		executor.execute(updateThread);
+	}
+	
+	public void addUpdateRequest(UpdateRequest updateRequest, List<Adapter> adapterList) {
+		logger.info("submitting update request for " + updateRequest.getAdapterId() + " and firmware "
+				+ updateRequest.getFwType());
+		if (executor == null || executor.isShutdown() || executor.isTerminated()) {
+			logger.info("Thread pool is not active! Creating a new one..");
+			executor = Executors.newFixedThreadPool(DEFAULT_POOL_SIZE); 
+		}
+		CustomUpdateRequestThread updateThread = new CustomUpdateRequestThread();
+		updateThread.setUpdateRequest(updateRequest);
+		updateThread.setAdapterList(adapterList);
 		executor.execute(updateThread);
 	}
 

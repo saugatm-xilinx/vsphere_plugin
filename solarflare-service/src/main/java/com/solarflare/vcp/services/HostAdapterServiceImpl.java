@@ -1,4 +1,4 @@
-package com.solarflare.vcp.services;
+﻿package com.solarflare.vcp.services;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -229,27 +229,23 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 				fwImageURL = new URL("file:/" + tempFile);
 
 				UpdateRequestProcessor requestProcessor = UpdateRequestProcessor.getInstance();
-				for (Adapter adapter : adapterList) {
-					if (isValidated(adapter, taskInfo)) {
 						UpdateRequest updateRequest = null;
 						if (controller) {
-							updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.CONTROLLER,
+							updateRequest = createUpdateRequestForCustom(cimService, taskInfo, FwType.CONTROLLER,
 									fwImageURL);
 						}
 						if (bootrom) {
-							updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.BOOTROM,
+							updateRequest = createUpdateRequestForCustom(cimService, taskInfo, FwType.BOOTROM,
 									fwImageURL);
 						}
 						if (uefirom) {
-							updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.UEFIROM,
+							updateRequest = createUpdateRequestForCustom(cimService, taskInfo, FwType.UEFIROM,
 									fwImageURL);
 						}
 
 						updateRequest.setCustom(true); // temp file is created
 						updateRequest.setTempFilePath(tempFile);
-						requestProcessor.addUpdateRequest(updateRequest);
-					}
-				}
+						requestProcessor.addUpdateRequest(updateRequest,adapterList);
 
 			} else {
 				String errMsg = null;
@@ -443,6 +439,18 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		updateRequest.setAdapterId(adapterId);
 		updateRequest.setFwInstance(fwInstance.getObjectPath());
 		updateRequest.setNicInstance(new CIMObjectPath(MOF.objectHandle(nicInstance.getObjectPath(), false, true)));
+		updateRequest.setFwImagePath(fwImageURL);
+		updateRequest.setCimService(cimService);
+		updateRequest.setTaskId(taskInfo.getTaskid());
+		updateRequest.setFwType(fwType);
+
+		return updateRequest;
+	}
+
+	private UpdateRequest createUpdateRequestForCustom(SfCIMService cimService, TaskInfo taskInfo,
+			FwType fwType, URL fwImageURL) throws Exception {
+
+		UpdateRequest updateRequest = new UpdateRequest();
 		updateRequest.setFwImagePath(fwImageURL);
 		updateRequest.setCimService(cimService);
 		updateRequest.setTaskId(taskInfo.getTaskid());
