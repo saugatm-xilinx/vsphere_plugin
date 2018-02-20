@@ -384,10 +384,10 @@
 
     <div class="col-md-12">
         <div style="text-align: center">
-            <span class="spinner spinner-lg" *ngIf="(adapter|json) === '{}' && !getOverviewErr ">
+            <span class="spinner spinner-lg" *ngIf="(adapter|json) === '{}' && !getAdapterListErr ">
             Loading..
             </span>
-            <span class="text-danger" *ngIf="getOverviewErr"><br/>
+            <span class="text-danger" *ngIf="getAdapterListErr"><br/>
                 <clr-icon shape="error-standard" style="margin: 0 auto"></clr-icon>
                 Error occurred while fetching data</span>
         </div>
