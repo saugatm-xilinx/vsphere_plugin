@@ -36,6 +36,7 @@ import com.solarflare.vcp.model.Status;
 import com.solarflare.vcp.model.TaskInfo;
 import com.solarflare.vcp.model.TaskState;
 import com.solarflare.vcp.model.UpdateRequest;
+import com.solarflare.vcp.security.ASN1Parser;
 import com.solarflare.vcp.vim.SfVimService;
 import com.solarflare.vcp.vim.SimpleTimeCounter;
 
@@ -182,10 +183,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			byte[] decodedDataBytes = decoder.decode(dataBytes);
 
 			// Get Header info from data
-			byte[] headerData = Arrays.copyOf(decodedDataBytes, 40); // header
-																		// size
-																		// is 40
-																		// bytes
+			byte[] headerData = new ASN1Parser().getFileHeaderBytes(decodedDataBytes);
 			FileHeader header = cimService.getFileHeader(headerData);
 			logger.debug("Solarflare:: Header : " + header);
 
@@ -286,8 +284,9 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			boolean controller = false;
 			boolean bootrom = false;
 			boolean uefirom = false;
-			boolean readComplete = false;
-			byte[] headerData = cimService.readData(fwImageURL, readComplete);
+			boolean readComplete = true;
+			byte[] fileData = cimService.readData(fwImageURL, readComplete);
+			byte[] headerData = new ASN1Parser().getFileHeaderBytes(fileData);
 			FileHeader header = cimService.getFileHeader(headerData);
 			boolean isFwApplicable = false;
 			logger.debug("Solarflare:: Header : " + header);
