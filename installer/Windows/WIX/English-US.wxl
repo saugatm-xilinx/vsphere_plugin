@@ -256,7 +256,7 @@
 <String Id="GetHostIPDlg" Overridable="yes">Setup - [App_Name]</String>
 <String Id="GetHostIPDlg_Title" Overridable="yes">{\UI_Font_Title}IP Address</String>
 <String Id="GetHostIPDlg_Description" Overridable="yes">Configuring IP address for plugin.</String>
-<String Id="GetHostIPDlg_Description1" Overridable="yes">Select the ip address of host machine which can be accessed from vCenter server. </String>
+<String Id="GetHostIPDlg_Description1" Overridable="yes">Select the IP address of host machine which can be accessed from vCenter server. </String>
 <String Id="InstallDirDlgBrowse" Overridable="yes">&amp;Browse...</String>
 <String Id="InstallDirDlgDescription" Overridable="yes">Where should [App_Name] be installed ?</String>
 <String Id="InstallDirDlgDescription1" Overridable="yes">Setup will install [App_Name] into the following folder.</String>

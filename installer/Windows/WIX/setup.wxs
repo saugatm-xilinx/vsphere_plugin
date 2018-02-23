@@ -171,7 +171,7 @@
 	<SetProperty Id="ServerInstallRollback" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\service.bat&quot; remove" Sequence="execute" Before="ServerInstallRollback" />
 	<SetProperty Id="ServerStart" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\tomcat9.exe&quot; start" Sequence="execute" Before="ServerStart" />
 	<SetProperty Id="ServerStartRollback" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\tomcat9.exe&quot; stop" Sequence="execute" Before="ServerStartRollback" />
-	<SetProperty Id="ServiceStartAuto" Value="&quot;[WindowsFolder]system32\sc.exe&quot; config Tomcat9 start=auto" Sequence="execute" Before="ServiceStartAuto" />
+	<SetProperty Id="ServiceStartAuto" Value="&quot;[WindowsFolder]system32\sc.exe&quot; config Tomcat9 start= auto" Sequence="execute" Before="ServiceStartAuto" />
 	<SetProperty Id="ServerStop" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\tomcat9.exe&quot; stop" Sequence="execute" Before="ServerStop" />
 	<SetProperty Id="ServerStopRollback" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\tomcat9.exe&quot; start" Sequence="execute" Before="ServerStopRollback" />
 	<SetProperty Id="ServerUninstall" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\service.bat&quot; remove" Sequence="execute" Before="ServerUninstall" />
