@@ -30,6 +30,7 @@ import com.vmware.vim25.HostServiceTicket;
 import com.vmware.vim25.HostSystemConnectionState;
 import com.vmware.vim25.InvalidPropertyFaultMsg;
 import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.NotFoundFaultMsg;
 import com.vmware.vim25.PhysicalNic;
 import com.vmware.vim25.RuntimeFaultFaultMsg;
 import com.vmware.vim25.SoftwarePackage;
@@ -41,6 +42,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 	private static final Log logger = LogFactory.getLog(SfVimServiceImpl.class);
 	private static final String LOG_KEY = "Solarflare:: ";
 	private static final String CIM_SCHEME = "https://";
+	private static final String SOLARFLARE_MODULE_NAME = "sfvmk";
 	private String extensionURL;
 	private Connection connection;
 	private UserSessionService userSessionService;
@@ -371,5 +373,50 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 			logger.error(LOG_KEY, e);
 		}
 	}
+	
+	public ManagedObjectReference getHostKernelModuleSystem(String hostId)throws Exception{
+		logger.info("getHostKernelModuleSystem hostId : " + hostId);
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: getHostKernelModuleSystem");
+		List<String> props = new ArrayList<>();
+		props.add("configManager.kernelModuleSystem");
 
+		Connection _conn = getSession();
+
+		GetMOREF _moRefService = new GetMOREF(_conn.getVimPort(), _conn.getServiceContent());
+
+		ManagedObjectReference hostMoRef = getManagedObjectReference("HostSystem", hostId);
+
+		Map<String, Object> hostprops = _moRefService.entityProps(hostMoRef, props.toArray(new String[] {}));
+
+		ManagedObjectReference kernelModuleSystem = (ManagedObjectReference) hostprops
+				.get("configManager.kernelModuleSystem");
+		timer.stop();
+		return kernelModuleSystem;
+	}
+	
+	/**
+	 * Returns Options string value for given host id
+	 */
+	public String getOptionString(String hostId) throws Exception{
+		logger.info("getOptionString for hostId : " + hostId);
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: getOptionString");
+		Connection _conn = getSession();
+		ManagedObjectReference kernelModuleSystem = getHostKernelModuleSystem(hostId);
+		String optionString = _conn.getVimPort().queryConfiguredModuleOptionString(kernelModuleSystem, SOLARFLARE_MODULE_NAME);
+		timer.stop();
+		return optionString;
+	}
+	
+	/**
+	 * Updates the option string for given host id
+	 */
+	public void updateOptionString(String hostId, String value)throws Exception{
+		logger.info("updateOptionString for hostId : " + hostId + " optionString : " + value);
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: updateOptionString");
+		Connection _conn = getSession();
+		ManagedObjectReference kernelModuleSystem = getHostKernelModuleSystem(hostId);
+		_conn.getVimPort().updateModuleOptionString(kernelModuleSystem, SOLARFLARE_MODULE_NAME, value);
+		timer.stop();
+	}
+	
 }

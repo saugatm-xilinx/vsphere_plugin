@@ -98,7 +98,7 @@ public class DummayService implements HostAdapterService {
 	}
 
 	@Override
-	public void updateHostConfigurations(HostConfiguration hostConfigurationRequest) throws Exception {
+	public void updateHostConfigurations(String hostId, HostConfiguration hostConfigurationRequest) throws Exception {
 		hostconfig.put("1",hostConfigurationRequest);
 	}
 	

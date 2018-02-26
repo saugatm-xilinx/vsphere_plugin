@@ -32,13 +32,16 @@ import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.HostConfiguration;
 import com.solarflare.vcp.model.NicBootParamInfo;
 import com.solarflare.vcp.model.SfFirmware;
+import com.solarflare.vcp.model.SfOptionString;
 import com.solarflare.vcp.model.Status;
 import com.solarflare.vcp.model.TaskInfo;
 import com.solarflare.vcp.model.TaskState;
 import com.solarflare.vcp.model.UpdateRequest;
 import com.solarflare.vcp.security.ASN1Parser;
 import com.solarflare.vcp.vim.SfVimService;
+import com.solarflare.vcp.vim.SfVimServiceImpl;
 import com.solarflare.vcp.vim.SimpleTimeCounter;
+import com.solarflare.vcp.vim.connection.ConnectionImpl;
 
 public class HostAdapterServiceImpl implements HostAdapterService {
 	private static final Log logger = LogFactory.getLog(HostAdapterServiceImpl.class);
@@ -377,14 +380,23 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 
 	@Override
 	public HostConfiguration getHostConfigurations(String hostId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: getHostConfigurations");
+		logger.info("Solarflare:: getHostConfigurations for hostId : "+hostId);
+		SfOptionString sfOptionString = new SfOptionString();
+		String optionString = sfVimService.getOptionString(hostId);
+		HostConfiguration hostConfiguration = sfOptionString.getHostConfiguration(optionString);
+		timer.stop();
+		return hostConfiguration;
 	}
 
 	@Override
-	public void updateHostConfigurations(HostConfiguration hostConfigurationRequest) throws Exception {
-		// TODO Auto-generated method stub
-
+	public void updateHostConfigurations(String hostId,HostConfiguration hostConfigurationRequest) throws Exception {
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: updateHostConfigurations");
+		logger.info("Solarflare:: updateHostConfigurations ");
+		SfOptionString sfOptionString = new SfOptionString();
+		sfOptionString = sfOptionString.getOptionString(hostConfigurationRequest);
+		sfVimService.updateOptionString(hostId, sfOptionString.toString());
+		timer.stop();
 	}
 
 	private TaskInfo createTask(String hostId) {
@@ -575,4 +587,6 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	
 }

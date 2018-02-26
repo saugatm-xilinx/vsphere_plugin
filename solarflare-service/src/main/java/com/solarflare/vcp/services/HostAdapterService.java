@@ -74,7 +74,7 @@ public interface HostAdapterService {
 
 	HostConfiguration getHostConfigurations(String hostId) throws Exception;
 
-	void updateHostConfigurations(HostConfiguration hostConfigurationRequest) throws Exception;
+	void updateHostConfigurations(String hostId, HostConfiguration hostConfigurationRequest) throws Exception;
 	
 	AdapterOverview getAdapterOverview(String hostId, String nicId) throws Exception;
 	
