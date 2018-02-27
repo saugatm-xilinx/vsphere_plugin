@@ -1,0 +1,28 @@
+<clr-tabs>
+  <clr-tab>
+    <button (click)="redirect('overview')" clrTabLink id="overview">Overview</button>
+    <clr-tab-content id="overview" *clrIfActive="true">
+    </clr-tab-content>
+  </clr-tab>
+  <clr-tab>
+    <button (click)="redirect('statistics')" id="statistics" clrTabLink>Statistics</button>
+    <clr-tab-content id="fwupdate" *clrIfActive>
+    </clr-tab-content>
+  </clr-tab>
+  <!-- <clr-tab>
+    <button (click)="redirect('boot-params')" id="bootParams" clrTabLink>Boot Params</button>
+    <clr-tab-content id="config" *clrIfActive>
+    </clr-tab-content>
+  </clr-tab>
+  <clr-tab>
+    <button (click)="redirect('diagnostics')" id="diagnostics" clrTabLink>Diagnostics</button>
+    <clr-tab-content id="config" *clrIfActive>
+    </clr-tab-content>
+  </clr-tab>
+  <clr-tab>
+    <button (click)="redirect('configuration')" id="configuration" clrTabLink>Configuration</button>
+    <clr-tab-content id="config" *clrIfActive>
+    </clr-tab-content>
+  </clr-tab> -->
+</clr-tabs>
+<router-outlet></router-outlet>

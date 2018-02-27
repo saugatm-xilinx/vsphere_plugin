@@ -1,0 +1,123 @@
+<div class="nic-overview">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="nic-overview__top">
+        <div>
+          <img [src]="isProd ? '../solarflare/assets/images/sf-logo.png' : 'assets/images/sf-logo.png'" width="140px">
+        </div>
+        <div>
+          <div class="btn-group">
+            <button class="btn" (click)="refrechNicDetail()">Refresh</button>
+            <button class="btn btn-info">Help</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nic-overview__detail" *ngIf="!isLoading && !hasError">
+
+    <div class="row">
+      <div class="col-sm-2">
+        <label>Driver Name</label>
+      </div>
+      <div class="col-sm-4">
+        <span>{{nicDetail.name}}</span>
+      </div>
+      <div class="col-sm-2">
+        <label>Device Id</label>
+      </div>
+      <div class="col-sm-4">
+        <span>{{nicDetail.id}}</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-2">
+        <label>Driver Version</label>
+      </div>
+      <div class="col-sm-4">
+        <span>{{nicDetail.driverVersion}}</span>
+      </div>
+      <div class="col-sm-2">
+        <label>Subsystem Device Id</label>
+      </div>
+      <div class="col-sm-4">
+        <span>{{nicDetail.subSystemDeviceId}}</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-2">
+        <label>MAC Address</label>
+      </div>
+      <div class="col-sm-4">
+        <span>{{nicDetail.macAddress}}</span>
+      </div>
+      <div class="col-sm-2">
+        <label>Vendor Id</label>
+      </div>
+      <div class="col-sm-4">
+        <span>{{nicDetail.vendorId}}</span>
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="col-sm-2">
+        <label>Link Status</label>
+      </div>
+      <div class="col-sm-4">
+        <span>{{nicDetail.status}}</span>
+      </div>
+      <div class="col-sm-2">
+        <label>Subsystem Vendor Id</label>
+      </div>
+      <div class="col-sm-4">
+        <span>{{nicDetail.subSystemVendorId}}</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-2">
+        <label>Interface name</label>
+      </div>
+      <div class="col-sm-4">
+        <span>{{nicDetail.interfaceName}}</span>
+      </div>
+      <div class="col-sm-2">
+        <label>PCI function</label>
+      </div>
+      <div class="col-sm-4">
+        <span>{{nicDetail.pciFunction}}</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-2">
+        <label>Port Speed</label>
+      </div>
+      <div class="col-sm-4">
+        <span>{{nicDetail.portSpeed}}</span>
+      </div>
+      <div class="col-sm-2">
+        <label>PCI Bus Number</label>
+      </div>
+      <div class="col-sm-4">
+        <span>{{nicDetail.pciBusNumber}}</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="nic-overview__info-container">
+    <span class="spinner spinner-lg" *ngIf="isLoading">
+      Loading..
+    </span>
+    <span class="text-danger" *ngIf="hasError">
+      <br/>
+      <clr-icon shape="error-standard" style="margin: 0 auto"></clr-icon>
+      Error occurred while fetching data</span>
+  </div>
+
+</div>

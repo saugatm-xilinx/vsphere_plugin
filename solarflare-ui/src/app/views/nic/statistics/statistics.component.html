@@ -1,0 +1,43 @@
+<div class="nic-stats">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="nic-stats__top">
+        <div>
+          <img [src]="isProd ? '../solarflare/assets/images/sf-logo.png' : 'assets/images/sf-logo.png'" width="140px">
+        </div>
+        <div>
+          <div class="btn-group">
+            <button class="btn" (click)="getStatDetail()">Refresh</button>
+            <button class="btn btn-info">Help</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nic-stats__detail" *ngIf="!isLoading && !hasError">
+    <div class="nic-stats__detail__table-layout">
+      <table class="table">
+        <tr>
+          <th class="table-border-right"> Name </th>
+          <th class="table-border-right">Value</th>
+        </tr>
+        <tr *ngFor="let ad of statisticTableData">
+          <td>{{ad.name}}</td>
+          <td>{{ad.value}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="nic-stats__info-container">
+    <span class="spinner spinner-lg" *ngIf="isLoading">
+      Loading..
+    </span>
+    <span class="text-danger" *ngIf="hasError">
+      <br/>
+      <clr-icon shape="error-standard" style="margin: 0 auto"></clr-icon>
+      Error occurred while fetching data</span>
+  </div>
+
+</div>
