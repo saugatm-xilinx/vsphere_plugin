@@ -295,8 +295,8 @@ public class SfCIMService {
 	}
 
 	public String getLatestFWImageVersion(URL pluginURL, SfCIMService cimService, CIMInstance bootROMInstance,
-			CIMInstance nicInstance, FwType fwType)
-			throws MalformedURLException, RuntimeFaultFaultMsg, URISyntaxException, WBEMException {
+			CIMInstance nicInstance, FwType fwType) 
+			throws MalformedURLException, RuntimeFaultFaultMsg, URISyntaxException, WBEMException, Exception {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getLatestFWImageVersion");
 		String versionString = CIMConstants.DEFAULT_VERSION;
 		SfFirmware file = MetadataHelper.getMetaDataForAdapter(pluginURL, cimService, bootROMInstance, nicInstance,
@@ -844,24 +844,4 @@ public class SfCIMService {
 		return partNumber;
 	}
 	
-	// TODO Cleanup : Written for testing
-			public static void main(String[] args) throws Exception {
-				String url = "https://10.101.10.3:5989/";
-				String password = "Ibmx#3750c";
-				String user = "root";
-				String deviceID = "vmnic5";
-				CIMHost cimHost = new CIMHostUser(url, user, password);
-
-				 SfCIMClientService cimClientService = new SfCIMClientService(cimHost);
-
-				SfCIMService cimService = new SfCIMService(cimClientService);
-				//cimService.setCIMClient(cimClient);
-				//cimService.setCimHost(cimHost);
-
-		        CIMInstance fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_MCFW_NAME);
-		       // CIMInstance bootROM  = cimService.getBootROMSoftwareInstallationInstance();
-				CIMInstance nic = cimService.getNICCardInstance(deviceID);
-				System.out.println(cimService.getRequiredFwImageName(fwInstance, nic));
-				
-			}
 }

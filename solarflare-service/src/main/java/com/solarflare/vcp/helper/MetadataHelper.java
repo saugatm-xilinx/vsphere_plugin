@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -31,8 +32,9 @@ public class MetadataHelper {
 
 	private static final Log logger = LogFactory.getLog(MetadataHelper.class);
 
-	public static BinaryFiles getMetadata(URL filePath) throws MalformedURLException {
+	public static BinaryFiles getMetadata(URL filePath) throws MalformedURLException,Exception {
 		logger.info("getMetadata called with URL : " + filePath);
+		validateURL(filePath);
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 		byte[] jsonData = readData(filePath, true);
@@ -44,9 +46,9 @@ public class MetadataHelper {
 	}
 
 	public static SfFirmware getMetaDataForAdapter(URL pluginURL, SfCIMService cimService, CIMInstance sfFWInstance,
-			CIMInstance nicInstance, FwType fwType) throws MalformedURLException, RuntimeFaultFaultMsg {
-		logger.info("getMetaDataForAdapter called for input params pluginURL : " + pluginURL + " FwType : "+fwType);
-		
+			CIMInstance nicInstance, FwType fwType) throws MalformedURLException, RuntimeFaultFaultMsg, Exception {
+		logger.info("getMetaDataForAdapter called for input params pluginURL : " + pluginURL + " FwType : " + fwType);
+
 		BinaryFiles metadata = null;
 		SfFirmware metaDatafile = null;
 
@@ -103,8 +105,43 @@ public class MetadataHelper {
 				}
 			}
 		} catch (IOException e) {
-			return null;
+			logger.error("Error in reading file : "+toDownload);
 		}
 		return outputStream.toByteArray();
+	}
+
+	public static boolean validateURL(URL url) throws Exception {
+		logger.info("Solaflare :: validating url...");
+		// validate url
+		// check for multicast or loopback
+		java.net.InetAddress address = java.net.InetAddress.getByName(url.getHost());
+		logger.info("Solaflare :: Validating address for metadata file : " + address);
+		
+		if (address.isMulticastAddress()) {
+			logger.error("Solaflare :: Invalid host. {} is a multicast address."+ url.getHost());
+			throw new Exception("Multicast address can not be used.");
+		}
+		if (address.isLoopbackAddress()) {
+			logger.error("Solaflare :: Invalid host. {} is a loopback address."+ url.getHost());
+			throw new Exception("Loopback address can not be used.");
+		}
+		// ping host
+		if (!address.isReachable(5000)) {
+			logger.error("Solaflare ::  unreachable "+ url.getHost());
+			throw new Exception(url.getHost() + " is NOT reachable! Please verify if the server is accessible.");
+		}
+
+		// Validate if metadata file is present at server
+		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.connect();
+
+        int code = connection.getResponseCode();
+        if (code == 404) {
+        	logger.error("Solaflare ::  FirmwareMetadata.json file not found on server "+url.getHost());
+			throw new Exception("Unable to access latest binary files metadata on server "+url.getHost());
+        }
+
+		return true;
 	}
 }
