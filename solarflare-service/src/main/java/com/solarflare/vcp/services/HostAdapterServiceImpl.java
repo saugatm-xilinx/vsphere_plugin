@@ -18,9 +18,9 @@ import com.solarflare.vcp.cim.CIMConstants;
 import com.solarflare.vcp.cim.CIMHost;
 import com.solarflare.vcp.cim.SfCIMClientService;
 import com.solarflare.vcp.cim.SfCIMService;
+import com.solarflare.vcp.exception.SfInvalidRequestException;
 import com.solarflare.vcp.helper.MetadataHelper;
 import com.solarflare.vcp.helper.SFBase64;
-import com.solarflare.vcp.helper.VCenterHelper;
 import com.solarflare.vcp.model.Adapter;
 import com.solarflare.vcp.model.AdapterOverview;
 import com.solarflare.vcp.model.AdapterTask;
@@ -39,9 +39,7 @@ import com.solarflare.vcp.model.TaskState;
 import com.solarflare.vcp.model.UpdateRequest;
 import com.solarflare.vcp.security.ASN1Parser;
 import com.solarflare.vcp.vim.SfVimService;
-import com.solarflare.vcp.vim.SfVimServiceImpl;
 import com.solarflare.vcp.vim.SimpleTimeCounter;
-import com.solarflare.vcp.vim.connection.ConnectionImpl;
 
 public class HostAdapterServiceImpl implements HostAdapterService {
 	private static final Log logger = LogFactory.getLog(HostAdapterServiceImpl.class);
@@ -117,44 +115,28 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			for (Adapter adapter : adapterList) {
 				if (isValidated(adapter, taskInfo)) {
 
-					FirmwareVersion fwVersion = adapter.getLatestVersion();
+					// update controller
+					logger.debug("Updating Controller of adapter " + adapter.getName());
+					URL fWImageURL = null; // for latest update this is null
+					CIMInstance fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_MCFW_NAME);
+					UpdateRequest updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.CONTROLLER,
+							fWImageURL, fwInstance);
+					requestProcessor.addUpdateRequest(updateRequest);
 
-					String currentVersion = adapter.getVersionController();
-					String latestVersion = fwVersion.getController();
-					String latest = VCenterHelper.getLatestVersion(currentVersion, latestVersion);
-					if (latest.equals(latestVersion)) {
-						// update controller
-						logger.debug(
-								"Updating Controller of adapter " + adapter.getName() + "to version " + latestVersion);
-						URL fWImageURL = null; // for latest update this is null
-						UpdateRequest updateRequest = createUpdateRequest(adapter, cimService, taskInfo,
-								FwType.CONTROLLER, fWImageURL);
-						requestProcessor.addUpdateRequest(updateRequest);
-					}
+					logger.debug("Updating BootROM of adapter " + adapter.getName());
+					fWImageURL = null; // for latest update this is null
+					fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_BOOTROM_NAME);
+					updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.BOOTROM, fWImageURL,
+							fwInstance);
+					requestProcessor.addUpdateRequest(updateRequest);
 
-					currentVersion = adapter.getVersionBootROM();
-					latestVersion = fwVersion.getBootROM();
-					latest = VCenterHelper.getLatestVersion(currentVersion, latestVersion);
-					if (latest.equals(latestVersion)) {
-						logger.debug(
-								"Updating BootROM of adapter " + adapter.getName() + "to version " + latestVersion);
-						URL fWImageURL = null; // for latest update this is null
-						UpdateRequest updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.BOOTROM,
-								fWImageURL);
-						requestProcessor.addUpdateRequest(updateRequest);
-					}
-					
-					currentVersion = adapter.getVersionUEFIROM();
-					latestVersion = fwVersion.getUefi();
-					latest = VCenterHelper.getLatestVersion(currentVersion, latestVersion);
-					if (latest.equals(latestVersion)) {
-						logger.debug(
-								"Updating UEFI ROM of adapter " + adapter.getName() + "to version " + latestVersion);
-						URL fWImageURL = null; // for latest update this is null
-						UpdateRequest updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.UEFIROM,
-								fWImageURL);
-						requestProcessor.addUpdateRequest(updateRequest);
-					}
+					logger.debug("Updating UEFI ROM of adapter " + adapter.getName());
+					fWImageURL = null; // for latest update this is null
+					fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
+					updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.UEFIROM, fWImageURL,
+							fwInstance);
+					requestProcessor.addUpdateRequest(updateRequest);
+
 				}
 			}
 		} catch (Exception e) {
@@ -193,73 +175,56 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			boolean controller = false;
 			boolean bootrom = false;
 			boolean uefirom = false;
-			boolean isFwApplicable = false;
 			CIMInstance fwInstance = null;
 			if (FirmwareType.FIRMWARE_TYPE_MCFW.ordinal() == header.getType()) {
 				logger.debug("Solarflare:: Updating Controller");
 				fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_MCFW_NAME);
 				controller = true;
-				isFwApplicable = true;
 			} else if (FirmwareType.FIRMWARE_TYPE_BOOTROM.ordinal() == header.getType()) {
 				// Get BootROM SF_SoftwareInstallationService instance
 				logger.debug("Solarflare:: Updating BootROM");
 				fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_BOOTROM_NAME);
 				bootrom = true;
-				isFwApplicable = true;
-			}else if(FirmwareType.FIRMWARE_TYPE_UEFIROM.ordinal() == header.getType()){
+			} else if (FirmwareType.FIRMWARE_TYPE_UEFIROM.ordinal() == header.getType()) {
 				// Get UEFI ROM SF_SoftwareInstallationService instance
 				logger.debug("Solarflare:: Updating UEFI ROM");
 				fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
 				uefirom = true;
-				isFwApplicable = true;
 			}
 
-			if (isFwApplicable && fwInstance != null) {
+			boolean isValid = isFwFileValid(adapterList, header, fwInstance, cimService);
+			if (isValid) {
+				if (fwInstance != null) {
 
-				String tempFile = cimService.startFwImageSend(fwInstance);
+					String tempFile = cimService.startFwImageSend(fwInstance);
 
-				sendDataInChunks(cimService, fwInstance, tempFile, decodedDataBytes);
+					sendDataInChunks(cimService, fwInstance, tempFile, decodedDataBytes);
 
-				fwImageURL = new URL("file:/" + tempFile);
+					fwImageURL = new URL("file:/" + tempFile);
 
-				UpdateRequestProcessor requestProcessor = UpdateRequestProcessor.getInstance();
-						UpdateRequest updateRequest = null;
-						if (controller) {
-							updateRequest = createUpdateRequestForCustom(cimService, taskInfo, FwType.CONTROLLER,
-									fwImageURL);
-						}
-						if (bootrom) {
-							updateRequest = createUpdateRequestForCustom(cimService, taskInfo, FwType.BOOTROM,
-									fwImageURL);
-						}
-						if (uefirom) {
-							updateRequest = createUpdateRequestForCustom(cimService, taskInfo, FwType.UEFIROM,
-									fwImageURL);
-						}
+					UpdateRequestProcessor requestProcessor = UpdateRequestProcessor.getInstance();
+					UpdateRequest updateRequest = null;
+					if (controller) {
+						updateRequest = createUpdateRequestForCustom(cimService, taskInfo, FwType.CONTROLLER,
+								fwImageURL);
+					}
+					if (bootrom) {
+						updateRequest = createUpdateRequestForCustom(cimService, taskInfo, FwType.BOOTROM, fwImageURL);
+					}
+					if (uefirom) {
+						updateRequest = createUpdateRequestForCustom(cimService, taskInfo, FwType.UEFIROM, fwImageURL);
+					}
 
-						updateRequest.setCustom(true); // temp file is created
-						updateRequest.setTempFilePath(tempFile);
-						requestProcessor.addUpdateRequest(updateRequest,adapterList);
+					updateRequest.setCustom(true); // temp file is created
+					updateRequest.setTempFilePath(tempFile);
+					requestProcessor.addUpdateRequest(updateRequest, adapterList);
 
-			} else {
-				String errMsg = null;
-				if (isFwApplicable) {
-					errMsg = "Fail to get CIM Firmware Instance";
 				} else {
-					errMsg = "Invalid Firmware File";
-
+					String errMsg = "Fail to get CIM Firmware Instance";
+					logger.error(errMsg);
+					throw new SfInvalidRequestException(errMsg);
 				}
 
-				Status conntrollerStatus = new Status(TaskState.Error, errMsg, FwType.CONTROLLER);
-				Status bootROMStatus = new Status(TaskState.Error, errMsg, FwType.BOOTROM);
-				Status uefiROMStatus = new Status(TaskState.Error, errMsg, FwType.UEFIROM);
-				for (Adapter adapter : adapterList) {
-					AdapterTask aTask = getAdapterTask(taskInfo, adapter.getId());
-					aTask.setController(conntrollerStatus);
-					aTask.setBootROM(bootROMStatus);
-					aTask.setUefiROM(uefiROMStatus);
-				}
-				logger.error(errMsg);
 			}
 
 		} catch (Exception e) {
@@ -291,23 +256,24 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			byte[] fileData = cimService.readData(fwImageURL, readComplete);
 			byte[] headerData = new ASN1Parser().getFileHeaderBytes(fileData);
 			FileHeader header = cimService.getFileHeader(headerData);
-			boolean isFwApplicable = false;
+			CIMInstance fwInstance = null;
 			logger.debug("Solarflare:: Header : " + header);
 			if (FirmwareType.FIRMWARE_TYPE_MCFW.ordinal() == header.getType()) {
 				logger.debug("Solarflare:: Updating Controller");
 				controller = true;
-				isFwApplicable = true;
+				fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_MCFW_NAME);
 			} else if (FirmwareType.FIRMWARE_TYPE_BOOTROM.ordinal() == header.getType()) {
 				logger.debug("Solarflare:: Updating BootROM");
 				bootrom = true;
-				isFwApplicable = true;
-			}else if (FirmwareType.FIRMWARE_TYPE_UEFIROM.ordinal() == header.getType()) {
+				fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_BOOTROM_NAME);
+			} else if (FirmwareType.FIRMWARE_TYPE_UEFIROM.ordinal() == header.getType()) {
 				logger.debug("Solarflare:: Updating UEFI ROM");
 				uefirom = true;
-				isFwApplicable = true;
+				fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
 			}
 
-			if (isFwApplicable) {
+			boolean isValid = isFwFileValid(adapterList, header, fwInstance, cimService);
+			if (isValid) {
 
 				UpdateRequestProcessor requestProcessor = UpdateRequestProcessor.getInstance();
 				for (Adapter adapter : adapterList) {
@@ -315,33 +281,25 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 						UpdateRequest updateRequest = null;
 						if (controller) {
 							updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.CONTROLLER,
-									fwImageURL);
+									fwImageURL, fwInstance);
 						}
 						if (bootrom) {
 							updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.BOOTROM,
-									fwImageURL);
+									fwImageURL, fwInstance);
 						}
 						if (uefirom) {
 							updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.UEFIROM,
-									fwImageURL);
+									fwImageURL, fwInstance);
 						}
 						requestProcessor.addUpdateRequest(updateRequest);
 					}
 				}
 			} else {
-				String errMsg = null;
-				errMsg = "Invalid Firmware File";
-				Status conntrollerStatus = new Status(TaskState.Error, errMsg, FwType.CONTROLLER);
-				Status bootROMStatus = new Status(TaskState.Error, errMsg, FwType.BOOTROM);
-				Status uefiROMStatus = new Status(TaskState.Error, errMsg, FwType.UEFIROM);
-				for (Adapter adapter : adapterList) {
-					AdapterTask aTask = getAdapterTask(taskInfo, adapter.getId());
-					aTask.setController(conntrollerStatus);
-					aTask.setBootROM(bootROMStatus);
-					aTask.setUefiROM(uefiROMStatus);
-				}
+				String errMsg = "Invalid Firmware File";
 				logger.error(errMsg);
+				throw new SfInvalidRequestException(errMsg);
 			}
+
 		} catch (Exception e) {
 			timer.stop();
 			throw e;
@@ -367,6 +325,29 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 
 	}
 
+	private boolean isFwFileValid(List<Adapter> adapterList, FileHeader header, CIMInstance fwInstance,
+			SfCIMService cimService) throws Exception {
+
+		boolean isValid = true;
+		for (Adapter adapter : adapterList) {
+			CIMInstance nicInstance = cimService.getNICCardInstance(adapter.getChildren().get(0).getName());
+			if (FirmwareType.FIRMWARE_TYPE_MCFW.ordinal() == header.getType()) {
+				isValid = cimService.isCustomFWImageCompatible(fwInstance, nicInstance, header, FwType.CONTROLLER,
+						adapter);
+			} else if (FirmwareType.FIRMWARE_TYPE_BOOTROM.ordinal() == header.getType()) {
+				isValid = cimService.isCustomFWImageCompatible(fwInstance, nicInstance, header, FwType.BOOTROM,
+						adapter);
+			} else if (FirmwareType.FIRMWARE_TYPE_UEFIROM.ordinal() == header.getType()) {
+				isValid = cimService.isCustomFWImageCompatible(fwInstance, nicInstance, header, FwType.UEFIROM,
+						adapter);
+			} else {
+				throw new SfInvalidRequestException(
+						"Invalid firmware file. Not valid for either Controler, BootROM or UEFI ROM.");
+			}
+		}
+		return isValid;
+	}
+
 	@Override
 	public NicBootParamInfo getNicParamInfo(String hostId, String nicId) throws Exception {
 		// TODO Auto-generated method stub
@@ -381,7 +362,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 	@Override
 	public HostConfiguration getHostConfigurations(String hostId) throws Exception {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: getHostConfigurations");
-		logger.info("Solarflare:: getHostConfigurations for hostId : "+hostId);
+		logger.info("Solarflare:: getHostConfigurations for hostId : " + hostId);
 		SfOptionString sfOptionString = new SfOptionString();
 		String optionString = sfVimService.getOptionString(hostId);
 		HostConfiguration hostConfiguration = sfOptionString.getHostConfiguration(optionString);
@@ -390,7 +371,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 	}
 
 	@Override
-	public void updateHostConfigurations(String hostId,HostConfiguration hostConfigurationRequest) throws Exception {
+	public void updateHostConfigurations(String hostId, HostConfiguration hostConfigurationRequest) throws Exception {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: updateHostConfigurations");
 		logger.info("Solarflare:: updateHostConfigurations ");
 		SfOptionString sfOptionString = new SfOptionString();
@@ -418,23 +399,19 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 	}
 
 	private UpdateRequest createUpdateRequest(Adapter adapter, SfCIMService cimService, TaskInfo taskInfo,
-			FwType fwType, URL fwImageURL) throws Exception {
+			FwType fwType, URL fwImageURL, CIMInstance fwInstance) throws Exception {
 		String adapterId = adapter.getId();
 		AdapterTask aTask = getAdapterTask(taskInfo, adapterId);
 
-		CIMInstance fwInstance = null;
 		CIMInstance nicInstance = cimService.getNICCardInstance(adapter.getChildren().get(0).getName());
 		// Check for controller version
 		Status status = new Status(TaskState.Queued, null, fwType);
 		if (FwType.CONTROLLER.equals(fwType)) {
 			aTask.setController(status);
-			fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_MCFW_NAME);
 		} else if (FwType.BOOTROM.equals(fwType)) {
 			aTask.setBootROM(status);
-			fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_BOOTROM_NAME);
 		} else if (FwType.UEFIROM.equals(fwType)) {
 			aTask.setUefiROM(status);
-			fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
 		}
 		if (fwImageURL == null) {
 			fwImageURL = getImageURL(fwInstance, nicInstance, cimService, fwType);
@@ -451,8 +428,8 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		return updateRequest;
 	}
 
-	private UpdateRequest createUpdateRequestForCustom(SfCIMService cimService, TaskInfo taskInfo,
-			FwType fwType, URL fwImageURL) throws Exception {
+	private UpdateRequest createUpdateRequestForCustom(SfCIMService cimService, TaskInfo taskInfo, FwType fwType,
+			URL fwImageURL) throws Exception {
 
 		UpdateRequest updateRequest = new UpdateRequest();
 		updateRequest.setFwImagePath(fwImageURL);
@@ -534,7 +511,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		URL pluginURL = new URL(sfVimService.getPluginURL(CIMConstants.PLUGIN_KEY));
 
 		String latestControllerVersion = cimService.getLatestFWImageVersion(pluginURL, cimService, fwInstance,
-				niCimInstance,FwType.CONTROLLER);
+				niCimInstance, FwType.CONTROLLER);
 
 		FirmwareVersion frmVesion = new FirmwareVersion();
 
@@ -543,14 +520,14 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		// Get version from image binary for BootRom
 		CIMInstance bootROMInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_BOOTROM_NAME);
 		String latestBootROMVersion = cimService.getLatestFWImageVersion(pluginURL, cimService, bootROMInstance,
-				niCimInstance,FwType.BOOTROM);
+				niCimInstance, FwType.BOOTROM);
 
 		frmVesion.setBootROM(latestBootROMVersion);
 
 		// Get version from image binary for BootRom
 		CIMInstance uefiROMInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
 		String latestUefiROMVersion = cimService.getLatestFWImageVersion(pluginURL, cimService, uefiROMInstance,
-				niCimInstance,FwType.UEFIROM);
+				niCimInstance, FwType.UEFIROM);
 		frmVesion.setUefi(latestUefiROMVersion);
 
 		// Put dummy latest versions for Firmware family
@@ -587,6 +564,5 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
+
 }

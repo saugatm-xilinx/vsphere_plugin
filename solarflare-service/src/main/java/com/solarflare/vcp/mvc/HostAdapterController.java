@@ -27,6 +27,7 @@ import com.solarflare.vcp.exception.SfInvalidLoginException;
 import com.solarflare.vcp.exception.SfInvalidRequestException;
 import com.solarflare.vcp.exception.SfNotFoundException;
 import com.solarflare.vcp.model.Adapter;
+import com.solarflare.vcp.model.AdapterNicStatistics;
 import com.solarflare.vcp.model.AdapterOverview;
 import com.solarflare.vcp.model.CustomUpdateRequest;
 import com.solarflare.vcp.model.Host;
@@ -297,4 +298,29 @@ public class HostAdapterController {
 		Gson gson = new Gson();
 		return gson.toJson(response);
 	}
+	
+	@RequestMapping(value= "/hosts/{hostId}/adapters/{nicId}/statistics", method = RequestMethod.GET)
+	 @ResponseBody
+	 public AdapterNicStatistics getAdapterNicStatistics(@PathVariable String hostId, @PathVariable String nicId) throws Exception
+	 {
+	  if(hostId == null || hostId.isEmpty())
+	  {
+	   throw new Exception("hostId should not be null or empty");
+	  }
+	  else if(nicId == null ||nicId.isEmpty())
+	  {
+	   throw new Exception("nicId should not be null or empty");
+	  }
+	  AdapterNicStatistics adapterNicStatistics = null;
+	  DummayService service = new DummayService();
+	  try
+	  {
+	   adapterNicStatistics = service.getAdapterNicStatistics(hostId, nicId);
+	  }
+	  catch(Exception e)
+	  {
+	   throw e;
+	  }
+	  return adapterNicStatistics;
+	 }
 }

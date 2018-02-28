@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.solarflare.vcp.model.Adapter;
+import com.solarflare.vcp.model.AdapterNicStatistics;
 import com.solarflare.vcp.model.AdapterOverview;
 import com.solarflare.vcp.model.Debugging;
 import com.solarflare.vcp.model.Host;
@@ -142,4 +143,31 @@ public class DummayService implements HostAdapterService {
 		return adp;
 	}
 
+	public AdapterNicStatistics getAdapterNicStatistics(String hostId, String nicId) {
+		  AdapterNicStatistics stat = new AdapterNicStatistics();
+		  stat.setTimePeriod("Last 1 Hour");
+		  stat.setPacketsReceived("57");
+		  stat.setPacketsSent("69");
+		  stat.setBytesReceived("4502");
+		  stat.setBytesSent("5770");
+		  stat.setReceivePacketsDropped("0");
+		  stat.setTransmitPacketsDropped("0");
+		  stat.setMulticastPacketsReceived("0");
+		  stat.setBroadcastPacketsSent("0");  
+		  stat.setTotalReceiveError("0");
+		  stat.setReceiveLengthErrors("0");
+		  stat.setReceiveOverErrors("0");
+		  stat.setReceiveCRCErrors("0");
+		  stat.setReveiveFrameErrors("0");
+		  stat.setReveiveFIFOErrors("0");
+		  stat.setReceiveMissedErrors("0");
+		  stat.setTotalReceiveError("0");
+		  stat.setTotalTransmitErrors("0");
+		  stat.setTransmitAbortedErrors("0");
+		  stat.setTransmitCarrierErrors("0");
+		  stat.setTransmitFIFOErrors("0");
+		  stat.setMulticastPacketsReceived("0");
+		  stat.setBroadcastPacketsSent("0");
+		  return stat;
+		 }
 }

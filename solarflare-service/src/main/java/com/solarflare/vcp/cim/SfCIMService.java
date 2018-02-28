@@ -26,8 +26,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sblim.cimclient.internal.util.MOF;
 
+import com.solarflare.vcp.exception.SfInvalidRequestException;
 import com.solarflare.vcp.exception.SfUpdateRequestFailed;
 import com.solarflare.vcp.helper.MetadataHelper;
+import com.solarflare.vcp.model.Adapter;
 import com.solarflare.vcp.model.FileHeader;
 import com.solarflare.vcp.model.FwType;
 import com.solarflare.vcp.model.SfFirmware;
@@ -364,39 +366,43 @@ public class SfCIMService {
 	 * @return True is given Firmware image file is compatible with nicInstance
 	 * @throws Exception
 	 */
-	public boolean isCustomFWImageCompatible(CIMInstance fwInst, CIMInstance nicInstance, FileHeader header)
-			throws Exception {
+	public boolean isCustomFWImageCompatible(CIMInstance fwInst, CIMInstance nicInstance, FileHeader header,
+			FwType fwType, Adapter adapter) throws Exception {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: isCustomFWImageCompatible");
 		boolean isCompatible = false;
 
 		Map<String, String> params = getRequiredFwImageName(fwInst, nicInstance);
 		int currentType = 0, currentSubType = 0;
+		String fileName = null;
 		if (params != null) {
 			currentType = Integer.parseInt(params.get(CIMConstants.TYPE));
 			currentSubType = Integer.parseInt(params.get(CIMConstants.SUB_TYPE));
+			fileName = params.get(CIMConstants.NAME);
 		}
 
-		logger.info("Solarflare::Current firmware type : " + currentType);
-		logger.info("Solarflare::Current firmware subtype : " + currentSubType);
+		logger.debug("Solarflare::Current firmware type : " + currentType);
+		logger.debug("Solarflare::Current firmware subtype : " + currentSubType);
 
 		int newType = 0, newSubType = 0;
 		if (header != null) {
-			logger.info("Solarflare::Headers: " + header);
 			newType = header.getType();
 			newSubType = header.getSubtype();
 		} else {
 			logger.error("FileHeader is null");
 		}
 
-		logger.info("Solarflare::New Type:" + newType);
-		logger.info("Solarflare::New Subtype:" + newSubType);
+		logger.debug("Solarflare::New Type:" + newType);
+		logger.debug("Solarflare::New Subtype:" + newSubType);
 
 		if (currentType == newType && currentSubType == newSubType) {
 			isCompatible = true;
 			logger.info("Solarflare::Custom Firmeware Image compatable");
 		} else {
-			logger.info("Solarflare::Custom Firmeware Image not compatable");
+			String errMsg = "Incompatible " + fwType + " firmware file for adapter " + adapter.getName()
+					+ ". Expected file is " + fileName;
+			throw new SfInvalidRequestException(errMsg);
 		}
+
 		timer.stop();
 		return isCompatible;
 	}
@@ -812,7 +818,8 @@ public class SfCIMService {
 	}
 
 	/**
-	 * Return Part Number for given deviceID 
+	 * Return Part Number for given deviceID
+	 * 
 	 * @param deviceId
 	 * @return Part Number
 	 */
@@ -836,4 +843,25 @@ public class SfCIMService {
 		}
 		return partNumber;
 	}
+	
+	// TODO Cleanup : Written for testing
+			public static void main(String[] args) throws Exception {
+				String url = "https://10.101.10.3:5989/";
+				String password = "Ibmx#3750c";
+				String user = "root";
+				String deviceID = "vmnic5";
+				CIMHost cimHost = new CIMHostUser(url, user, password);
+
+				 SfCIMClientService cimClientService = new SfCIMClientService(cimHost);
+
+				SfCIMService cimService = new SfCIMService(cimClientService);
+				//cimService.setCIMClient(cimClient);
+				//cimService.setCimHost(cimHost);
+
+		        CIMInstance fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_MCFW_NAME);
+		       // CIMInstance bootROM  = cimService.getBootROMSoftwareInstallationInstance();
+				CIMInstance nic = cimService.getNICCardInstance(deviceID);
+				System.out.println(cimService.getRequiredFwImageName(fwInstance, nic));
+				
+			}
 }
