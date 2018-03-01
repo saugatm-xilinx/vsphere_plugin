@@ -1,12 +1,12 @@
-import {Component, ElementRef, ViewChild, OnInit, OnDestroy, Injector, Input} from '@angular/core';
-import {Router, ActivatedRoute, Params} from '@angular/router';
-import {Http} from "@angular/http";
-import {GlobalsService} from "../../../shared/globals.service";
-import {Subscription} from 'rxjs/Subscription';
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {AppComponent} from "../../../app.component";
-import {HostsService} from "../../../services/hosts.service";
-import {Observable} from "rxjs/Observable";
+import { Component, ElementRef, ViewChild, OnInit, OnDestroy, Injector, Input } from '@angular/core';
+import { Router, ActivatedRoute, Params } from '@angular/router';
+import { Http } from "@angular/http";
+import { GlobalsService } from "../../../shared/globals.service";
+import { Subscription } from 'rxjs/Subscription';
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { AppComponent } from "../../../app.component";
+import { HostsService } from "../../../services/hosts.service";
+import { Observable } from "rxjs/Observable";
 
 //  TODO: review comments - components should not have this much line code in a single file.
 //  Break code in smaller chunck and may create a helper/service to serve functionality.
@@ -61,11 +61,14 @@ export class FwupdateComponent implements OnInit {
 
     @ViewChild('fileInput') fileInput: ElementRef;
 
+    customUpdateErrorMessage = '';
+    fetchDataErrorMessage = '';
+
     constructor(private activatedRoute: ActivatedRoute,
-                private gs: GlobalsService,
-                private fb: FormBuilder,
-                private inj: Injector,
-                private hs: HostsService) {
+        private gs: GlobalsService,
+        private fb: FormBuilder,
+        private inj: Injector,
+        private hs: HostsService) {
         this.activatedRoute.parent.params.subscribe((params: Params) => {
             this.params = params;
         });
@@ -120,6 +123,7 @@ export class FwupdateComponent implements OnInit {
         this.status.status = false;
         this.gettingAdapterList = true;
         this.getAdapterListErr = false;
+        this.fetchDataErrorMessage = '';
         this.hs.getAdapters(this.params['id'])
             .subscribe(
                 data => {
@@ -128,6 +132,8 @@ export class FwupdateComponent implements OnInit {
                     this.updateStatus(data);
                 },
                 err => {
+                    const error = err.json();
+                    this.fetchDataErrorMessage = error ? error.message : null;
                     console.error(err);
                     this.gettingAdapterList = false;
                     this.getAdapterListErr = true;
@@ -228,6 +234,7 @@ export class FwupdateComponent implements OnInit {
     }
 
     latestUpdate() {
+        this.customUpdateErrorMessage = '';
         this.hs.latestUpdate(this.params['id'], this.selectedAdapters)
             .subscribe(
                 data => {
@@ -243,6 +250,8 @@ export class FwupdateComponent implements OnInit {
                     this.button.latestErr = false;
                 },
                 err => {
+                    const error = err.json();
+                    this.customUpdateErrorMessage = error ? error.message : null;
                     console.error(err);
                     this.button.latest = false;
                     this.button.latestErr = true;
@@ -271,10 +280,10 @@ export class FwupdateComponent implements OnInit {
             reader.onload = () => {
                 this.customUploadFile
                     .get('fwFile').setValue({
-                    filename: file.name,
-                    filetype: file.type,
-                    value: reader.result.split(',')[1]
-                });
+                        filename: file.name,
+                        filetype: file.type,
+                        value: reader.result.split(',')[1]
+                    });
             };
         }
     }
@@ -334,7 +343,7 @@ export class FwupdateComponent implements OnInit {
             "base64Data": null,
             "adapters": this.selectedAdapters
         };
-
+        this.customUpdateErrorMessage = '';
         this.hs.onSubmitUrl(this.params['id'], payload)
             .subscribe(
                 data => {
@@ -351,6 +360,8 @@ export class FwupdateComponent implements OnInit {
                     this.customUploadUrl.get('urlProtocol').setValue('');
                 },
                 err => {
+                    const error = err.json();
+                    this.customUpdateErrorMessage = error ? error.message : null;
                     console.error(err);
                     setTimeout(() => {
                         this.button.custom = false;
@@ -401,14 +412,14 @@ export class FwupdateComponent implements OnInit {
         const obs = Observable.interval(3000)
             .switchMap(() => this.hs.getStatus(taskId).map((data) => data))
             .subscribe((data) => {
-                    if (this.status.status === true) {
-                        this.status.status = false;
-                        this.processStatusLatest(data, adapters);
-                        obs.unsubscribe();
-                    } else {
-                        this.processStatusLatest(data, adapters);
-                    }
-                },
+                if (this.status.status === true) {
+                    this.status.status = false;
+                    this.processStatusLatest(data, adapters);
+                    obs.unsubscribe();
+                } else {
+                    this.processStatusLatest(data, adapters);
+                }
+            },
                 err => {
                     console.log(err);
                 });
@@ -488,15 +499,15 @@ export class FwupdateComponent implements OnInit {
         const obs = Observable.interval(3000)
             .switchMap(() => this.hs.getStatus(taskId).map((data) => data))
             .subscribe((data) => {
-                    if (this.status.status === true) {
-                        this.status.status = false;
-                        this.processStatusCustom(data, adapters);
-                        this.getAdapterList();
-                        obs.unsubscribe();
-                    } else {
-                        this.processStatusCustom(data, adapters);
-                    }
-                },
+                if (this.status.status === true) {
+                    this.status.status = false;
+                    this.processStatusCustom(data, adapters);
+                    this.getAdapterList();
+                    obs.unsubscribe();
+                } else {
+                    this.processStatusCustom(data, adapters);
+                }
+            },
                 err => {
                     console.log(err);
                 });

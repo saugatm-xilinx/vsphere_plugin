@@ -10,8 +10,9 @@
                     <div class="alert-icon-wrapper">
                         <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
                     </div>
-                    <div class="alert-text">
-                        Request failed
+                    <div class="alert-text" style="width:80%">
+                        <span *ngIf="!customUpdateErrorMessage"> Request failed</span>
+                        <span *ngIf="customUpdateErrorMessage">{{customUpdateErrorMessage}}</span>
                     </div>
                     <div class="alert-actions">
                         <button class="btn alert-action" [disabled]="button.latest"
@@ -169,8 +170,9 @@
                     <div class="alert-icon-wrapper">
                         <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
                     </div>
-                    <div class="alert-text">
-                        Request failed
+                    <div class="alert-text" style="width:80%">
+                       <span *ngIf="!customUpdateErrorMessage"> Request failed</span>
+                       <span *ngIf="customUpdateErrorMessage">{{customUpdateErrorMessage}}</span>
                     </div>
                     <div class="alert-actions">
                         <button class="btn alert-action" *ngIf="customSelectUrl"
@@ -442,7 +444,9 @@
             </span>
             <span class="text-danger" *ngIf="getAdapterListErr"><br/>
                 <clr-icon shape="error-standard" style="margin: 0 auto"></clr-icon>
-                Error occurred while fetching data</span>
+                Error occurred while fetching data</span> 
+                <br/>
+               <span *ngIf="fetchDataErrorMessage"  class="text-danger">{{fetchDataErrorMessage}}</span> 
         </div>
     </div>
 
