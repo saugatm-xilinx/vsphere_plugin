@@ -166,6 +166,10 @@
                                 <input type="checkbox" class="checkbox" formControlName="eventQueue" id="eventqueue">
                                 <label for="eventqueue">Event Queue</label>
                             </div>
+                            <div class="checkbox-inline debugMask">
+                                <input type="checkbox" class="checkbox" formControlName="mcdi" id="mcdi">
+                                <label for="mcdi">MCDI</label>
+                            </div>
                         </div>
                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
                             <div class="checkbox-inline debugMask">
@@ -194,7 +198,7 @@
                     <div class="form-group row" style="min-height: 30px; ">
                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
                             <div class="checkbox-inline debugMask">
-                                VxLAN Offload
+                                VXLAN Offload
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
@@ -219,7 +223,7 @@
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                            <div class="checkbox-inline debugMask">
+                            <div class="checkbox-inline debugMask disabled">
                                 <div class="radio">
                                     <input type="radio" formControlName="geneveOffloadEnable"
                                            name="geneveOffloadEnable" [value]="true" id="geneveOffloadEnable">
@@ -240,9 +244,9 @@
                     <button class="btn btn-outline-primary"
                             type="button" [disabled]="submitted" (click)="restoreConfig()" >Restore
                     </button>
-                    <button class="btn btn-outline-secondary"
+<!--                    <button class="btn btn-outline-secondary"
                             type="button" [disabled]="submitted" (click)="defaultConfig()" >Defaults
-                    </button>
+                    </button>-->
                     <button class="btn btn-primary"
                             type="submit"
                             [disabled]="submitted || (!hostConfig.dirty || hostConfig.invalid)" >Apply

@@ -30,7 +30,8 @@ export class ConfigComponent implements OnInit {
             "interrupt": false,
             "commonCode": false,
             "driver": false,
-            "filter": false
+            "filter": false,
+            "mcdi": false
         },
         "overlay": {"vxlanOffloadEnable": true, "geneveOffloadEnable": true},
         "restart": false
@@ -113,7 +114,8 @@ export class ConfigComponent implements OnInit {
                 interrupt: new FormControl('', Validators.required),
                 commonCode: new FormControl('', Validators.required),
                 driver: new FormControl('', Validators.required),
-                filter: new FormControl('', Validators.required)
+                filter: new FormControl('', Validators.required),
+                mcdi: new FormControl('', Validators.required)
             }),
             overlay: new FormGroup({
                 vxlanOffloadEnable: new FormControl('', Validators.required),

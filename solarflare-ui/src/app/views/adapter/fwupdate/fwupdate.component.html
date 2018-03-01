@@ -34,6 +34,7 @@
                 <th colspan="2" class="table-border-right">Controller Version</th>
                 <th colspan="2" class="table-border-right">Boot ROM Version</th>
                 <th colspan="2">UEFI ROM Version</th>
+                <th>Latest Version Available</th>
             </tr>
             <tr>
                 <th class="table-border-right">Current</th>
@@ -41,7 +42,8 @@
                 <th class="table-border-right">Current</th>
                 <th class="table-border-right" style="color:#781DA0;">Latest</th>
                 <th class="table-border-right">Current</th>
-                <th style="color:#781DA0;">Latest</th>
+                <th style="color:#781DA0;" class="table-border-right">Latest</th>
+                <th></th>
             </tr>
             <tr *ngFor="let ad of adapters">
                 <td>{{ad.name}}</td>
@@ -72,9 +74,14 @@
                         NA
                     </b>
                 </td>
+                <td>
+                    {{isLatestAvailable(ad)}}
+                </td>
             </tr>
         </table>
-
+        <div style="text-align: right; height: 30px;">
+            <span *ngIf="button.latest" >This may take some time, Please wait...</span>
+        </div>
     </div>
     <div class="modal-footer">
         <button class="btn btn-outline" type="button"
@@ -154,8 +161,6 @@
                                 <option selected value="">Select URL Protocol</option>
                                 <option value="http://">http://</option>
                                 <option value="https://">https://</option>
-                                <option value="sftp://">sftp://</option>
-                                <option value="tftp://">tftp://</option>
                                 <option value="ftp://">ftp://</option>
                             </select>
                         </div>
@@ -249,14 +254,14 @@
                 Controller Firmware: v{{output.controller.from}} updated to v{{output.controller.to}}
             </span>
                 <span *ngIf="output.controller.state === 'Success' && !output.controller.to ">
-                Controller Firmware: v{{output.controller.from}} updating ...
+                Controller Firmware: Firmware update in progress {{dots}}
             </span>
                 <span *ngIf="output.controller.state === 'Error'">
                 Controller Firmware: Error occurred while updating v{{output.controller.from}}
                 <i style="color: red;" *ngIf="output.controller.message !== null"><br/>{{output.controller.message}}</i>
             </span>
                 <span *ngIf="output.controller.state === 'Queued' || output.controller.state === 'Running'">
-                Controller Firmware: v{{output.controller.from}} updating ...
+                Controller Firmware: Firmware update in progress {{dots}}
             </span>
                 <br/>
             </div>
@@ -266,14 +271,14 @@
                 BootROM Firmware: v{{output.bootRom.from}} updated to v{{output.bootRom.to}}
             </span>
                 <span *ngIf="output.bootRom.state === 'Success' && !output.bootRom.to ">
-                BootROM Firmware: v{{output.bootRom.from}} updating ...
+                BootROM Firmware: Firmware update in progress {{dots}}
             </span>
                 <span *ngIf="output.bootRom.state === 'Error'">
                 BootROM Firmware: Error occurred while updating v{{output.bootRom.from}}
                 <i style="color: red;" *ngIf="output.bootRom.message !== null"><br/>{{output.bootRom.message}}</i>
             </span>
                 <span *ngIf="output.bootRom.state === 'Queued' || output.bootRom.state === 'Running'">
-                BootROM Firmware: v{{output.bootRom.from}} updating ...
+                BootROM Firmware: Firmware update in progress {{dots}}
             </span>
                 <br/>
             </div>
@@ -283,14 +288,14 @@
                 UEFIROM Firmware: v{{output.uefiRom.from}} updated to v{{output.uefiRom.to}}
             </span>
                 <span *ngIf="output.uefiRom.state === 'Success' && !output.uefiRom.to ">
-                UEFIROM Firmware: v{{output.uefiRom.from}} updating ...
+                UEFIROM Firmware: Firmware update in progress {{dots}}
             </span>
                 <span *ngIf="output.uefiRom.state === 'Error'">
                 UEFIROM Firmware: Error occurred while updating v{{output.uefiRom.from}}
                 <i style="color: red;" *ngIf="output.uefiRom.message !== null"><br/>{{output.uefiRom.message}}</i>
             </span>
                 <span *ngIf="output.uefiRom.state === 'Queued' || output.uefiRom.state === 'Running'">
-                UEFIROM Firmware: v{{output.uefiRom.from}} updating ...
+                UEFIROM Firmware: Firmware update in progress {{dots}}
             </span>
                 <br/>
             </div>
@@ -303,7 +308,9 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-outline" type="button" (click)="status.custom.modal = false;status.status = true;" >Ok</button>
+        <button class="btn btn-outline" type="button"
+                (click)="status.custom.modal = false;status.status = true;"
+                [disabled]="statusUpdate" >Ok</button>
     </div>
 </clr-modal>
 
@@ -362,7 +369,9 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-outline" type="button" (click)="status.latest.modal = false;status.status = true;" >Ok</button>
+        <button class="btn btn-outline" type="button"
+                (click)="status.latest.modal = false;status.status = true;"
+                [disabled]="statusUpdate" >Ok</button>
     </div>
 </clr-modal>
 
