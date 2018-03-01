@@ -65,6 +65,7 @@ public class SfVimServiceHelper {
 	 * @return
 	 */
 	public static Map<String, PhysicalNic> getSfPhysicalNic(List<PhysicalNic> physicalNics, List<String> pciIDs) {
+		logger.info("Solarflare:: getSfPhysicalNic"); 
 		Map<String, PhysicalNic> sfNics = new HashMap<>();
 		if (physicalNics != null && !physicalNics.isEmpty())
 			for (PhysicalNic physicalNic : physicalNics) {
@@ -72,6 +73,7 @@ public class SfVimServiceHelper {
 				if (pciIDs.contains(pci))
 					sfNics.put(pci, physicalNic);
 			}
+		logger.trace("Total SF Nics retunred: "+sfNics.size());
 		return sfNics;
 	}
 
@@ -82,12 +84,15 @@ public class SfVimServiceHelper {
 	 * @return
 	 */
 	public static List<HostPciDevice> getSfPciDevice(List<HostPciDevice> pciDevices) {
+		logger.info("Solarflare:: getSfPciDevice");
+		
 		List<HostPciDevice> sfDevices = new ArrayList<HostPciDevice>();
 		if (pciDevices != null && !pciDevices.isEmpty())
 			for (HostPciDevice pciDevice : pciDevices) {
 				if (SOLARFLARE_VENDOR_ID == pciDevice.getVendorId() && pciDevice.getDeviceId() >= DEVICE_ID_SUPPORTED)
 					sfDevices.add(pciDevice);
 			}
+		logger.trace("Solarflare:: Number of SF PCI devices returned : "+sfDevices.size());
 		return sfDevices;
 	}
 
@@ -118,11 +123,13 @@ public class SfVimServiceHelper {
 		if (hostName != null && pciId != null) {
 			adapterId = hostName + ADAPETR_ID_SEPARATOR + pciId.split("\\.")[0];
 		}
+		logger.info("Solarflare:: getAdapterId retured adapterId: "+adapterId);
 		return adapterId;
 	}
 
 	public static Map<String, List<VMNIC>> mergeToVMNICObject(List<HostPciDevice> pciDevices,
 			Map<String, PhysicalNic> pNICs, String hostName) {
+		logger.info("Solarflare:: mergeToVMNICObject - hostName :"+hostName);
 		Map<String, List<VMNIC>> vmNICmap = new HashMap<>();
 		for (HostPciDevice pciDevice : pciDevices) {
 			PhysicalNic pNIC = pNICs.get(pciDevice.getId());
@@ -148,6 +155,7 @@ public class SfVimServiceHelper {
 				vmNICmap.put(id, vmNICList);
 			}
 		}
+		logger.trace("Solarflare:: mergeToVMNICObject retuned vmNICmap.size: "+vmNICmap.size());
 		return vmNICmap;
 	}
 

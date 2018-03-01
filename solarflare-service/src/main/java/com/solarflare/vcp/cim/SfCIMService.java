@@ -824,6 +824,7 @@ public class SfCIMService {
 	 * @return Part Number
 	 */
 	public String getPartNumber(String deviceId) {
+		logger.info("Solarflare:: getPartNumber for deviceId - "+deviceId);
 		String partNumber = null;
 		if (null == deviceId || deviceId.isEmpty()) {
 			logger.info("deviceId is null");
