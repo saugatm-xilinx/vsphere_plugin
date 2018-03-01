@@ -60,7 +60,10 @@ const appRoutes: Routes = [
     },
     {
         path: "adapter/:id", component: AdapterComponent
-    }
+    },
+    {
+        path: "nic/:hostId/:nicId",  loadChildren: 'app/views/nic/nic.module#NicModule'
+    },
 ];
 
 /**

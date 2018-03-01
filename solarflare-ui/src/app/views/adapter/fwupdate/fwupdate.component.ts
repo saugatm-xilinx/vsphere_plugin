@@ -42,7 +42,8 @@ export class FwupdateComponent implements OnInit {
     public customSelectUrl = false;
     customUploadFile: FormGroup;
     customUploadUrl: FormGroup;
-
+    public statusUpdate = false;
+    public dots = '.';
 
     @ViewChild('fileInput') fileInput: ElementRef;
 
@@ -145,10 +146,22 @@ export class FwupdateComponent implements OnInit {
                         }
                     }
                 })
-            })
+            });
+            this.statusUpdate = false;
         }
     }
 
+    isLatestAvailable(ad) {
+        if (ad.latestVersion.controller !== ad.versionController.split(' ')[0]){
+            return "Yes";
+        }else if (ad.latestVersion.bootROM !== ad.versionBootROM){
+            return "Yes";
+        }else if (ad.latestVersion.uefi !== ad.versionUEFIROM){
+            return "Yes";
+        }else {
+            return "No";
+        }
+    }
     latestUpdate() {
 
         this.hs.latestUpdate(this.params['hostid'], [this.adapter])
@@ -295,12 +308,6 @@ export class FwupdateComponent implements OnInit {
             } else if (rehttps.test(url.value)) {
                 this.customUploadUrl.get('url').setValue(url.value.replace(rehttps, ""));
                 this.customUploadUrl.get('urlProtocol').setValue('https://');
-            } else if (retftp.test(url.value)) {
-                this.customUploadUrl.get('url').setValue(url.value.replace(retftp, ""));
-                this.customUploadUrl.get('urlProtocol').setValue('tftp://');
-            } else if (resftp.test(url.value)) {
-                this.customUploadUrl.get('url').setValue(url.value.replace(resftp, ""));
-                this.customUploadUrl.get('urlProtocol').setValue('sftp://');
             } else if (reftp.test(url.value)) {
                 this.customUploadUrl.get('url').setValue(url.value.replace(reftp, ""));
                 this.customUploadUrl.get('urlProtocol').setValue('ftp://');
@@ -311,12 +318,16 @@ export class FwupdateComponent implements OnInit {
     }
 
     getLatestUpdateStatus(adapters: object, taskId: string) {
+        this.statusUpdate = true;
+        this.dots = '.';
         const obs = Observable.interval(3000)
             .switchMap(() => this.hs.getStatus(taskId).map((data) => data))
             .subscribe((data) => {
+                    this.dots = this.dots + '.';
                     if (this.status.status === true) {
                         this.status.status = false;
                         this.processStatusLatest(data, adapters);
+                        this.statusUpdate = false;
                         obs.unsubscribe();
                     } else {
                         this.processStatusLatest(data, adapters);
@@ -396,9 +407,12 @@ export class FwupdateComponent implements OnInit {
     }
 
     getCustomUpdateStatus(adapters: object, taskId: string) {
+        this.statusUpdate = true;
+        this.dots = '.';
         const obs = Observable.interval(3000)
             .switchMap(() => this.hs.getStatus(taskId).map((data) => data))
             .subscribe((data) => {
+                    this.dots = this.dots + '.';
                     if (this.status.status === true) {
                         this.status.status = false;
                         this.processStatusCustom(data, adapters);

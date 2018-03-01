@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { HostsService } from "../../../services/hosts.service";
+import { HostsService} from "../../../services/hosts.service";
 import { GlobalsService } from "../../../shared/globals.service";
 import { FormBuilder, FormGroup, FormControl, Validators } from "@angular/forms";
 // TODO :- reveiw comments - It would be best if import is done via a absolute path.
@@ -16,7 +16,7 @@ export class ConfigComponent implements OnInit {
     public params = {};
     hostConfig: FormGroup;
     public configDefault = {
-        "netQueue": { "netQueueCount": 8, "rss": 4, "maxNumpCPU": false },
+        "netQueue": {"netQueueCount": 8, "rss": 4, "maxNumpCPU": false},
         "debuggingMask": {
             "utils": true,
             "mgmt": false,
@@ -33,7 +33,7 @@ export class ConfigComponent implements OnInit {
             "filter": false,
             "mcdi": false
         },
-        "overlay": { "vxlanOffloadEnable": true, "geneveOffloadEnable": true },
+        "overlay": {"vxlanOffloadEnable": true, "geneveOffloadEnable": true},
         "restart": false
     };
     public config = {};
@@ -52,8 +52,8 @@ export class ConfigComponent implements OnInit {
     public submitted = false;
 
     constructor(private activatedRoute: ActivatedRoute,
-        public gs: GlobalsService,
-        private hs: HostsService) {
+                public gs: GlobalsService,
+                private hs: HostsService) {
 
         this.activatedRoute.parent.params.subscribe((params: Params) => {
             this.params = params;
@@ -115,7 +115,7 @@ export class ConfigComponent implements OnInit {
                 commonCode: new FormControl('', Validators.required),
                 driver: new FormControl('', Validators.required),
                 filter: new FormControl('', Validators.required),
-                mcdi: new FormControl('', Validators.required),
+                mcdi: new FormControl('', Validators.required)
             }),
             overlay: new FormGroup({
                 vxlanOffloadEnable: new FormControl('', Validators.required),

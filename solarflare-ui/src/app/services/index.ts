@@ -3,3 +3,4 @@ export * from './host.model';
 export * from './host.service';
 export * from './nav.service';
 export * from './app-main.service';
+export * from './nic.service';

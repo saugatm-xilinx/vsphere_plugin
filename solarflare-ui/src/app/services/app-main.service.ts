@@ -1,7 +1,9 @@
-import {Injectable} from "@angular/core";
-import {Http, Response} from "@angular/http";
+import { Injectable } from "@angular/core";
+import { Http, Response } from "@angular/http";
 
-import {GlobalsService} from "../shared/index";
+import { GlobalsService } from "../shared/index";
+import { NicService } from "./nic.service";
+
 
 
 @Injectable()
@@ -9,8 +11,8 @@ export class AppMainService {
 
     public allHostUrl = this.gs.getWebContextPath() + '/rest/services/hosts/';
 
-    constructor(public http: Http,
-                public gs: GlobalsService) {}
+    constructor(public http: Http, private nicService: NicService,
+        public gs: GlobalsService) { }
 
     public getHosts(url?: string) {
 
@@ -24,8 +26,9 @@ export class AppMainService {
 
         return this.http.get(url)
             .map((response: Response) => {
-            return response.json();
-        });
+                this.nicService.setNicDetails(response);
+                return response.json();
+            });
 
     }
 

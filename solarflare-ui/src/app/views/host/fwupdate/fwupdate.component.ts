@@ -58,6 +58,9 @@ export class FwupdateComponent implements OnInit {
         status: false
     };
     public getAdapterListErr = false;
+    public latestUpdateAdapterFilter = false;
+    public statusUpdate = false;
+    public dots = '.';
 
     @ViewChild('fileInput') fileInput: ElementRef;
 
@@ -158,7 +161,8 @@ export class FwupdateComponent implements OnInit {
                         }
                     }
                 })
-            })
+            });
+            this.statusUpdate = false;
         }
     }
 
@@ -167,38 +171,47 @@ export class FwupdateComponent implements OnInit {
         // this.devMode();
     }
 
-    validateLatestUpdate(remove: string) {
+    validateLatestUpdate(remove?: string) {
         let updatable = 0, invalid = 0;
         const filterdAdapters = [];
         this.selectedAdapters.forEach((value, index) => {
-            if (value.laterVersionAvailable) {
+            if (value.latestVersion.controller !== value.versionController.split(' ')[0]){
                 updatable++;
-            } else {
+            }else if (value.latestVersion.bootROM !== value.versionBootROM){
+                updatable++;
+            }else if (value.latestVersion.uefi !== value.versionUEFIROM){
+                updatable++;
+            }else {
                 invalid++;
             }
         });
+
         if (remove === 'remove') {
             this.selectedAdapters.forEach((value, index) => {
-                if (value.laterVersionAvailable) {
+                if (value.latestVersion.controller !== value.versionController.split(' ')[0]){
+                    filterdAdapters.push(value);
+                }else if (value.latestVersion.bootROM !== value.versionBootROM){
+                    filterdAdapters.push(value);
+                }else if (value.latestVersion.uefi !== value.versionUEFIROM){
                     filterdAdapters.push(value);
                 }
             });
             this.selectedAdapters = filterdAdapters;
-            this.validateLatestUpdateModal = false;
             if (this.selectedAdapters && this.selectedAdapters.length !== 0) {
-                this.latestUpdateModal = true;
                 return true;
             }
         }
 
         updatable !== 0 ? this.updatable.latest = true : this.updatable.latest = false;
 
-        if (invalid === 0 && updatable !== 0) {
-            this.latestUpdateModal = true;
+        return updatable !== 0;
+    }
+
+    latestUpdateButton() {
+        if ( this.validateLatestUpdate()) {
             return true;
-        } else {
-            this.validateLatestUpdateModal = true;
-            return false;
+        }else {
+            return this.latestUpdateAdapterFilter === true;
         }
     }
 
@@ -233,8 +246,23 @@ export class FwupdateComponent implements OnInit {
         }
     }
 
+    isLatestAvailable(ad) {
+        if (ad.latestVersion.controller !== ad.versionController.split(' ')[0]){
+            return "Yes";
+        }else if (ad.latestVersion.bootROM !== ad.versionBootROM){
+            return "Yes";
+        }else if (ad.latestVersion.uefi !== ad.versionUEFIROM){
+            return "Yes";
+        }else {
+            return "No";
+        }
+    }
+
     latestUpdate() {
         this.customUpdateErrorMessage = '';
+        if (!this.latestUpdateAdapterFilter ){
+            this.validateLatestUpdate('remove');
+        }
         this.hs.latestUpdate(this.params['id'], this.selectedAdapters)
             .subscribe(
                 data => {
@@ -393,12 +421,6 @@ export class FwupdateComponent implements OnInit {
             } else if (rehttps.test(url.value)) {
                 this.customUploadUrl.get('url').setValue(url.value.replace(rehttps, ""));
                 this.customUploadUrl.get('urlProtocol').setValue('https://');
-            } else if (retftp.test(url.value)) {
-                this.customUploadUrl.get('url').setValue(url.value.replace(retftp, ""));
-                this.customUploadUrl.get('urlProtocol').setValue('tftp://');
-            } else if (resftp.test(url.value)) {
-                this.customUploadUrl.get('url').setValue(url.value.replace(resftp, ""));
-                this.customUploadUrl.get('urlProtocol').setValue('sftp://');
             } else if (reftp.test(url.value)) {
                 this.customUploadUrl.get('url').setValue(url.value.replace(reftp, ""));
                 this.customUploadUrl.get('urlProtocol').setValue('ftp://');
@@ -409,17 +431,21 @@ export class FwupdateComponent implements OnInit {
     }
 
     getLatestUpdateStatus(adapters: object, taskId: string) {
+        this.statusUpdate = true;
+        this.dots = '.';
         const obs = Observable.interval(3000)
             .switchMap(() => this.hs.getStatus(taskId).map((data) => data))
             .subscribe((data) => {
-                if (this.status.status === true) {
-                    this.status.status = false;
-                    this.processStatusLatest(data, adapters);
-                    obs.unsubscribe();
-                } else {
-                    this.processStatusLatest(data, adapters);
-                }
-            },
+                    this.dots = this.dots + '.';
+                    if (this.status.status === true) {
+                        this.status.status = false;
+                        this.processStatusLatest(data, adapters);
+                        this.statusUpdate = false;
+                        obs.unsubscribe();
+                    } else {
+                        this.processStatusLatest(data, adapters);
+                    }
+                },
                 err => {
                     console.log(err);
                 });
@@ -496,18 +522,21 @@ export class FwupdateComponent implements OnInit {
     }
 
     getCustomUpdateStatus(adapters: object, taskId: string) {
+        this.statusUpdate = true;
+        this.dots = '.';
         const obs = Observable.interval(3000)
             .switchMap(() => this.hs.getStatus(taskId).map((data) => data))
             .subscribe((data) => {
-                if (this.status.status === true) {
-                    this.status.status = false;
-                    this.processStatusCustom(data, adapters);
-                    this.getAdapterList();
-                    obs.unsubscribe();
-                } else {
-                    this.processStatusCustom(data, adapters);
-                }
-            },
+                    this.dots = this.dots + '.';
+                    if (this.status.status === true) {
+                        this.status.status = false;
+                        this.processStatusCustom(data, adapters);
+                        this.getAdapterList();
+                        obs.unsubscribe();
+                    } else {
+                        this.processStatusCustom(data, adapters);
+                    }
+                },
                 err => {
                     console.log(err);
                 });

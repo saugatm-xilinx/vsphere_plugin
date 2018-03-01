@@ -7,7 +7,7 @@ import {HttpModule} from "@angular/http";
 import {ClarityModule} from "clarity-angular";
 import {AppRoutingModule, routedComponents} from "./app-routing.module";
 
-import { EchoService, HostService, NavService }  from "./services/index";
+import { EchoService, HostService, NavService, NicService }  from "./services/index";
 import {Globals} from "./shared/globals.service";
 import { GlobalsService, I18nService,
          AppAlertService, RefreshService }   from "./shared/index";
@@ -29,6 +29,7 @@ import {HostModule} from "./views/host/host.module";
 import {AdapterModule} from "./views/adapter/adapter.module";
 import {HTTP_INTERCEPTORS, HttpClient, HttpHandler} from "@angular/common/http";
 import {AppMainService} from "./services/app-main.service";
+import { NicModule } from "./views/nic/nic.module";
 
 
 @NgModule({
@@ -48,7 +49,8 @@ import {AppMainService} from "./services/app-main.service";
       }),
       // [end-chassis-code]
        HostModule,
-       AdapterModule
+       AdapterModule,
+       NicModule
    ],
    declarations: [
       AppComponent,
@@ -70,7 +72,8 @@ import {AppMainService} from "./services/app-main.service";
       RefreshService,
       UserSettingService,
        HttpClient,
-       AppMainService
+       AppMainService,
+       NicService
    ],
    bootstrap: [AppComponent]
 })
