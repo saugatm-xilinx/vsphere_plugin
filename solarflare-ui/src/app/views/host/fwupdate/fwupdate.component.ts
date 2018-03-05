@@ -66,6 +66,7 @@ export class FwupdateComponent implements OnInit {
 
     customUpdateErrorMessage = '';
     fetchDataErrorMessage = '';
+    isLatestVersionNotAvailable = false;
 
     constructor(private activatedRoute: ActivatedRoute,
         private gs: GlobalsService,
@@ -175,24 +176,24 @@ export class FwupdateComponent implements OnInit {
         let updatable = 0, invalid = 0;
         const filterdAdapters = [];
         this.selectedAdapters.forEach((value, index) => {
-            if (value.latestVersion.controller !== value.versionController.split(' ')[0]){
+            if (value.latestVersion.controller !== value.versionController.split(' ')[0]) {
                 updatable++;
-            }else if (value.latestVersion.bootROM !== value.versionBootROM){
+            } else if (value.latestVersion.bootROM !== value.versionBootROM) {
                 updatable++;
-            }else if (value.latestVersion.uefi !== value.versionUEFIROM){
+            } else if (value.latestVersion.uefi !== value.versionUEFIROM) {
                 updatable++;
-            }else {
+            } else {
                 invalid++;
             }
         });
 
         if (remove === 'remove') {
             this.selectedAdapters.forEach((value, index) => {
-                if (value.latestVersion.controller !== value.versionController.split(' ')[0]){
+                if (value.latestVersion.controller !== value.versionController.split(' ')[0]) {
                     filterdAdapters.push(value);
-                }else if (value.latestVersion.bootROM !== value.versionBootROM){
+                } else if (value.latestVersion.bootROM !== value.versionBootROM) {
                     filterdAdapters.push(value);
-                }else if (value.latestVersion.uefi !== value.versionUEFIROM){
+                } else if (value.latestVersion.uefi !== value.versionUEFIROM) {
                     filterdAdapters.push(value);
                 }
             });
@@ -208,9 +209,9 @@ export class FwupdateComponent implements OnInit {
     }
 
     latestUpdateButton() {
-        if ( this.validateLatestUpdate()) {
+        if (this.validateLatestUpdate()) {
             return true;
-        }else {
+        } else {
             return this.latestUpdateAdapterFilter === true;
         }
     }
@@ -247,20 +248,27 @@ export class FwupdateComponent implements OnInit {
     }
 
     isLatestAvailable(ad) {
-        if (ad.latestVersion.controller !== ad.versionController.split(' ')[0]){
+        if (ad.latestVersion.controller !== ad.versionController.split(' ')[0]) {
             return "Yes";
-        }else if (ad.latestVersion.bootROM !== ad.versionBootROM){
+        } else if (ad.latestVersion.bootROM !== ad.versionBootROM) {
             return "Yes";
-        }else if (ad.latestVersion.uefi !== ad.versionUEFIROM){
+        } else if (ad.latestVersion.uefi !== ad.versionUEFIROM) {
             return "Yes";
-        }else {
+        } else {
+            this.isLatestVersionNotAvailable = true;
             return "No";
         }
     }
 
+    closeAndResetModal() {
+        this.customUpdateModal = false;
+        this.customUploadFile.reset();
+        this.customUploadUrl.reset();
+    }
+
     latestUpdate() {
         this.customUpdateErrorMessage = '';
-        if (!this.latestUpdateAdapterFilter ){
+        if (!this.latestUpdateAdapterFilter) {
             this.validateLatestUpdate('remove');
         }
         this.hs.latestUpdate(this.params['id'], this.selectedAdapters)
@@ -436,16 +444,16 @@ export class FwupdateComponent implements OnInit {
         const obs = Observable.interval(3000)
             .switchMap(() => this.hs.getStatus(taskId).map((data) => data))
             .subscribe((data) => {
-                    this.dots = this.dots + '.';
-                    if (this.status.status === true) {
-                        this.status.status = false;
-                        this.processStatusLatest(data, adapters);
-                        this.statusUpdate = false;
-                        obs.unsubscribe();
-                    } else {
-                        this.processStatusLatest(data, adapters);
-                    }
-                },
+                this.dots = this.dots + '.';
+                if (this.status.status === true) {
+                    this.status.status = false;
+                    this.processStatusLatest(data, adapters);
+                    this.statusUpdate = false;
+                    obs.unsubscribe();
+                } else {
+                    this.processStatusLatest(data, adapters);
+                }
+            },
                 err => {
                     console.log(err);
                 });
@@ -527,16 +535,16 @@ export class FwupdateComponent implements OnInit {
         const obs = Observable.interval(3000)
             .switchMap(() => this.hs.getStatus(taskId).map((data) => data))
             .subscribe((data) => {
-                    this.dots = this.dots + '.';
-                    if (this.status.status === true) {
-                        this.status.status = false;
-                        this.processStatusCustom(data, adapters);
-                        this.getAdapterList();
-                        obs.unsubscribe();
-                    } else {
-                        this.processStatusCustom(data, adapters);
-                    }
-                },
+                this.dots = this.dots + '.';
+                if (this.status.status === true) {
+                    this.status.status = false;
+                    this.processStatusCustom(data, adapters);
+                    this.getAdapterList();
+                    obs.unsubscribe();
+                } else {
+                    this.processStatusCustom(data, adapters);
+                }
+            },
                 err => {
                     console.log(err);
                 });

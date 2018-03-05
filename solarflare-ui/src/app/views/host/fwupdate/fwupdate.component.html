@@ -1,10 +1,8 @@
-<clr-modal [clrModalSize]="'lg'" [(clrModalOpen)]="latestUpdateModal" [clrModalClosable]="false"
-           [clrModalStaticBackdrop]="true">
+<clr-modal [clrModalSize]="'lg'" [(clrModalOpen)]="latestUpdateModal" [clrModalClosable]="false" [clrModalStaticBackdrop]="true">
     <h3 class="modal-title">Latest Update</h3>
     <div class="modal-body">
 
-        <div class="alert alert-app-level alert-danger" style="margin-bottom:24px"
-             *ngIf="button.latestErr">
+        <div class="alert alert-app-level alert-danger" style="margin-bottom:24px" *ngIf="button.latestErr">
             <div class="alert-items">
                 <div class="alert-item static">
                     <div class="alert-icon-wrapper">
@@ -15,8 +13,7 @@
                         <span *ngIf="customUpdateErrorMessage">{{customUpdateErrorMessage}}</span>
                     </div>
                     <div class="alert-actions">
-                        <button class="btn alert-action" [disabled]="button.latest"
-                                (click)="button.latestErr = false;button.latest = true; latestUpdate();">Retry
+                        <button class="btn alert-action" [disabled]="button.latest" (click)="button.latestErr = false;button.latest = true; latestUpdate();">Retry
                         </button>
                     </div>
                 </div>
@@ -28,8 +25,7 @@
 
         <table class="table">
             <tr>
-                <th rowspan="2" class="table-border-right"
-                    style="vertical-align: middle;">
+                <th rowspan="2" class="table-border-right" style="vertical-align: middle;">
                     Adapter Name
                 </th>
                 <th colspan="2" class="table-border-right">Controller Version</th>
@@ -82,20 +78,18 @@
         </table>
         <br/>
         <div>
-            <input type="checkbox" id="filter" [(ngModel)]="latestUpdateAdapterFilter" >
+            <input type="checkbox" id="filter" [(ngModel)]="latestUpdateAdapterFilter" [disabled]="isLatestVersionNotAvailable">
             <label for="filter">Add adapters for which latest version(s) is not available</label>
         </div>
 
         <div style="text-align: right; height: 30px;">
-            <span *ngIf="button.latest" >This may take some time, Please wait...</span>
+            <span *ngIf="button.latest">This may take some time, Please wait...</span>
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-outline" type="button"
-                (click)="button.latestErr = false; latestUpdateModal = false; button.latest = false;">Cancel
+        <button class="btn btn-outline" type="button" (click)="button.latestErr = false; latestUpdateModal = false; button.latest = false;">Cancel
         </button>
-        <button class="btn btn-primary" type="button" [disabled]="button.latest || !latestUpdateButton()"
-                (click)="button.latestErr = false; button.latest = true; latestUpdate()">
+        <button class="btn btn-primary" type="button" [disabled]="button.latest || !latestUpdateButton()" (click)="button.latestErr = false; button.latest = true; latestUpdate()">
             <span *ngIf="!button.latest">
                 Update
             </span>
@@ -117,9 +111,7 @@
 
             <clr-dg-column>Later Version Available</clr-dg-column>
 
-            <clr-dg-row *clrDgItems="let ad of selectedAdapters"
-                        [clrDgItem]="ad"
-                        [ngStyle]="{'background-color': ad.laterVersionAvailable === true ? '' : '#adcb' }">
+            <clr-dg-row *clrDgItems="let ad of selectedAdapters" [clrDgItem]="ad" [ngStyle]="{'background-color': ad.laterVersionAvailable === true ? '' : '#adcb' }">
                 <clr-dg-cell>{{ad.name}}</clr-dg-cell>
                 <clr-dg-cell>{{ad.versionController}}</clr-dg-cell>
                 <clr-dg-cell>{{ad.versionBootROM}}</clr-dg-cell>
@@ -138,11 +130,9 @@
 
     </div>
     <div class="modal-footer">
-        <button class="btn btn-outline" type="button"
-                (click)="validateLatestUpdateModal = false">Cancel
+        <button class="btn btn-outline" type="button" (click)="validateLatestUpdateModal = false">Cancel
         </button>
-        <button class="btn btn-primary" type="button" *ngIf="updatable.latest"
-                (click)="validateLatestUpdate('remove')">Remove and continue
+        <button class="btn btn-primary" type="button" *ngIf="updatable.latest" (click)="validateLatestUpdate('remove')">Remove and continue
         </button>
     </div>
 </clr-modal>
@@ -154,48 +144,38 @@
         <h6> Please select adapters of the same family type.</h6>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-outline" type="button" (click)="validateCustomUpdateModal = false;" >Ok</button>
+        <button class="btn btn-outline" type="button" (click)="validateCustomUpdateModal = false;">Ok</button>
     </div>
 </clr-modal>
 
-<clr-modal [clrModalSize]="'md'" [(clrModalOpen)]="customUpdateModal" [clrModalClosable]="false"
-           [clrModalStaticBackdrop]="true">
+<clr-modal [clrModalSize]="'md'" [(clrModalOpen)]="customUpdateModal" [clrModalClosable]="false" [clrModalStaticBackdrop]="true">
     <h3 class="modal-title">Custom Update
         <div style="position: absolute;right: 0;" class="toggle-switch">
-            <input type="checkbox" name="isUrl" id="urlFileSelect"
-                   style="visibility: hidden;" [(ngModel)]="customSelectUrl">
+            <input type="checkbox" name="isUrl" id="urlFileSelect" style="visibility: hidden;" [(ngModel)]="customSelectUrl">
             <label [ngStyle]="{'font-weight': customSelectUrl === true ? '' : 900,
-                               'color': customSelectUrl === true ? '#C1CDD4': '#48960C'}"
-                   [ngClass]="{'colored': customSelectUrl === false}"
-                   for="urlFileSelect">
+                               'color': customSelectUrl === true ? '#C1CDD4': '#48960C'}" [ngClass]="{'colored': customSelectUrl === false}"
+                for="urlFileSelect">
                 File
             </label>
-            <span style="cursor: pointer;"
-                  [ngStyle]="{'font-weight': customSelectUrl === true ? 900 : '',
-                   'color': customSelectUrl === false ? '#C1CDD4': '#48960C'}"
-                  (click)="customSelectUrl = !customSelectUrl; button.customErr = false;">URL</span>
+            <span style="cursor: pointer;" [ngStyle]="{'font-weight': customSelectUrl === true ? 900 : '',
+                   'color': customSelectUrl === false ? '#C1CDD4': '#48960C'}" (click)="customSelectUrl = !customSelectUrl; button.customErr = false;">URL</span>
         </div>
     </h3>
     <div class="modal-body">
-        <div class="alert alert-app-level alert-danger" style="margin-bottom:24px"
-             *ngIf="button.customErr">
+        <div class="alert alert-app-level alert-danger" style="margin-bottom:24px" *ngIf="button.customErr">
             <div class="alert-items">
                 <div class="alert-item static">
                     <div class="alert-icon-wrapper">
                         <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
                     </div>
                     <div class="alert-text" style="width:80%">
-                       <span *ngIf="!customUpdateErrorMessage"> Request failed</span>
-                       <span *ngIf="customUpdateErrorMessage">{{customUpdateErrorMessage}}</span>
+                        <span *ngIf="!customUpdateErrorMessage"> Request failed</span>
+                        <span *ngIf="customUpdateErrorMessage">{{customUpdateErrorMessage}}</span>
                     </div>
                     <div class="alert-actions">
-                        <button class="btn alert-action" *ngIf="customSelectUrl"
-                                [disabled]="button.custom || customUploadUrl.invalid"
-                                (click)="button.customErr = false;button.custom = true; onSubmitUrl();">Retry
+                        <button class="btn alert-action" *ngIf="customSelectUrl" [disabled]="button.custom || customUploadUrl.invalid" (click)="button.customErr = false;button.custom = true; onSubmitUrl();">Retry
                         </button>
-                        <button class="btn alert-action" *ngIf="!customSelectUrl"
-                                [disabled]="button.custom || customUploadFile.invalid"
-                                (click)="button.customErr = false;button.custom = true; onSubmitFile();">Retry
+                        <button class="btn alert-action" *ngIf="!customSelectUrl" [disabled]="button.custom || customUploadFile.invalid" (click)="button.customErr = false;button.custom = true; onSubmitFile();">Retry
                         </button>
                     </div>
                 </div>
@@ -228,15 +208,9 @@
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                        <label for="url"
-                               aria-haspopup="true"
-                               role="tooltip"
-                               class="tooltip tooltip-validation tooltip-md tooltip-top-left"
-                               [class.invalid]="customUploadUrl.invalid && (customUploadUrl.dirty || customUploadUrl.touched)">
-                            <input type="text" id="url" formControlName="url"
-                                   required
-                                   (input)="urlVerifier()"
-                                   placeholder="solarflare.com/downloads/.../mcfw.dat" size="40">
+                        <label for="url" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-top-left" [class.invalid]="customUploadUrl.invalid && (customUploadUrl.dirty || customUploadUrl.touched)">
+                            <input type="text" id="url" formControlName="url" required (input)="urlVerifier()" placeholder="solarflare.com/downloads/.../mcfw.dat"
+                                size="40">
                             <span class="tooltip-content">
                                 Valid
                                 <i *ngIf="customUploadUrl.value.url === ''
@@ -246,7 +220,7 @@
                                 <i *ngIf="urlVerifier() && customUploadUrl.value.url === ''
                                 && customUploadUrl.value.urlProtocol === ''">Protocol and URL</i>
                                 Required
-                </span>
+                            </span>
                         </label>
                     </div>
                 </div>
@@ -257,8 +231,7 @@
             <section class="form-block">
                 <div class="form-group row">
                     <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
-                        <label class="btn btn-outline"
-                               style="width: 100%;" for="fwFile">
+                        <label class="btn btn-outline" style="width: 100%;" for="fwFile">
                             <a *ngIf="customUploadFile.value.fwFile !== null">
                                 {{customUploadFile.value.fwFile.filename}}
                             </a>
@@ -266,10 +239,8 @@
                                 Select Firmware File
                             </a>
                         </label>
-                        <input type="file"
-                               required id="fwFile" (change)="onFileChange($event)" #fileInput
-                               placeholder="Select file" style="display: none;"
-                               accept=".dat"/>
+                        <input type="file" required id="fwFile" (change)="onFileChange($event)" #fileInput placeholder="Select file" style="display: none;"
+                            accept=".dat" />
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
 
@@ -283,9 +254,8 @@
 
     </div>
     <div class="modal-footer" *ngIf="customSelectUrl">
-        <button class="btn btn-outline" type="button" (click)="customUpdateModal = false">Cancel</button>
-        <button class="btn btn-primary" type="submit" (click)="onSubmitUrl()"
-                [disabled]="customUploadUrl.invalid || button.custom">
+        <button class="btn btn-outline" type="button" (click)="closeAndResetModal()">Cancel</button>
+        <button class="btn btn-primary" type="submit" (click)="onSubmitUrl()" [disabled]="customUploadUrl.invalid || button.custom">
             <span *ngIf="!button.custom">
                 Update
             </span>
@@ -293,9 +263,8 @@
         </button>
     </div>
     <div class="modal-footer" *ngIf="!customSelectUrl">
-        <button class="btn btn-outline" type="button" (click)="customUpdateModal = false;">Cancel</button>
-        <button class="btn btn-primary" type="submit" (click)="onSubmitFile()"
-                [disabled]="customUploadFile.invalid || button.custom">
+        <button class="btn btn-outline" type="button" (click)="closeAndResetModal()">Cancel</button>
+        <button class="btn btn-primary" type="submit" (click)="onSubmitFile()" [disabled]="customUploadFile.invalid || button.custom">
             <span *ngIf="!button.custom">
                 Update
             </span>
@@ -313,66 +282,68 @@
             <h6>{{i+1}}. {{output.name}} :</h6>
             <div *ngIf="output.controller !== null ">
                 <span *ngIf="output.controller.state === 'Success' && output.controller.to ">
-                Controller Firmware: v{{output.controller.from}} updated to v{{output.controller.to}}
-            </span>
+                    Controller Firmware: v{{output.controller.from}} updated to v{{output.controller.to}}
+                </span>
                 <span *ngIf="output.controller.state === 'Success' && !output.controller.to ">
-                Controller Firmware: Firmware update in progress {{dots}}
-            </span>
+                    Controller Firmware: Firmware update in progress {{dots}}
+                </span>
                 <span *ngIf="output.controller.state === 'Error'">
-                Controller Firmware: Error occurred while updating v{{output.controller.from}}
-                <i style="color: red;" *ngIf="output.controller.message !== null"><br/>{{output.controller.message}}</i>
-            </span>
+                    Controller Firmware: Error occurred while updating v{{output.controller.from}}
+                    <i style="color: red;" *ngIf="output.controller.message !== null">
+                        <br/>{{output.controller.message}}</i>
+                </span>
                 <span *ngIf="output.controller.state === 'Queued' || output.controller.state === 'Running'">
-                Controller Firmware: Firmware update in progress {{dots}}
-            </span>
+                    Controller Firmware: Firmware update in progress {{dots}}
+                </span>
                 <br/>
             </div>
 
             <div *ngIf="output.bootRom !== null ">
                 <span *ngIf="output.bootRom.state === 'Success' && output.bootRom.to ">
-                BootROM Firmware: v{{output.bootRom.from}} updated to v{{output.bootRom.to}}
-            </span>
+                    BootROM Firmware: v{{output.bootRom.from}} updated to v{{output.bootRom.to}}
+                </span>
                 <span *ngIf="output.bootRom.state === 'Success' && !output.bootRom.to ">
-                BootROM Firmware: Firmware update in progress {{dots}}
-            </span>
+                    BootROM Firmware: Firmware update in progress {{dots}}
+                </span>
                 <span *ngIf="output.bootRom.state === 'Error'">
-                BootROM Firmware: Error occurred while updating v{{output.bootRom.from}}
-                <i style="color: red;" *ngIf="output.bootRom.message !== null"><br/>{{output.bootRom.message}}</i>
-            </span>
+                    BootROM Firmware: Error occurred while updating v{{output.bootRom.from}}
+                    <i style="color: red;" *ngIf="output.bootRom.message !== null">
+                        <br/>{{output.bootRom.message}}</i>
+                </span>
                 <span *ngIf="output.bootRom.state === 'Queued' || output.bootRom.state === 'Running'">
-                BootROM Firmware: Firmware update in progress {{dots}}
-            </span>
+                    BootROM Firmware: Firmware update in progress {{dots}}
+                </span>
                 <br/>
             </div>
 
             <div *ngIf="output.uefiRom !== null">
                 <span *ngIf="output.uefiRom.state === 'Success' && output.uefiRom.to ">
-                UEFIROM Firmware: v{{output.uefiRom.from}} updated to v{{output.uefiRom.to}}
-            </span>
+                    UEFIROM Firmware: v{{output.uefiRom.from}} updated to v{{output.uefiRom.to}}
+                </span>
                 <span *ngIf="output.uefiRom.state === 'Success' && !output.uefiRom.to ">
-                UEFIROM Firmware: Firmware update in progress {{dots}}
-            </span>
+                    UEFIROM Firmware: Firmware update in progress {{dots}}
+                </span>
                 <span *ngIf="output.uefiRom.state === 'Error'">
-                UEFIROM Firmware: Error occurred while updating v{{output.uefiRom.from}}
-                <i style="color: red;" *ngIf="output.uefiRom.message !== null"><br/>{{output.uefiRom.message}}</i>
-            </span>
+                    UEFIROM Firmware: Error occurred while updating v{{output.uefiRom.from}}
+                    <i style="color: red;" *ngIf="output.uefiRom.message !== null">
+                        <br/>{{output.uefiRom.message}}</i>
+                </span>
                 <span *ngIf="output.uefiRom.state === 'Queued' || output.uefiRom.state === 'Running'">
-                UEFIROM Firmware: Firmware update in progress {{dots}}
-            </span>
+                    UEFIROM Firmware: Firmware update in progress {{dots}}
+                </span>
                 <br/>
             </div>
 
 
             <span *ngIf="output.uefiRom === null && output.bootRom === null && output.controller === null">
-                Update is in progress.. Please wait...<br/>
+                Update is in progress.. Please wait...
+                <br/>
             </span>
 
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-outline" type="button"
-                (click)="status.custom.modal = false;status.status = true;"
-                [disabled]="statusUpdate">Ok</button>
+        <button class="btn btn-outline" type="button" (click)="status.custom.modal = false;status.status = true;" [disabled]="statusUpdate">Ok</button>
     </div>
 </clr-modal>
 
@@ -385,41 +356,44 @@
             <h6>{{i+1}}. {{output.name}}</h6>
             <div *ngIf="output.controller !== null">
                 <span *ngIf="output.controller.state === 'Success'">
-                Controller Firmware: v{{output.controller.from}} updated to v{{output.controller.to}}
-            </span>
+                    Controller Firmware: v{{output.controller.from}} updated to v{{output.controller.to}}
+                </span>
                 <span *ngIf="output.controller.state === 'Error'">
-                Controller Firmware: Error occurred while updating v{{output.controller.from}} to v{{output.controller.to}}
-                <i style="color: red;" *ngIf="output.controller.message !== null"><br/>{{output.controller.message}}</i>
-            </span>
+                    Controller Firmware: Error occurred while updating v{{output.controller.from}} to v{{output.controller.to}}
+                    <i style="color: red;" *ngIf="output.controller.message !== null">
+                        <br/>{{output.controller.message}}</i>
+                </span>
                 <span *ngIf="output.controller.state === 'Queued' || output.controller.state === 'Running'">
-                Controller Firmware: v{{output.controller.from}} updating to v{{output.controller.to}}
-            </span>
+                    Controller Firmware: v{{output.controller.from}} updating to v{{output.controller.to}}
+                </span>
                 <br/>
             </div>
             <div *ngIf="output.bootRom !== null">
                 <span *ngIf="output.bootRom.state === 'Success'">
-                BootROM Firmware: v{{output.bootRom.from}} updated to v{{output.bootRom.to}}
-            </span>
+                    BootROM Firmware: v{{output.bootRom.from}} updated to v{{output.bootRom.to}}
+                </span>
                 <span *ngIf="output.bootRom.state === 'Error'">
-                BootROM Firmware: Error occurred while updating v{{output.bootRom.from}} to v{{output.bootRom.to}}
-                <i style="color: red;" *ngIf="output.bootRom.message !== null"><br/>{{output.bootRom.message}}</i>
-            </span>
+                    BootROM Firmware: Error occurred while updating v{{output.bootRom.from}} to v{{output.bootRom.to}}
+                    <i style="color: red;" *ngIf="output.bootRom.message !== null">
+                        <br/>{{output.bootRom.message}}</i>
+                </span>
                 <span *ngIf="output.bootRom.state === 'Queued' || output.bootRom.state === 'Running'">
-                BootROM Firmware: v{{output.bootRom.from}} updating to v{{output.bootRom.to}}
-            </span>
+                    BootROM Firmware: v{{output.bootRom.from}} updating to v{{output.bootRom.to}}
+                </span>
                 <br/>
             </div>
             <div *ngIf="output.uefiRom !== null">
                 <span *ngIf="output.uefiRom.state === 'Success'">
-                UefiROM Firmware: v{{output.uefiRom.from}} updated to v{{output.uefiRom.to}}
-            </span>
+                    UefiROM Firmware: v{{output.uefiRom.from}} updated to v{{output.uefiRom.to}}
+                </span>
                 <span *ngIf="output.uefiRom.state === 'Error'">
-                UefiROM Firmware: Error occurred while updating v{{output.uefiRom.from}} to v{{output.uefiRom.to}}
-                <i style="color: red;" *ngIf="output.uefiRom.message !== null"><br/>{{output.uefiRom.message}}</i>
-            </span>
+                    UefiROM Firmware: Error occurred while updating v{{output.uefiRom.from}} to v{{output.uefiRom.to}}
+                    <i style="color: red;" *ngIf="output.uefiRom.message !== null">
+                        <br/>{{output.uefiRom.message}}</i>
+                </span>
                 <span *ngIf="output.uefiRom.state === 'Queued' || output.uefiRom.state === 'Running'">
-                UefiROM Firmware: v{{output.uefiRom.from}} updating to v{{output.uefiRom.to}}
-            </span>
+                    UefiROM Firmware: v{{output.uefiRom.from}} updating to v{{output.uefiRom.to}}
+                </span>
                 <br/>
             </div>
 
@@ -430,9 +404,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-outline" type="button"
-                (click)="status.latest.modal = false;status.status = true;"
-                [disabled]="statusUpdate" >Ok</button>
+        <button class="btn btn-outline" type="button" (click)="status.latest.modal = false;status.status = true;" [disabled]="statusUpdate">Ok</button>
     </div>
 </clr-modal>
 
@@ -455,13 +427,14 @@
     <div class="col-md-12">
         <div style="text-align: center">
             <span class="spinner spinner-lg" *ngIf="(adapterList|json) === '[]' && !getAdapterListErr ">
-            Loading..
+                Loading..
             </span>
-            <span class="text-danger" *ngIf="getAdapterListErr"><br/>
-                <clr-icon shape="error-standard" style="margin: 0 auto"></clr-icon>
-                Error occurred while fetching data</span> 
+            <span class="text-danger" *ngIf="getAdapterListErr">
                 <br/>
-               <span *ngIf="fetchDataErrorMessage"  class="text-danger">{{fetchDataErrorMessage}}</span> 
+                <clr-icon shape="error-standard" style="margin: 0 auto"></clr-icon>
+                Error occurred while fetching data</span>
+            <br/>
+            <span *ngIf="fetchDataErrorMessage" class="text-danger">{{fetchDataErrorMessage}}</span>
         </div>
     </div>
 
@@ -493,14 +466,10 @@
         </clr-datagrid>
     </div>
     <div class="col-md-12" style="text-align: center;">
-        <button class="btn"
-                (click)="latestUpdateModal = true"
-                [disabled]="selectedAdapters.length == 0 || gettingAdapterList">
+        <button class="btn" (click)="latestUpdateModal = true" [disabled]="selectedAdapters.length == 0 || gettingAdapterList">
             Update
         </button>
-        <button class="btn btn-outline"
-                (click)="validateCustomUpdate();"
-                [disabled]="selectedAdapters.length == 0 || gettingAdapterList">
+        <button class="btn btn-outline" (click)="validateCustomUpdate();" [disabled]="selectedAdapters.length == 0 || gettingAdapterList">
             Custom Update
         </button>
     </div>
