@@ -78,7 +78,7 @@
         </table>
         <br/>
         <div>
-            <input type="checkbox" id="filter" [(ngModel)]="latestUpdateAdapterFilter" [disabled]="isLatestVersionNotAvailable">
+            <input type="checkbox" id="filter" [(ngModel)]="latestUpdateAdapterFilter" [disabled]="!isLatestVersionNotAvailable()">
             <label for="filter">Add adapters for which latest version(s) is not available</label>
         </div>
 
@@ -87,7 +87,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-outline" type="button" (click)="button.latestErr = false; latestUpdateModal = false; button.latest = false;">Cancel
+        <button class="btn btn-outline" type="button" (click)="button.latestErr = false; latestUpdateModal = false; button.latest = false; latestUpdateAdapterFilter = false">Cancel
         </button>
         <button class="btn btn-primary" type="button" [disabled]="button.latest || !latestUpdateButton()" (click)="button.latestErr = false; button.latest = true; latestUpdate()">
             <span *ngIf="!button.latest">

@@ -66,7 +66,6 @@ export class FwupdateComponent implements OnInit {
 
     customUpdateErrorMessage = '';
     fetchDataErrorMessage = '';
-    isLatestVersionNotAvailable = false;
 
     constructor(private activatedRoute: ActivatedRoute,
         private gs: GlobalsService,
@@ -248,16 +247,22 @@ export class FwupdateComponent implements OnInit {
     }
 
     isLatestAvailable(ad) {
-        if (ad.latestVersion.controller !== ad.versionController.split(' ')[0]) {
+        if (!ad.latestVersion.controller.includes(ad.versionController.split(' ')[0])) {
             return "Yes";
-        } else if (ad.latestVersion.bootROM !== ad.versionBootROM) {
+        } else if (!ad.latestVersion.bootROM.includes(ad.versionBootROM)) {
             return "Yes";
-        } else if (ad.latestVersion.uefi !== ad.versionUEFIROM) {
+        } else if (!ad.latestVersion.uefi.includes(ad.versionUEFIROM)) {
             return "Yes";
         } else {
-            this.isLatestVersionNotAvailable = true;
             return "No";
         }
+    }
+
+    isLatestVersionNotAvailable() {
+        const result = this.selectedAdapters.find(ele => {
+            return this.isLatestAvailable(ele) === 'No';
+        });
+        return result ? true : false;
     }
 
     closeAndResetModal() {
