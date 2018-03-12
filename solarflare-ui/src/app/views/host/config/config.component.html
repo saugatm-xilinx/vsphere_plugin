@@ -242,7 +242,7 @@
             <section class="form-block">
                 <div style="display: flex; justify-content: space-between; width: 70%;margin: 0 auto;">
                     <button class="btn btn-outline-primary"
-                            type="button" [disabled]="submitted" (click)="restoreConfig()" >Restore
+                            type="button" [disabled]="submitted || !hostConfig.dirty" (click)="restoreConfig()" >Restore
                     </button>
                     <button class="btn btn-outline-secondary" style="display:none"
                             type="button" [disabled]="submitted" (click)="defaultConfig()" >Defaults
