@@ -7,7 +7,7 @@
 	<Package Id="*" InstallerVersion="200" Description="$(var.PackageDescription)" Comments="$(var.PackageComments)" Platform="x64" InstallPrivileges="elevated" Languages="1033" Compressed="yes"/>
 	
 	<InstallExecuteSequence>
-		<Custom Action="IPValidation" Before="InstallFiles">NOT Installed</Custom>
+		<Custom Action="HostName_IPAddress_Validation" Before="InstallFiles">NOT Installed</Custom>
 		<Custom Action="PropertiesFile" After="ServerStart">NOT Installed</Custom>
 		<Custom Action="SetPropertyForPropertiesFile" Before="InstallInitialize">Not Installed</Custom>
 		<Custom Action="ServerInstall" Before="InstallFinalize">NOT Installed</Custom>
@@ -23,7 +23,7 @@
 	</InstallExecuteSequence>
 	<AdminExecuteSequence/>
 	<InstallUISequence>
-		<Custom Action="GetUserIP" Before="CostFinalize"></Custom>
+		<Custom Action="GetHostName" Before="CostFinalize"></Custom>
 	</InstallUISequence>
 	<AdminUISequence/>
 	<AdvertiseExecuteSequence/>
@@ -36,8 +36,8 @@
 		<RegistrySearch Id="InstallDirectorySearch" Type="raw" Root="HKLM" Key="Software\$(var.AppName)" Name="InstallDir" Win64="yes"/>
 	</Property>
 	<Property Id="BROWSER_CHECKBOX_PROPERTY" Secure="yes"/>
-	<Property Id="IP_ADDRESS" Secure="yes" Admin="yes"/>
-	<Property Id="IP_VALID" Secure="yes" Admin="yes"/>
+	<Property Id="HOSTNAME_IPADDRESS" Secure="yes" Admin="yes"/>
+	<Property Id="HOSTNAME_IPADDRESS_VALID" Secure="yes" Admin="yes"/>
 	<Property Id="App_Name" Value="$(var.AppName)"/>
 	<Property Id="MsiLogging" Value="v" />
 	<Property Id="DiskPrompt" Value="!(loc.UIDiskPrompt)"/>
@@ -55,8 +55,6 @@
 	<Property Id="MSIFACT_INSTALLDIR" Value="INSTALLDIR"/>
 	<Property Id="PIDTemplate" Value="&lt;####-####-####-####&gt;"/>
 
-	<EnsureTable Id="ComboBox"/>
-	
 	<Feature Id="bin" Title="bin" Level="1" Description="bin folder" Absent="allow" AllowAdvertise="no" TypicalDefault="install" Display="collapse" InstallDefault="local">
 		<ComponentRef Id="bootstrap.jar"/>
 		<ComponentRef Id="catalina.bat"/>
@@ -178,10 +176,10 @@
 	<SetProperty Id="ServerUninstallRollback" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\service.bat&quot; install" Sequence="execute" Before="ServerUninstallRollback" />
 	
 	<Binary Id="CustomAction.CA.dll" SourceFile="$(var.PathToFile)\CustomAction.CA.dll"/>
-	<CustomAction Id="GetUserIP" BinaryKey="CustomAction.CA.dll" DllEntry="Get_IPAddress" Execute="immediate" Return="check"/>
-	<CustomAction Id="IPValidation" BinaryKey="CustomAction.CA.dll" DllEntry="Validate_IPAddress" Execute="immediate" Return="check"/>
+	<CustomAction Id="GetHostName" BinaryKey="CustomAction.CA.dll" DllEntry="Get_HostName" Execute="immediate" Return="check"/>
+	<CustomAction Id="HostName_IPAddress_Validation" BinaryKey="CustomAction.CA.dll" DllEntry="Validate_HostName_IPAddress" Execute="immediate" Return="check"/>
 	<CustomAction Id="PropertiesFile" BinaryKey="CustomAction.CA.dll" DllEntry="Modify_PropertiesFile" Execute="deferred" Impersonate="no" Return="check"/>
-	<CustomAction Id="SetPropertyForPropertiesFile" Property="PropertiesFile" Value="INSTALLDIR=[INSTALLDIR];IP_ADDRESS=[IP_ADDRESS]"/>
+	<CustomAction Id="SetPropertyForPropertiesFile" Property="PropertiesFile" Value="INSTALLDIR=[INSTALLDIR];HOSTNAME_IPADDRESS=[HOSTNAME_IPADDRESS]"/>
 	<CustomAction Id="ServerInstall" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Impersonate="no" Return="check"/>
 	<CustomAction Id="ServerInstallRollback" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="rollback" Impersonate="no" Return="ignore"/>
 	<CustomAction Id="ServerStart" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Impersonate="no" Return="check"/>
