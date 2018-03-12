@@ -2,100 +2,55 @@ using System;
 using Microsoft.Deployment.WindowsInstaller;
 using System.Windows.Forms;
 using System.Net;
-using System.Text.RegularExpressions;
 using System.IO;
-using System.Security.AccessControl;
-using System.Security.Principal;
 
 namespace CustomActions
 {
     public class CustomActions
     {
-        static int index = 1;
-
-        public static void FillComboBox(Session session, string text, string value)
-        {
-            Microsoft.Deployment.WindowsInstaller.View view = session.Database.OpenView(
-                "SELECT * FROM ComboBox WHERE Property = 'IP_ADDRESS'"
-                );
-            view.Execute();
-            Record record = session.Database.CreateRecord(4);
-            record.SetString(1, "IP_ADDRESS");
-            record.SetInteger(2, index);
-            record.SetString(3, value);
-            record.SetString(4, text);
-            view.Modify(ViewModifyMode.InsertTemporary, record);
-            view.Close();
-            index++;
-        }
-
 
         [CustomAction]
-        public static ActionResult Get_IPAddress(Session session)
+        public static ActionResult Get_HostName(Session session)
         {
-            Microsoft.Deployment.WindowsInstaller.View view = session.Database.OpenView(
-                "DELETE FROM ComboBox WHERE ComboBox.Property = 'IP_ADDRESS'"
-                );
-            view.Execute();
-
-            //First get the host name of local machine.
+            //First get the hostname of local machine.
             String strHostName = Dns.GetHostName();
 
-            // Then using host name, get the IP address list..
-            IPHostEntry ipEntry = Dns.GetHostByName(strHostName);
-            IPAddress[] addr = ipEntry.AddressList;
-
-            // Fill ComboBox with the IP Addresses
-            foreach (IPAddress address in addr)
-                FillComboBox(session, address.ToString(), address.ToString());
-
-            session.Log("Got the IP address list successfully.\n");
+            // Assign Hostname to the property ""HOSTNAME_IPADDRESS"
+            session["HOSTNAME_IPADDRESS"] = strHostName;
+            session.Log("Got the Hostname successfully.\n");
             return ActionResult.Success;
         }
 
 
         [CustomAction]
-        public static ActionResult Validate_IPAddress(Session session)
-        {           
-            string ipAddress = session["IP_ADDRESS"];
-            var Pattern = new string[]
-            {
-                "^",                                                                        // Start of string
-                @"(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.",         // Between 0 and 255 and "."
-                @"(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.",
-                @"(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.",
-                @"(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])",
-                "$"                                                                         // End of string
-            };
+        public static ActionResult Validate_HostName_IPAddress(Session session)
+        {
+            string HostName_IPAddress = session["HOSTNAME_IPADDRESS"];
 
-            // Match 'ipAddress' with the 'Pattern'
-            bool ValidateIP = Regex.IsMatch(
-                                ipAddress,
-                                string.Join(string.Empty, Pattern)
-                                );
             try
             {
-                if (ValidateIP)
+                // check if "HostName_IPAddress" is an empty string
+                if (HostName_IPAddress == String.Empty)
                 {
-                    session["IP_VALID"] = "1";
-                    session.Log("This is a valid ip address");
+                    session["HOSTNAME_IPADDRESS_VALID"] = string.Empty;
+                    MessageBox.Show(
+                        "Please enter Hostname or IP Address",
+                        "Setup",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    session.Log("This is not a valid Hostname or IP Address");
                     return ActionResult.Success;
                 }
                 else
                 {
-                    session["IP_VALID"] = string.Empty;
-                    MessageBox.Show(
-                        "Please select IP Address",
-                        "Setup",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning);
-                    session.Log("This is not a valid ip address");
+                    session["HOSTNAME_IPADDRESS_VALID"] = "1";
+                    session.Log("This is a valid Hostname or IP Address");
                     return ActionResult.Success;
                 }
             }
             catch (Exception ex)
             {
-                session.Log("Exception while validating ip address" + ex.Message);
+                session.Log("Exception while validating Hostname or IP Address" + ex.Message);
                 return ActionResult.Failure;
             }
         }
@@ -107,17 +62,25 @@ namespace CustomActions
             string InstallFolder = session.CustomActionData["INSTALLDIR"];
             string file = InstallFolder + "Tomcat_Server\\webapps\\plugin-registration\\WEB-INF\\registerPlugin.properties";
 
-            System.Threading.Thread.Sleep(5000);
+            for (int i = 1; i <= 30; i = i + 1)
+            {
+                if (File.Exists(file))
+                {
+                    session.Log("registerPlugin.properties file found");
+                    break;
+                }
+                System.Threading.Thread.Sleep(500);
+            }
 
             try
             {
                 if (File.Exists(file))
                 {
                     string rows = File.ReadAllText(file);
-                    string ip = session.CustomActionData["IP_ADDRESS"];
+                    string HostName_IPAddress = session.CustomActionData["HOSTNAME_IPADDRESS"];
 
-                    // Replacing 'localhost' with the given 'ip'
-                    rows = rows.Replace("localhost", ip);
+                    // Replacing 'localhost' with the given 'HostName_IPAddress'
+                    rows = rows.Replace("localhost", HostName_IPAddress);
                     File.WriteAllText(file, rows);
                     session.Log("registerPlugin.properties file updated successfully");
                     return ActionResult.Success;
@@ -127,8 +90,6 @@ namespace CustomActions
                     session.Log("registerPlugin.properties file doesn't exist");
                     return ActionResult.Failure;
                 }
-
-
             }
             catch (Exception ex)
             {
