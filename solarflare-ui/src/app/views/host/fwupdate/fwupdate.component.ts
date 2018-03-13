@@ -258,11 +258,18 @@ export class FwupdateComponent implements OnInit {
         }
     }
 
-    isLatestVersionNotAvailable() {
+    disableLatestUpdateAdapterFilter() {
         const result = this.selectedAdapters.find(ele => {
             return this.isLatestAvailable(ele) === 'No';
         });
-        return result ? true : false;
+        return result ? false : true;
+    }
+
+    disableUpdateButton() {
+        const updatable = this.selectedAdapters.filter(ele => {
+            return this.isLatestAvailable(ele) === 'No';
+        });
+        return updatable.length === this.selectedAdapters.length ? true : false;
     }
 
     closeAndResetModal() {
@@ -342,7 +349,7 @@ export class FwupdateComponent implements OnInit {
             "base64Data": formModel.fwFile.value,
             "adapters": this.selectedAdapters
         };
-
+        this.customUpdateErrorMessage = '';
         this.hs.onSubmitFile(this.params['id'], payload)
             .subscribe(
                 data => {
@@ -358,6 +365,8 @@ export class FwupdateComponent implements OnInit {
                     this.clearFile();
                 },
                 err => {
+                    const error = err.json();
+                    this.customUpdateErrorMessage = error ? error.message : null;
                     console.error(err);
                     this.clearFile();
                     setTimeout(() => {
@@ -594,6 +603,11 @@ export class FwupdateComponent implements OnInit {
                 });
             }
         });
+    }
+
+    resetView() {
+        this.customUpdateErrorMessage = '';
+        this.button.customErr = false;
     }
 }
 

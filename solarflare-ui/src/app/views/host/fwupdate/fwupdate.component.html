@@ -78,7 +78,7 @@
         </table>
         <br/>
         <div>
-            <input type="checkbox" id="filter" [(ngModel)]="latestUpdateAdapterFilter" [disabled]="!isLatestVersionNotAvailable()">
+            <input type="checkbox" id="filter" [(ngModel)]="latestUpdateAdapterFilter" [disabled]="disableLatestUpdateAdapterFilter()">
             <label for="filter">Add adapters for which latest version(s) is not available</label>
         </div>
 
@@ -89,7 +89,8 @@
     <div class="modal-footer">
         <button class="btn btn-outline" type="button" (click)="button.latestErr = false; latestUpdateModal = false; button.latest = false; latestUpdateAdapterFilter = false">Cancel
         </button>
-        <button class="btn btn-primary" type="button" [disabled]="button.latest || !latestUpdateButton()" (click)="button.latestErr = false; button.latest = true; latestUpdate()">
+        <button class="btn btn-primary" type="button" [disabled]="button.latest || !latestUpdateButton() || (!latestUpdateAdapterFilter && disableUpdateButton()) "
+            (click)="button.latestErr = false; button.latest = true; latestUpdate()">
             <span *ngIf="!button.latest">
                 Update
             </span>
@@ -151,7 +152,7 @@
 <clr-modal [clrModalSize]="'md'" [(clrModalOpen)]="customUpdateModal" [clrModalClosable]="false" [clrModalStaticBackdrop]="true">
     <h3 class="modal-title">Custom Update
         <div style="position: absolute;right: 0;" class="toggle-switch">
-            <input type="checkbox" name="isUrl" id="urlFileSelect" style="visibility: hidden;" [(ngModel)]="customSelectUrl">
+            <input (click)="resetView()" type="checkbox" name="isUrl" id="urlFileSelect" style="visibility: hidden;" [(ngModel)]="customSelectUrl">
             <label [ngStyle]="{'font-weight': customSelectUrl === true ? '' : 900,
                                'color': customSelectUrl === true ? '#C1CDD4': '#48960C'}" [ngClass]="{'colored': customSelectUrl === false}"
                 for="urlFileSelect">
