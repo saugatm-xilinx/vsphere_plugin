@@ -29,7 +29,7 @@ rem ---------------------------------------------------------------------------
 setlocal ENABLEEXTENSIONS
 
 :: Search the registry value of InstallDir
-set KEY_NAME="HKEY_LOCAL_MACHINE\Software\Solarflare vSphere client plugin"
+set KEY_NAME="HKEY_LOCAL_MACHINE\Software\Solarflare Communications, Inc.\Solarflare vSphere client plugin"
 set VALUE_NAME=InstallDir
 
 FOR /F "skip=2 tokens=1,2*" %%A IN ('%Systemroot%\system32\reg.exe QUERY %KEY_NAME% /v %VALUE_NAME% 2^>nul') DO (

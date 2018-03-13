@@ -31,7 +31,7 @@
 	<Media Id="1" DiskPrompt="Disk 1" Cabinet="setup.cab" EmbedCab="yes" CompressionLevel="mszip"/>
 	
 	<Property Id="INSTALLDIR" Secure="yes">
-		<RegistrySearch Id="InstallDirectorySearch" Type="raw" Root="HKLM" Key="Software\$(var.AppName)" Name="InstallDir" Win64="yes"/>
+		<RegistrySearch Id="InstallDirectorySearch" Type="raw" Root="HKLM" Key="Software\$(var.ProductManufacturer)\$(var.AppName)" Name="InstallDir" Win64="yes"/>
 	</Property>
 	<Property Id="BROWSER_CHECKBOX_PROPERTY" Secure="yes"/>
 	<Property Id="BROWSER" Secure="yes" Admin="yes"/>
@@ -195,7 +195,7 @@
 <Fragment>
 	<DirectoryRef Id="TARGETDIR">
 		<Component Id="InstallDirectorySearch" Guid="9BE8902F-CB46-4DF6-A8C2-34F2366CC12E" KeyPath="yes">
-			<RegistryKey Key="Software\$(var.AppName)" Root="HKLM" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
+			<RegistryKey Key="Software\$(var.ProductManufacturer)\$(var.AppName)" Root="HKLM" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
 				<RegistryValue Type="string" Name="InstallDir" Value="[INSTALLDIR]" />
 			</RegistryKey> 
 		</Component>
