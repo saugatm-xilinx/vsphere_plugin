@@ -24,18 +24,17 @@
 	<AdminExecuteSequence/>
 	<InstallUISequence>
 		<Custom Action="GetHostName" Before="CostFinalize"></Custom>
+		<Custom Action="GetDefaultBrowser" Before="CostFinalize"></Custom>
 	</InstallUISequence>
 	<AdminUISequence/>
 	<AdvertiseExecuteSequence/>
 	<Media Id="1" DiskPrompt="Disk 1" Cabinet="setup.cab" EmbedCab="yes" CompressionLevel="mszip"/>
-
-	<Property Id="BROWSER" Secure="yes">
-        <RegistrySearch Id="IEXPLORE_SEARCH" Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\IEXPLORE.EXE" Type="raw" Win64="yes" />
-    </Property>
+	
 	<Property Id="INSTALLDIR" Secure="yes">
 		<RegistrySearch Id="InstallDirectorySearch" Type="raw" Root="HKLM" Key="Software\$(var.AppName)" Name="InstallDir" Win64="yes"/>
 	</Property>
 	<Property Id="BROWSER_CHECKBOX_PROPERTY" Secure="yes"/>
+	<Property Id="BROWSER" Secure="yes" Admin="yes"/>
 	<Property Id="HOSTNAME_IPADDRESS" Secure="yes" Admin="yes"/>
 	<Property Id="HOSTNAME_IPADDRESS_VALID" Secure="yes" Admin="yes"/>
 	<Property Id="App_Name" Value="$(var.AppName)"/>
@@ -176,6 +175,7 @@
 	<SetProperty Id="ServerUninstallRollback" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\service.bat&quot; install" Sequence="execute" Before="ServerUninstallRollback" />
 	
 	<Binary Id="CustomAction.CA.dll" SourceFile="$(var.PathToFile)\CustomAction.CA.dll"/>
+	<CustomAction Id="GetDefaultBrowser" BinaryKey="CustomAction.CA.dll" DllEntry="Get_DefaultBrowser" Execute="immediate" Return="check"/>
 	<CustomAction Id="GetHostName" BinaryKey="CustomAction.CA.dll" DllEntry="Get_HostName" Execute="immediate" Return="check"/>
 	<CustomAction Id="HostName_IPAddress_Validation" BinaryKey="CustomAction.CA.dll" DllEntry="Validate_HostName_IPAddress" Execute="immediate" Return="check"/>
 	<CustomAction Id="PropertiesFile" BinaryKey="CustomAction.CA.dll" DllEntry="Modify_PropertiesFile" Execute="deferred" Impersonate="no" Return="check"/>

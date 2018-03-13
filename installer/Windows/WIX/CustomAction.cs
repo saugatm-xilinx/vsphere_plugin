@@ -3,11 +3,62 @@ using Microsoft.Deployment.WindowsInstaller;
 using System.Windows.Forms;
 using System.Net;
 using System.IO;
+using Microsoft.Win32;
 
 namespace CustomActions
 {
     public class CustomActions
     {
+
+        [CustomAction]
+        public static ActionResult Get_DefaultBrowser(Session session)
+        {
+            string urlAssociation = @"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http";
+            string browserPathKey = @"$BROWSER$\shell\open\command";
+
+            RegistryKey userChoiceKey = null;
+
+            try
+            {
+                //Read default browser path from userChoiceKey
+                userChoiceKey = Registry.CurrentUser.OpenSubKey(urlAssociation + @"\UserChoice", false);
+
+                //If user choice was not found, try machine default
+                if (userChoiceKey == null)
+                {
+                    //Read default browser path from Win XP registry key
+                    var browserKey = Registry.ClassesRoot.OpenSubKey(@"HTTP\shell\open\command", false);
+
+                    //If browser path wasn’t found, try Win Vista (and newer) registry key
+                    if (browserKey == null)
+                    {
+                        browserKey = Registry.CurrentUser.OpenSubKey(urlAssociation, false);
+                    }
+                    return ActionResult.Success;
+                }
+                else
+                {
+                    // user defined browser choice was found
+                    string progId = (userChoiceKey.GetValue("ProgId").ToString());
+                    userChoiceKey.Close();
+
+                    // now look up the path of the executable
+                    string concreteBrowserKey = browserPathKey.Replace("$BROWSER$", progId);
+                    var kp = Registry.ClassesRoot.OpenSubKey(concreteBrowserKey, false);
+                    string defaultBrowserPath = (kp.GetValue("").ToString());
+                    defaultBrowserPath = defaultBrowserPath.Substring(1, defaultBrowserPath.LastIndexOf(".exe") + 3);
+                    session.Log("Default browser path : " + defaultBrowserPath);
+                    session["BROWSER"] = defaultBrowserPath;
+                    return ActionResult.Success;
+                }
+            }
+            catch(Exception ex)
+            {
+                session.Log("Exception while getting default browser path" + ex.Message);
+                return ActionResult.Failure;
+            }
+        }
+
 
         [CustomAction]
         public static ActionResult Get_HostName(Session session)
@@ -62,7 +113,7 @@ namespace CustomActions
             string InstallFolder = session.CustomActionData["INSTALLDIR"];
             string file = InstallFolder + "Tomcat_Server\\webapps\\plugin-registration\\WEB-INF\\registerPlugin.properties";
 
-            for (int i = 1; i <= 30; i = i + 1)
+            for (int i = 1; i <= 60; i = i + 1)
             {
                 if (File.Exists(file))
                 {
