@@ -133,7 +133,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 
 		List<Adapter> adapters = getAdapters(hostprops, hostId);
 		host.setAdapterCount(adapters.size());
-
+		host.setChildren(adapters);
 		host.setPortCount(SfVimServiceHelper.getPortCount(adapters));
 
 		// Get Version of CIM provider and Driver
@@ -158,8 +158,6 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 		List<Host> hostList = new ArrayList<>();
 
 		List<String> props = new ArrayList<>();
-		props.add("hardware.pciDevice");
-		props.add("config.network.pnic");
 		props.add("name");
 		props.add("runtime.connectionState");
 
@@ -183,8 +181,6 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 					// Get name
 					String name = (String) hostprops.get("name");
 					host.setName(name);
-					List<Adapter> adapters = getAdapters(hostprops, hostMoRef.getValue());
-					host.setChildren(adapters);
 					logger.debug("Adding '" + name + "' host to hostList");
 					hostList.add(host);
 				} else {

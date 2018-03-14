@@ -316,9 +316,10 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		if (hostId != null && !hostId.isEmpty()) {
 			adapters = sfVimService.getHostAdapters(hostId);
 			SfCIMService cimService = getCIMService(hostId);
-
+			Map<String, CIMInstance> nics = cimService.getEthernatePortInstanceMap();
+			
 			for (Adapter adapter : adapters) {
-				setFirmwareVersions(adapter, cimService);
+				setFirmwareVersions(adapter, cimService, nics);
 			}
 		}
 		return adapters;
@@ -414,7 +415,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			aTask.setUefiROM(status);
 		}
 		if (fwImageURL == null) {
-			fwImageURL = getImageURL(fwInstance, nicInstance, cimService, fwType);
+			fwImageURL = getImageURL(fwInstance, nicInstance, cimService, fwType, adapter);
 		}
 		UpdateRequest updateRequest = new UpdateRequest();
 		updateRequest.setAdapterId(adapterId);
@@ -455,12 +456,12 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		return aTask;
 	}
 
-	private URL getImageURL(CIMInstance fw_inst, CIMInstance nicInstance, SfCIMService cimService, FwType fwType)
+	private URL getImageURL(CIMInstance fw_inst, CIMInstance nicInstance, SfCIMService cimService, FwType fwType, Adapter adapter)
 			throws Exception {
 
 		URL pluginURL = new URL(sfVimService.getPluginURL(CIMConstants.PLUGIN_KEY));
 		String filePath = null;
-		SfFirmware file = MetadataHelper.getMetaDataForAdapter(pluginURL, cimService, fw_inst, nicInstance, fwType);
+		SfFirmware file = MetadataHelper.getMetaDataForAdapter(pluginURL, cimService, fw_inst, nicInstance, fwType,adapter);
 		if (file != null) {
 			filePath = file.getPath();
 		}
@@ -491,10 +492,10 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		logger.info("Solarflare::Sending data in chunks is complete");
 	}
 
-	private void setFirmwareVersions(Adapter adapter, SfCIMService cimService) throws Exception {
+	private void setFirmwareVersions(Adapter adapter, SfCIMService cimService, Map<String, CIMInstance> nics) throws Exception {
 		logger.info("Solarflare:: setFirmwareVersions for adapter : " + adapter.getName());
 		String deviceId = adapter.getChildren().get(0).getName();
-		Map<String, String> versions = cimService.getAdapterVersions(deviceId);
+		Map<String, String> versions = cimService.getAdapterVersions(deviceId,nics);
 
 		String controllerVersion = versions.get(CIMConstants.CONTROLLER_VERSION);
 		String bootROMVersion = versions.get(CIMConstants.BOOT_ROM_VERSION);
@@ -511,7 +512,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		URL pluginURL = new URL(sfVimService.getPluginURL(CIMConstants.PLUGIN_KEY));
 
 		String latestControllerVersion = cimService.getLatestFWImageVersion(pluginURL, cimService, fwInstance,
-				niCimInstance, FwType.CONTROLLER);
+				niCimInstance, FwType.CONTROLLER,adapter);
 
 		FirmwareVersion frmVesion = new FirmwareVersion();
 
@@ -520,14 +521,14 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		// Get version from image binary for BootRom
 		CIMInstance bootROMInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_BOOTROM_NAME);
 		String latestBootROMVersion = cimService.getLatestFWImageVersion(pluginURL, cimService, bootROMInstance,
-				niCimInstance, FwType.BOOTROM);
+				niCimInstance, FwType.BOOTROM,adapter);
 
 		frmVesion.setBootROM(latestBootROMVersion);
 
 		// Get version from image binary for BootRom
 		CIMInstance uefiROMInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
 		String latestUefiROMVersion = cimService.getLatestFWImageVersion(pluginURL, cimService, uefiROMInstance,
-				niCimInstance, FwType.UEFIROM);
+				niCimInstance, FwType.UEFIROM,adapter);
 		frmVesion.setUefi(latestUefiROMVersion);
 
 		// Put dummy latest versions for Firmware family

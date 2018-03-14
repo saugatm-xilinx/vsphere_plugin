@@ -21,6 +21,62 @@ public class Adapter implements Serializable {
 	private String subSystemDeviceId;
 	private String vendorId;
 	private String subSystemVendorId;
+	// Caching type and subType in adapter 
+	private int controllerType;
+	private int controllerSubType;
+	private int bootROMType;
+	private int bootROMSubType;
+	private int uefiROMType;
+	private int uefiROMSubType;
+	
+
+	public int getControllerType() {
+		return controllerType;
+	}
+
+	public void setControllerType(int controllerType) {
+		this.controllerType = controllerType;
+	}
+
+	public int getControllerSubType() {
+		return controllerSubType;
+	}
+
+	public void setControllerSubType(int controllerSubType) {
+		this.controllerSubType = controllerSubType;
+	}
+
+	public int getBootROMType() {
+		return bootROMType;
+	}
+
+	public void setBootROMType(int bootROMType) {
+		this.bootROMType = bootROMType;
+	}
+
+	public int getBootROMSubType() {
+		return bootROMSubType;
+	}
+
+	public void setBootROMSubType(int bootROMSubType) {
+		this.bootROMSubType = bootROMSubType;
+	}
+
+	public int getUefiROMType() {
+		return uefiROMType;
+	}
+
+	public void setUefiROMType(int uefiROMType) {
+		this.uefiROMType = uefiROMType;
+	}
+
+	public int getUefiROMSubType() {
+		return uefiROMSubType;
+	}
+
+	public void setUefiROMSubType(int uefiROMSubType) {
+		this.uefiROMSubType = uefiROMSubType;
+	}
 
 	public String getDeviceId() {
 		return deviceId;
@@ -126,13 +182,15 @@ public class Adapter implements Serializable {
 		this.latestVersion = latestVersion;
 	}
 
-
 	@Override
 	public String toString() {
 		return "Adapter [name=" + name + ", type=" + type + ", id=" + id + ", versionController=" + versionController
 				+ ", versionBootROM=" + versionBootROM + ", versionUEFIROM=" + versionUEFIROM + ", versionFirmware="
-				+ versionFirmware + ", latestVersion=" + latestVersion +  ", children=" + children + ", deviceId=" + deviceId + ", subSystemDeviceId="
-				+ subSystemDeviceId + ", vendorId=" + vendorId + ", subSystemVendorId=" + subSystemVendorId + "]";
+				+ versionFirmware + ", latestVersion=" + latestVersion + ", children=" + children + ", deviceId="
+				+ deviceId + ", subSystemDeviceId=" + subSystemDeviceId + ", vendorId=" + vendorId
+				+ ", subSystemVendorId=" + subSystemVendorId + ", controllerType=" + controllerType
+				+ ", controllerSubType=" + controllerSubType + ", bootROMType=" + bootROMType + ", bootROMSubType="
+				+ bootROMSubType + ", uefiROMType=" + uefiROMType + ", uefiROMSubType=" + uefiROMSubType + "]";
 	}
 
 }
