@@ -137,8 +137,7 @@
 	</Feature>
 	<Feature Id="Installer" Title="Installer Files" Level="1" Description="Files related to this Installation" Absent="allow" AllowAdvertise="no" TypicalDefault="install" Display="collapse" InstallDefault="local">
 		<ComponentRef Id="InstallDirectorySearch"/>
-		<ComponentRef Id="RemoveInstallFolder"/>
-		<ComponentRef Id="StartMenuShortcut"/>
+		<ComponentRef Id="RemoveInstallFolder"/>		
 	</Feature>
 	<Directory Id="TARGETDIR" Name="SourceDir">
 		<Directory Id="ProgramFiles64Folder" Name="ProgramFiles64Folder">
@@ -153,10 +152,7 @@
 					<Directory Id="webapps_dir" Name="webapps"/>
 					<Directory Id="work" Name="work"/>
 				</Directory>
-			</Directory>
-			<Directory Id="StartMenuFolder">
-				<Directory Id="StartMenuShortcutDir" Name="$(var.AppName)"/>
-			</Directory>
+			</Directory>			
 		</Directory>		
 	</Directory>
 	<UIRef Id="SUFWI_UI"/>
@@ -205,15 +201,6 @@
 	<DirectoryRef Id="INSTALLDIR">
 		<Component Id ="RemoveInstallFolder"  Guid="AA11A32B-9E1E-458A-8C94-3EFEDA77E494" KeyPath="yes" >			
 			<util:RemoveFolderEx On="uninstall" Property="INSTALLDIR" />
-		</Component>
-	</DirectoryRef>
-</Fragment>
-<Fragment>
-	<DirectoryRef Id="StartMenuShortcutDir">
-		<Component Id="StartMenuShortcut" Guid="D84FC5FF-58A0-40BF-92CE-5FD447125674">
-			<Shortcut Id="UninstallShortcut"  Name="Uninstall $(var.AppName)" Description="Uninstalls $(var.AppName) and all of its components." Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" />
-			<RemoveFolder Id="RemoveStartMeunShortcutDir" On="uninstall"/>
-			<RegistryValue Root="HKCU" Key="Software\Microsoft\[App_Name]" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
 		</Component>
 	</DirectoryRef>
 </Fragment>
