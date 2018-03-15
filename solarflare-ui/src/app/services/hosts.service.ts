@@ -8,10 +8,12 @@ import { Http, Response } from "@angular/http";
 export class HostsService {
 
     public hostDetailUrl = this.gs.getWebContextPath() + '/rest/services/hosts/';
-    private rootUrl = 'https://10.101.10.7';
+    private rootUrl = 'https://10.101.10.8';
+    private hosts = [];
+    private adapters = [];
+    private configs = null;
 
-    constructor(private gs: GlobalsService,
-        private http: Http) { }
+    constructor(private gs: GlobalsService, private http: Http) { }
 
     public getHostDetails(hostId: string, url?: string) {
 
@@ -143,4 +145,57 @@ export class HostsService {
 
     }
 
+    setHosts(hosts) {
+        this.hosts = hosts;
+    }
+
+    updateHostDetail(hostDetail) {
+        let isPresent = false;
+        if (hostDetail && hostDetail.id) {
+            this.hosts.map((host, index) => {
+                if (host.id === hostDetail.id) {
+                    this.hosts[index] = hostDetail;
+                    isPresent = true;
+                }
+            })
+        }
+        if (!isPresent) {
+            this.hosts.push(hostDetail);
+        }
+    }
+
+    getHost(hostId) {
+        const hostResult = this.hosts.filter(host => {
+            return String(host.id) === String(hostId);
+        })
+        return hostResult.length === 1 ? hostResult[0] : {};
+    }
+
+    setAdapter(adapterDetail) {
+        let isPresent = false;
+        this.adapters.map((adapter, index) => {
+            if (String(adapter.hostId) === String(adapterDetail.hostId)) {
+                this.adapters[index] = adapterDetail;
+                isPresent = true;
+            }
+        })
+        if (!isPresent) {
+            this.adapters.push(adapterDetail);
+        }
+    }
+
+    getAdapter(hostId): any {
+        const adapterResult = this.adapters.filter(adapter => {
+            return String(adapter.hostId) === String(hostId);
+        })
+        return adapterResult.length === 1 ? adapterResult[0] : { hostId: '', adapters: [], isLatest: false };
+    }
+
+    setConfigs(configs) {
+        this.configs = configs;
+    }
+
+    getConfigs() {
+        return this.configs;
+    }
 }

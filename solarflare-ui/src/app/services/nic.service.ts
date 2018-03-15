@@ -6,7 +6,7 @@ import { Nic } from '../views/nic/nic.model';
 @Injectable()
 export class NicService {
 
-    private rootUrl = 'https://10.101.10.7';
+    private rootUrl = 'https://10.101.10.8';
     private nics: Nic[];
     private urlParts = { hostId: '', nicId: '' };
     private readonly baseUrl = this.globalSvc.getWebContextPath() + '/rest/services/hosts/';
@@ -18,9 +18,8 @@ export class NicService {
         this.urlParts = { hostId, nicId };
     }
 
-    setNicDetails(res) {
-        if (res) {
-            const data = res.json();
+    setNicDetails(data) {
+        if (data) {
             this.buildNics(data);
         }
     }

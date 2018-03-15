@@ -5,7 +5,7 @@ import { Http, Response } from "@angular/http";
 @Injectable()
 export class AdapterService {
 
-    private rootUrl = 'https://10.101.10.7';
+    private rootUrl = 'https://10.101.10.8';
     public hostDetailUrl = this.gs.getWebContextPath() + '/rest/services/hosts/';
 
     constructor(private gs: GlobalsService,

@@ -62,7 +62,14 @@ export class ConfigComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.getConfiguration();
+        this.config = this.hs.getConfigs();
+        if (this.config) {
+            this.reInitButton();
+            this.restoreConfig();
+            this.hs.setConfigs(this.config);
+        } else {
+            this.getConfiguration();
+        }
     }
 
     reInitButton() {
@@ -86,6 +93,7 @@ export class ConfigComponent implements OnInit {
                 data => {
                     this.config = data;
                     this.restoreConfig();
+                    this.hs.setConfigs(data);
                 },
                 err => {
                     console.error(err);

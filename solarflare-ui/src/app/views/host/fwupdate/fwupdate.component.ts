@@ -80,6 +80,17 @@ export class FwupdateComponent implements OnInit {
         this.hosts = this.inj.get(AppComponent).hosts;
     }
 
+    ngOnInit() {
+        const adapterDetail = this.hs.getAdapter(this.params['id']);
+        if (adapterDetail && adapterDetail.isLatest) {
+            this.adapterList = adapterDetail.adapters;
+            this.updateStatus(this.adapterList);
+        } else {
+            this.getAdapterList();
+        }
+        // this.devMode();
+    }
+
     static returnStatusOutput(br) {
         if (br.state === 'Error') {
             return {
@@ -121,8 +132,12 @@ export class FwupdateComponent implements OnInit {
         };
     }
 
-    getAdapterList() {
+    refreshAdapterList() {
         this.adapterList = [];
+        this.getAdapterList();
+    }
+
+    getAdapterList() {
         this.status.status = false;
         this.gettingAdapterList = true;
         this.getAdapterListErr = false;
@@ -131,6 +146,7 @@ export class FwupdateComponent implements OnInit {
             .subscribe(
                 data => {
                     this.adapterList = data;
+                    this.hs.setAdapter({ hostId: this.params['id'], adapters: data, isLatest: true });
                     this.gettingAdapterList = false;
                     this.updateStatus(data);
                 },
@@ -164,11 +180,6 @@ export class FwupdateComponent implements OnInit {
             });
             this.statusUpdate = false;
         }
-    }
-
-    ngOnInit() {
-        this.getAdapterList();
-        // this.devMode();
     }
 
     validateLatestUpdate(remove?: string) {
