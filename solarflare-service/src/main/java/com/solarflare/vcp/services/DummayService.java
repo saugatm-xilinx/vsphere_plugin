@@ -15,6 +15,7 @@ import com.solarflare.vcp.model.NetQueue;
 import com.solarflare.vcp.model.NicBootParamInfo;
 import com.solarflare.vcp.model.Overlay;
 import com.solarflare.vcp.model.VMNIC;
+import com.solarflare.vcp.model.VMNICResponse;
 
 public class DummayService implements HostAdapterService {
 
@@ -107,40 +108,28 @@ public class DummayService implements HostAdapterService {
 	public AdapterOverview getAdapterOverview(String hostId, String nicId) throws Exception {
 		
 		AdapterOverview overview = new AdapterOverview();
-		overview.setName("solarflare adapter-1");
 		overview.setSerialNumber("231231231231");
 		overview.setPortNumber("SFNsdsdssd");
-		overview.setPciExpressLinkSpeed("8.0 Gt/s");
-		overview.setPciExpressBusWidth("x8");
 		return overview;
 	}
-	@Override
-	public Adapter getAdapters(String hostId, String nicId)  throws Exception{
+	
+	
+	public VMNICResponse getAdapterForNIC(String hostId, String nicId)  throws Exception{
 		
-		Adapter adp = new Adapter();
-		adp.setId("adapter-id");
-		adp.setName("solarflare adapter-id");
-		adp.setDeviceId("device id");
-		adp.setSubSystemDeviceId("subsystem device id");
-		adp.setSubSystemVendorId("subsystem vender id");
-		adp.setVendorId("venderId");
-		VMNIC vmNic = new VMNIC();
-		vmNic.setName("nic name");
-		vmNic.setId("nic-Id");
-		vmNic.setDriverName("driver name");
-		vmNic.setDriverVersion("10.1.1.1");
-		vmNic.setMacAddress("aa.bb.cc.ee");
-		vmNic.setStatus("link status");
-		vmNic.setInterfaceName("Interface name");
-		vmNic.setPortSpeed("port speed");
-		vmNic.setCurrentMTU("current MTU");
-		vmNic.setMaxMTU("max mtu");
-		vmNic.setPciBusNumber("pci bus number");
-		vmNic.setPciFunction("pci function");
-		List<VMNIC> list = new ArrayList<>();
-		list.add(vmNic);
-		adp.setChildren(list);
-		return adp;
+		VMNICResponse nicResponse = new VMNICResponse();
+		nicResponse.setDeviceId("device id");
+		nicResponse.setSubSystemDeviceId("subsystem device id");
+		nicResponse.setSubSystemVendorId("subsystem vender id");
+		nicResponse.setVendorId("venderId");
+		nicResponse.setDriverVersion("10.1.1.1");
+		nicResponse.setMacAddress("aa.bb.cc.ee");
+		nicResponse.setLinkStatus("link status");
+		nicResponse.setInterfaceName("Interface name");
+		nicResponse.setPortSpeed("port speed");
+		nicResponse.setPciBusNumber("pci bus number");
+		nicResponse.setPciFunction("pci function");
+		nicResponse.setDriverName("driver name");
+		return nicResponse;
 	}
 
 	public AdapterNicStatistics getAdapterNicStatistics(String hostId, String nicId) {

@@ -18,6 +18,7 @@ import com.solarflare.vcp.cim.CIMConstants;
 import com.solarflare.vcp.cim.CIMHost;
 import com.solarflare.vcp.cim.SfCIMClientService;
 import com.solarflare.vcp.cim.SfCIMService;
+import com.solarflare.vcp.cim.SfCIMService.NicProperty;
 import com.solarflare.vcp.exception.SfInvalidRequestException;
 import com.solarflare.vcp.helper.MetadataHelper;
 import com.solarflare.vcp.helper.SFBase64;
@@ -37,9 +38,13 @@ import com.solarflare.vcp.model.Status;
 import com.solarflare.vcp.model.TaskInfo;
 import com.solarflare.vcp.model.TaskState;
 import com.solarflare.vcp.model.UpdateRequest;
+import com.solarflare.vcp.model.VMNIC;
+import com.solarflare.vcp.model.VMNICResponse;
 import com.solarflare.vcp.security.ASN1Parser;
 import com.solarflare.vcp.vim.SfVimService;
+import com.solarflare.vcp.vim.SfVimServiceImpl;
 import com.solarflare.vcp.vim.SimpleTimeCounter;
+import com.solarflare.vcp.vim.connection.ConnectionImpl;
 
 public class HostAdapterServiceImpl implements HostAdapterService {
 	private static final Log logger = LogFactory.getLog(HostAdapterServiceImpl.class);
@@ -317,7 +322,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			adapters = sfVimService.getHostAdapters(hostId);
 			SfCIMService cimService = getCIMService(hostId);
 			Map<String, CIMInstance> nics = cimService.getEthernatePortInstanceMap();
-			
+
 			for (Adapter adapter : adapters) {
 				setFirmwareVersions(adapter, cimService, nics);
 			}
@@ -456,12 +461,13 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		return aTask;
 	}
 
-	private URL getImageURL(CIMInstance fw_inst, CIMInstance nicInstance, SfCIMService cimService, FwType fwType, Adapter adapter)
-			throws Exception {
+	private URL getImageURL(CIMInstance fw_inst, CIMInstance nicInstance, SfCIMService cimService, FwType fwType,
+			Adapter adapter) throws Exception {
 
 		URL pluginURL = new URL(sfVimService.getPluginURL(CIMConstants.PLUGIN_KEY));
 		String filePath = null;
-		SfFirmware file = MetadataHelper.getMetaDataForAdapter(pluginURL, cimService, fw_inst, nicInstance, fwType,adapter);
+		SfFirmware file = MetadataHelper.getMetaDataForAdapter(pluginURL, cimService, fw_inst, nicInstance, fwType,
+				adapter);
 		if (file != null) {
 			filePath = file.getPath();
 		}
@@ -492,10 +498,11 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		logger.info("Solarflare::Sending data in chunks is complete");
 	}
 
-	private void setFirmwareVersions(Adapter adapter, SfCIMService cimService, Map<String, CIMInstance> nics) throws Exception {
+	private void setFirmwareVersions(Adapter adapter, SfCIMService cimService, Map<String, CIMInstance> nics)
+			throws Exception {
 		logger.info("Solarflare:: setFirmwareVersions for adapter : " + adapter.getName());
 		String deviceId = adapter.getChildren().get(0).getName();
-		Map<String, String> versions = cimService.getAdapterVersions(deviceId,nics);
+		Map<String, String> versions = cimService.getAdapterVersions(deviceId, nics);
 
 		String controllerVersion = versions.get(CIMConstants.CONTROLLER_VERSION);
 		String bootROMVersion = versions.get(CIMConstants.BOOT_ROM_VERSION);
@@ -512,7 +519,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		URL pluginURL = new URL(sfVimService.getPluginURL(CIMConstants.PLUGIN_KEY));
 
 		String latestControllerVersion = cimService.getLatestFWImageVersion(pluginURL, cimService, fwInstance,
-				niCimInstance, FwType.CONTROLLER,adapter);
+				niCimInstance, FwType.CONTROLLER, adapter);
 
 		FirmwareVersion frmVesion = new FirmwareVersion();
 
@@ -521,14 +528,14 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		// Get version from image binary for BootRom
 		CIMInstance bootROMInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_BOOTROM_NAME);
 		String latestBootROMVersion = cimService.getLatestFWImageVersion(pluginURL, cimService, bootROMInstance,
-				niCimInstance, FwType.BOOTROM,adapter);
+				niCimInstance, FwType.BOOTROM, adapter);
 
 		frmVesion.setBootROM(latestBootROMVersion);
 
 		// Get version from image binary for BootRom
 		CIMInstance uefiROMInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
 		String latestUefiROMVersion = cimService.getLatestFWImageVersion(pluginURL, cimService, uefiROMInstance,
-				niCimInstance, FwType.UEFIROM,adapter);
+				niCimInstance, FwType.UEFIROM, adapter);
 		frmVesion.setUefi(latestUefiROMVersion);
 
 		// Put dummy latest versions for Firmware family
@@ -556,14 +563,58 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 
 	@Override
 	public AdapterOverview getAdapterOverview(String hostId, String nicId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		AdapterOverview adpOverview = new AdapterOverview();
+		SfCIMService sfcimService = getCIMService(hostId);
+		Map<String, String> info = sfcimService.getNicInfo(nicId);
+
+		for (Map.Entry<String, String> entry : info.entrySet()) {
+			String key = entry.getKey();
+
+			if (NicProperty.PartNumber.toString().equals(key)) {
+				adpOverview.setPortNumber(entry.getValue());
+
+			} else if (NicProperty.SerialNumber.toString().equals(key)) {
+				adpOverview.setSerialNumber(entry.getValue());
+
+			} 
+		}
+
+		return adpOverview;
 	}
 
 	@Override
-	public Adapter getAdapters(String hostId, String nicId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public VMNICResponse getAdapterForNIC(String hostId, String nicId) throws Exception {
+		List<Adapter> adapters = sfVimService.getHostAdapters(hostId);
+		//List<Adapter> adapters = host.getChildren();
+		VMNICResponse nicResponse = null;
+		boolean isFound = false;
+		for (Adapter adp : adapters) {
+			for (VMNIC nic : adp.getChildren()) {
+				if (nic.getId().equals(nicId)) {
+					nicResponse = new VMNICResponse();
+					nicResponse.setDeviceId(adp.getDeviceId());
+					nicResponse.setSubSystemDeviceId(adp.getSubSystemDeviceId());
+					nicResponse.setVendorId(adp.getVendorId());
+					nicResponse.setSubSystemVendorId(adp.getSubSystemVendorId());
+					
+					nicResponse.setDriverName(nic.getDriverName());
+					nicResponse.setLinkStatus(nic.getStatus());
+					nicResponse.setPortSpeed(nic.getPortSpeed());
+					nicResponse.setMacAddress(nic.getMacAddress());
+					
+					nicResponse.setInterfaceName(nic.getInterfaceName());
+					nicResponse.setPciBusNumber(nic.getPciBusNumber());
+					nicResponse.setPciFunction(nic.getPciFunction());
+					nicResponse.setDriverVersion(sfVimService.getDriverVersion(hostId));
+					isFound = true;
+					break;
+				}
+			}
+			if (isFound) {
+				break;
+			}
+		}
+		return nicResponse;
 	}
-
+	
 }

@@ -28,8 +28,7 @@ public class Adapter implements Serializable {
 	private int bootROMSubType;
 	private int uefiROMType;
 	private int uefiROMSubType;
-	
-
+    
 	public int getControllerType() {
 		return controllerType;
 	}
@@ -193,4 +192,5 @@ public class Adapter implements Serializable {
 				+ bootROMSubType + ", uefiROMType=" + uefiROMType + ", uefiROMSubType=" + uefiROMSubType + "]";
 	}
 
+	
 }

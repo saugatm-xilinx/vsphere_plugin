@@ -38,10 +38,14 @@ import com.vmware.vim25.RuntimeFaultFaultMsg;
 
 public class SfCIMService {
 
+	public enum NicProperty {
+		PartNumber, SerialNumber, Name
+	}
+
 	private static final Log logger = LogFactory.getLog(SfCIMService.class);
-	//sfSoftwareInstallation map instance is for per host.
-	private Map<String,CIMInstance> sfSoftwareInstallation;
-	
+	// sfSoftwareInstallation map instance is for per host.
+	private Map<String, CIMInstance> sfSoftwareInstallation;
+
 	SfCIMClientService cimClientService;
 	final String DUMMY_VERSION_STRING = "0.0.0.0";
 
@@ -96,18 +100,19 @@ public class SfCIMService {
 		logger.info("Solarflare::Getting Software Installation Instance ");
 		Collection<CIMInstance> instances = getAllInstances(CIMConstants.CIM_NAMESPACE,
 				CIMConstants.SF_SOFTWARE_INSTALLATION_SERVICE);
-		
+
 		sfSoftwareInstallation = new HashMap<>();
-			Object namePropValue = null;
-			for (CIMInstance inst : instances) {
-				namePropValue = inst.getProperty("Name").getValue();
-				if (namePropValue != null) {
-					sfSoftwareInstallation.put(String.valueOf(namePropValue), inst);
-				}
-			}	
-		
+		Object namePropValue = null;
+		for (CIMInstance inst : instances) {
+			namePropValue = inst.getProperty("Name").getValue();
+			if (namePropValue != null) {
+				sfSoftwareInstallation.put(String.valueOf(namePropValue), inst);
+			}
+		}
+
 		timer.stop();
-	} 
+	}
+
 	/**
 	 * 
 	 * @param firmwareTypeName
@@ -117,8 +122,8 @@ public class SfCIMService {
 	public CIMInstance getSoftwareInstallationInstance(String firmwareTypeName) throws WBEMException {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getSoftwareInstallationInstance");
 		logger.info("Solarflare::Getting Software Installation Instance for firmware type : " + firmwareTypeName);
-		
-		if(this.sfSoftwareInstallation == null){
+
+		if (this.sfSoftwareInstallation == null) {
 			getSoftwareInstallationInstance();
 		}
 		CIMInstance svc_inst = this.sfSoftwareInstallation.get(firmwareTypeName);
@@ -211,7 +216,7 @@ public class SfCIMService {
 	/**
 	 * 
 	 * @param deviceId
-	 * @param nics 
+	 * @param nics
 	 * @return Adapter Versions for given deviceId
 	 * @throws WBEMException
 	 */
@@ -223,7 +228,8 @@ public class SfCIMService {
 		if (deviceId != null && !deviceId.isEmpty()) {
 
 			// Get EthernatePort Instance
-			//CIMInstance ethernateInstance = getEthernatePortInstance(deviceId);
+			// CIMInstance ethernateInstance =
+			// getEthernatePortInstance(deviceId);
 			CIMInstance ethernateInstance = nics.get(deviceId);
 			if (ethernateInstance != null) {
 				// Get SF_ControlledBy instance through association
@@ -316,7 +322,7 @@ public class SfCIMService {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getLatestFWImageVersion");
 		String versionString = CIMConstants.DEFAULT_VERSION;
 		SfFirmware file = MetadataHelper.getMetaDataForAdapter(pluginURL, cimService, bootROMInstance, nicInstance,
-				fwType,adapter);
+				fwType, adapter);
 		if (file != null) {
 			versionString = file.getVersionString();
 		}
@@ -388,31 +394,31 @@ public class SfCIMService {
 		boolean isCompatible = false;
 		int currentType = 0;
 		int currentSubType = 0;
-		String fileName = null; 
-		
-		//Check if adapter has type and subType cached
-		if(fwType.equals(FwType.CONTROLLER)){
+		String fileName = null;
+
+		// Check if adapter has type and subType cached
+		if (fwType.equals(FwType.CONTROLLER)) {
 			currentType = adapter.getControllerType();
 			currentSubType = adapter.getControllerSubType();
-		}else if(fwType.equals(FwType.BOOTROM)){
+		} else if (fwType.equals(FwType.BOOTROM)) {
 			currentType = adapter.getBootROMType();
 			currentSubType = adapter.getBootROMSubType();
-		}else if(fwType.equals(FwType.UEFIROM)){
+		} else if (fwType.equals(FwType.UEFIROM)) {
 			currentType = adapter.getUefiROMType();
 			currentSubType = adapter.getUefiROMSubType();
 		}
-		
-		if(currentType == 0 || currentSubType == 0){
+
+		if (currentType == 0 || currentSubType == 0) {
 			logger.info("Solarflare:: CIM call to get current type and sub type");
 			Map<String, String> params = getRequiredFwImageName(fwInst, nicInstance);
 
 			currentType = Integer.parseInt(params.isEmpty() ? "0" : params.get(CIMConstants.TYPE));
 			currentSubType = Integer.parseInt(params.isEmpty() ? "0" : params.get(CIMConstants.SUB_TYPE));
 			fileName = params.get(CIMConstants.NAME);
-		}else{
+		} else {
 			logger.info("Solarflare:: Read current type and sub type from adapter object");
 		}
-		
+
 		logger.debug("Solarflare::Current firmware type : " + currentType);
 		logger.debug("Solarflare::Current firmware subtype : " + currentSubType);
 
@@ -895,4 +901,35 @@ public class SfCIMService {
 		return nics;
 	}
 
+	public Map<String, String> getNicInfo(String deviceId) {
+		Map<String, String> nicInfo = new HashMap<String, String>();
+		if (null == deviceId || deviceId.isEmpty()) {
+			logger.info("deviceId is null");
+		} else {
+			try {
+				CIMInstance nicCardInstance = getNICCardInstance(deviceId);
+				Object partNumberObj = nicCardInstance.getProperty(NicProperty.PartNumber.toString()).getValue();
+
+				if (partNumberObj != null) {
+					String partNumber = partNumberObj.toString();
+					nicInfo.put(NicProperty.PartNumber.toString(), partNumber);
+				}
+				Object serialNumberObj = nicCardInstance.getProperty(NicProperty.SerialNumber.toString()).getValue();
+				if (serialNumberObj != null) {
+					String serialNumber = serialNumberObj.toString();
+					nicInfo.put(NicProperty.SerialNumber.toString(), serialNumber);
+				}
+				Object nameObj = nicCardInstance.getProperty(NicProperty.Name.toString()).getValue();
+				if (nameObj != null) {
+					String name = nameObj.toString();
+					nicInfo.put(NicProperty.Name.toString(), name);
+				}
+
+			} catch (WBEMException e) {
+				logger.error("Error in getiing NIC Info for deviceId : " + deviceId + ", Error : " + e.getMessage());
+			}
+
+		}
+		return nicInfo;
+	}
 }

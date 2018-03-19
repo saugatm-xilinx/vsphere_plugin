@@ -25,4 +25,6 @@ public interface SfVimService {
 	public String getOptionString(String hostId) throws Exception;
 	
 	public void updateOptionString(String hostId, String value)throws Exception;
+	
+	String getDriverVersion(String hostId) throws Exception;
 }

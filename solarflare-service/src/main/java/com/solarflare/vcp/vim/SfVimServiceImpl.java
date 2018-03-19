@@ -149,6 +149,28 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 		return host;
 	}
 
+	public String getDriverVersion(String hostId) throws Exception {
+		logger.info("getDriverVersion() for hostId : " + hostId);
+		
+		List<String> props = new ArrayList<>();
+		props.add("configManager.imageConfigManager");
+
+		Connection _conn = getSession();
+
+		GetMOREF _moRefService = new GetMOREF(_conn.getVimPort(), _conn.getServiceContent());
+		ManagedObjectReference hostMoRef = getManagedObjectReference("HostSystem", hostId);
+
+		Map<String, Object> hostprops = _moRefService.entityProps(hostMoRef, props.toArray(new String[] {}));
+		// Get Version of CIM provider and Driver
+		ManagedObjectReference imageConfigManager = (ManagedObjectReference) hostprops
+				.get("configManager.imageConfigManager");
+
+		List<SoftwarePackage> softwarePackage = _conn.getVimPort().fetchSoftwarePackages(imageConfigManager);
+		
+		String driverVersion = SfVimServiceHelper.getDriverVersion(softwarePackage);
+
+		return driverVersion;
+	}
 	/**
 	 * Returns all hosts of vCenter.
 	 */
@@ -212,10 +234,10 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getHostAdapters");
 		List<String> props = new ArrayList<>();
-		props.add("configManager.imageConfigManager");
+		//props.add("configManager.imageConfigManager");
 		props.add("hardware.pciDevice");
 		props.add("config.network.pnic");
-		props.add("name");
+		//props.add("name");
 
 		Connection _conn = getSession();
 
@@ -245,10 +267,9 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 			List<String> sfDeviceIds = SfVimServiceHelper.getSfPciDeviceIds(sfDevices);
 			// Get Physical Nics
 			ArrayOfPhysicalNic arrayOfPhysicalNic = (ArrayOfPhysicalNic) hostprops.get("config.network.pnic");
-
+			
 			Map<String, PhysicalNic> sfPhysicalNics = SfVimServiceHelper
 					.getSfPhysicalNic(arrayOfPhysicalNic.getPhysicalNic(), sfDeviceIds);
-
 			Map<String, List<VMNIC>> vmNICMap = SfVimServiceHelper.mergeToVMNICObject(sfDevices, sfPhysicalNics,
 					hostId);
 			Map<String, Adapter> adapterMap = new HashMap<>();
@@ -266,6 +287,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 					adapter.setSubSystemDeviceId(Short.toString(pciDevice.getSubDeviceId()));
 					adapter.setVendorId(Short.toString(pciDevice.getVendorId()));
 					adapter.setSubSystemVendorId(Short.toString(pciDevice.getSubVendorId()));
+					//adapter.setDriverName(sfPhysicalNics.get(0).getDriver());
 					adapter.setChildren(vmNICs);
 
 					adapterMap.put(id, adapter);
@@ -283,6 +305,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 			}
 		} catch (Exception e) {
 			logger.error("Solarflare:: Error getting adapters : " + e.getMessage());
+			throw e;
 		}
 		timer.stop();
 		logger.trace("Solarflare:: returning adapters for hostId : " + hostId + " Total adapters: " + adapters.size());

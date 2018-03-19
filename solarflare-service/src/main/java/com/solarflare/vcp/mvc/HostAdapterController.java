@@ -33,6 +33,7 @@ import com.solarflare.vcp.model.CustomUpdateRequest;
 import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.HostConfiguration;
 import com.solarflare.vcp.model.TaskInfo;
+import com.solarflare.vcp.model.VMNICResponse;
 import com.solarflare.vcp.services.DummayService;
 import com.solarflare.vcp.services.HostAdapterService;
 import com.solarflare.vcp.services.TaskManager;
@@ -212,9 +213,8 @@ public class HostAdapterController {
 			throw new Exception("nicId should not be null or empty");
 		}
 		AdapterOverview adapterOverview = null;
-		DummayService service = new DummayService();
 		try {
-			adapterOverview = service.getAdapterOverview(hostId, nicId);
+			adapterOverview = hostAdapterService.getAdapterOverview(hostId, nicId);
 		} catch (Exception e) {
 			throw e;
 		}
@@ -223,20 +223,19 @@ public class HostAdapterController {
 
 	@RequestMapping(value = "/hosts/{hostId}/adapters/{nicId}/nics", method = RequestMethod.GET)
 	@ResponseBody
-	public Adapter getAdapterNics(@PathVariable String hostId, @PathVariable String nicId) throws Exception {
+	public VMNICResponse getAdapterNics(@PathVariable String hostId, @PathVariable String nicId) throws Exception {
 		if (hostId == null || hostId.isEmpty()) {
 			throw new Exception("hostId should not be null or empty");
 		} else if (nicId == null || nicId.isEmpty()) {
 			throw new Exception("nicId should not be null or empty");
 		}
-		Adapter adapterOverview = null;
-		DummayService service = new DummayService();
+		VMNICResponse nicResponse = null;
 		try {
-			adapterOverview = service.getAdapters(hostId, nicId);
+			nicResponse = hostAdapterService.getAdapterForNIC(hostId, nicId);
 		} catch (Exception e) {
 			throw e;
 		}
-		return adapterOverview;
+		return nicResponse;
 	}
 
 	@ExceptionHandler(SfNotFoundException.class)

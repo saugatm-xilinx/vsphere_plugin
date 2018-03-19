@@ -12,12 +12,10 @@ public class VMNIC
     private String deviceName;
         
     private String vendorName;
+    private String driverName;    
+
     
-
-    private String driverName;
-    private String driverVersion;
-
-    private String macAddress;
+	private String macAddress;
 
     private String status;
     private String interfaceName;
@@ -29,6 +27,15 @@ public class VMNIC
     private String pciFunction;
     private String pciBusNumber;
 
+    
+    public String getDriverName() {
+		return driverName;
+	}
+
+	public void setDriverName(String driverName) {
+		this.driverName = driverName;
+	}
+
     public String getName()
     {
         return name;
@@ -37,28 +44,6 @@ public class VMNIC
     public void setName(String name)
     {
         this.name = name;
-    }
-
-   
-    
-    public String getDriverName()
-    {
-        return driverName;
-    }
-
-    public void setDriverName(String driverName)
-    {
-        this.driverName = driverName;
-    }
-
-    public String getDriverVersion()
-    {
-        return driverVersion;
-    }
-
-    public void setDriverVersion(String driverVersion)
-    {
-        this.driverVersion = driverVersion;
     }
 
     public String getMacAddress()
@@ -196,12 +181,13 @@ public class VMNIC
 	@Override
 	public String toString() {
 		return "VMNIC [type=" + type + ", id=" + id + ", name=" + name + ", deviceName=" + deviceName + ", vendorName="
-				+ vendorName + ", driverName=" + driverName + ", driverVersion=" + driverVersion + ", macAddress="
-				+ macAddress + ", status=" + status + ", interfaceName=" + interfaceName + ", portSpeed=" + portSpeed
-				+ ", currentMTU=" + currentMTU + ", maxMTU=" + maxMTU + ", pciId=" + pciId + ", pciFunction="
-				+ pciFunction + ", pciBusNumber=" + pciBusNumber + "]";
+				+ vendorName + ", driverName=" + driverName + ", macAddress=" + macAddress + ", status=" + status
+				+ ", interfaceName=" + interfaceName + ", portSpeed=" + portSpeed + ", currentMTU=" + currentMTU
+				+ ", maxMTU=" + maxMTU + ", pciId=" + pciId + ", pciFunction=" + pciFunction + ", pciBusNumber="
+				+ pciBusNumber + "]";
 	}
-    
-    
+
+	
+
 
 }

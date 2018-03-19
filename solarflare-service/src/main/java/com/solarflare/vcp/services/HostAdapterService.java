@@ -7,6 +7,7 @@ import com.solarflare.vcp.model.AdapterOverview;
 import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.HostConfiguration;
 import com.solarflare.vcp.model.NicBootParamInfo;
+import com.solarflare.vcp.model.VMNICResponse;
 
 public interface HostAdapterService {
 
@@ -78,6 +79,6 @@ public interface HostAdapterService {
 	
 	AdapterOverview getAdapterOverview(String hostId, String nicId) throws Exception;
 	
-	Adapter getAdapters(String hostId, String nicId) throws Exception ;
+	VMNICResponse getAdapterForNIC(String hostId, String nicId) throws Exception ;
 
 }

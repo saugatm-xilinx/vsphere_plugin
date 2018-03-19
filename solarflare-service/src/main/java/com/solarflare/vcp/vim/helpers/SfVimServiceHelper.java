@@ -15,6 +15,7 @@ import com.solarflare.vcp.model.Adapter;
 import com.solarflare.vcp.model.VMNIC;
 import com.vmware.vim25.HostPciDevice;
 import com.vmware.vim25.PhysicalNic;
+import com.vmware.vim25.PhysicalNicLinkInfo;
 import com.vmware.vim25.SoftwarePackage;
 
 public class SfVimServiceHelper {
@@ -146,7 +147,19 @@ public class SfVimServiceHelper {
 				vmNIC.setPciId(pciDevice.getId());
 				vmNIC.setPciFunction(Byte.toString(pciDevice.getFunction()));
 				vmNIC.setPciBusNumber(Byte.toString(pciDevice.getBus()));
+				vmNIC.setInterfaceName(pNIC.getDevice());
+				vmNIC.setDriverName(pNIC.getDriver());
+				
+				PhysicalNicLinkInfo linkSpeed = pNIC.getLinkSpeed();
+				String linkStatus = "Down";
+				int portSpeed = 0;
+				if(linkSpeed != null){
+					linkStatus = "Up";
+					portSpeed = linkSpeed.getSpeedMb();
+				}
 
+				vmNIC.setStatus(linkStatus);
+				vmNIC.setPortSpeed(portSpeed+"");
 				List<VMNIC> vmNICList = vmNICmap.get(id);
 				if (vmNICList == null) {
 					vmNICList = new ArrayList<>();
@@ -155,7 +168,7 @@ public class SfVimServiceHelper {
 				vmNICmap.put(id, vmNICList);
 			}
 		}
-		logger.trace("Solarflare:: mergeToVMNICObject retuned vmNICmap.size: "+vmNICmap.size());
+		logger.info("Solarflare:: mergeToVMNICObject retuned vmNICmap.size: "+vmNICmap.size());
 		return vmNICmap;
 	}
 
