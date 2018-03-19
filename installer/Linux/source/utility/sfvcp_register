@@ -5,14 +5,15 @@ if [[ $(id -u) -ne 0 ]] ; then echo "Please run as root" ; exit 1 ; fi
 
 function usage()
 {
-    echo "Please run this command using an argument: --ip <IP_ADDRESS>"
-    echo "e.g. sf_vcp_register --ip 192.145.1.3"
+    echo "Please run this command using an argument: --ip <this-machine-ip-address>"
+    echo "e.g. sfvcp_register --ip 192.145.1.3"
 }
 
 if [[ $# -eq 0 ]]; then usage ; exit 1; fi
 
 PARAM=`echo $1`
 VALUE=`echo $2`
+valid=0
 
 case $PARAM in
     -h | --help)
@@ -35,7 +36,37 @@ if [[ "$IP_ADDRESS" == "" ]]; then
    exit 1
 fi
 
-sed -i -e "s/pluginHost=.*/pluginHost=$IP_ADDRESS/" /var/lib/tomcat/webapps/plugin-registration/WEB-INF/registerPlugin.properties
+ping $IP_ADDRESS -c 1 -i 0.1 -w 1 > /dev/null 2>&1
+
+if [ $? -ge 1 ]; then
+  echo "IP seems to be not reachable. Try again"
+  exit 1
+fi
+
+for i in $(ip a | grep \inet\\s | cut -d '/' -f 1 | awk '{print $2}'); do
+	if [ "$IP_ADDRESS" == "$i" ]; then
+  		valid=1
+	fi
+done
+
+if [ $valid -ne 1 ]; then
+  echo "IP seems to be invalid. Please check and try again"
+  exit 1
+fi
+
+unset CATALINA_HOME CATALINA_BASE JAVA_HOME JRE_HOME
+export JRE_HOME=/opt/solarflare/jre
+
+/opt/solarflare/tomcat/bin/startup.sh > /dev/null 2>&1
+
+if [ $? -ne 0 ]; then
+  echo "Oops! Could not start Tomcat. Check if you have a WebServer running on port 80 and disable it "
+  exit 1
+fi
+
+sleep 3
+
+sed -i -e "s/pluginHost=.*/pluginHost=$IP_ADDRESS/" /opt/solarflare/tomcat/webapps/plugin-registration/WEB-INF/registerPlugin.properties > /dev/null 2>&1
 
 if [ $? -ne 0 ]; then
   echo "Oops! Please contact your administrator "
@@ -43,7 +74,5 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Please visit http://$IP_ADDRESS/plugin-registration/registration.html to register the plugin"
-
-systemctl restart tomcat
 
 exit 0

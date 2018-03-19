@@ -21,4 +21,8 @@ public interface SfVimService {
 	Connection getSession();
 
 	String getPluginURL(String pluginKey) throws Exception;
+	
+	public String getOptionString(String hostId) throws Exception;
+	
+	public void updateOptionString(String hostId, String value)throws Exception;
 }

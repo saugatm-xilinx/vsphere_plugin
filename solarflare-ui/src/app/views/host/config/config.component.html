@@ -216,23 +216,23 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group row" style="min-height: 30px; ">
+                    <div class="form-group row" style="min-height: 30px; color: #b5b3b3; ">
                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
                             <div class="checkbox-inline debugMask">
                                 GENEVE Offload
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                            <div class="checkbox-inline debugMask disabled">
+                            <div class="checkbox-inline debugMask">
                                 <div class="radio">
-                                    <input type="radio" formControlName="geneveOffloadEnable"
+                                    <input type="radio" formControlName="geneveOffloadEnable" 
                                            name="geneveOffloadEnable" [value]="true" id="geneveOffloadEnable">
-                                    <label for="geneveOffloadEnable">Enable</label>
+                                    <label for="geneveOffloadEnable" style="cursor: not-allowed;">Enable</label>
                                 </div>
                                 <div class="radio">
                                     <input type="radio" formControlName="geneveOffloadEnable"
                                            name="geneveOffloadEnable" [value]="false" id="geneveOffloadDisable">
-                                    <label for="geneveOffloadDisable">Disable</label>
+                                    <label for="geneveOffloadDisable" style="cursor: not-allowed;">Disable</label>
                                 </div>
                             </div>
                         </div>
@@ -242,11 +242,11 @@
             <section class="form-block">
                 <div style="display: flex; justify-content: space-between; width: 70%;margin: 0 auto;">
                     <button class="btn btn-outline-primary"
-                            type="button" [disabled]="submitted" (click)="restoreConfig()" >Restore
+                            type="button" [disabled]="submitted || !hostConfig.dirty" (click)="restoreConfig()" >Restore
                     </button>
-<!--                    <button class="btn btn-outline-secondary"
+                    <button class="btn btn-outline-secondary" style="display:none"
                             type="button" [disabled]="submitted" (click)="defaultConfig()" >Defaults
-                    </button>-->
+                    </button>
                     <button class="btn btn-primary"
                             type="submit"
                             [disabled]="submitted || (!hostConfig.dirty || hostConfig.invalid)" >Apply

@@ -1,7 +1,7 @@
-import {Component, OnInit} from '@angular/core';
-import { ActivatedRoute, Params} from '@angular/router';
-import {GlobalsService} from "../../../shared/globals.service";
-import {HostsService} from "../../../services/hosts.service";
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
+import { GlobalsService } from "../../../shared/globals.service";
+import { HostsService } from "../../../services/hosts.service";
 
 @Component({
     selector: 'app-overview',
@@ -15,8 +15,9 @@ export class OverviewComponent implements OnInit {
     public getOverviewErr = false;
 
     constructor(private activatedRoute: ActivatedRoute,
-                public gs: GlobalsService,
-                private hs: HostsService) {
+        public gs: GlobalsService,
+        private hs: HostsService,
+    ) {
 
         this.activatedRoute.parent.params.subscribe((params: Params) => {
             this.params = params;
@@ -24,6 +25,7 @@ export class OverviewComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.hostDetail = this.hs.getHost(this.params['id']);
         this.getHostDetail();
     }
 
@@ -33,6 +35,7 @@ export class OverviewComponent implements OnInit {
             .subscribe(
                 data => {
                     this.hostDetail = data
+                    this.hs.updateHostDetail(data);
                 },
                 err => {
                     console.error(err);

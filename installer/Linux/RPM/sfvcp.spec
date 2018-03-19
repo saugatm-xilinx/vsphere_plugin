@@ -13,17 +13,17 @@
 # ----------------------------------------------------------------------------
 #
 Name:    sfvcp
-Summary: RPM for Solarflare VCP
+Summary: Solarflare vCenter Plugin
 Version: SOFTWARE_VERSION_TEMPLATE
 Release: RELEASE_VERSION_TEMPLATE
 Group:   Applications/System
 License: Apache
 Source0: %{name}-%{version}-%{release}.tar.gz
 BuildRoot:  %_tmppath/%{name}
-Requires: tomcat
 Provides: %{name}
+AutoReqProv: no
 %description
-Solarflare VCP Registration plugin
+Solarflare VCP Registration installer
 # ----------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------
@@ -43,71 +43,44 @@ cd  %{_builddir}
 mkdir -p %{buildroot}
 cp -R vcp/* %{buildroot}
 # ----------------------------------------------------------------------------
-
-
 # ----------------------------------------------------------------------------
 # Pre Install Section : Prepare host for sfvcp installation
 # ----------------------------------------------------------------------------
 #
 %pre
 # ----------------------------------------------------------------------------
-# Identify init type
-# ----------------------------------------------------------------------------
-#
-init_type=$(cat -e /sbin/init | grep -waoe 'upstart\|sysvinit\|systemd' | head -n1)
-# ----------------------------------------------------------------------------
-case "$init_type" in
-        upstart)
-        ;;
-
-        systemd)
-        systemctl stop tomcat
-        ;;
-
-        sysvinit)
-        ;;
-
-        *)
-        echo "Unsupported init sytem: $init_type"
-esac
-# ----------------------------------------------------------------------------
-
-# ----------------------------------------------------------------------------
 # Firewall changes
 # ----------------------------------------------------------------------------
 #
-firewall-cmd --permanent --add-port=8080/tcp > /dev/null 2>&1
+if ! type "firewall-cmd" > /dev/null 2>&1; then
+iptables -I OUTPUT -p tcp --sport 80 -j ACCEPT
+iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+iptables -I OUTPUT -p tcp --sport 8443 -j ACCEPT
+iptables -I INPUT -p tcp --dport 8443 -j ACCEPT
+/sbin/iptables-save | awk '!x[$0]++' > /tmp/iptables.conf
+/sbin/iptables -F
+/sbin/iptables-restore < /tmp/iptables.conf
+/sbin/iptables-save > /etc/sysconfig/iptables
+/sbin/service iptables restart > /dev/null 2>&1
+if [ -f /tmp/iptables.conf ] ; then /bin/rm -f /tmp/iptables.conf ; fi
+else
+firewall-cmd --permanent --add-port=80/tcp > /dev/null 2>&1
+firewall-cmd --permanent --add-port=8443/tcp > /dev/null 2>&1
 firewall-cmd --reload > /dev/null 2>&1
-/sbin/iptables -t nat -I PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080 > /dev/null 2>&1
-
+fi
 # ----------------------------------------------------------------------------
-
-
+unset CATALINA_HOME CATALINA_BASE JAVA_HOME JRE_HOME
 # ----------------------------------------------------------------------------
 # Post Install Section : Start sfvcp-tomcat to finalize installation
 # ----------------------------------------------------------------------------
 #
 %post
 # ----------------------------------------------------------------------------
-# Identify init type
+# Load JRE env vars
 # ----------------------------------------------------------------------------
 #
-init_type=$(cat -e /sbin/init | grep -waoe 'upstart\|sysvinit\|systemd' | head -n1)
-# ----------------------------------------------------------------------------
-case "$init_type" in
-        upstart)
-        ;;
-
-        systemd)
-        systemctl start tomcat
-        ;;
-
-        sysvinit)
-        ;;
-
-        *)
-        echo "Unsupported init sytem: $init_type"
-esac
+unset CATALINA_HOME CATALINA_BASE JAVA_HOME JRE_HOME
+export JRE_HOME=/opt/solarflare/jre
 # ----------------------------------------------------------------------------
 if [ -d "/usr/local/bin/sfvcp_register" ]; then
   # ----------------------------------------------------------------------------
@@ -116,90 +89,60 @@ if [ -d "/usr/local/bin/sfvcp_register" ]; then
   #
     rm /usr/local/bin/sfvcp_register
 fi
-
-ln -s /usr/bin/sfvcp_register /usr/local/bin
-
+ln -s /usr/bin/sfvcp_register /usr/local/bin > /dev/null 2>&1
+chmod a+x /opt/solarflare/tomcat/bin/startup.sh /opt/solarflare/tomcat/bin/shutdown.sh
+chmod a+x /opt/solarflare/tomcat/bin/catalina.sh
+chmod a+x /usr/bin/sfvcp_register /usr/local/bin/sfvcp_register
+# ----------------------------------------------------------------------------
+# Start Tomcat
+# ----------------------------------------------------------------------------
+#
+# /opt/solarflare/tomcat/bin/startup.sh > /dev/null 2>&1
+# ----------------------------------------------------------------------------
+# Exit Message
+# ----------------------------------------------------------------------------
+#
 echo
-echo 'Run "sudo sfvcp_register --ip <machine-ip-address>" to start plugin registration process'
+echo 'Run "sudo sfvcp_register --ip <this-machine-ip-address>" to start plugin registration process'
 echo
-
 # ----------------------------------------------------------------------------
 # Pre Un-Install Section : Prepare to remove sfvcp
 # ----------------------------------------------------------------------------
 #
 %preun
-# ----------------------------------------------------------------------------
-# Identify init type
-# ----------------------------------------------------------------------------
-#
-init_type=$(cat -e /sbin/init | grep -waoe 'upstart\|sysvinit\|systemd' | head -n1)
-# ----------------------------------------------------------------------------
-case "$init_type" in
-        upstart)
-        ;;
-
-        systemd)
-        systemctl stop tomcat
-        ;;
-
-        sysvinit)
-        ;;
-
-        *)
-        echo "Unsupported init sytem: $init_type"
-esac
+unset CATALINA_HOME CATALINA_BASE JAVA_HOME JRE_HOME
+export JRE_HOME=/opt/solarflare/jre
 # ----------------------------------------------------------------------------
 if [ -d "/usr/local/bin/sfvcp_register" ]; then
   # ----------------------------------------------------------------------------
-  # Remove existing file. If exists
+  # Remove file. If exists
   # ----------------------------------------------------------------------------
   #
     rm /usr/local/bin/sfvcp_register
 fi
 # ----------------------------------------------------------------------------
-
-
+# ----------------------------------------------------------------------------
+# Stop Tomcat
+# ----------------------------------------------------------------------------
+#
+/opt/solarflare/tomcat/bin/shutdown.sh > /dev/null 2>&1
 # ----------------------------------------------------------------------------
 # Post Un-Install Section : Finalize removeal of sfvcp
 # ----------------------------------------------------------------------------
 #
 %postun
+rm -rf /opt/solarflare
 # ----------------------------------------------------------------------------
-# Identify init type
-# ----------------------------------------------------------------------------
-#
-init_type=$(cat -e /sbin/init | grep -waoe 'upstart\|sysvinit\|systemd' | head -n1)
-# ----------------------------------------------------------------------------
-rm -rf /var/lib/tomcat/webapps/plugin-registration
-
-case "$init_type" in
-        upstart)
-        ;;
-
-        systemd)
-        systemctl start tomcat
-        ;;
-
-        sysvinit)
-        ;;
-
-        *)
-        echo "Unsupported init sytem: $init_type"
-esac
-# ----------------------------------------------------------------------------
-
-# ----------------------------------------------------------------------------
-
 # ----------------------------------------------------------------------------
 # Install Section : Copy all files required for vcp (controlled by rpmdb)
 # config(noreplace) -> Will do a .rpmsave if conf files were changed
 # ----------------------------------------------------------------------------
 #
 %files
-/var/lib/tomcat/webapps/*
+/opt/solarflare/jre/*
+/opt/solarflare/tomcat/*
 /usr/bin/sfvcp_register
 # ----------------------------------------------------------------------------
-
 # ----------------------------------------------------------------------------
 # Cleanup after building RPM
 # ----------------------------------------------------------------------------
@@ -207,12 +150,23 @@ esac
 %clean
 rm -rf $buildroot
 # ----------------------------------------------------------------------------
-
 # ----------------------------------------------------------------------------
 # Changelog
 # ----------------------------------------------------------------------------
 #
 %changelog
+
+* Fri Mar 09 2018 Ashish Koushik <ashish.koushik@msystechnologies.com>
+- 2-1
+- Bug Fixes - Release
+
+* Wed Mar 07 2018 Ashish Koushik <ashish.koushik@msystechnologies.com>
+- 1.98-0.4
+- Reform installation procedure
+
+* Tue Mar 06 2018 Ashish Koushik <ashish.koushik@msystechnologies.com>
+- 1.98-0.3
+- Pre-package Tomcat and JRE
 
 * Fri Jan 12 2018 Ashish Koushik <ashish.koushik@msystechnologies.com>
 - 1.97-0.1

@@ -52,7 +52,7 @@ fi
 #   Create and establish required directory structure for building RPM.
 # ----------------------------------------------------------------------------
 #
-mkdir -p $current_dir/RPM/src/vcp/var/lib/tomcat/webapps
+mkdir -p $current_dir/RPM/src/vcp/opt/solarflare/{tomcat,jre}
 mkdir -p $current_dir/RPM/src/vcp/usr/bin
 # ----------------------------------------------------------------------------
 
@@ -69,7 +69,13 @@ mkdir -p $current_dir/build/logs
 #   Copy all required files from parent-source to src directories for building.
 # ----------------------------------------------------------------------------
 #
-echo $current_dir/RPM/src/vcp/var/lib/tomcat/webapps \
+echo $current_dir/RPM/src/vcp/opt/solarflare/jre \
+     | xargs -n 1 cp -R source/jre/*
+
+echo $current_dir/RPM/src/vcp/opt/solarflare/tomcat \
+     | xargs -n 1 cp -R source/tomcat/*
+
+echo $current_dir/RPM/src/vcp/opt/solarflare/tomcat/webapps \
      | xargs -n 1 cp -R source/vcp/*
 
 echo $current_dir/RPM/src/vcp/usr/bin \

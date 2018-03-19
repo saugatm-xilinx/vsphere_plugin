@@ -30,6 +30,7 @@ import com.vmware.vim25.HostServiceTicket;
 import com.vmware.vim25.HostSystemConnectionState;
 import com.vmware.vim25.InvalidPropertyFaultMsg;
 import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.NotFoundFaultMsg;
 import com.vmware.vim25.PhysicalNic;
 import com.vmware.vim25.RuntimeFaultFaultMsg;
 import com.vmware.vim25.SoftwarePackage;
@@ -41,6 +42,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 	private static final Log logger = LogFactory.getLog(SfVimServiceImpl.class);
 	private static final String LOG_KEY = "Solarflare:: ";
 	private static final String CIM_SCHEME = "https://";
+	private static final String SOLARFLARE_MODULE_NAME = "sfvmk";
 	private String extensionURL;
 	private Connection connection;
 	private UserSessionService userSessionService;
@@ -131,7 +133,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 
 		List<Adapter> adapters = getAdapters(hostprops, hostId);
 		host.setAdapterCount(adapters.size());
-
+		host.setChildren(adapters);
 		host.setPortCount(SfVimServiceHelper.getPortCount(adapters));
 
 		// Get Version of CIM provider and Driver
@@ -156,8 +158,6 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 		List<Host> hostList = new ArrayList<>();
 
 		List<String> props = new ArrayList<>();
-		props.add("hardware.pciDevice");
-		props.add("config.network.pnic");
 		props.add("name");
 		props.add("runtime.connectionState");
 
@@ -181,8 +181,6 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 					// Get name
 					String name = (String) hostprops.get("name");
 					host.setName(name);
-					List<Adapter> adapters = getAdapters(hostprops, hostMoRef.getValue());
-					host.setChildren(adapters);
 					logger.debug("Adding '" + name + "' host to hostList");
 					hostList.add(host);
 				} else {
@@ -192,9 +190,11 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 			}
 		} catch (InvalidPropertyFaultMsg | RuntimeFaultFaultMsg e) {
 			// TODO Auto-generated catch block
+			logger.error("Solarflare:: Error getting All hosts : " +e.getMessage());
 			throw e;
 		}
 		timer.stop();
+		logger.trace("Solarflare::Get - getAllHosts returned total hosts: "+hostList.size());
 		return hostList;
 
 	}
@@ -234,51 +234,58 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 	private List<Adapter> getAdapters(Map<String, Object> hostprops, String hostId) {
 
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getAdapters");
+		logger.info("Solarflare:: Get adapters for hostId : " + hostId);
 		List<Adapter> adapters = new ArrayList<>();
+		try {
 
-		// Get PCI devices (key for this is hardware.pciDevice and return
-		// type is ArrayOfHostPciDevice)
-		ArrayOfHostPciDevice arrayOfHostPciDevice = (ArrayOfHostPciDevice) hostprops.get("hardware.pciDevice");
-		List<HostPciDevice> sfDevices = SfVimServiceHelper.getSfPciDevice(arrayOfHostPciDevice.getHostPciDevice());
-		List<String> sfDeviceIds = SfVimServiceHelper.getSfPciDeviceIds(sfDevices);
-		// Get Physical Nics
-		ArrayOfPhysicalNic arrayOfPhysicalNic = (ArrayOfPhysicalNic) hostprops.get("config.network.pnic");
+			// Get PCI devices (key for this is hardware.pciDevice and return
+			// type is ArrayOfHostPciDevice)
+			ArrayOfHostPciDevice arrayOfHostPciDevice = (ArrayOfHostPciDevice) hostprops.get("hardware.pciDevice");
+			List<HostPciDevice> sfDevices = SfVimServiceHelper.getSfPciDevice(arrayOfHostPciDevice.getHostPciDevice());
+			List<String> sfDeviceIds = SfVimServiceHelper.getSfPciDeviceIds(sfDevices);
+			// Get Physical Nics
+			ArrayOfPhysicalNic arrayOfPhysicalNic = (ArrayOfPhysicalNic) hostprops.get("config.network.pnic");
 
-		Map<String, PhysicalNic> sfPhysicalNics = SfVimServiceHelper
-				.getSfPhysicalNic(arrayOfPhysicalNic.getPhysicalNic(), sfDeviceIds);
+			Map<String, PhysicalNic> sfPhysicalNics = SfVimServiceHelper
+					.getSfPhysicalNic(arrayOfPhysicalNic.getPhysicalNic(), sfDeviceIds);
 
-		Map<String, List<VMNIC>> vmNICMap = SfVimServiceHelper.mergeToVMNICObject(sfDevices, sfPhysicalNics, hostId);
-		Map<String, Adapter> adapterMap = new HashMap<>();
-		for (HostPciDevice pciDevice : sfDevices) {
-			String id = SfVimServiceHelper.getAdapterId(hostId, pciDevice.getId());
-			List<VMNIC> vmNICs = vmNICMap.get(id);
-			if (vmNICs != null) {
-				Adapter adapter = adapterMap.get(id);
-				if (adapter == null) {
-					adapter = new Adapter();
+			Map<String, List<VMNIC>> vmNICMap = SfVimServiceHelper.mergeToVMNICObject(sfDevices, sfPhysicalNics,
+					hostId);
+			Map<String, Adapter> adapterMap = new HashMap<>();
+			for (HostPciDevice pciDevice : sfDevices) {
+				String id = SfVimServiceHelper.getAdapterId(hostId, pciDevice.getId());
+				List<VMNIC> vmNICs = vmNICMap.get(id);
+				if (vmNICs != null) {
+					Adapter adapter = adapterMap.get(id);
+					if (adapter == null) {
+						adapter = new Adapter();
+					}
+					adapter.setName(pciDevice.getDeviceName());
+					adapter.setId(id);
+					adapter.setDeviceId(Short.toString(pciDevice.getDeviceId()));
+					adapter.setSubSystemDeviceId(Short.toString(pciDevice.getSubDeviceId()));
+					adapter.setVendorId(Short.toString(pciDevice.getVendorId()));
+					adapter.setSubSystemVendorId(Short.toString(pciDevice.getSubVendorId()));
+					adapter.setChildren(vmNICs);
+
+					adapterMap.put(id, adapter);
 				}
-				adapter.setName(pciDevice.getDeviceName());
-				adapter.setId(id);
-				adapter.setDeviceId(Short.toString(pciDevice.getDeviceId()));
-				adapter.setSubSystemDeviceId(Short.toString(pciDevice.getSubDeviceId()));
-				adapter.setVendorId(Short.toString(pciDevice.getVendorId()));
-				adapter.setSubSystemVendorId(Short.toString(pciDevice.getSubVendorId()));
-				adapter.setChildren(vmNICs);
-
-				adapterMap.put(id, adapter);
 			}
-		}
-		// Set adapter name including device name and mac address
-		for (Adapter adapter : adapterMap.values()) {
-			String minMacAddress = SfVimServiceHelper.getMinMacAddress(adapter.getChildren());
-			// VSPPLUG-154 - Using "Part Number" Field for adapter name
-			String deviceId = adapter.getChildren().get(0).getName();
-			String partNumber = getPartNumber(hostId, deviceId);
-			String adapterName = partNumber + "-" + minMacAddress;
-			adapter.setName(adapterName);
-			adapters.add(adapter);
+			// Set adapter name including device name and mac address
+			for (Adapter adapter : adapterMap.values()) {
+				String minMacAddress = SfVimServiceHelper.getMinMacAddress(adapter.getChildren());
+				// VSPPLUG-154 - Using "Part Number" Field for adapter name
+				String deviceId = adapter.getChildren().get(0).getName();
+				String partNumber = getPartNumber(hostId, deviceId);
+				String adapterName = partNumber + "-" + minMacAddress;
+				adapter.setName(adapterName);
+				adapters.add(adapter);
+			}
+		} catch (Exception e) {
+			logger.error("Solarflare:: Error getting adapters : " + e.getMessage());
 		}
 		timer.stop();
+		logger.trace("Solarflare:: returning adapters for hostId : " + hostId + " Total adapters: " + adapters.size());
 		return adapters;
 	}
 
@@ -290,7 +297,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 			SfCIMService cimService = new SfCIMService(new SfCIMClientService(cimHost));
 			partNumber = cimService.getPartNumber(deviceId);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			logger.error("Solarflare:: Error gettinng part number for hostId - " + hostId + " deviceId - "+deviceId);
 			e.printStackTrace();
 		}
 
@@ -370,6 +377,52 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 		} catch (Exception e) {
 			logger.error(LOG_KEY, e);
 		}
+	}
+
+	public ManagedObjectReference getHostKernelModuleSystem(String hostId) throws Exception {
+		logger.info("getHostKernelModuleSystem hostId : " + hostId);
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: getHostKernelModuleSystem");
+		List<String> props = new ArrayList<>();
+		props.add("configManager.kernelModuleSystem");
+
+		Connection _conn = getSession();
+
+		GetMOREF _moRefService = new GetMOREF(_conn.getVimPort(), _conn.getServiceContent());
+
+		ManagedObjectReference hostMoRef = getManagedObjectReference("HostSystem", hostId);
+
+		Map<String, Object> hostprops = _moRefService.entityProps(hostMoRef, props.toArray(new String[] {}));
+
+		ManagedObjectReference kernelModuleSystem = (ManagedObjectReference) hostprops
+				.get("configManager.kernelModuleSystem");
+		timer.stop();
+		return kernelModuleSystem;
+	}
+
+	/**
+	 * Returns Options string value for given host id
+	 */
+	public String getOptionString(String hostId) throws Exception {
+		logger.info("getOptionString for hostId : " + hostId);
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: getOptionString");
+		Connection _conn = getSession();
+		ManagedObjectReference kernelModuleSystem = getHostKernelModuleSystem(hostId);
+		String optionString = _conn.getVimPort().queryConfiguredModuleOptionString(kernelModuleSystem,
+				SOLARFLARE_MODULE_NAME);
+		timer.stop();
+		return optionString;
+	}
+
+	/**
+	 * Updates the option string for given host id
+	 */
+	public void updateOptionString(String hostId, String value) throws Exception {
+		logger.info("updateOptionString for hostId : " + hostId + " optionString : " + value);
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: updateOptionString");
+		Connection _conn = getSession();
+		ManagedObjectReference kernelModuleSystem = getHostKernelModuleSystem(hostId);
+		_conn.getVimPort().updateModuleOptionString(kernelModuleSystem, SOLARFLARE_MODULE_NAME, value);
+		timer.stop();
 	}
 
 }

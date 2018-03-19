@@ -6,6 +6,7 @@ import { Nic } from '../views/nic/nic.model';
 @Injectable()
 export class NicService {
 
+    private rootUrl = 'https://10.101.10.8';
     private nics: Nic[];
     private urlParts = { hostId: '', nicId: '' };
     private readonly baseUrl = this.globalSvc.getWebContextPath() + '/rest/services/hosts/';
@@ -17,9 +18,8 @@ export class NicService {
         this.urlParts = { hostId, nicId };
     }
 
-    setNicDetails(res) {
-        if (res) {
-            const data = res.json();
+    setNicDetails(data) {
+        if (data) {
             this.buildNics(data);
         }
     }
@@ -90,7 +90,7 @@ export class NicService {
         if (this.globalSvc.isPluginMode()) {
             url = this.baseUrl + this.urlParts.hostId + '/adapters/' + this.urlParts.nicId + '/nics';
         } else {
-            url = 'https://10.101.10.8/ui/solarflare/rest/services/hosts/' +
+            url = this.rootUrl + '/ui/solarflare/rest/services/hosts/' +
                 this.urlParts.hostId + '/adapters/' + this.urlParts.nicId + '/nics';
         }
         return this.http.get(url)
@@ -104,7 +104,7 @@ export class NicService {
         if (this.globalSvc.isPluginMode()) {
             url = this.baseUrl + this.urlParts.hostId + '/adapters/' + this.urlParts.nicId + '/statistics';
         } else {
-            url = 'https://10.101.10.8/ui/solarflare/rest/services/hosts/' +
+            url = this.rootUrl + '/ui/solarflare/rest/services/hosts/' +
                 this.urlParts.hostId + '/adapters/' + this.urlParts.nicId + '/statistics';
         }
         return this.http.get(url)

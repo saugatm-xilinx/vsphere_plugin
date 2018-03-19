@@ -27,6 +27,7 @@ import com.solarflare.vcp.exception.SfInvalidLoginException;
 import com.solarflare.vcp.exception.SfInvalidRequestException;
 import com.solarflare.vcp.exception.SfNotFoundException;
 import com.solarflare.vcp.model.Adapter;
+import com.solarflare.vcp.model.AdapterNicStatistics;
 import com.solarflare.vcp.model.AdapterOverview;
 import com.solarflare.vcp.model.CustomUpdateRequest;
 import com.solarflare.vcp.model.Host;
@@ -89,7 +90,8 @@ public class HostAdapterController {
 
 	@RequestMapping(value = "/hosts/{hostId}/adapters/latest", method = RequestMethod.POST)
 	@ResponseBody
-	public String updateFirmwareToLatest(@RequestBody String adapterList, @PathVariable String hostId) throws Exception {
+	public String updateFirmwareToLatest(@RequestBody String adapterList, @PathVariable String hostId)
+			throws Exception {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Update - updateFirmwareToLatest");
 		if (adapterList == null || adapterList.isEmpty()) {
 			throw new SfInvalidRequestException("Adapter is not selected to update.");
@@ -157,7 +159,8 @@ public class HostAdapterController {
 		Gson gson = new Gson();
 		CustomUpdateRequest customUpdateRequest = gson.fromJson(adapters, CustomUpdateRequest.class);
 		String data = customUpdateRequest.getBase64Data();
-		String taskId = hostAdapterService.customUpdateFirmwareFromLocal(customUpdateRequest.getAdapters(), hostId, data);
+		String taskId = hostAdapterService.customUpdateFirmwareFromLocal(customUpdateRequest.getAdapters(), hostId,
+				data);
 		String response = createTaskRequestId(taskId);
 		logger.debug("Solarflare:: updateCustomWithBinary response: " + response);
 		timer.stop();
@@ -171,10 +174,7 @@ public class HostAdapterController {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: getConfiguration");
 		logger.info("Start configuring host, hostId:" + hostId);
 		HostConfiguration hostConfigurations = null;
-		DummayService service = new DummayService();
-		// hostConfigurations =
-		// hostAdapterService.getHostConfigurations(hostId);
-		hostConfigurations = service.getHostConfigurations(hostId);
+		hostConfigurations = hostAdapterService.getHostConfigurations(hostId);
 		timer.stop();
 		return hostConfigurations;
 
@@ -183,69 +183,62 @@ public class HostAdapterController {
 	// Get configuration
 	@RequestMapping(value = "/hosts/{hostId}/configuration", method = RequestMethod.POST)
 	@ResponseBody
-	public void updateConfiguration(@RequestBody String hostConfiguration, @PathVariable String hostId) throws Exception {
+	public void updateConfiguration(@RequestBody String hostConfiguration, @PathVariable String hostId)
+			throws Exception {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: updateConfiguration");
+		logger.info("Solarflare:: updateConfiguration");
 		if (hostId == null || hostId.isEmpty()) {
+			logger.error("hostId is null");
 			throw new Exception("hostId should not be is null or empty");
 		}
 		if (hostConfiguration == null || hostConfiguration.isEmpty()) {
+			logger.error("Host configuration is null");
 			throw new Exception("Host configuration should not be is null or empty");
 		}
 		Gson gson = new Gson();
 		HostConfiguration hostConfigurationRequest = gson.fromJson(hostConfiguration, HostConfiguration.class);
-		DummayService service = new DummayService();
-		service.updateHostConfigurations(hostConfigurationRequest);
+		hostAdapterService.updateHostConfigurations(hostId,hostConfigurationRequest);
 		timer.stop();
 	}
+
 	// Get Adapter Overview
-	@RequestMapping(value= "/hosts/{hostId}/adapters/{nicId}/overview", method = RequestMethod.GET)
+	@RequestMapping(value = "/hosts/{hostId}/adapters/{nicId}/overview", method = RequestMethod.GET)
 	@ResponseBody
-	public AdapterOverview getAdapterOverview(@PathVariable String hostId, @PathVariable String nicId) throws Exception
-	{
-		if(hostId == null || hostId.isEmpty())
-		{
+	public AdapterOverview getAdapterOverview(@PathVariable String hostId, @PathVariable String nicId)
+			throws Exception {
+		if (hostId == null || hostId.isEmpty()) {
 			throw new Exception("hostId should not be null or empty");
-		}
-		else if(nicId == null ||nicId.isEmpty())
-		{
+		} else if (nicId == null || nicId.isEmpty()) {
 			throw new Exception("nicId should not be null or empty");
 		}
 		AdapterOverview adapterOverview = null;
 		DummayService service = new DummayService();
-		try
-		{
-			adapterOverview= service.getAdapterOverview(hostId, nicId);
-		}
-		catch(Exception e)
-		{
+		try {
+			adapterOverview = service.getAdapterOverview(hostId, nicId);
+		} catch (Exception e) {
 			throw e;
 		}
 		return adapterOverview;
 	}
-	@RequestMapping(value= "/hosts/{hostId}/adapters/{nicId}/nics", method = RequestMethod.GET)
+
+	@RequestMapping(value = "/hosts/{hostId}/adapters/{nicId}/nics", method = RequestMethod.GET)
 	@ResponseBody
-	public Adapter getAdapterNics(@PathVariable String hostId, @PathVariable String nicId) throws Exception
-	{
-		if(hostId == null || hostId.isEmpty())
-		{
+	public Adapter getAdapterNics(@PathVariable String hostId, @PathVariable String nicId) throws Exception {
+		if (hostId == null || hostId.isEmpty()) {
 			throw new Exception("hostId should not be null or empty");
-		}
-		else if(nicId == null ||nicId.isEmpty())
-		{
+		} else if (nicId == null || nicId.isEmpty()) {
 			throw new Exception("nicId should not be null or empty");
 		}
 		Adapter adapterOverview = null;
 		DummayService service = new DummayService();
-		try
-		{
-			adapterOverview= service.getAdapters(hostId, nicId);
-		}
-		catch(Exception e)
-		{
+		try {
+			adapterOverview = service.getAdapters(hostId, nicId);
+		} catch (Exception e) {
 			throw e;
 		}
 		return adapterOverview;
 	}
+
 	@ExceptionHandler(SfNotFoundException.class)
 	@ResponseBody
 	public Map<String, String> handleException(SfNotFoundException ex, HttpServletResponse response) {
@@ -282,6 +275,7 @@ public class HostAdapterController {
 
 		return getError(ex, false);
 	}
+
 	private Map<String, String> getError(Exception ex, boolean includeStacktrace) {
 		Map<String, String> errorMap = new HashMap<String, String>();
 		errorMap.put("message", ex.getMessage());
@@ -304,4 +298,29 @@ public class HostAdapterController {
 		Gson gson = new Gson();
 		return gson.toJson(response);
 	}
+	
+	@RequestMapping(value= "/hosts/{hostId}/adapters/{nicId}/statistics", method = RequestMethod.GET)
+	 @ResponseBody
+	 public AdapterNicStatistics getAdapterNicStatistics(@PathVariable String hostId, @PathVariable String nicId) throws Exception
+	 {
+	  if(hostId == null || hostId.isEmpty())
+	  {
+	   throw new Exception("hostId should not be null or empty");
+	  }
+	  else if(nicId == null ||nicId.isEmpty())
+	  {
+	   throw new Exception("nicId should not be null or empty");
+	  }
+	  AdapterNicStatistics adapterNicStatistics = null;
+	  DummayService service = new DummayService();
+	  try
+	  {
+	   adapterNicStatistics = service.getAdapterNicStatistics(hostId, nicId);
+	  }
+	  catch(Exception e)
+	  {
+	   throw e;
+	  }
+	  return adapterNicStatistics;
+	 }
 }

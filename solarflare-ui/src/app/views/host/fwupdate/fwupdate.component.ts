@@ -1,12 +1,12 @@
-import {Component, ElementRef, ViewChild, OnInit, OnDestroy, Injector, Input} from '@angular/core';
-import {Router, ActivatedRoute, Params} from '@angular/router';
-import {Http} from "@angular/http";
-import {GlobalsService} from "../../../shared/globals.service";
-import {Subscription} from 'rxjs/Subscription';
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {AppComponent} from "../../../app.component";
-import {HostsService} from "../../../services/hosts.service";
-import {Observable} from "rxjs/Observable";
+import { Component, ElementRef, ViewChild, OnInit, OnDestroy, Injector, Input } from '@angular/core';
+import { Router, ActivatedRoute, Params } from '@angular/router';
+import { Http } from "@angular/http";
+import { GlobalsService } from "../../../shared/globals.service";
+import { Subscription } from 'rxjs/Subscription';
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { AppComponent } from "../../../app.component";
+import { HostsService } from "../../../services/hosts.service";
+import { Observable } from "rxjs/Observable";
 
 //  TODO: review comments - components should not have this much line code in a single file.
 //  Break code in smaller chunck and may create a helper/service to serve functionality.
@@ -64,17 +64,31 @@ export class FwupdateComponent implements OnInit {
 
     @ViewChild('fileInput') fileInput: ElementRef;
 
+    customUpdateErrorMessage = '';
+    fetchDataErrorMessage = '';
+
     constructor(private activatedRoute: ActivatedRoute,
-                private gs: GlobalsService,
-                private fb: FormBuilder,
-                private inj: Injector,
-                private hs: HostsService) {
+        private gs: GlobalsService,
+        private fb: FormBuilder,
+        private inj: Injector,
+        private hs: HostsService) {
         this.activatedRoute.parent.params.subscribe((params: Params) => {
             this.params = params;
         });
         this.createFormFile();
         this.createFormUrl();
         this.hosts = this.inj.get(AppComponent).hosts;
+    }
+
+    ngOnInit() {
+        const adapterDetail = this.hs.getAdapter(this.params['id']);
+        if (adapterDetail && adapterDetail.isLatest) {
+            this.adapterList = adapterDetail.adapters;
+            this.updateStatus(this.adapterList);
+        } else {
+            this.getAdapterList();
+        }
+        // this.devMode();
     }
 
     static returnStatusOutput(br) {
@@ -118,19 +132,27 @@ export class FwupdateComponent implements OnInit {
         };
     }
 
-    getAdapterList() {
+    refreshAdapterList() {
         this.adapterList = [];
+        this.getAdapterList();
+    }
+
+    getAdapterList() {
         this.status.status = false;
         this.gettingAdapterList = true;
         this.getAdapterListErr = false;
+        this.fetchDataErrorMessage = '';
         this.hs.getAdapters(this.params['id'])
             .subscribe(
                 data => {
                     this.adapterList = data;
+                    this.hs.setAdapter({ hostId: this.params['id'], adapters: data, isLatest: true });
                     this.gettingAdapterList = false;
                     this.updateStatus(data);
                 },
                 err => {
+                    const error = err.json();
+                    this.fetchDataErrorMessage = error ? error.message : null;
                     console.error(err);
                     this.gettingAdapterList = false;
                     this.getAdapterListErr = true;
@@ -160,33 +182,28 @@ export class FwupdateComponent implements OnInit {
         }
     }
 
-    ngOnInit() {
-        this.getAdapterList();
-        // this.devMode();
-    }
-
     validateLatestUpdate(remove?: string) {
         let updatable = 0, invalid = 0;
         const filterdAdapters = [];
         this.selectedAdapters.forEach((value, index) => {
-            if (value.latestVersion.controller !== value.versionController.split(' ')[0]){
+            if (value.latestVersion.controller !== value.versionController.split(' ')[0]) {
                 updatable++;
-            }else if (value.latestVersion.bootROM !== value.versionBootROM){
+            } else if (value.latestVersion.bootROM !== value.versionBootROM) {
                 updatable++;
-            }else if (value.latestVersion.uefi !== value.versionUEFIROM){
+            } else if (value.latestVersion.uefi !== value.versionUEFIROM) {
                 updatable++;
-            }else {
+            } else {
                 invalid++;
             }
         });
 
         if (remove === 'remove') {
             this.selectedAdapters.forEach((value, index) => {
-                if (value.latestVersion.controller !== value.versionController.split(' ')[0]){
+                if (value.latestVersion.controller !== value.versionController.split(' ')[0]) {
                     filterdAdapters.push(value);
-                }else if (value.latestVersion.bootROM !== value.versionBootROM){
+                } else if (value.latestVersion.bootROM !== value.versionBootROM) {
                     filterdAdapters.push(value);
-                }else if (value.latestVersion.uefi !== value.versionUEFIROM){
+                } else if (value.latestVersion.uefi !== value.versionUEFIROM) {
                     filterdAdapters.push(value);
                 }
             });
@@ -202,9 +219,9 @@ export class FwupdateComponent implements OnInit {
     }
 
     latestUpdateButton() {
-        if ( this.validateLatestUpdate()) {
+        if (this.validateLatestUpdate()) {
             return true;
-        }else {
+        } else {
             return this.latestUpdateAdapterFilter === true;
         }
     }
@@ -241,19 +258,40 @@ export class FwupdateComponent implements OnInit {
     }
 
     isLatestAvailable(ad) {
-        if (ad.latestVersion.controller !== ad.versionController.split(' ')[0]){
+        if (!ad.latestVersion.controller.includes(ad.versionController.split(' ')[0])) {
             return "Yes";
-        }else if (ad.latestVersion.bootROM !== ad.versionBootROM){
+        } else if (!ad.latestVersion.bootROM.includes(ad.versionBootROM)) {
             return "Yes";
-        }else if (ad.latestVersion.uefi !== ad.versionUEFIROM){
+        } else if (!ad.latestVersion.uefi.includes(ad.versionUEFIROM)) {
             return "Yes";
-        }else {
+        } else {
             return "No";
         }
     }
 
+    disableLatestUpdateAdapterFilter() {
+        const result = this.selectedAdapters.find(ele => {
+            return this.isLatestAvailable(ele) === 'No';
+        });
+        return result ? false : true;
+    }
+
+    disableUpdateButton() {
+        const updatable = this.selectedAdapters.filter(ele => {
+            return this.isLatestAvailable(ele) === 'No';
+        });
+        return updatable.length === this.selectedAdapters.length ? true : false;
+    }
+
+    closeAndResetModal() {
+        this.customUpdateModal = false;
+        this.customUploadFile.reset();
+        this.customUploadUrl.reset();
+    }
+
     latestUpdate() {
-        if (!this.latestUpdateAdapterFilter ){
+        this.customUpdateErrorMessage = '';
+        if (!this.latestUpdateAdapterFilter) {
             this.validateLatestUpdate('remove');
         }
         this.hs.latestUpdate(this.params['id'], this.selectedAdapters)
@@ -271,6 +309,8 @@ export class FwupdateComponent implements OnInit {
                     this.button.latestErr = false;
                 },
                 err => {
+                    const error = err.json();
+                    this.customUpdateErrorMessage = error ? error.message : null;
                     console.error(err);
                     this.button.latest = false;
                     this.button.latestErr = true;
@@ -299,10 +339,10 @@ export class FwupdateComponent implements OnInit {
             reader.onload = () => {
                 this.customUploadFile
                     .get('fwFile').setValue({
-                    filename: file.name,
-                    filetype: file.type,
-                    value: reader.result.split(',')[1]
-                });
+                        filename: file.name,
+                        filetype: file.type,
+                        value: reader.result.split(',')[1]
+                    });
             };
         }
     }
@@ -320,7 +360,7 @@ export class FwupdateComponent implements OnInit {
             "base64Data": formModel.fwFile.value,
             "adapters": this.selectedAdapters
         };
-
+        this.customUpdateErrorMessage = '';
         this.hs.onSubmitFile(this.params['id'], payload)
             .subscribe(
                 data => {
@@ -336,6 +376,8 @@ export class FwupdateComponent implements OnInit {
                     this.clearFile();
                 },
                 err => {
+                    const error = err.json();
+                    this.customUpdateErrorMessage = error ? error.message : null;
                     console.error(err);
                     this.clearFile();
                     setTimeout(() => {
@@ -362,7 +404,7 @@ export class FwupdateComponent implements OnInit {
             "base64Data": null,
             "adapters": this.selectedAdapters
         };
-
+        this.customUpdateErrorMessage = '';
         this.hs.onSubmitUrl(this.params['id'], payload)
             .subscribe(
                 data => {
@@ -379,6 +421,8 @@ export class FwupdateComponent implements OnInit {
                     this.customUploadUrl.get('urlProtocol').setValue('');
                 },
                 err => {
+                    const error = err.json();
+                    this.customUpdateErrorMessage = error ? error.message : null;
                     console.error(err);
                     setTimeout(() => {
                         this.button.custom = false;
@@ -425,16 +469,16 @@ export class FwupdateComponent implements OnInit {
         const obs = Observable.interval(3000)
             .switchMap(() => this.hs.getStatus(taskId).map((data) => data))
             .subscribe((data) => {
-                    this.dots = this.dots + '.';
-                    if (this.status.status === true) {
-                        this.status.status = false;
-                        this.processStatusLatest(data, adapters);
-                        this.statusUpdate = false;
-                        obs.unsubscribe();
-                    } else {
-                        this.processStatusLatest(data, adapters);
-                    }
-                },
+                this.dots = this.dots + '.';
+                if (this.status.status === true) {
+                    this.status.status = false;
+                    this.processStatusLatest(data, adapters);
+                    this.statusUpdate = false;
+                    obs.unsubscribe();
+                } else {
+                    this.processStatusLatest(data, adapters);
+                }
+            },
                 err => {
                     console.log(err);
                 });
@@ -516,16 +560,16 @@ export class FwupdateComponent implements OnInit {
         const obs = Observable.interval(3000)
             .switchMap(() => this.hs.getStatus(taskId).map((data) => data))
             .subscribe((data) => {
-                    this.dots = this.dots + '.';
-                    if (this.status.status === true) {
-                        this.status.status = false;
-                        this.processStatusCustom(data, adapters);
-                        this.getAdapterList();
-                        obs.unsubscribe();
-                    } else {
-                        this.processStatusCustom(data, adapters);
-                    }
-                },
+                this.dots = this.dots + '.';
+                if (this.status.status === true) {
+                    this.status.status = false;
+                    this.processStatusCustom(data, adapters);
+                    this.getAdapterList();
+                    obs.unsubscribe();
+                } else {
+                    this.processStatusCustom(data, adapters);
+                }
+            },
                 err => {
                     console.log(err);
                 });
@@ -570,6 +614,11 @@ export class FwupdateComponent implements OnInit {
                 });
             }
         });
+    }
+
+    resetView() {
+        this.customUpdateErrorMessage = '';
+        this.button.customErr = false;
     }
 }
 
