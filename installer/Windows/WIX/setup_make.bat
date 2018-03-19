@@ -4,7 +4,6 @@ set nameOfWxiFile=EnvironmentVars.wxi
 
 if %1.==. (
     set PathToFile=..\..\dist\
-	set ProductCode=0F3C8313-A5EA-4432-9264-6BD824909B34
 	set ProductVersion=1.0.0.0
 	goto done
 )
@@ -22,8 +21,7 @@ goto loop
 
 :checkParam
 if "%1" equ "-p" goto A
-if "%1" equ "-i" goto B
-if "%1" equ "-v" goto C
+if "%1" equ "-v" goto B
 echo Incorrect Parameter
 goto paramError
 
@@ -34,20 +32,14 @@ goto paramError
 
 :B
     shift /1
-    set ProductCode=%1
-    goto next
-
-:C
-    shift /1
     set ProductVersion=%1
     goto next
 	
 :done
-echo PathToFile=%PathToFile%     ProductCode=%ProductCode%     ProductVersion=%ProductVersion%
+echo PathToFile=%PathToFile%	ProductVersion=%ProductVersion%
 
 echo ^<Include^> > %nameOfWxiFile%
 echo ^<^?define PathToFile ^= "%PathToFile%" ^?^> >> %nameOfWxiFile%
-echo ^<^?define ProductCode ^= "%ProductCode%" ^?^> >> %nameOfWxiFile%
 echo ^<^?define ProductVersion ^= "%ProductVersion%" ^?^> >> %nameOfWxiFile%
 echo ^</Include^> >> %nameOfWxiFile%
 

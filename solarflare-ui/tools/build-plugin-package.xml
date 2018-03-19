@@ -31,15 +31,22 @@
    <property name="BUILD_ZIP_DIR" value="${basedir}/../../installer/dist/Tomcat_Server/webapps" />
    <property name="PLUGIN_REGISTRATION" value="${basedir}/../../PluginRegistration"/>
    <property name="P_GOLES" value="clean install" />
+   <property name="installVim25" value="install:install-file -Dfile=${basedir}/../../PluginRegistration/lib/vim25.jar -DgroupId=com.vmware10 -DartifactId=vim2510 -Dversion=1.0.0 -Dpackaging=jar" />
    <property name="PLUGIN_PATH" value="solarflare-vcp" />
    <property name="CLASSES" value="${SERVICE_DIR}/target/classes" />
    <property name="FIRMWARE_JAR" value="${FIRMWARE_TOOL_DIR}/target/firmware-packaging-tool.jar" />
    <property name="FIRMWARE_COPY_TO" value="${basedir}/../../installer/dist/Tomcat_Server/webapps/firmware"/>
-	<target name="firmware">
+   <!-- Take input from user for generating firmware binary metadata file -->
+   <target name="isFirmware">
+	    <input  message="Would you like to generate firmware binary metadata file?  y or n:" validargs="y,n" addproperty="yes.or.no" />
+        <condition property="yes.is.true">
+             <equals arg1="${yes.or.no}" arg2="y"/>
+        </condition>
+	</target>   
+	<target name="firmware" if="yes.is.true">
 		<input message="Enter firmware binary file directory path :" addproperty="DEFAULT_FIRMWARE_PATH"/>
 	</target>
-   <target name="build" depends="firmware, buildCheck, buildUiWar, buildServiceJar, build-firmware-packaging-tool, run_utility, createPluginPackageDir,
-         createPluginProxyPackageDir, createPluginNoJavaPackageDir, mvnWindowsSetup, mvnUnixSetup, runMvnGoals,copyPluginPackageDir, copyRegistrationWar">
+   <target name="build" depends="isFirmware, firmware, buildCheck, buildUiWar, buildServiceJar, build-firmware-packaging-tool, run_utility, run_firmware_utility, createPluginPackageDir, createPluginProxyPackageDir, createPluginNoJavaPackageDir, mvnWindowsSetup, mvnUnixSetup, runMvnGoals,copyPluginPackageDir, copyRegistrationWar, copyFirmwareMetadata">
       <echo level="info">*** You must restart the Virgo server to use the new plugin package! ***</echo>
    </target>
    <target name="buildCheck">
@@ -71,6 +78,8 @@
 				<pathelement path="${CLASSES}"/>
 			</classpath>
 		</java>
+   </target>
+   <target name="run_firmware_utility" if="yes.is.true">
 		<java classname="com.solarflare.firmware.Runner" fork="true" failonerror="yes">
            <arg value="${DEFAULT_FIRMWARE_PATH}"/>
 			<classpath>
@@ -139,9 +148,13 @@ TO THIS /tools FOLDER."/>
 		<entry key="version" value="${VERSION}" />
 	</propertyfile>
 	<target name="runMvnGoals" depends="mvnWindowsSetup, mvnUnixSetup">
+	    <!-- install vim25 -->
+		<exec dir="${basedir}" executable="${mvn.executable}" >
+			<arg line="${mvn.args} 'mvn ${installVim25}'" />
+		</exec>
 		<exec dir="${PLUGIN_REGISTRATION}" executable="${mvn.executable}" >
 			<arg line="${mvn.args} 'mvn ${P_GOLES}'" />
-		</exec>
+		</exec>	
 	</target>
    <target name="copyPluginPackageDir">
       <delete dir="${VSPHERE_SDK_HOME}/vsphere-ui/plugin-packages/solarflare" quiet="true"/>
@@ -156,10 +169,13 @@ TO THIS /tools FOLDER."/>
 	<target name="copyRegistrationWar" description="Copy war file in plugin dist directory">
 		<delete dir="${BUILD_ZIP_DIR}/plugin-registration.war" quiet="true"/>
 		<copy todir="${BUILD_ZIP_DIR}/" file="${PLUGIN_REGISTRATION}/target/plugin-registration.war"/>
-		<copy todir="${FIRMWARE_COPY_TO}">
+	</target>
+	<!-- copy only if yes.is.true -->
+	<target name="copyFirmwareMetadata" if="yes.is.true">
+	   <copy todir="${FIRMWARE_COPY_TO}" >
 			<fileset dir="${DEFAULT_FIRMWARE_PATH}">
-			<include name="**/*.*"/>
-      </fileset>
+				<include name="**/*.*"/>
+			</fileset>
 		</copy>
 	</target>
 

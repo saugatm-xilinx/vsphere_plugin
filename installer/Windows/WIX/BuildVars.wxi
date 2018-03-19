@@ -1,6 +1,7 @@
 <Include>
 <?define AppName="Solarflare vSphere client plugin" ?>
 <?define Add_RemoveProductName="Solarflare vSphere client plugin Installer" ?>
+<?define ProductCode="06F8FD25-9F5F-43D6-98F4-D2C4DC61EE8E" ?>
 <?define ProductManufacturer="Solarflare Communications, Inc." ?>
 <?define ProductUpgradeCode="07E63CD8-315E-4273-B865-D53F3BC5CC24" ?>
 <?define PackageDescription="Solarflare vSphere client plugin Installer" ?>
