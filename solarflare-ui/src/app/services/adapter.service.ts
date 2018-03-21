@@ -13,9 +13,9 @@ export class AdapterService {
 
     public getAdapterDetails(id, url?: string) {
         if (this.gs.isPluginMode()) {
-            url = this.hostDetailUrl + id.hostid + '/adapters/' + id.adapterid + '/overview';
+            url = this.hostDetailUrl + id.hostid + '/adapters/' + id.nicId + '/overview';
         } else {
-            url = this.rootUrl + `/ui/solarflare/rest/services/hosts/${id.hostid}/adapters/${id.adapterid}/overview`;
+            url = this.rootUrl + `/ui/solarflare/rest/services/hosts/${id.hostid}/adapters/${id.nicId}/overview`;
         }
 
         return this.http.get(url)

@@ -26,7 +26,7 @@
             </div>
         </div>
         <clr-vertical-nav *ngIf="hosts.length !== 0" [clrVerticalNavCollapsible]="Collapsible">
-            <clr-vertical-nav-group *ngFor="let host of hosts"   [clrVerticalNavGroupExpanded]="host.id === activeHostId">
+            <clr-vertical-nav-group *ngFor="let host of hosts" [clrVerticalNavGroupExpanded]="host.id === activeHostId">
                 <a clrVerticalNavLink routerLink="/host/{{host.id}}" (click)="getHostDetail(host.id)" routerLinkActive="active">
                     <clr-icon clrVerticalNavIcon (click)="getHostDetail(host.id)" shape="host"></clr-icon>
                     {{host.name}}
@@ -34,11 +34,12 @@
                 <clr-vertical-nav-group-children>
                     <div style="margin-left:6px;">
                         <clr-vertical-nav-group *ngFor="let adaptor of host.children">
-                            <img src="../solarflare/assets/images/adaptor.png" width="20px" />
-                            <span class="adaptorName"> {{adaptor.name}} </span>
+                            <a class="adaptor-link" clrVerticalNavLink routerLink="/adapter/{{host.id}}/{{adaptor.children[0].id}}" routerLinkActive="active">
+                                <img [src]="isProd ? '../solarflare/assets/images/adaptor.png' : 'assets/images/adaptor.png'" width="20px" /> {{adaptor.name}}
+                            </a>
                             <clr-vertical-nav-group-children>
-                                <a clrVerticalNavLink *ngFor="let nic of adaptor.children">
-                                    <img src="../solarflare/assets/images/port.png" width="15px" /> {{nic.name}}
+                                <a class="nic-link" clrVerticalNavLink *ngFor="let nic of adaptor.children" routerLink="/nic/{{host.id}}/{{nic.id}}" routerLinkActive="active">
+                                    <img [src]="isProd ? '../solarflare/assets/images/port.png' : 'assets/images/port.png'" width="15px" /> {{nic.name}}
                                 </a>
                             </clr-vertical-nav-group-children>
                         </clr-vertical-nav-group>

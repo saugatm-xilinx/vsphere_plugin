@@ -191,6 +191,55 @@ export class HostsService {
         return adapterResult.length === 1 ? adapterResult[0] : { hostId: '', adapters: [], isLatest: false };
     }
 
+    getAdapterNameByHostIdAndNicId(hostId, nicId) {
+        let adapterName = '';
+        const adapterResult = this.hosts.forEach(host => {
+            if (String(host.id) === String(hostId)) {
+                host.children.forEach(adapter => {
+                    adapter.children.forEach(nic => {
+                        if (String(nic.id) === String(nicId)) {
+                            adapterName = adapter.name;
+                        }
+                    });
+                });
+            }
+        })
+        return adapterName;
+    }
+
+    getAdapterOverviewDetail(hostId, nicId) {
+        const overviewDetail = { adapterName: '', portNumber: '', serialNumber: '' }
+        const adapterResult = this.hosts.forEach(host => {
+            if (String(host.id) === String(hostId)) {
+                host.children.forEach(adapter => {
+                    adapter.children.forEach(nic => {
+                        if (String(nic.id) === String(nicId)) {
+                            overviewDetail.adapterName = adapter.name;
+                            overviewDetail.portNumber = adapter.portNumber;
+                            overviewDetail.serialNumber = adapter.serialNumber;
+                        }
+                    });
+                });
+            }
+        })
+        return overviewDetail;
+    }
+
+    updateAdapterOverview(detail, hostId, nicId) {
+        const adapterResult = this.hosts.forEach(host => {
+            if (String(host.id) === String(hostId)) {
+                host.children.forEach(adapter => {
+                    adapter.children.forEach(nic => {
+                        if (String(nic.id) === String(nicId)) {
+                            adapter.portNumber = detail.portNumber;
+                            adapter.serialNumber = detail.serialNumber
+                        }
+                    });
+                });
+            }
+        })
+    }
+
     setConfigs(configs) {
         this.configs = configs;
     }

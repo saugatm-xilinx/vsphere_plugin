@@ -4,12 +4,12 @@ import { AdapterService } from "../../../services/adapter.service";
 import { GlobalsService } from "../../../shared/globals.service";
 import { HostsService } from "../../../services/hosts.service";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import {Observable} from "rxjs/Observable";
+import { Observable } from "rxjs/Observable";
 
 @Component({
-  selector: 'app-fwupdate',
-  templateUrl: './fwupdate.component.html',
-  styleUrls: ['./fwupdate.component.scss']
+    selector: 'app-fwupdate',
+    templateUrl: './fwupdate.component.html',
+    styleUrls: ['./fwupdate.component.scss']
 })
 export class FwupdateComponent implements OnInit {
     public params = {};
@@ -48,16 +48,16 @@ export class FwupdateComponent implements OnInit {
     @ViewChild('fileInput') fileInput: ElementRef;
 
     constructor(private activatedRoute: ActivatedRoute,
-              public gs: GlobalsService,
-                private fb: FormBuilder,
-                private as: AdapterService,
-              private hs: HostsService) {
-      this.activatedRoute.parent.params.subscribe((params: Params) => {
-          this.params = params;
-      });
+        public gs: GlobalsService,
+        private fb: FormBuilder,
+        private as: AdapterService,
+        private hs: HostsService) {
+        this.activatedRoute.parent.params.subscribe((params: Params) => {
+            this.params = params;
+        });
         this.createFormFile();
         this.createFormUrl();
-  }
+    }
 
     getAdapterList() {
         this.getAdapterListErr = false;
@@ -77,12 +77,14 @@ export class FwupdateComponent implements OnInit {
     }
 
     findAdapter(data) {
-      data.forEach((adapter, index) => {
-          if (adapter.id === this.params['adapterid']) {
-              this.adapter = adapter;
-              this.adapters = [adapter];
-          }
-      })
+        data.forEach((adapter, index) => {
+            adapter.children.forEach(nic => {
+                if (nic.id === this.params['nicId']) {
+                    this.adapter = adapter;
+                    this.adapters = [adapter];
+                }
+            })
+        })
     }
 
     ngOnInit() {
@@ -152,13 +154,13 @@ export class FwupdateComponent implements OnInit {
     }
 
     isLatestAvailable(ad) {
-        if (ad.latestVersion.controller !== ad.versionController.split(' ')[0]){
+        if (ad.latestVersion.controller !== ad.versionController.split(' ')[0]) {
             return "Yes";
-        }else if (ad.latestVersion.bootROM !== ad.versionBootROM){
+        } else if (ad.latestVersion.bootROM !== ad.versionBootROM) {
             return "Yes";
-        }else if (ad.latestVersion.uefi !== ad.versionUEFIROM){
+        } else if (ad.latestVersion.uefi !== ad.versionUEFIROM) {
             return "Yes";
-        }else {
+        } else {
             return "No";
         }
     }
@@ -207,10 +209,10 @@ export class FwupdateComponent implements OnInit {
             reader.onload = () => {
                 this.customUploadFile
                     .get('fwFile').setValue({
-                    filename: file.name,
-                    filetype: file.type,
-                    value: reader.result.split(',')[1]
-                });
+                        filename: file.name,
+                        filetype: file.type,
+                        value: reader.result.split(',')[1]
+                    });
             };
         }
     }
@@ -323,16 +325,16 @@ export class FwupdateComponent implements OnInit {
         const obs = Observable.interval(3000)
             .switchMap(() => this.hs.getStatus(taskId).map((data) => data))
             .subscribe((data) => {
-                    this.dots = this.dots + '.';
-                    if (this.status.status === true) {
-                        this.status.status = false;
-                        this.processStatusLatest(data, adapters);
-                        this.statusUpdate = false;
-                        obs.unsubscribe();
-                    } else {
-                        this.processStatusLatest(data, adapters);
-                    }
-                },
+                this.dots = this.dots + '.';
+                if (this.status.status === true) {
+                    this.status.status = false;
+                    this.processStatusLatest(data, adapters);
+                    this.statusUpdate = false;
+                    obs.unsubscribe();
+                } else {
+                    this.processStatusLatest(data, adapters);
+                }
+            },
                 err => {
                     console.log(err);
                 });
@@ -412,16 +414,16 @@ export class FwupdateComponent implements OnInit {
         const obs = Observable.interval(3000)
             .switchMap(() => this.hs.getStatus(taskId).map((data) => data))
             .subscribe((data) => {
-                    this.dots = this.dots + '.';
-                    if (this.status.status === true) {
-                        this.status.status = false;
-                        this.processStatusCustom(data, adapters);
-                        this.getAdapterList();
-                        obs.unsubscribe();
-                    } else {
-                        this.processStatusCustom(data, adapters);
-                    }
-                },
+                this.dots = this.dots + '.';
+                if (this.status.status === true) {
+                    this.status.status = false;
+                    this.processStatusCustom(data, adapters);
+                    this.getAdapterList();
+                    obs.unsubscribe();
+                } else {
+                    this.processStatusCustom(data, adapters);
+                }
+            },
                 err => {
                     console.log(err);
                 });

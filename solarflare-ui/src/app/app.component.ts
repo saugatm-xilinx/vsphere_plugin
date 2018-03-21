@@ -4,6 +4,8 @@ import { ActionDevService } from "./services/testing/action-dev.service";
 import { AppMainService } from "./services/app-main.service";
 import { NicService } from "app/services";
 import { HostsService } from "./services/hosts.service";
+import { environment } from 'environments/environment';
+
 // TODO: review comment:- Many linting issues in entire project.
 
 @Component({
@@ -15,6 +17,7 @@ import { HostsService } from "./services/hosts.service";
 
 export class AppComponent implements OnInit {
 
+    isProd = environment.production;
     public hosts = [];
     public Collapsible = true;
     public getHostsErr = false;

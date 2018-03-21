@@ -2,108 +2,109 @@ import { NgModule, ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from "@angular/router";
 
 import { APP_CONFIG } from "./shared/app-config";
-import { AppRoutingComponent }  from "./app-routing.component";
-import { MainComponent }  from "./views/main/index";
+import { AppRoutingComponent } from "./app-routing.component";
+import { MainComponent } from "./views/main/index";
 import { MonitorComponent } from "./views/monitor/index";
 import { SummaryComponent } from "./views/summary/summary.component";
-import { Action1ModalComponent, Action2WizardComponent,
-         EchoModalComponent } from "./views/modals/index";
+import {
+    Action1ModalComponent, Action2WizardComponent,
+    EchoModalComponent
+} from "./views/modals/index";
 import { NYIComponent } from "./views/not-implemented-yet/nyi.component";
 // [removable-chassis-code]
 import { EditChassisComponent } from "./views/modals/edit-chassis.component";
 import { ChassisSummaryComponent } from "./views/chassis-summary/chassis-summary.component";
 // [end-chassis-code]
 
-import {HostComponent} from "./views/host/host.component";
-import {AdapterComponent} from "./views/adapter/adapter.component";
+import { HostComponent } from "./views/host/host.component";
 
 /**
  * Supported routes and associated components
  */
 const appRoutes: Routes = [
 
-   // ----- Route for plugin mode -----
-   // All views and action extensions use index.html in plugin.xml:
-   // AppRoutingComponent will redispatch to an internal route below
+    // ----- Route for plugin mode -----
+    // All views and action extensions use index.html in plugin.xml:
+    // AppRoutingComponent will redispatch to an internal route below
 
-   { path: "index.html", component: AppRoutingComponent },
+    { path: "index.html", component: AppRoutingComponent },
 
-   // ----- Routes for dev mode and for internal routing -----
+    // ----- Routes for dev mode and for internal routing -----
 
-   { path: "", redirectTo: "/main", pathMatch: "full" },
-   { path: "main",         component: MainComponent },
+    { path: "", redirectTo: "/main", pathMatch: "full" },
+    { path: "main", component: MainComponent },
 
-   // settings is an example of lazy loaded module
-   { path: "settings",     loadChildren: 'app/views/settings/settings.module#SettingsModule' },
+    // settings is an example of lazy loaded module
+    { path: "settings", loadChildren: 'app/views/settings/settings.module#SettingsModule' },
 
-   { path: "action1-modal/:id/:actionUid",  component: Action1ModalComponent },
-   { path: "action2-wizard/:id/:actionUid", component: Action2WizardComponent },
+    { path: "action1-modal/:id/:actionUid", component: Action1ModalComponent },
+    { path: "action2-wizard/:id/:actionUid", component: Action2WizardComponent },
 
-   // echo-modal route may or may not have an id parameter
-   { path: "echo-modal/:id",  component: EchoModalComponent },
-   { path: "echo-modal",      component: EchoModalComponent },
+    // echo-modal route may or may not have an id parameter
+    { path: "echo-modal/:id", component: EchoModalComponent },
+    { path: "echo-modal", component: EchoModalComponent },
 
-   // MonitorComponent is shared by the Host Monitor and Manage (Configure) views
-   { path: "monitor/:id",   component: MonitorComponent },
-   { path: "manage/:id",    component: MonitorComponent },
-   { path: "summary/:id",   component: SummaryComponent },
+    // MonitorComponent is shared by the Host Monitor and Manage (Configure) views
+    { path: "monitor/:id", component: MonitorComponent },
+    { path: "manage/:id", component: MonitorComponent },
+    { path: "summary/:id", component: SummaryComponent },
 
-   // [removable-chassis-code]
-   { path: "chassis-summary/:id",   component: ChassisSummaryComponent },
-   { path: "chassis-monitor/:id",   component: NYIComponent },
-   { path: "chassis-manage/:id",    component: NYIComponent },
-   { path: "edit-chassis/:id/:actionUid",   component: EditChassisComponent },
-   // [end-chassis-code]
+    // [removable-chassis-code]
+    { path: "chassis-summary/:id", component: ChassisSummaryComponent },
+    { path: "chassis-monitor/:id", component: NYIComponent },
+    { path: "chassis-manage/:id", component: NYIComponent },
+    { path: "edit-chassis/:id/:actionUid", component: EditChassisComponent },
+    // [end-chassis-code]
 
     {
         path: "host/:id", component: HostComponent
     },
     {
-        path: "adapter/:id", component: AdapterComponent
+        path: "adapter/:hostid/:nicId", loadChildren: 'app/views/adapter/adapter.module#AdapterModule'
     },
     {
-        path: "nic/:hostId/:nicId",  loadChildren: 'app/views/nic/nic.module#NicModule'
+        path: "nic/:hostId/:nicId", loadChildren: 'app/views/nic/nic.module#NicModule'
     },
 ];
 
 /**
  * Map from plugin.xml view extensions to routes, used by navigation utilities in nav.service.ts
  */
-export const extensionToRoutes = { };
-extensionToRoutes[APP_CONFIG.packageName + ".mainView" ]          = "/main";
-extensionToRoutes[APP_CONFIG.packageName + ".settingsView" ]      = "/settings";
-extensionToRoutes[APP_CONFIG.packageName + ".host.summaryView" ]  = "/summary";
-extensionToRoutes[APP_CONFIG.packageName + ".host.monitorView" ]  = "/monitor";
-extensionToRoutes[APP_CONFIG.packageName + ".host.manageView" ]   = "/manage";   // = Configure tab
+export const extensionToRoutes = {};
+extensionToRoutes[APP_CONFIG.packageName + ".mainView"] = "/main";
+extensionToRoutes[APP_CONFIG.packageName + ".settingsView"] = "/settings";
+extensionToRoutes[APP_CONFIG.packageName + ".host.summaryView"] = "/summary";
+extensionToRoutes[APP_CONFIG.packageName + ".host.monitorView"] = "/monitor";
+extensionToRoutes[APP_CONFIG.packageName + ".host.manageView"] = "/manage";   // = Configure tab
 // [removable-chassis-code]
-extensionToRoutes[APP_CONFIG.packageName + ".chassis.summaryView" ]  = "/chassis-summary";
-extensionToRoutes[APP_CONFIG.packageName + ".chassis.monitorView" ]  = "/chassis-monitor";
-extensionToRoutes[APP_CONFIG.packageName + ".chassis.manageView" ]   = "/chassis-manage";
+extensionToRoutes[APP_CONFIG.packageName + ".chassis.summaryView"] = "/chassis-summary";
+extensionToRoutes[APP_CONFIG.packageName + ".chassis.monitorView"] = "/chassis-monitor";
+extensionToRoutes[APP_CONFIG.packageName + ".chassis.manageView"] = "/chassis-manage";
 // [end-chassis-code]
 
 /**
  * List of routed components above, for easy inclusion in app-module
  */
 export const routedComponents = [
-   AppRoutingComponent,
-   MainComponent,
-   MonitorComponent,
-   SummaryComponent,
-   Action1ModalComponent,
-   Action2WizardComponent,
-   EchoModalComponent,
-   // [removable-chassis-code]
-   ChassisSummaryComponent,
-   EditChassisComponent,
-   // [end-chassis-code]
-   NYIComponent
+    AppRoutingComponent,
+    MainComponent,
+    MonitorComponent,
+    SummaryComponent,
+    Action1ModalComponent,
+    Action2WizardComponent,
+    EchoModalComponent,
+    // [removable-chassis-code]
+    ChassisSummaryComponent,
+    EditChassisComponent,
+    // [end-chassis-code]
+    NYIComponent
 ];
 
 export const routing: ModuleWithProviders = RouterModule.forRoot(appRoutes);
 
 @NgModule({
-   imports: [ routing ],
-   exports: [ RouterModule ]
+    imports: [routing],
+    exports: [RouterModule]
 })
 export class AppRoutingModule { }
 

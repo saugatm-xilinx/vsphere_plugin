@@ -36,8 +36,14 @@
     opacity: 0.6;
 }
 
-span.adaptorName {
-    font-size: 0.75em;
+.clr-vertical-nav.has-icons .nav-group-children .nav-link.adaptor-link {
+    font-size: 0.9em;
+    padding-left: 0.5rem;
+}
+
+.clr-vertical-nav.has-icons .nav-group-children .nav-link.nic-link {
+    font-size: 0.9em;
+    padding-left: 2rem;
 }
 
 .table-border-right {
