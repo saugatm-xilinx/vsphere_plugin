@@ -49,7 +49,10 @@ export class OverviewComponent implements OnInit, OnDestroy {
             );
     }
 
-
+    refresh() {
+        this.adapterDetail = { adapterName: '', portNumber: '', serialNumber: '' }
+        this.adapterDetails()
+    }
 
 
 }
