@@ -1,5 +1,4 @@
 <Include> 
 <?define PathToFile = "..\..\dist\" ?> 
-<?define ProductCode = "0F3C8313-A5EA-4432-9264-6BD824909B34" ?> 
 <?define ProductVersion = "1.0.0.0" ?> 
 </Include> 

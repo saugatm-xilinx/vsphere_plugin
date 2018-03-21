@@ -33,7 +33,7 @@
 	<Property Id="INSTALLDIR" Secure="yes">
 		<RegistrySearch Id="InstallDirectorySearch" Type="raw" Root="HKLM" Key="Software\$(var.ProductManufacturer)\$(var.AppName)" Name="InstallDir" Win64="yes"/>
 	</Property>
-	<Property Id="BROWSER_CHECKBOX_PROPERTY" Secure="yes"/>
+	<Property Id="BROWSER_CHECKBOX_PROPERTY" Secure="yes" Value="1"/>
 	<Property Id="BROWSER" Secure="yes" Admin="yes"/>
 	<Property Id="HOSTNAME_IPADDRESS" Secure="yes" Admin="yes"/>
 	<Property Id="HOSTNAME_IPADDRESS_VALID" Secure="yes" Admin="yes"/>
