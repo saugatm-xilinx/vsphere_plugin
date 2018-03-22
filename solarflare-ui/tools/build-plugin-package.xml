@@ -31,7 +31,7 @@
    <property name="BUILD_ZIP_DIR" value="${basedir}/../../installer/dist/Tomcat_Server/webapps" />
    <property name="PLUGIN_REGISTRATION" value="${basedir}/../../PluginRegistration"/>
    <property name="P_GOLES" value="clean install" />
-   <property name="installVim25" value="install:install-file -Dfile=${basedir}/../../PluginRegistration/lib/vim25.jar -DgroupId=com.vmware10 -DartifactId=vim2510 -Dversion=1.0.0 -Dpackaging=jar" />
+   <property name="installVim25" value="install:install-file -Dfile=${basedir}/../../PluginRegistration/lib/vim25.jar -DgroupId=com.vmware -DartifactId=vim25 -Dversion=1.0.0 -Dpackaging=jar" />
    <property name="PLUGIN_PATH" value="solarflare-vcp" />
    <property name="CLASSES" value="${SERVICE_DIR}/target/classes" />
    <property name="FIRMWARE_JAR" value="${FIRMWARE_TOOL_DIR}/target/firmware-packaging-tool.jar" />
