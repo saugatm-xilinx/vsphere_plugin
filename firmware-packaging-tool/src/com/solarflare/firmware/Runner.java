@@ -26,12 +26,13 @@ public class Runner
             else if (System.getenv("FIRMWARE_PATH") != null)// Second check on environment variable
             {
                 path = System.getenv("FIRMWARE_PATH");
+                System.out.println("Default path get from environment variable 'FIRMWARE_PATH', where path is set : "+path);
                 file = new File(path);
                 lastIndex = getLastIndex(file.getAbsolutePath());
             }
             else
             {
-                throw new RuntimeException("Firmware binary file path not found !!!");
+                System.out.println("Error: Environment variable 'FIRMWARE_PATH' not found !!!");
             }
             if (lastIndex > 0)
             {
@@ -40,12 +41,12 @@ public class Runner
             }
             else
             {
-                throw new Exception("Invalid path");
+               System.out.println("Error: Invalid path");
             }
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            System.out.println("Error: "+e.getMessage());
         }
     }
     /**
@@ -73,7 +74,7 @@ public class Runner
         }
         else
         {
-            throw new Exception("Invalid path, found null or empty value!!!");
+            System.out.println("Error: Invalid path, not found firmware binary file !!!");
         }
         return lastIndex;
     }
