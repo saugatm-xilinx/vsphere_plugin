@@ -29,24 +29,15 @@ rem ---------------------------------------------------------------------------
 setlocal ENABLEEXTENSIONS
 
 :: Search the registry value of InstallDir
-set KEY_NAME="HKEY_LOCAL_MACHINE\Software\Solarflare Communications, Inc.\Solarflare vSphere client plugin"
-set VALUE_NAME=InstallDir
 
-FOR /F "skip=2 tokens=1,2*" %%A IN ('%Systemroot%\system32\reg.exe QUERY %KEY_NAME% /v %VALUE_NAME% 2^>nul') DO (
-    set RegName=%%A
-	echo %RegName%
-    set RegType=%%B
-    set RegValue=%%C
-)
-if defined RegName (
-    echo Reg Name = %RegName%		Reg Value = %RegValue%
-) else (
-    echo %KEY_NAME%\%VALUE_NAME% not found.
-)
-echo.
+cd %~dp0
+echo %~dp0
+
+for /f "delims=," %%a in ('cscript //nologo registryValueSearch.vbs') do (set "strVBScriptResults=%%a")
+echo/%strVBScriptResults%
 echo ---------------
 
-CD %RegValue%\Tomcat_Server\
+cd %strVBScriptResults%\Tomcat_Server\
 
 set "SELF=%~dp0%service.bat"
 rem Guess CATALINA_HOME if not defined

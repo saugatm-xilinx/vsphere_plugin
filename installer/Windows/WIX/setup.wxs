@@ -66,6 +66,7 @@
 		<ComponentRef Id="daemon.sh"/>
 		<ComponentRef Id="digest.bat"/>
 		<ComponentRef Id="digest.sh"/>
+		<ComponentRef Id="registryValueSearch.vbs"/>
 		<ComponentRef Id="service.bat"/>
 		<ComponentRef Id="setclasspath.bat"/>
 		<ComponentRef Id="setclasspath.sh"/>
@@ -278,6 +279,13 @@
 	<DirectoryRef Id="bin">
 		<Component Id="digest.sh" Guid="CA891910-DA30-4815-B3C2-ABB63622F9B2">
 			<File Id="digest.sh" Name="digest.sh" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\digest.sh"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="registryValueSearch.vbs" Guid="7E994C75-5595-42C6-902D-D92D0601DC70">
+			<File Id="registryValueSearch.vbs" Name="registryValueSearch.vbs" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\registryValueSearch.vbs"/>
 		</Component>
 	</DirectoryRef>
 </Fragment>
