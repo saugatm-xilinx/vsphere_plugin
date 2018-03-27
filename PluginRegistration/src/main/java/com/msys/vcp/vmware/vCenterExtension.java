@@ -194,6 +194,8 @@ public class vCenterExtension implements ExtensionService {
 		final String type = connectionService.getApiType();
 		if (type.equals("VirtualCenter"))
 			return true;
+		//Disconnect session. It allows to create a new connection with VC.
+		disconnect();
 		return false;
 	}
 
