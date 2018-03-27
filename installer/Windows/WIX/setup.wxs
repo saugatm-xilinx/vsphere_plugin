@@ -29,7 +29,11 @@
 	<AdminUISequence/>
 	<AdvertiseExecuteSequence/>
 	<Media Id="1" DiskPrompt="Disk 1" Cabinet="setup.cab" EmbedCab="yes" CompressionLevel="mszip"/>
-	
+		
+	<Property Id="JAVA_CURRENT_VERSION">
+		<RegistrySearch Id="JRE_CURRENT_VERSION_REGSEARCH1" Root="HKLM" Key="SOFTWARE\JavaSoft\Java Runtime Environment" Name="CurrentVersion" Type="raw" Win64="yes" />
+		<RegistrySearch Id="JRE_CURRENT_VERSION_REGSEARCH2" Root="HKLM" Key="SOFTWARE\JavaSoft\JRE" Name="CurrentVersion" Type="raw" Win64="yes" />	
+	</Property>
 	<Property Id="INSTALLDIR" Secure="yes">
 		<RegistrySearch Id="InstallDirectorySearch" Type="raw" Root="HKLM" Key="Software\$(var.ProductManufacturer)\$(var.AppName)" Name="InstallDir" Win64="yes"/>
 	</Property>
@@ -53,7 +57,15 @@
 	<Property Id="MSIFACTUSERPROFILE" Value="ALLUSERS"/>
 	<Property Id="MSIFACT_INSTALLDIR" Value="INSTALLDIR"/>
 	<Property Id="PIDTemplate" Value="&lt;####-####-####-####&gt;"/>
-
+	<Property Id="CRLF" Value="&#xD;&#xA;"/>
+	
+	<Condition Message="Java Runtime Environment (64 Bit) is not installed or outdated. Setup will ended now. Please try again later after install Oracle JRE 1.8 or later.[CRLF][CRLF]Also set JRE_HOME environment variable to its respective path.">
+		<![CDATA[Installed OR (JAVA_CURRENT_VERSION >= "1.8")]]>
+	</Condition>
+	<Condition Message="Please make sure that JRE_HOME environment variable for Oracle JRE 1.8 or later (64 Bit) is set to its respective path correctly.">
+		<![CDATA[%JRE_HOME OR %JAVA_HOME]]>
+	</Condition>
+	
 	<Feature Id="bin" Title="bin" Level="1" Description="bin folder" Absent="allow" AllowAdvertise="no" TypicalDefault="install" Display="collapse" InstallDefault="local">
 		<ComponentRef Id="bootstrap.jar"/>
 		<ComponentRef Id="catalina.bat"/>
