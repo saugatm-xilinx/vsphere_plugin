@@ -37,6 +37,7 @@
     "clarity-ui": "^0.10.0",
     "core-js": "^2.4.1",
     "mutationobserver-shim": "^0.3.2",
+    "node-sass": "^4.8.3",
     "rxjs": "^5.4.0",
     "web-animations-js": "^2.2.5",
     "zone.js": "0.8.12"

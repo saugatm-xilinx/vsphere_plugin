@@ -18,7 +18,9 @@ export class AdapterService {
             url = this.rootUrl + `/ui/solarflare/rest/services/hosts/${id.hostid}/adapters/${id.nicId}/overview`;
         }
 
-        return this.http.get(url)
+        const cacheControlHeaders = this.gs.getCacheControlHeaders()
+
+        return this.http.get(url, cacheControlHeaders)
             .map((response: Response) => {
                 return response.json();
             });
