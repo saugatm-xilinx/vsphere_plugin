@@ -67,7 +67,9 @@ export class ChassisService {
     * @param sorted  true for sorting the list by names
     */
    getChassisList(sorted: boolean = false): Observable<ChassisList> {
-      const headers = this.gs.getHttpHeaders();
+      const headers = {
+            ...this.gs.getHttpHeaders(), ...this.gs.getCacheControlHeaders()
+      }
 
       return this.http.get(this.getChassisUrl(), headers)
             .map(response => {
@@ -88,7 +90,7 @@ export class ChassisService {
       if (this.gs.useLiveData()) {
          // Use rest/data/properties/[objectId]?properties=... to get data from the Java service
          const url = this.buildDataUrl(objectId, APP_CONFIG.chassisProperties);
-         const headers = this.gs.getHttpHeaders();
+         const headers = { ...this.gs.getHttpHeaders(), ...this.gs.getCacheControlHeaders() }
 
          return this.http.get(url, headers)
             .map(function (response) {

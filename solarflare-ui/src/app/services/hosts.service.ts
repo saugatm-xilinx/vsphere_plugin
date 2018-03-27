@@ -23,8 +23,8 @@ export class HostsService {
             url = this.rootUrl + '/ui/solarflare/rest/services/hosts/' +
                 hostId + '/';
         }
-
-        return this.http.get(url)
+        const headers = this.gs.getCacheControlHeaders()
+        return this.http.get(url, headers)
             .map((response: Response) => {
                 return response.json();
             });
@@ -39,8 +39,8 @@ export class HostsService {
             url = this.rootUrl + '/ui/solarflare/rest/services/hosts/' +
                 hostId + '/adapters/';
         }
-
-        return this.http.get(url)
+        const headers = this.gs.getCacheControlHeaders()
+        return this.http.get(url, headers)
             .map((response: Response) => {
                 return response.json();
             });
@@ -104,8 +104,8 @@ export class HostsService {
         } else {
             url = this.rootUrl + '/ui/solarflare/rest/services/hosts/tasks/' + taskId;
         }
-
-        return this.http.get(url)
+        const headers = this.gs.getCacheControlHeaders()
+        return this.http.get(url, headers)
             .map((response: Response) => {
                 return response.json();
             }).catch(error => {
@@ -121,8 +121,8 @@ export class HostsService {
             url = this.rootUrl + '/ui/solarflare/rest/services/hosts/' +
                 hostId + '/configuration/';
         }
-
-        return this.http.get(url)
+        const headers = this.gs.getCacheControlHeaders()
+        return this.http.get(url, headers)
             .map((response: Response) => {
                 return response.json();
             });

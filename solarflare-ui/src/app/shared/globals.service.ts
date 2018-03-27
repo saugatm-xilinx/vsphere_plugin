@@ -228,4 +228,10 @@ export class GlobalsService {
       }
       return { headers: new Headers({"webClientSessionId": this.getClientId()}) };
    }
+   getCacheControlHeaders(): any {
+      return { headers: new Headers({
+            "Cache-Control": "no-cache",
+            "Pragma": "no-cache"
+      }) };
+   }
 }

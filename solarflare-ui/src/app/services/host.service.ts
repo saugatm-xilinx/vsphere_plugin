@@ -66,7 +66,7 @@ export class HostService {
     * @returns an Observable with a Host array or an error message
     */
    getHosts(): Observable<HostList> {
-      const headers = this.gs.getHttpHeaders();
+      const headers = { ...this.gs.getHttpHeaders(), ...this.gs.getCacheControlHeaders() }
       const useLiveData = this.gs.useLiveData();
 
       return this.http.get(this.getHostsUrl(), headers)
@@ -87,7 +87,7 @@ export class HostService {
     * @returns an Observable with host data or a HostError
     */
    getHostProperties(objectId: string, properties: string[]): Observable<Host | HostError> {
-      const headers = this.gs.getHttpHeaders();
+      const headers = { ...this.gs.getHttpHeaders(), ...this.gs.getCacheControlHeaders() }
       const url = this.getHostPropertiesUrl(objectId, properties);
       const useLiveData = this.gs.useLiveData();
 
