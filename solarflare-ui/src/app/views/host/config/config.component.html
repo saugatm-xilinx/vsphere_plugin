@@ -18,7 +18,7 @@
     <div class="col-md-12">
 
         <div style="padding:20px;" class="container-fluid">
-            <img src="../solarflare/assets/images/sf-logo.png" width="140px">
+            <img [src]="isProd ? '../solarflare/assets/images/sf-logo.png' : 'assets/images/sf-logo.png'" width="140px">
             <div style="text-align: right;">
                 <div class="btn-group">
                     <button class="btn" (click)="getConfiguration()">Refresh</button>

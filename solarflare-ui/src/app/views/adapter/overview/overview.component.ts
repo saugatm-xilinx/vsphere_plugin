@@ -3,6 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { AdapterService } from "../../../services/adapter.service";
 import { GlobalsService } from "../../../shared/globals.service";
 import { HostsService } from '../../../services/hosts.service';
+import { environment } from "environments/environment"
 
 @Component({
     selector: 'app-overview',
@@ -10,6 +11,7 @@ import { HostsService } from '../../../services/hosts.service';
     styleUrls: ['./overview.component.scss']
 })
 export class OverviewComponent implements OnInit, OnDestroy {
+    public isProd = environment.production
     public params = {};
     public adapterDetail = { adapterName: '', portNumber: '', serialNumber: '' };
     adapterName = '';

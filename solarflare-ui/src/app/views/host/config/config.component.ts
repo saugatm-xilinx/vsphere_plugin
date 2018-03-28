@@ -3,6 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { HostsService } from "../../../services/hosts.service";
 import { GlobalsService } from "../../../shared/globals.service";
 import { FormBuilder, FormGroup, FormControl, Validators } from "@angular/forms";
+import { environment } from "environments/environment"
 // TODO :- reveiw comments - It would be best if import is done via a absolute path.
 // Define all modules paths in tsconfig.json file. This will help in managing file import.
 // Import definitions are auto generated as plugin paths are relatively packaged with vmware web client.
@@ -13,6 +14,7 @@ import { FormBuilder, FormGroup, FormControl, Validators } from "@angular/forms"
     styleUrls: ['./config.component.scss']
 })
 export class ConfigComponent implements OnInit {
+    public isProd = environment.production
     public params = {};
     hostConfig: FormGroup;
     public configDefault = {

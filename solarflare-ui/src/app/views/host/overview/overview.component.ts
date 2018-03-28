@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { GlobalsService } from "../../../shared/globals.service";
 import { HostsService } from "../../../services/hosts.service";
+import { environment } from "environments/environment"
 
 @Component({
     selector: 'app-overview',
@@ -10,6 +11,7 @@ import { HostsService } from "../../../services/hosts.service";
 })
 
 export class OverviewComponent implements OnInit {
+    public isProd = environment.production
     public params = {};
     public hostDetail = {};
     public getOverviewErr = false;

@@ -5,6 +5,7 @@ import { GlobalsService } from "../../../shared/globals.service";
 import { HostsService } from "../../../services/hosts.service";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { Observable } from "rxjs/Observable";
+import { environment } from "environments/environment"
 
 @Component({
     selector: 'app-fwupdate',
@@ -12,6 +13,7 @@ import { Observable } from "rxjs/Observable";
     styleUrls: ['./fwupdate.component.scss']
 })
 export class FwupdateComponent implements OnInit {
+    public isProd = environment.production
     public params = {};
     public adapter = {};
     public adapters = [];

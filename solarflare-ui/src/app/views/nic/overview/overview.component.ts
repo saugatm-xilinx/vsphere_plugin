@@ -59,12 +59,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
       .subscribe(
         data => {
           this.isLoading = false;
-          const nic = this.nicSvc.buildNicByAdapter(data, null);
-          if (nic && nic.length === 1) {
-            this.nicDetail = nic[0];
-          } else {
-            this.nicDetail = new Nic();
-          }
+            this.nicDetail = data;
         },
         err => {
           this.isLoading = false;
