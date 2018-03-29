@@ -4,7 +4,7 @@
 <?include EnvironmentVars.wxi?>
 
 <Product Id="$(var.ProductCode)" Name="$(var.Add_RemoveProductName)" Version="$(var.ProductVersion)" Manufacturer="$(var.ProductManufacturer)" UpgradeCode="$(var.ProductUpgradeCode)" Language="1033">
-	<Package Id="*" InstallerVersion="200" Description="$(var.PackageDescription)" Comments="$(var.PackageComments)" Platform="x64" InstallPrivileges="elevated" Languages="1033" Compressed="yes"/>
+	<Package Id="*" InstallerVersion="500" Description="$(var.PackageDescription)" Comments="$(var.PackageComments)" Platform="x64" InstallPrivileges="elevated" Languages="1033" Compressed="yes"/>
 	
 	<InstallExecuteSequence>
 		<Custom Action="HostName_IPAddress_Validation" Before="InstallFiles">NOT Installed</Custom>
