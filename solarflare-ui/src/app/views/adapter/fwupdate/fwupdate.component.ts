@@ -156,16 +156,17 @@ export class FwupdateComponent implements OnInit {
     }
 
     isLatestAvailable(ad) {
-        if (ad.latestVersion.controller !== ad.versionController.split(' ')[0]) {
+        if (!ad.latestVersion.controller.includes(ad.versionController.split(' ')[0])) {
             return "Yes";
-        } else if (ad.latestVersion.bootROM !== ad.versionBootROM) {
+        } else if (!ad.latestVersion.bootROM.includes(ad.versionBootROM)) {
             return "Yes";
-        } else if (ad.latestVersion.uefi !== ad.versionUEFIROM) {
+        } else if (!ad.latestVersion.uefi.includes(ad.versionUEFIROM)) {
             return "Yes";
         } else {
             return "No";
         }
     }
+    
     latestUpdate() {
 
         this.hs.latestUpdate(this.params['hostid'], [this.adapter])

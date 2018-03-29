@@ -20,10 +20,10 @@
       <table class="table">
         <tr>
           <th class="table-border-right"> Name </th>
-          <th class="table-border-right">Value</th>
+          <th>Value</th>
         </tr>
         <tr *ngFor="let ad of statisticTableData">
-          <td>{{ad.name}}</td>
+          <td class="table-border-right">{{ad.name}}</td>
           <td>{{ad.value}}</td>
         </tr>
       </table>
