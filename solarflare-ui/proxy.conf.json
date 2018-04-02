@@ -1,6 +1,6 @@
 {
   "/ui": {
-    "target": "https://10.101.10.7/ui",
+    "target": "https://10.101.10.8/ui",
     "secure": true
   }
 }

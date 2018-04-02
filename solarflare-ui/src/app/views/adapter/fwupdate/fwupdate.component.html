@@ -11,7 +11,7 @@
                         <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
                     </div>
                     <div class="alert-text">
-                        Request failed
+                        Request Failed
                     </div>
                     <div class="alert-actions">
                         <button class="btn alert-action" [disabled]="button.latest"
@@ -124,7 +124,7 @@
                         <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
                     </div>
                     <div class="alert-text">
-                        Request failed
+                        Request Failed
                     </div>
                     <div class="alert-actions">
                         <button class="btn alert-action" *ngIf="customSelectUrl"
@@ -172,7 +172,7 @@
                                class="tooltip tooltip-validation tooltip-md tooltip-top-left"
                                [class.invalid]="customUploadUrl.invalid && (customUploadUrl.dirty || customUploadUrl.touched)">
                             <input type="text" id="url" formControlName="url"
-                                   required
+                                   required autocomplete="off"
                                    (input)="urlVerifier()"
                                    placeholder="solarflare.com/downloads/.../mcfw.dat" size="40">
                             <span class="tooltip-content">
@@ -221,7 +221,7 @@
 
     </div>
     <div class="modal-footer" *ngIf="customSelectUrl">
-        <button class="btn btn-outline" type="button" (click)="customUpdateModal = false">Cancel</button>
+        <button class="btn btn-outline" type="button" (click)="cancelUpdateModal()">Cancel</button>
         <button class="btn btn-primary" type="submit" (click)="onSubmitUrl()"
                 [disabled]="customUploadUrl.invalid || button.custom">
             <span *ngIf="!button.custom">
@@ -231,7 +231,7 @@
         </button>
     </div>
     <div class="modal-footer" *ngIf="!customSelectUrl">
-        <button class="btn btn-outline" type="button" (click)="customUpdateModal = false;">Cancel</button>
+        <button class="btn btn-outline" type="button" (click)="cancelUpdateModal()">Cancel</button>
         <button class="btn btn-primary" type="submit" (click)="onSubmitFile()"
                 [disabled]="customUploadFile.invalid || button.custom">
             <span *ngIf="!button.custom">

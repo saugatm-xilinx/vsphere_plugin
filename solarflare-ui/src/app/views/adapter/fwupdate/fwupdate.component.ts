@@ -21,6 +21,7 @@ export class FwupdateComponent implements OnInit {
     public getAdapterListErr = false;
     public latestUpdateModal = false;
     public customUpdateModal = false;
+    public errText = ""
     public button = {
         latest: false,
         custom: false,
@@ -185,6 +186,7 @@ export class FwupdateComponent implements OnInit {
                 },
                 err => {
                     console.error(err);
+                    this.errText = err.message
                     this.button.latest = false;
                     this.button.latestErr = true;
                 }
@@ -238,7 +240,6 @@ export class FwupdateComponent implements OnInit {
                     this.status.custom.modal = true;
                     this.status.selectedAdapters.push(this.adapter);
                     this.getCustomUpdateStatus([this.adapter], data.taskId);
-
                     this.button.custom = false;
                     this.button.customErr = false;
                     this.clearFile();
@@ -249,6 +250,7 @@ export class FwupdateComponent implements OnInit {
                     setTimeout(() => {
                         this.button.custom = false;
                         this.button.customErr = true;
+                        this.errText = err.message
                     }, 1000);
 
                 }
@@ -267,7 +269,7 @@ export class FwupdateComponent implements OnInit {
             "adapters": [this.adapter]
         };
 
-        this.hs.onSubmitUrl(this.params['id'], payload)
+        this.hs.onSubmitUrl(this.params['hostid'], payload)
             .subscribe(
                 data => {
                     this.reInitStatus();
@@ -286,6 +288,7 @@ export class FwupdateComponent implements OnInit {
                     setTimeout(() => {
                         this.button.custom = false;
                         this.button.customErr = true;
+                        this.errText = err.message
                     }, 1000);
                 }
             );
@@ -293,9 +296,19 @@ export class FwupdateComponent implements OnInit {
 
     clearFile() {
         this.customUploadFile.get('fwFile').setValue(null);
-        this.fileInput.nativeElement.value = '';
+        if(this.fileInput && this.fileInput.nativeElement){
+            this.fileInput.nativeElement.value = '';
+        }
         this.button.custom = false;
         this.button.customErr = false;
+        this.errText = ""
+    }
+
+    cancelUpdateModal() {
+        this.customUpdateModal = false;
+        this.clearFile();
+        this.customUploadUrl.get('url').setValue('');
+        this.customUploadUrl.get('urlProtocol').setValue('');
     }
 
     urlVerifier() {
