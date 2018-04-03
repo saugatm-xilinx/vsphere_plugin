@@ -66,13 +66,15 @@
                             </label>
                             <div class="btn-group">
                                 <button class="btn" id="netQueueCountbtn" (click)="btn.netQueue.count = true;"
-                                        *ngIf="!btn.netQueue.count">
+                                    *ngIf="!btn.netQueue.count">
                                     {{hostConfig.get('netQueue').get('netQueueCount').value}}
                                 </button>
                                 <input formControlName="netQueueCount" id="netQueueCount"
-                                       style="width: 40px;text-align: center;"
-                                       *ngIf="btn.netQueue.count"
-                                       type="text">
+                                    style="width: 40px;text-align: center;"
+                                    *ngIf="btn.netQueue.count"
+                                    (blur)="btn.netQueue.count = false;"
+                                    type="number"
+                                >
                             </div>
                         </div>
                     </div>
@@ -106,6 +108,7 @@
                                        style="width: 40px;text-align: center;"
                                        *ngIf="btn.netQueue.rss"
                                        type="number"
+                                       (blur)="btn.netQueue.rss = false;"
                                        [attr.disabled]="hostConfig.get('netQueue').get('maxNumpCPU').value?'true':null">
                             </div>
                         </div>
