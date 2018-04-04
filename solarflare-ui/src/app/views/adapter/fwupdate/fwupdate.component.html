@@ -10,8 +10,8 @@
                     <div class="alert-icon-wrapper">
                         <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
                     </div>
-                    <div class="alert-text">
-                        Request Failed
+                    <div class="alert-text" style="width:80%">
+                        {{errText}}
                     </div>
                     <div class="alert-actions">
                         <button class="btn alert-action" [disabled]="button.latest"
@@ -123,8 +123,8 @@
                     <div class="alert-icon-wrapper">
                         <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
                     </div>
-                    <div class="alert-text">
-                        Request Failed
+                    <div class="alert-text" style="width:80%">
+                        {{errText}}
                     </div>
                     <div class="alert-actions">
                         <button class="btn alert-action" *ngIf="customSelectUrl"
@@ -245,41 +245,40 @@
 <clr-modal [clrModalSize]="'md'" [(clrModalOpen)]="status.custom.modal">
     <h3 class="modal-title">Custom Firmware Update Status</h3>
     <div class="modal-body" style="min-height: 140px;">
-        <h6>Note: Firmware update may take some time ...</h6>
-
+        <h6 [hidden]="!statusUpdate">Note: Firmware update may take some time ...</h6>
         <div *ngFor="let output of status.custom.output; let i = index">
             <h6>{{i+1}}. {{output.name}} :</h6>
             <div *ngIf="output.controller !== null ">
                 <span *ngIf="output.controller.state === 'Success' && output.controller.to ">
-                Controller Firmware: v{{output.controller.from}} updated to v{{output.controller.to}}
-            </span>
+                    Controller Firmware: v{{output.controller.from}} updated to v{{output.controller.to}}
+                </span>
                 <span *ngIf="output.controller.state === 'Success' && !output.controller.to ">
-                Controller Firmware: Firmware update in progress {{dots}}
-            </span>
+                    Controller Firmware: Firmware update in progress {{dots}}
+                </span>
                 <span *ngIf="output.controller.state === 'Error'">
-                Controller Firmware: Error occurred while updating v{{output.controller.from}}
-                <i style="color: red;" *ngIf="output.controller.message !== null"><br/>{{output.controller.message}}</i>
-            </span>
+                    Controller Firmware: Error occurred while updating v{{output.controller.from}}
+                    <i style="color: red;" *ngIf="output.controller.message !== null"><br/>{{output.controller.message}}</i>
+                </span>
                 <span *ngIf="output.controller.state === 'Queued' || output.controller.state === 'Running'">
-                Controller Firmware: Firmware update in progress {{dots}}
-            </span>
+                    Controller Firmware: Firmware update in progress {{dots}}
+                </span>
                 <br/>
             </div>
 
             <div *ngIf="output.bootRom !== null ">
                 <span *ngIf="output.bootRom.state === 'Success' && output.bootRom.to ">
-                BootROM Firmware: v{{output.bootRom.from}} updated to v{{output.bootRom.to}}
-            </span>
+                    BootROM Firmware: v{{output.bootRom.from}} updated to v{{output.bootRom.to}}
+                </span>
                 <span *ngIf="output.bootRom.state === 'Success' && !output.bootRom.to ">
-                BootROM Firmware: Firmware update in progress {{dots}}
-            </span>
+                    BootROM Firmware: Firmware update in progress {{dots}}
+                </span>
                 <span *ngIf="output.bootRom.state === 'Error'">
-                BootROM Firmware: Error occurred while updating v{{output.bootRom.from}}
-                <i style="color: red;" *ngIf="output.bootRom.message !== null"><br/>{{output.bootRom.message}}</i>
-            </span>
+                    BootROM Firmware: Error occurred while updating v{{output.bootRom.from}}
+                    <i style="color: red;" *ngIf="output.bootRom.message !== null"><br/>{{output.bootRom.message}}</i>
+                </span>
                 <span *ngIf="output.bootRom.state === 'Queued' || output.bootRom.state === 'Running'">
-                BootROM Firmware: Firmware update in progress {{dots}}
-            </span>
+                    BootROM Firmware: Firmware update in progress {{dots}}
+                </span>
                 <br/>
             </div>
 
@@ -317,7 +316,7 @@
 <clr-modal [clrModalSize]="'md'" [(clrModalOpen)]="status.latest.modal">
     <h3 class="modal-title">Latest Firmware Update Status</h3>
     <div class="modal-body" style="min-height: 140px;">
-        <h6>Note: Firmware update may take some time ...</h6>
+        <h6 [hidden]="!statusUpdate">Note: Firmware update may take some time ...</h6>
 
         <div *ngFor="let output of status.latest.output; let i = index">
             <h6>{{i+1}}. {{output.name}}</h6>
@@ -383,7 +382,7 @@
             <img [src]="isProd ? '../solarflare/assets/images/sf-logo.png' : 'assets/images/sf-logo.png'" width="140px">
             <div style="text-align: right;">
                 <div class="btn-group">
-                    <button class="btn" (click)="adapter = {};getAdapterList()">Refresh</button>
+                    <button class="btn" (click)="adapter = {};getAdapterList()" [disabled]="refreshButtonDisabled">Refresh</button>
                     <button class="btn btn-info">Help</button>
                 </div>
             </div>

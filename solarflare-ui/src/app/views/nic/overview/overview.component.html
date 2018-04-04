@@ -7,7 +7,7 @@
         </div>
         <div>
           <div class="btn-group">
-            <button class="btn" (click)="refrechNicDetail()">Refresh</button>
+            <button class="btn" (click)="refrechNicDetail()" [disabled]="isLoading">Refresh</button>
             <button class="btn btn-info">Help</button>
           </div>
         </div>

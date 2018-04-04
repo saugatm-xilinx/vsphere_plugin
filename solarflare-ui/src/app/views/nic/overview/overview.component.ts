@@ -59,7 +59,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
       .subscribe(
         data => {
           this.isLoading = false;
-            this.nicDetail = data;
+          this.nicDetail = data;
         },
         err => {
           this.isLoading = false;

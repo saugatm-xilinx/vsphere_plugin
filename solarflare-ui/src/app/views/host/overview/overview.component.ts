@@ -15,6 +15,7 @@ export class OverviewComponent implements OnInit {
     public params = {};
     public hostDetail = {};
     public getOverviewErr = false;
+    public refreshButtonDisable;
 
     constructor(private activatedRoute: ActivatedRoute,
         public gs: GlobalsService,
@@ -32,15 +33,18 @@ export class OverviewComponent implements OnInit {
     }
 
     getHostDetail() {
+        this.refreshButtonDisable = true
         this.getOverviewErr = false;
         this.hs.getHostDetails(this.params['id'])
             .subscribe(
                 data => {
+                    this.refreshButtonDisable = false
                     this.hostDetail = data
                     this.hs.updateHostDetail(data);
                 },
                 err => {
                     console.error(err);
+                    this.refreshButtonDisable = false
                     this.getOverviewErr = true;
                 }
             );

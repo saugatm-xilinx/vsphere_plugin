@@ -6,7 +6,7 @@
             <img [src]="isProd ? '../solarflare/assets/images/sf-logo.png' : 'assets/images/sf-logo.png'" width="140px">
             <div style="text-align: right;">
                 <div class="btn-group">
-                    <button class="btn" (click)="hostDetail = {};getHostDetail()">Refresh</button>
+                    <button class="btn" [disabled]="refreshButtonDisable" (click)="hostDetail = {};getHostDetail()">Refresh</button>
                     <button class="btn btn-info">Help</button>
                 </div>
             </div>

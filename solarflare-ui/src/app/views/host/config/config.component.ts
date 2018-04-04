@@ -16,6 +16,7 @@ import { environment } from "environments/environment"
 export class ConfigComponent implements OnInit {
     public isProd = environment.production
     public params = {};
+    public refreshButtonDisabled;
     hostConfig: FormGroup;
     public configDefault = {
         "netQueue": { "netQueueCount": 8, "rss": 4, "maxNumpCPU": false },
@@ -89,16 +90,18 @@ export class ConfigComponent implements OnInit {
         this.err.getConfiguration = false;
         this.reInitButton();
         this.config = {};
-
+        this.refreshButtonDisabled = true
         this.hs.getConfiguration(this.params['id'])
             .subscribe(
                 data => {
+                    this.refreshButtonDisabled = false
                     this.config = data;
                     this.restoreConfig();
                     this.hs.setConfigs(data);
                 },
                 err => {
                     console.error(err);
+                    this.refreshButtonDisabled = false
                     this.err.getConfiguration = true;
                 }
             );

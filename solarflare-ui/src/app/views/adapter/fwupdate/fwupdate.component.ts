@@ -47,6 +47,7 @@ export class FwupdateComponent implements OnInit {
     customUploadUrl: FormGroup;
     public statusUpdate = false;
     public dots = '.';
+    public refreshButtonDisabled;
 
     @ViewChild('fileInput') fileInput: ElementRef;
 
@@ -64,15 +65,18 @@ export class FwupdateComponent implements OnInit {
 
     getAdapterList() {
         this.getAdapterListErr = false;
+        this.refreshButtonDisabled = true
         this.hs.getAdapters(this.params['hostid'])
             .subscribe(
                 data => {
+                    this.refreshButtonDisabled = false
                     this.findAdapter(data);
                     this.gettingAdapterList = false;
                     this.updateStatus(data);
                 },
                 err => {
                     console.error(err);
+                    this.refreshButtonDisabled = false
                     this.gettingAdapterList = false;
                     this.getAdapterListErr = true;
                 }
@@ -186,7 +190,8 @@ export class FwupdateComponent implements OnInit {
                 },
                 err => {
                     console.error(err);
-                    this.errText = err.message
+                    const error = err.json();
+                    this.errText = error ? error.message : null;
                     this.button.latest = false;
                     this.button.latestErr = true;
                 }
@@ -246,11 +251,12 @@ export class FwupdateComponent implements OnInit {
                 },
                 err => {
                     console.error(err);
+                    const error = err.json();
+                    this.errText = error ? error.message : null;
                     this.clearFile();
                     setTimeout(() => {
                         this.button.custom = false;
                         this.button.customErr = true;
-                        this.errText = err.message
                     }, 1000);
 
                 }
@@ -285,10 +291,11 @@ export class FwupdateComponent implements OnInit {
                 },
                 err => {
                     console.error(err);
+                    const error = err.json();
+                    this.errText = error ? error.message : null;
                     setTimeout(() => {
                         this.button.custom = false;
                         this.button.customErr = true;
-                        this.errText = err.message
                     }, 1000);
                 }
             );
@@ -352,6 +359,8 @@ export class FwupdateComponent implements OnInit {
                 }
             },
                 err => {
+                    const error = err.json();
+                    this.errText = error ? error.message : null;
                     console.log(err);
                 });
     }
@@ -441,6 +450,8 @@ export class FwupdateComponent implements OnInit {
                 }
             },
                 err => {
+                    const error = err.json();
+                    this.errText = error ? error.message : null;
                     console.log(err);
                 });
 

@@ -16,6 +16,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
     public adapterDetail = { adapterName: '', portNumber: '', serialNumber: '' };
     adapterName = '';
     public getOverviewErr = false;
+    public refreshButtonDisabled
 
     constructor(private activatedRoute: ActivatedRoute,
         public gs: GlobalsService,
@@ -37,14 +38,17 @@ export class OverviewComponent implements OnInit, OnDestroy {
     ngOnDestroy() { }
 
     adapterDetails() {
+        this.refreshButtonDisabled = true
         this.getOverviewErr = false;
         this.as.getAdapterDetails(this.params)
             .subscribe(
                 data => {
+                    this.refreshButtonDisabled = false
                     this.hostService.updateAdapterOverview(data, this.params['hostid'], this.params['nicId']);
                     this.adapterDetail = this.hostService.getAdapterOverviewDetail(this.params['hostid'], this.params['nicId']);
                 },
                 err => {
+                    this.refreshButtonDisabled = false
                     console.error(err);
                     this.getOverviewErr = true;
                 }

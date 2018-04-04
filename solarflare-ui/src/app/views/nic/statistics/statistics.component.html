@@ -7,7 +7,7 @@
         </div>
         <div>
           <div class="btn-group">
-            <button class="btn" (click)="getStatDetail()">Refresh</button>
+            <button class="btn" (click)="getStatDetail()" [disabled]="isLoading">Refresh</button>
             <button class="btn btn-info">Help</button>
           </div>
         </div>

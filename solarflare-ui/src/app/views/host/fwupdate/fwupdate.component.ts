@@ -26,6 +26,7 @@ export class FwupdateComponent implements OnInit {
     public customUpdateModal = false;
     public params = {};
     public adapterList = [];
+    public refreshButtonDisabled;
     public button = {
         latest: false,
         custom: false,
@@ -144,15 +145,18 @@ export class FwupdateComponent implements OnInit {
         this.gettingAdapterList = true;
         this.getAdapterListErr = false;
         this.fetchDataErrorMessage = '';
+        this.refreshButtonDisabled = true
         this.hs.getAdapters(this.params['id'])
             .subscribe(
                 data => {
+                    this.refreshButtonDisabled = false
                     this.adapterList = data;
                     this.hs.setAdapter({ hostId: this.params['id'], adapters: data, isLatest: true });
                     this.gettingAdapterList = false;
                     this.updateStatus(data);
                 },
                 err => {
+                    this.refreshButtonDisabled = false;
                     const error = err.json();
                     this.fetchDataErrorMessage = error ? error.message : null;
                     console.error(err);
