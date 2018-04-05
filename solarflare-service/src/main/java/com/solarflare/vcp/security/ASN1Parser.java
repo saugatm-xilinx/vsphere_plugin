@@ -5,7 +5,6 @@ import java.util.Arrays;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.solarflare.vcp.cim.SfCIMService;
 import com.solarflare.vcp.security.model.ASN1Cursor;
 import com.solarflare.vcp.security.model.PKCS7_Data;
 import com.solarflare.vcp.security.model.PKCS7_SignedData;

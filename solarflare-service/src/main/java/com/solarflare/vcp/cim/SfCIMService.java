@@ -608,7 +608,7 @@ public class SfCIMService {
 			throws Exception {
 
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: updateFirmwareFromURL");
-		logger.debug("Solarflare:: updateFirmwareFromURL called with input : SfInstance " + softwareIntsallationInstance
+		logger.info("Solarflare:: updateFirmwareFromURL called with input : SfInstance " + softwareIntsallationInstance
 				+ " NIC : " + nic + " fwImagePath : " + fwImagePath);
 		WBEMClient client = getCIMClient();
 		String pMethodName = CIMConstants.INSTALL_FROM_URI;
@@ -932,4 +932,5 @@ public class SfCIMService {
 		}
 		return nicInfo;
 	}
+	
 }

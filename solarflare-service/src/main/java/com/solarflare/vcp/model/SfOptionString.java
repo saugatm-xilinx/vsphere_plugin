@@ -6,7 +6,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.solarflare.vcp.vim.SimpleTimeCounter;
-import com.vmware.vim25.HostAccessControlEntry;
 
 public class SfOptionString {
 
