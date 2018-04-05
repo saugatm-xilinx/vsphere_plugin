@@ -34,7 +34,6 @@ import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.HostConfiguration;
 import com.solarflare.vcp.model.TaskInfo;
 import com.solarflare.vcp.model.VMNICResponse;
-import com.solarflare.vcp.services.DummayService;
 import com.solarflare.vcp.services.HostAdapterService;
 import com.solarflare.vcp.services.TaskManager;
 import com.solarflare.vcp.vim.SimpleTimeCounter;
@@ -198,7 +197,7 @@ public class HostAdapterController {
 		}
 		Gson gson = new Gson();
 		HostConfiguration hostConfigurationRequest = gson.fromJson(hostConfiguration, HostConfiguration.class);
-		hostAdapterService.updateHostConfigurations(hostId,hostConfigurationRequest);
+		hostAdapterService.updateHostConfigurations(hostId, hostConfigurationRequest);
 		timer.stop();
 	}
 
@@ -297,29 +296,28 @@ public class HostAdapterController {
 		Gson gson = new Gson();
 		return gson.toJson(response);
 	}
-	
-	@RequestMapping(value= "/hosts/{hostId}/adapters/{nicId}/statistics", method = RequestMethod.GET)
-	 @ResponseBody
-	 public AdapterNicStatistics getAdapterNicStatistics(@PathVariable String hostId, @PathVariable String nicId) throws Exception
-	 {
-	  if(hostId == null || hostId.isEmpty())
-	  {
-	   throw new Exception("hostId should not be null or empty");
-	  }
-	  else if(nicId == null ||nicId.isEmpty())
-	  {
-	   throw new Exception("nicId should not be null or empty");
-	  }
-	  AdapterNicStatistics adapterNicStatistics = null;
-	  DummayService service = new DummayService();
-	  try
-	  {
-	   adapterNicStatistics = service.getAdapterNicStatistics(hostId, nicId);
-	  }
-	  catch(Exception e)
-	  {
-	   throw e;
-	  }
-	  return adapterNicStatistics;
-	 }
+
+	@RequestMapping(value = "/hosts/{hostId}/adapters/{nicId}/statistics", method = RequestMethod.GET)
+	@ResponseBody
+	public AdapterNicStatistics getAdapterNicStatistics(@PathVariable String hostId, @PathVariable String nicId)
+			throws Exception {
+		logger.info("Solarflare:: getAdapterNicStatistics called for hostId: " + hostId + " and nicId: "+nicId);
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: getAdapterNicStatistics");
+		if (hostId == null || hostId.isEmpty()) {
+			timer.stop();
+			throw new Exception("hostId should not be null or empty");
+		} else if (nicId == null || nicId.isEmpty()) {
+			timer.stop();
+			throw new Exception("nicId should not be null or empty");
+		}
+		AdapterNicStatistics adapterNicStatistics = null;
+		try {
+			adapterNicStatistics = hostAdapterService.getAdapterNicStatistics(hostId, nicId);
+		} catch (Exception e) {
+			timer.stop();
+			throw e;
+		}
+		timer.stop();
+		return adapterNicStatistics;
+	}
 }

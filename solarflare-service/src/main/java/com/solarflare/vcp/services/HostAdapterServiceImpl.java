@@ -23,6 +23,7 @@ import com.solarflare.vcp.exception.SfInvalidRequestException;
 import com.solarflare.vcp.helper.MetadataHelper;
 import com.solarflare.vcp.helper.SFBase64;
 import com.solarflare.vcp.model.Adapter;
+import com.solarflare.vcp.model.AdapterNicStatistics;
 import com.solarflare.vcp.model.AdapterOverview;
 import com.solarflare.vcp.model.AdapterTask;
 import com.solarflare.vcp.model.FileHeader;
@@ -42,9 +43,11 @@ import com.solarflare.vcp.model.VMNIC;
 import com.solarflare.vcp.model.VMNICResponse;
 import com.solarflare.vcp.security.ASN1Parser;
 import com.solarflare.vcp.vim.SfVimService;
-import com.solarflare.vcp.vim.SfVimServiceImpl;
 import com.solarflare.vcp.vim.SimpleTimeCounter;
-import com.solarflare.vcp.vim.connection.ConnectionImpl;
+import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.PerfCounterInfo;
+import com.vmware.vim25.PerfEntityMetricBase;
+import com.vmware.vim25.PerfEntityMetricCSV;
 
 public class HostAdapterServiceImpl implements HostAdapterService {
 	private static final Log logger = LogFactory.getLog(HostAdapterServiceImpl.class);
@@ -576,7 +579,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			} else if (NicProperty.SerialNumber.toString().equals(key)) {
 				adpOverview.setSerialNumber(entry.getValue());
 
-			} 
+			}
 		}
 
 		return adpOverview;
@@ -585,7 +588,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 	@Override
 	public VMNICResponse getAdapterForNIC(String hostId, String nicId) throws Exception {
 		List<Adapter> adapters = sfVimService.getHostAdapters(hostId);
-		//List<Adapter> adapters = host.getChildren();
+		// List<Adapter> adapters = host.getChildren();
 		VMNICResponse nicResponse = null;
 		boolean isFound = false;
 		for (Adapter adp : adapters) {
@@ -596,12 +599,10 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 					nicResponse.setSubSystemDeviceId(adp.getSubSystemDeviceId());
 					nicResponse.setVendorId(adp.getVendorId());
 					nicResponse.setSubSystemVendorId(adp.getSubSystemVendorId());
-					
 					nicResponse.setDriverName(nic.getDriverName());
 					nicResponse.setLinkStatus(nic.getStatus());
 					nicResponse.setPortSpeed(nic.getPortSpeed());
 					nicResponse.setMacAddress(nic.getMacAddress());
-					
 					nicResponse.setInterfaceName(nic.getInterfaceName());
 					nicResponse.setPciBusNumber(nic.getPciBusNumber());
 					nicResponse.setPciFunction(nic.getPciFunction());
@@ -615,6 +616,84 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			}
 		}
 		return nicResponse;
+	}
+
+	@Override
+	public AdapterNicStatistics getAdapterNicStatistics(String hostId, String nicId) throws Exception {
+		logger.info("Solarflare:: getAdapterNicStatistics");
+		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: getAdapterNicStatistics");
+		ManagedObjectReference perfManager = sfVimService.getSession().getServiceContent().getPerfManager();
+		Map<String, PerfCounterInfo> nicStatPerfIdMap = sfVimService.getNicStatPerfCounters(perfManager,
+				AdapterNicStatistics.performanceCounter);
+		
+		List<PerfEntityMetricBase> retrievedStats = sfVimService.retriveStats(perfManager, nicStatPerfIdMap, hostId,
+				nicId);
+		Map<Integer, Integer> nicStatPerfVal = sfVimService.processNicStats(retrievedStats, nicStatPerfIdMap);
+
+		AdapterNicStatistics nicStats = new AdapterNicStatistics();
+
+		for (PerfEntityMetricBase singleEntityPerfStats : retrievedStats) {
+			PerfEntityMetricCSV entityStatsCsv = (PerfEntityMetricCSV) singleEntityPerfStats;
+			/*
+			 * Retrieve time interval information
+			 * (PerfEntityMetricCSV.sampleInfoCSV). format is : Collection:
+			 * interval (seconds),time (yyyy-mm-ddThh:mm:ssZ)
+			 */
+			String csvTimeInfoAboutStats = entityStatsCsv.getSampleInfoCSV();
+			nicStats.setTimePeriod_from(csvTimeInfoAboutStats.split(",")[1]);
+			nicStats.setTimePeriod_to(csvTimeInfoAboutStats.split(",")[csvTimeInfoAboutStats.split(",").length - 1]);
+		}
+
+		for (String perfCounter : nicStatPerfIdMap.keySet()) {
+			PerfCounterInfo counterInfo = nicStatPerfIdMap.get(perfCounter);
+			if (counterInfo != null) {
+				int statValue = nicStatPerfVal.get(counterInfo.getKey());
+				String unitInfo = counterInfo.getUnitInfo().getKey();
+				if("number".equalsIgnoreCase(unitInfo)){
+					unitInfo = "";
+				}
+				switch (perfCounter) {
+				case "net.packetsRx.SUMMATION":
+					nicStats.setPacketsReceived(statValue + " " + unitInfo);
+					break;
+				case "net.packetsTx.SUMMATION":
+					nicStats.setPacketsSent(statValue + " " + unitInfo);
+					break;
+				case "net.bytesRx.AVERAGE":
+					nicStats.setBytesReceived(statValue + " " + unitInfo);
+					break;
+				case "net.bytesTx.AVERAGE":
+					nicStats.setBytesSent(statValue + " " + unitInfo);
+					break;
+				case "net.droppedRx.SUMMATION":
+					nicStats.setReceivePacketsDropped(statValue + " " + unitInfo);
+					break;
+				case "net.droppedTx.SUMMATION":
+					nicStats.setTransmitPacketsDropped(statValue + " " + unitInfo);
+					break;
+				case "net.multicastRx.SUMMATION":
+					nicStats.setMulticastPacketsReceived(statValue + " " + unitInfo);
+					break;
+				case "net.broadcastRx.SUMMATION":
+					nicStats.setBroadcastPacketsReceived(statValue + " " + unitInfo);
+					break;
+				case "net.multicastTx.SUMMATION":
+					nicStats.setMulticastPacketsSent(statValue + " " + unitInfo);
+					break;
+				case "net.broadcastTx.SUMMATION":
+					nicStats.setBroadcastPacketsSent(statValue + " " + unitInfo);
+					break;
+				case "net.errorsRx.SUMMATION":
+					nicStats.setTotalReceiveError(statValue + " " + unitInfo);
+					break;
+				case "net.errorsTx.SUMMATION":
+					nicStats.setTotalTransmitErrors(statValue + " " + unitInfo);
+					break;
+				}
+			}
+		}
+		timer.stop();
+		return nicStats;
 	}
 	
 }

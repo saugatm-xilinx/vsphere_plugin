@@ -12,7 +12,6 @@ import org.springframework.beans.factory.InitializingBean;
 
 import com.solarflare.vcp.cim.CIMHost;
 import com.solarflare.vcp.cim.CIMHostSession;
-import com.solarflare.vcp.cim.CIMHostUser;
 import com.solarflare.vcp.cim.SfCIMClientService;
 import com.solarflare.vcp.cim.SfCIMService;
 import com.solarflare.vcp.model.Adapter;
@@ -22,6 +21,7 @@ import com.solarflare.vcp.vim.connection.Connection;
 import com.solarflare.vcp.vim.helpers.GetMOREF;
 import com.solarflare.vcp.vim.helpers.SfVimServiceHelper;
 import com.vmware.vim25.ArrayOfHostPciDevice;
+import com.vmware.vim25.ArrayOfPerfCounterInfo;
 import com.vmware.vim25.ArrayOfPhysicalNic;
 import com.vmware.vim25.Extension;
 import com.vmware.vim25.ExtensionClientInfo;
@@ -30,7 +30,12 @@ import com.vmware.vim25.HostServiceTicket;
 import com.vmware.vim25.HostSystemConnectionState;
 import com.vmware.vim25.InvalidPropertyFaultMsg;
 import com.vmware.vim25.ManagedObjectReference;
-import com.vmware.vim25.NotFoundFaultMsg;
+import com.vmware.vim25.PerfCounterInfo;
+import com.vmware.vim25.PerfEntityMetricBase;
+import com.vmware.vim25.PerfEntityMetricCSV;
+import com.vmware.vim25.PerfMetricId;
+import com.vmware.vim25.PerfMetricSeriesCSV;
+import com.vmware.vim25.PerfQuerySpec;
 import com.vmware.vim25.PhysicalNic;
 import com.vmware.vim25.RuntimeFaultFaultMsg;
 import com.vmware.vim25.SoftwarePackage;
@@ -151,7 +156,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 
 	public String getDriverVersion(String hostId) throws Exception {
 		logger.info("getDriverVersion() for hostId : " + hostId);
-		
+
 		List<String> props = new ArrayList<>();
 		props.add("configManager.imageConfigManager");
 
@@ -166,11 +171,12 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 				.get("configManager.imageConfigManager");
 
 		List<SoftwarePackage> softwarePackage = _conn.getVimPort().fetchSoftwarePackages(imageConfigManager);
-		
+
 		String driverVersion = SfVimServiceHelper.getDriverVersion(softwarePackage);
 
 		return driverVersion;
 	}
+
 	/**
 	 * Returns all hosts of vCenter.
 	 */
@@ -212,11 +218,11 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 			}
 		} catch (InvalidPropertyFaultMsg | RuntimeFaultFaultMsg e) {
 			// TODO Auto-generated catch block
-			logger.error("Solarflare:: Error getting All hosts : " +e.getMessage());
+			logger.error("Solarflare:: Error getting All hosts : " + e.getMessage());
 			throw e;
 		}
 		timer.stop();
-		logger.trace("Solarflare::Get - getAllHosts returned total hosts: "+hostList.size());
+		logger.trace("Solarflare::Get - getAllHosts returned total hosts: " + hostList.size());
 		return hostList;
 
 	}
@@ -234,10 +240,10 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getHostAdapters");
 		List<String> props = new ArrayList<>();
-		//props.add("configManager.imageConfigManager");
+		// props.add("configManager.imageConfigManager");
 		props.add("hardware.pciDevice");
 		props.add("config.network.pnic");
-		//props.add("name");
+		// props.add("name");
 
 		Connection _conn = getSession();
 
@@ -267,7 +273,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 			List<String> sfDeviceIds = SfVimServiceHelper.getSfPciDeviceIds(sfDevices);
 			// Get Physical Nics
 			ArrayOfPhysicalNic arrayOfPhysicalNic = (ArrayOfPhysicalNic) hostprops.get("config.network.pnic");
-			
+
 			Map<String, PhysicalNic> sfPhysicalNics = SfVimServiceHelper
 					.getSfPhysicalNic(arrayOfPhysicalNic.getPhysicalNic(), sfDeviceIds);
 			Map<String, List<VMNIC>> vmNICMap = SfVimServiceHelper.mergeToVMNICObject(sfDevices, sfPhysicalNics,
@@ -287,7 +293,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 					adapter.setSubSystemDeviceId(Short.toString(pciDevice.getSubDeviceId()));
 					adapter.setVendorId(Short.toString(pciDevice.getVendorId()));
 					adapter.setSubSystemVendorId(Short.toString(pciDevice.getSubVendorId()));
-					//adapter.setDriverName(sfPhysicalNics.get(0).getDriver());
+					// adapter.setDriverName(sfPhysicalNics.get(0).getDriver());
 					adapter.setChildren(vmNICs);
 
 					adapterMap.put(id, adapter);
@@ -320,7 +326,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 			SfCIMService cimService = new SfCIMService(new SfCIMClientService(cimHost));
 			partNumber = cimService.getPartNumber(deviceId);
 		} catch (Exception e) {
-			logger.error("Solarflare:: Error gettinng part number for hostId - " + hostId + " deviceId - "+deviceId);
+			logger.error("Solarflare:: Error gettinng part number for hostId - " + hostId + " deviceId - " + deviceId);
 			e.printStackTrace();
 		}
 
@@ -447,5 +453,133 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 		_conn.getVimPort().updateModuleOptionString(kernelModuleSystem, SOLARFLARE_MODULE_NAME, value);
 		timer.stop();
 	}
+	
+	@Override
+	public Map<String,PerfCounterInfo> getNicStatPerfCounters(ManagedObjectReference perfManager, List<String> nicStatPerfCounter)
+			throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
 
+		logger.info("Solarflare:: getNicStatPerfCounters");
+		Map<String,PerfCounterInfo> nicStatPerfIdMap = new HashMap<String, PerfCounterInfo>();
+		Connection _conn = getSession();
+
+		GetMOREF _moRefService = new GetMOREF(_conn.getVimPort(), _conn.getServiceContent());
+		Object property = _moRefService.entityProps(perfManager, new String[] { "perfCounter" }).get("perfCounter");
+		ArrayOfPerfCounterInfo arrayCounter = (ArrayOfPerfCounterInfo) property;
+		List<PerfCounterInfo> counters = arrayCounter.getPerfCounterInfo();
+		
+		for (PerfCounterInfo counter : counters) {
+			// Only look for network related counters
+			if ("net".equalsIgnoreCase(counter.getGroupInfo().getKey())){
+				String counterGroup = counter.getGroupInfo().getKey();
+				String counterName = counter.getNameInfo().getKey();
+				String counterRollupType = counter.getRollupType().toString();
+				String fullCounterName = counterGroup + "." + counterName + "." + counterRollupType;
+				
+				if(nicStatPerfCounter.contains(fullCounterName)){
+					nicStatPerfIdMap.put(fullCounterName,counter);
+				}
+			}
+		}
+		return nicStatPerfIdMap;
+	}
+
+	@Override
+	public List<PerfEntityMetricBase> retriveStats(ManagedObjectReference perfManager, Map<String,PerfCounterInfo> nicStatPerfIdMap, String hostId, String nicId) throws RuntimeFaultFaultMsg,Exception{
+		
+		logger.info("Solarflare:: retriveStats for hostId: " + hostId + " and nicId: "+nicId);
+		/*
+		 * Create the list of PerfMetricIds, one for each counter.
+		 */
+		List<PerfMetricId> perfMetricIds = new ArrayList<PerfMetricId>();
+		
+		/* Get the ID for this counter. */
+		for (String perfConter : nicStatPerfIdMap.keySet()) {
+			/*
+			 * Create the PerfMetricId object for the counterName. Use an asterisk
+			 * to select all metrics associated with counterId (instances and
+			 * rollup).
+			 */
+			PerfMetricId metricId = new PerfMetricId();
+			metricId.setCounterId(nicStatPerfIdMap.get(perfConter).getKey());
+			metricId.setInstance(nicId);
+			perfMetricIds.add(metricId);
+		}
+		ManagedObjectReference mor = getManagedObjectReference("HostSystem", hostId);
+		/*
+		 * Create the query specification for queryPerf(). Specify 5 minute
+		 * rollup interval and CSV output format.
+		 */
+		int intervalId = 20; // for real time data
+		PerfQuerySpec querySpecification = new PerfQuerySpec();
+		querySpecification.setEntity(mor);
+		querySpecification.setIntervalId(intervalId);
+		querySpecification.setFormat("csv");
+		querySpecification.getMetricId().addAll(perfMetricIds);
+
+		List<PerfQuerySpec> pqsList = new ArrayList<PerfQuerySpec>();
+		pqsList.add(querySpecification);
+
+		/*
+		 * Call queryPerf()
+		 *
+		 * QueryPerf() returns the statistics specified by the provided
+		 * PerfQuerySpec objects. When specified statistics are unavailable -
+		 * for example, when the counter doesn't exist on the target
+		 * ManagedEntity - QueryPerf() returns null for that counter.
+		 */
+		Connection _conn = getSession();
+		List<PerfEntityMetricBase> retrievedStats = _conn.getVimPort().queryPerf(perfManager, pqsList);
+
+		return retrievedStats;
+				
+	}
+	
+	@Override
+	public  Map<Integer,Integer> processNicStats(List<PerfEntityMetricBase> retrievedStats, Map<String,PerfCounterInfo> nicStatPerfIdMap) throws Exception{
+		
+		logger.info("Solarflare:: processNicStats");
+		Map<Integer,Integer> nicStatPerfValue = new HashMap<>();
+		/*
+		 * Cycle through the PerfEntityMetricBase objects. Each object contains
+		 * a set of statistics for a single ManagedEntity.
+		 */
+		for (PerfEntityMetricBase singleEntityPerfStats : retrievedStats) {
+
+			/*
+			 * Cast the base type (PerfEntityMetricBase) to the csv-specific
+			 * sub-class.
+			 */
+			PerfEntityMetricCSV entityStatsCsv = (PerfEntityMetricCSV) singleEntityPerfStats;
+
+			/* Retrieve the list of sampled values. */
+			List<PerfMetricSeriesCSV> metricsValues = entityStatsCsv.getValue();
+
+			if (metricsValues.isEmpty()) {
+				System.out.println("No stats retrieved. " + "Check whether the NIC is properly configured.");
+				throw new Exception();
+			}
+
+			/*
+			 * Cycle through the PerfMetricSeriesCSV objects. Each object
+			 * contains statistics for a single counter on the ManagedEntity.
+			 */
+			for (PerfMetricSeriesCSV csv : metricsValues) {
+	
+				String[] values = csv.getValue().split(",");
+				int val = getSum(values);
+				nicStatPerfValue.put(csv.getId().getCounterId(),val);
+			}
+		}
+
+		return nicStatPerfValue;
+	}
+	
+	int getSum(String[] values){
+		int sum = 0;
+		for(String strVal : values){
+			int value = Integer.parseInt(strVal);
+			sum += value;
+		}
+		return sum;
+	}	
 }

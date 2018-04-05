@@ -1,6 +1,5 @@
 package com.solarflare.vcp.services;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +13,6 @@ import com.solarflare.vcp.model.HostConfiguration;
 import com.solarflare.vcp.model.NetQueue;
 import com.solarflare.vcp.model.NicBootParamInfo;
 import com.solarflare.vcp.model.Overlay;
-import com.solarflare.vcp.model.VMNIC;
 import com.solarflare.vcp.model.VMNICResponse;
 
 public class DummayService implements HostAdapterService {
@@ -134,7 +132,7 @@ public class DummayService implements HostAdapterService {
 
 	public AdapterNicStatistics getAdapterNicStatistics(String hostId, String nicId) {
 		  AdapterNicStatistics stat = new AdapterNicStatistics();
-		  stat.setTimePeriod("Last 1 Hour");
+		  //stat.setTimePeriod("Last 1 Hour");
 		  stat.setPacketsReceived("57");
 		  stat.setPacketsSent("69");
 		  stat.setBytesReceived("4502");

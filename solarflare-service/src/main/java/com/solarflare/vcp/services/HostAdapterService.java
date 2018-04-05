@@ -3,6 +3,7 @@ package com.solarflare.vcp.services;
 import java.util.List;
 
 import com.solarflare.vcp.model.Adapter;
+import com.solarflare.vcp.model.AdapterNicStatistics;
 import com.solarflare.vcp.model.AdapterOverview;
 import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.HostConfiguration;
@@ -81,4 +82,5 @@ public interface HostAdapterService {
 	
 	VMNICResponse getAdapterForNIC(String hostId, String nicId) throws Exception ;
 
+	AdapterNicStatistics getAdapterNicStatistics(String hostId, String nicId) throws Exception;
 }
