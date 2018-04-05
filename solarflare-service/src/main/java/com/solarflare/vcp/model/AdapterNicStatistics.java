@@ -1,8 +1,12 @@
 package com.solarflare.vcp.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AdapterNicStatistics {
 	
-	String timePeriod;
+	String timePeriod_from;
+	String timePeriod_to;
 	String packetsReceived;
 	String packetsSent;
 	String bytesReceived;
@@ -22,11 +26,51 @@ public class AdapterNicStatistics {
 	String transmitAbortedErrors;
 	String transmitCarrierErrors;
 	String transmitFIFOErrors;
-	public String getTimePeriod() {
-		return timePeriod;
+	String multicastPacketsSent;
+	String broadcastPacketsReceived;
+	
+
+	public static List<String> performanceCounter = new ArrayList<>();
+	static{
+		performanceCounter.add("net.packetsRx.SUMMATION");
+		performanceCounter.add("net.packetsTx.SUMMATION");
+		performanceCounter.add("net.bytesRx.AVERAGE");
+		performanceCounter.add("net.bytesTx.AVERAGE");
+		performanceCounter.add("net.droppedRx.SUMMATION");
+		performanceCounter.add("net.droppedTx.SUMMATION");
+		performanceCounter.add("net.multicastRx.SUMMATION");
+		performanceCounter.add("net.broadcastRx.SUMMATION");
+		performanceCounter.add("net.multicastTx.SUMMATION");
+		performanceCounter.add("net.broadcastTx.SUMMATION");
+		performanceCounter.add("net.errorsRx.SUMMATION");
+		performanceCounter.add("net.errorsTx.SUMMATION");
 	}
-	public void setTimePeriod(String timePeriod) {
-		this.timePeriod = timePeriod;
+	public String getTimePeriod_from() {
+		return timePeriod_from;
+	}
+	public void setTimePeriod_from(String timePeriod_from) {
+		this.timePeriod_from = timePeriod_from;
+	}
+	public String getTimePeriod_to() {
+		return timePeriod_to;
+	}
+	public void setTimePeriod_to(String timePeriod_to) {
+		this.timePeriod_to = timePeriod_to;
+	}
+	
+	
+	
+	public String getMulticastPacketsSent() {
+		return multicastPacketsSent;
+	}
+	public void setMulticastPacketsSent(String multicastPacketsSent) {
+		this.multicastPacketsSent = multicastPacketsSent;
+	}
+	public String getBroadcastPacketsReceived() {
+		return broadcastPacketsReceived;
+	}
+	public void setBroadcastPacketsReceived(String broadcastPacketsReceived) {
+		this.broadcastPacketsReceived = broadcastPacketsReceived;
 	}
 	public String getPacketsReceived() {
 		return packetsReceived;
@@ -143,5 +187,20 @@ public class AdapterNicStatistics {
 	public void setTransmitFIFOErrors(String transmitFIFOErrors) {
 		this.transmitFIFOErrors = transmitFIFOErrors;
 	}
+	@Override
+	public String toString() {
+		return "AdapterNicStatistics [timePeriod_from=" + timePeriod_from + ", timePeriod_to=" + timePeriod_to
+				+ ", packetsReceived=" + packetsReceived + ", packetsSent=" + packetsSent + ", bytesReceived="
+				+ bytesReceived + ", bytesSent=" + bytesSent + ", receivePacketsDropped=" + receivePacketsDropped
+				+ ", transmitPacketsDropped=" + transmitPacketsDropped + ", multicastPacketsReceived="
+				+ multicastPacketsReceived + ", broadcastPacketsSent=" + broadcastPacketsSent + ", totalReceiveError="
+				+ totalReceiveError + ", receiveLengthErrors=" + receiveLengthErrors + ", receiveOverErrors="
+				+ receiveOverErrors + ", receiveCRCErrors=" + receiveCRCErrors + ", reveiveFrameErrors="
+				+ reveiveFrameErrors + ", reveiveFIFOErrors=" + reveiveFIFOErrors + ", receiveMissedErrors="
+				+ receiveMissedErrors + ", totalTransmitErrors=" + totalTransmitErrors + ", transmitAbortedErrors="
+				+ transmitAbortedErrors + ", transmitCarrierErrors=" + transmitCarrierErrors + ", transmitFIFOErrors="
+				+ transmitFIFOErrors + "]";
+	}
+
 	
 }
