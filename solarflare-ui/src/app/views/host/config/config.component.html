@@ -245,18 +245,18 @@
             <section class="form-block">
                 <div style="display: flex; justify-content: space-between; width: 70%;margin: 0 auto;">
                     <button class="btn btn-outline-primary"
-                            type="button" [disabled]="submitted || !hostConfig.dirty" (click)="restoreConfig()" >Restore
+                            type="button" [disabled]="submitted || formNotChanged()" (click)="restoreConfig()" >Restore
                     </button>
                     <button class="btn btn-outline-secondary" style="display:none"
                             type="button" [disabled]="submitted" (click)="defaultConfig()" >Defaults
                     </button>
                     <button class="btn btn-primary"
                             type="submit"
-                            [disabled]="submitted || (!hostConfig.dirty || hostConfig.invalid)" >Apply
+                            [disabled]="submitted || hostConfig.invalid || formNotChanged()" >Apply
                     </button>
                 </div>
                 <div style=" width: 90%;margin: 0 auto; text-align: right;"
-                     *ngIf="!(submitted || (!hostConfig.dirty || hostConfig.invalid))">
+                     *ngIf="!(submitted || hostConfig.invalid || formNotChanged())">
                     <span style="font-size: smalller;">
                         You need to apply for changes to take effect
                     </span>

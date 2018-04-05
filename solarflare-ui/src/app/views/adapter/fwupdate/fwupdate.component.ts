@@ -253,7 +253,6 @@ export class FwupdateComponent implements OnInit {
                     console.error(err);
                     const error = err.json();
                     this.errText = error ? error.message : null;
-                    this.clearFile();
                     setTimeout(() => {
                         this.button.custom = false;
                         this.button.customErr = true;
