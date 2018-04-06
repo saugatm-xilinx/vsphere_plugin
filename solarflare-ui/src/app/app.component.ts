@@ -54,6 +54,7 @@ export class AppComponent implements OnInit {
         this.as.getHosts()
             .subscribe(
                 data => {
+                    data.sort(this.compare)
                     this.hosts = data
                 },
                 err => {
@@ -62,7 +63,15 @@ export class AppComponent implements OnInit {
                 }
             );
     }
-
+    compare(a, b) {
+        let comparison = 0;
+        if (a.name > b.name) {
+          comparison = 1;
+        } else if (a.name < b.name) {
+          comparison = -1;
+        }
+        return comparison;
+    }
     getHostDetail(hostId) {
         if (!this.hostHasChildDetail(hostId)) {
             this.getHostsErr = false;
