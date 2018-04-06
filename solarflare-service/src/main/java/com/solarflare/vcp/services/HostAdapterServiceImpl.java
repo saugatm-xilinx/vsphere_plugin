@@ -242,70 +242,21 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		logger.info("Solarflare:: customUpdateFirmwareFromURL");
 		String taskID = null;
 		try {
-
-			TaskInfo taskInfo = createTask(hostId);
-			taskID = taskInfo.getTaskid();
-
 			URL fwImageURL = new URL(fwImagePath);
 			SfCIMService cimService = getCIMService(hostId);
-
-			boolean controller = false;
-			boolean bootrom = false;
-			boolean uefirom = false;
 			boolean readComplete = true;
 			byte[] fileData = cimService.readData(fwImageURL, readComplete);
-			byte[] headerData = new ASN1Parser().getFileHeaderBytes(fileData);
-			FileHeader header = cimService.getFileHeader(headerData);
-			CIMInstance fwInstance = null;
-			logger.debug("Solarflare:: Header : " + header);
-			if (FirmwareType.FIRMWARE_TYPE_MCFW.ordinal() == header.getType()) {
-				logger.debug("Solarflare:: Updating Controller");
-				controller = true;
-				fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_MCFW_NAME);
-			} else if (FirmwareType.FIRMWARE_TYPE_BOOTROM.ordinal() == header.getType()) {
-				logger.debug("Solarflare:: Updating BootROM");
-				bootrom = true;
-				fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_BOOTROM_NAME);
-			} else if (FirmwareType.FIRMWARE_TYPE_UEFIROM.ordinal() == header.getType()) {
-				logger.debug("Solarflare:: Updating UEFI ROM");
-				uefirom = true;
-				fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
-			}
-
-			boolean isValid = isFwFileValid(adapterList, header, fwInstance, cimService);
-			if (isValid) {
-
-				UpdateRequestProcessor requestProcessor = UpdateRequestProcessor.getInstance();
-				for (Adapter adapter : adapterList) {
-					if (isValidated(adapter, taskInfo)) {
-						UpdateRequest updateRequest = null;
-						if (controller) {
-							updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.CONTROLLER,
-									fwImageURL, fwInstance);
-						}
-						if (bootrom) {
-							updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.BOOTROM,
-									fwImageURL, fwInstance);
-						}
-						if (uefirom) {
-							updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.UEFIROM,
-									fwImageURL, fwInstance);
-						}
-						requestProcessor.addUpdateRequest(updateRequest);
-					}
-				}
-			} else {
-				String errMsg = "Invalid Firmware File";
-				logger.error(errMsg);
-				throw new SfInvalidRequestException(errMsg);
-			}
-
+			Base64.Encoder encoder = Base64.getEncoder();
+			byte[] encodedData = encoder.encode(fileData);
+			String encodedFileData = new String(encodedData);
+			taskID = customUpdateFirmwareFromLocal(adapterList, hostId, encodedFileData);
 		} catch (Exception e) {
 			timer.stop();
 			throw e;
 		}
 		timer.stop();
 		return taskID;
+
 
 	}
 
