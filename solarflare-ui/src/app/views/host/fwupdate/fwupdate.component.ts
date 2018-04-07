@@ -7,6 +7,7 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { AppComponent } from "../../../app.component";
 import { HostsService } from "../../../services/hosts.service";
 import { Observable } from "rxjs/Observable";
+import { environment } from "environments/environment"
 
 //  TODO: review comments - components should not have this much line code in a single file.
 //  Break code in smaller chunck and may create a helper/service to serve functionality.
@@ -20,10 +21,12 @@ import { Observable } from "rxjs/Observable";
     styleUrls: ['./fwupdate.component.scss']
 })
 export class FwupdateComponent implements OnInit {
+    public isProd = environment.production
     public latestUpdateModal = false;
     public customUpdateModal = false;
     public params = {};
     public adapterList = [];
+    public refreshButtonDisabled;
     public button = {
         latest: false,
         custom: false,
@@ -142,15 +145,18 @@ export class FwupdateComponent implements OnInit {
         this.gettingAdapterList = true;
         this.getAdapterListErr = false;
         this.fetchDataErrorMessage = '';
+        this.refreshButtonDisabled = true
         this.hs.getAdapters(this.params['id'])
             .subscribe(
                 data => {
+                    this.refreshButtonDisabled = false
                     this.adapterList = data;
                     this.hs.setAdapter({ hostId: this.params['id'], adapters: data, isLatest: true });
                     this.gettingAdapterList = false;
                     this.updateStatus(data);
                 },
                 err => {
+                    this.refreshButtonDisabled = false;
                     const error = err.json();
                     this.fetchDataErrorMessage = error ? error.message : null;
                     console.error(err);

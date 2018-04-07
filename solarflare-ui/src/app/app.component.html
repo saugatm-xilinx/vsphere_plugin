@@ -26,11 +26,11 @@
             </div>
         </div>
         <clr-vertical-nav *ngIf="hosts.length !== 0" [clrVerticalNavCollapsible]="Collapsible">
-            <clr-vertical-nav-group *ngFor="let host of hosts"   [clrVerticalNavGroupExpanded]="host.id === activeHostId">
-                <a clrVerticalNavLink routerLink="/host/{{host.id}}" (click)="getHostDetail(host.id)" routerLinkActive="active">
+            <clr-vertical-nav-group *ngFor="let host of hosts" [clrVerticalNavGroupExpanded]="host.id === activeHostId">
+                <div clrVerticalNavLink routerLink="/host/{{host.id}}" (click)="getHostDetail(host.id)" class="cursor-pointer">
                     <clr-icon clrVerticalNavIcon (click)="getHostDetail(host.id)" shape="host"></clr-icon>
                     {{host.name}}
-                </a>
+                </div>
                 <clr-vertical-nav-group-children>
                     <div style="margin-left:6px;">
                         <clr-vertical-nav-group *ngFor="let adaptor of host.children">

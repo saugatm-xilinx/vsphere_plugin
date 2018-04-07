@@ -3,10 +3,10 @@
     <div class="col-md-12">
 
         <div style="padding:20px;" class="container-fluid">
-            <img src="../solarflare/assets/images/sf-logo.png" width="140px">
+            <img [src]="isProd ? '../solarflare/assets/images/sf-logo.png' : 'assets/images/sf-logo.png'" width="140px">
             <div style="text-align: right;">
                 <div class="btn-group">
-                    <button class="btn" (click)="hostDetail = {};getHostDetail()">Refresh</button>
+                    <button class="btn" [disabled]="refreshButtonDisable" (click)="hostDetail = {};getHostDetail()">Refresh</button>
                     <button class="btn btn-info">Help</button>
                 </div>
             </div>
@@ -31,21 +31,21 @@
                     <table class="host-overview">
                         <tr>
                             <td rowspan="4">
-                                <img src="../solarflare/assets/images/host.png" width="160px">
+                                <img [src]="isProd ? '../solarflare/assets/images/host.png' : 'assets/images/host.png'" width="160px">
                             </td>
                             <td>Adapters <span class="pull-right">({{hostDetail.adapterCount}})</span></td>
                             <td colspan="2" style="height: 2em">
                                 <img class="icos" style="float: left; margin-left: 2px"
-                                     *ngFor="let adapter of [] | range:hostDetail.adapterCount"
-                                     src="../solarflare/assets/images/adaptor_.png" width="40px"/>
+                                    *ngFor="let adapter of [] | range:hostDetail.adapterCount"
+                                    [src]="isProd ? '../solarflare/assets/images/adaptor_.png' : 'assets/images/adaptor_.png'" width="40px"/>
                             </td>
                         </tr>
                         <tr>
                             <td>Ports <span class="pull-right">({{hostDetail.portCount}})</span></td>
                             <td colspan="2" style="height: 2em;">
                                 <img class="icos" style="float: left; margin-left: 2px"
-                                     *ngFor="let port of [] | range:hostDetail.portCount"
-                                     src="../solarflare/assets/images/port_.png" width="30px">
+                                    *ngFor="let port of [] | range:hostDetail.portCount"
+                                    [src]="isProd ? '../solarflare/assets/images/port_.png' : 'assets/images/port_.png'" width="30px">
                             </td>
                         </tr>
                         <tr>

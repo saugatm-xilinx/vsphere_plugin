@@ -18,10 +18,10 @@
     <div class="col-md-12">
 
         <div style="padding:20px;" class="container-fluid">
-            <img src="../solarflare/assets/images/sf-logo.png" width="140px">
+            <img [src]="isProd ? '../solarflare/assets/images/sf-logo.png' : 'assets/images/sf-logo.png'" width="140px">
             <div style="text-align: right;">
                 <div class="btn-group">
-                    <button class="btn" (click)="getConfiguration()">Refresh</button>
+                    <button class="btn" (click)="getConfiguration()" [disabled]="refreshButtonDisabled">Refresh</button>
                     <button class="btn btn-info">Help</button>
                 </div>
             </div>
@@ -66,13 +66,16 @@
                             </label>
                             <div class="btn-group">
                                 <button class="btn" id="netQueueCountbtn" (click)="btn.netQueue.count = true;"
-                                        *ngIf="!btn.netQueue.count">
+                                    *ngIf="!btn.netQueue.count">
                                     {{hostConfig.get('netQueue').get('netQueueCount').value}}
                                 </button>
                                 <input formControlName="netQueueCount" id="netQueueCount"
-                                       style="width: 40px;text-align: center;"
-                                       *ngIf="btn.netQueue.count"
-                                       type="text">
+                                    style="width: 40px;text-align: center;"
+                                    *ngIf="btn.netQueue.count"
+                                    (blur)="btn.netQueue.count = false;"
+                                    type="number"
+                                    autocomplete="off"
+                                >
                             </div>
                         </div>
                     </div>
@@ -106,6 +109,8 @@
                                        style="width: 40px;text-align: center;"
                                        *ngIf="btn.netQueue.rss"
                                        type="number"
+                                       (blur)="btn.netQueue.rss = false;"
+                                       autocomplete="off"
                                        [attr.disabled]="hostConfig.get('netQueue').get('maxNumpCPU').value?'true':null">
                             </div>
                         </div>
@@ -242,18 +247,18 @@
             <section class="form-block">
                 <div style="display: flex; justify-content: space-between; width: 70%;margin: 0 auto;">
                     <button class="btn btn-outline-primary"
-                            type="button" [disabled]="submitted || !hostConfig.dirty" (click)="restoreConfig()" >Restore
+                            type="button" [disabled]="submitted || formNotChanged()" (click)="restoreConfig()" >Restore
                     </button>
                     <button class="btn btn-outline-secondary" style="display:none"
                             type="button" [disabled]="submitted" (click)="defaultConfig()" >Defaults
                     </button>
                     <button class="btn btn-primary"
                             type="submit"
-                            [disabled]="submitted || (!hostConfig.dirty || hostConfig.invalid)" >Apply
+                            [disabled]="submitted || hostConfig.invalid || formNotChanged()" >Apply
                     </button>
                 </div>
                 <div style=" width: 90%;margin: 0 auto; text-align: right;"
-                     *ngIf="!(submitted || (!hostConfig.dirty || hostConfig.invalid))">
+                     *ngIf="!(submitted || hostConfig.invalid || formNotChanged())">
                     <span style="font-size: smalller;">
                         You need to apply for changes to take effect
                     </span>

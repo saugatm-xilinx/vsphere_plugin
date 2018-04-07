@@ -4,6 +4,8 @@ import { ActionDevService } from "./services/testing/action-dev.service";
 import { AppMainService } from "./services/app-main.service";
 import { NicService } from "app/services";
 import { HostsService } from "./services/hosts.service";
+import { environment } from 'environments/environment';
+
 // TODO: review comment:- Many linting issues in entire project.
 
 @Component({
@@ -15,6 +17,7 @@ import { HostsService } from "./services/hosts.service";
 
 export class AppComponent implements OnInit {
 
+    isProd = environment.production;
     public hosts = [];
     public Collapsible = true;
     public getHostsErr = false;
@@ -51,6 +54,7 @@ export class AppComponent implements OnInit {
         this.as.getHosts()
             .subscribe(
                 data => {
+                    data.sort(this.compare)
                     this.hosts = data
                 },
                 err => {
@@ -59,7 +63,15 @@ export class AppComponent implements OnInit {
                 }
             );
     }
-
+    compare(a, b) {
+        let comparison = 0;
+        if (a.name > b.name) {
+          comparison = 1;
+        } else if (a.name < b.name) {
+          comparison = -1;
+        }
+        return comparison;
+    }
     getHostDetail(hostId) {
         if (!this.hostHasChildDetail(hostId)) {
             this.getHostsErr = false;

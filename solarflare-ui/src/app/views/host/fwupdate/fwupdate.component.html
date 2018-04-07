@@ -277,7 +277,7 @@
 <clr-modal [clrModalSize]="'md'" [(clrModalOpen)]="status.custom.modal">
     <h3 class="modal-title">Custom Firmware Update Status</h3>
     <div class="modal-body" style="min-height: 140px;">
-        <h6>Note: Firmware update may take some time ...</h6>
+        <h6 [hidden]="!statusUpdate">Note: Firmware update may take some time ...</h6>
 
         <div *ngFor="let output of status.custom.output; let i = index">
             <h6>{{i+1}}. {{output.name}} :</h6>
@@ -351,7 +351,7 @@
 <clr-modal [clrModalSize]="'md'" [(clrModalOpen)]="status.latest.modal">
     <h3 class="modal-title">Latest Firmware Update Status</h3>
     <div class="modal-body" style="min-height: 140px;">
-        <h6>Note: Firmware update may take some time ...</h6>
+        <h6 [hidden]="!statusUpdate">Note: Firmware update may take some time ...</h6>
 
         <div *ngFor="let output of status.latest.output; let i = index">
             <h6>{{i+1}}. {{output.name}}</h6>
@@ -385,15 +385,15 @@
             </div>
             <div *ngIf="output.uefiRom !== null">
                 <span *ngIf="output.uefiRom.state === 'Success'">
-                    UefiROM Firmware: v{{output.uefiRom.from}} updated to v{{output.uefiRom.to}}
+                    UEFIROM Firmware: v{{output.uefiRom.from}} updated to {{output.uefiRom.to}}
                 </span>
                 <span *ngIf="output.uefiRom.state === 'Error'">
-                    UefiROM Firmware: Error occurred while updating v{{output.uefiRom.from}} to v{{output.uefiRom.to}}
+                    UEFIROM Firmware: Error occurred while updating v{{output.uefiRom.from}} to {{output.uefiRom.to}}
                     <i style="color: red;" *ngIf="output.uefiRom.message !== null">
                         <br/>{{output.uefiRom.message}}</i>
                 </span>
                 <span *ngIf="output.uefiRom.state === 'Queued' || output.uefiRom.state === 'Running'">
-                    UefiROM Firmware: v{{output.uefiRom.from}} updating to v{{output.uefiRom.to}}
+                    UEFIROM Firmware: v{{output.uefiRom.from}} updating to {{output.uefiRom.to}}
                 </span>
                 <br/>
             </div>
@@ -414,10 +414,10 @@
     <div class="col-md-12">
 
         <div style="padding:20px;" class="container-fluid">
-            <img src="../solarflare/assets/images/sf-logo.png" width="140px">
+            <img [src]="isProd ? '../solarflare/assets/images/sf-logo.png' : 'assets/images/sf-logo.png'" width="140px">
             <div style="text-align: right;">
                 <div class="btn-group">
-                    <button class="btn" (click)="refreshAdapterList()">Refresh</button>
+                    <button class="btn" (click)="refreshAdapterList()" [disabled]="refreshButtonDisabled">Refresh</button>
                     <button class="btn btn-info">Help</button>
                 </div>
             </div>

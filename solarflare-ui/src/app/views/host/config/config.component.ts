@@ -3,6 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { HostsService } from "../../../services/hosts.service";
 import { GlobalsService } from "../../../shared/globals.service";
 import { FormBuilder, FormGroup, FormControl, Validators } from "@angular/forms";
+import { environment } from "environments/environment"
 // TODO :- reveiw comments - It would be best if import is done via a absolute path.
 // Define all modules paths in tsconfig.json file. This will help in managing file import.
 // Import definitions are auto generated as plugin paths are relatively packaged with vmware web client.
@@ -13,7 +14,9 @@ import { FormBuilder, FormGroup, FormControl, Validators } from "@angular/forms"
     styleUrls: ['./config.component.scss']
 })
 export class ConfigComponent implements OnInit {
+    public isProd = environment.production
     public params = {};
+    public refreshButtonDisabled;
     hostConfig: FormGroup;
     public configDefault = {
         "netQueue": { "netQueueCount": 8, "rss": 4, "maxNumpCPU": false },
@@ -36,7 +39,7 @@ export class ConfigComponent implements OnInit {
         "overlay": { "vxlanOffloadEnable": true, "geneveOffloadEnable": true },
         "restart": false
     };
-    public config = {};
+    public config: any = {};
     public devModeConfig = {};
     public err = {
         getConfiguration: false,
@@ -87,16 +90,18 @@ export class ConfigComponent implements OnInit {
         this.err.getConfiguration = false;
         this.reInitButton();
         this.config = {};
-
+        this.refreshButtonDisabled = true
         this.hs.getConfiguration(this.params['id'])
             .subscribe(
                 data => {
+                    this.refreshButtonDisabled = false
                     this.config = data;
                     this.restoreConfig();
                     this.hs.setConfigs(data);
                 },
                 err => {
                     console.error(err);
+                    this.refreshButtonDisabled = false
                     this.err.getConfiguration = true;
                 }
             );
@@ -156,5 +161,83 @@ export class ConfigComponent implements OnInit {
                     this.getConfiguration();
                 }
             );
+    }
+    formNotChanged() {
+        // {
+        //     "netQueue": { "netQueueCount": 8, "rss": 4, "maxNumpCPU": false },
+        //     "debuggingMask": {
+        //         "utils": true,
+        //         "mgmt": false,
+        //         "uplink": false,
+        //         "transmit": false,
+        //         "receive": true,
+        //         "hardware": false,
+        //         "eventQueue": false,
+        //         "rss": false,
+        //         "port": false,
+        //         "interrupt": false,
+        //         "commonCode": false,
+        //         "driver": false,
+        //         "filter": false,
+        //         "mcdi": false
+        //     },
+        //     "overlay": { "vxlanOffloadEnable": true, "geneveOffloadEnable": true },
+        //     "restart": false
+        // };
+        if(this.config.netQueue.netQueueCount !== this.hostConfig.get('netQueue').get('netQueueCount').value){
+            return false;
+        }
+        if(this.config.netQueue.rss !== this.hostConfig.get('netQueue').get('rss').value){
+            return false;
+        }
+        if(this.config.debuggingMask.utils !== this.hostConfig.get('debuggingMask').get('utils').value){
+            return false;
+        }
+        if(this.config.debuggingMask.mgmt !== this.hostConfig.get('debuggingMask').get('mgmt').value){
+            return false;
+        }
+        if(this.config.debuggingMask.uplink !== this.hostConfig.get('debuggingMask').get('uplink').value){
+            return false;
+        }
+        if(this.config.debuggingMask.transmit !== this.hostConfig.get('debuggingMask').get('transmit').value){
+            return false;
+        }
+        if(this.config.debuggingMask.receive !== this.hostConfig.get('debuggingMask').get('receive').value){
+            return false;
+        }
+        if(this.config.debuggingMask.hardware !== this.hostConfig.get('debuggingMask').get('hardware').value){
+            return false;
+        }
+        if(this.config.debuggingMask.eventQueue !== this.hostConfig.get('debuggingMask').get('eventQueue').value){
+            return false;
+        }
+        if(this.config.debuggingMask.rss !== this.hostConfig.get('debuggingMask').get('rss').value){
+            return false;
+        }
+        if(this.config.debuggingMask.port !== this.hostConfig.get('debuggingMask').get('port').value){
+            return false;
+        }
+        if(this.config.debuggingMask.interrupt !== this.hostConfig.get('debuggingMask').get('interrupt').value){
+            return false;
+        }
+        if(this.config.debuggingMask.commonCode !== this.hostConfig.get('debuggingMask').get('commonCode').value){
+            return false;
+        }
+        if(this.config.debuggingMask.driver !== this.hostConfig.get('debuggingMask').get('driver').value){
+            return false;
+        }
+        if(this.config.debuggingMask.filter !== this.hostConfig.get('debuggingMask').get('filter').value){
+            return false;
+        }
+        if(this.config.debuggingMask.mcdi !== this.hostConfig.get('debuggingMask').get('mcdi').value){
+            return false;
+        }
+        if(this.config.overlay.vxlanOffloadEnable !== this.hostConfig.get('overlay').get('vxlanOffloadEnable').value){
+            return false;
+        }
+        if(this.config.overlay.geneveOffloadEnable !== this.hostConfig.get('overlay').get('geneveOffloadEnable').value){
+            return false;
+        }
+        return true;
     }
 }
