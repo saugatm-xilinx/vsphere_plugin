@@ -28,7 +28,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
       const hostId = params.get('hostId');
       const nicId = params.get('nicId');
       this.nicSvc.setUrlParts(hostId, nicId);
-      this.getDataFromStorage(hostId, nicId);
+      // this.getDataFromStorage(hostId, nicId); // use to lazily load data from hosts api
       this.getNicDetail();
     });
 
