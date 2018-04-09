@@ -34,12 +34,13 @@
                 <clr-vertical-nav-group-children>
                     <div style="margin-left:6px;">
                         <clr-vertical-nav-group *ngFor="let adaptor of host.children">
-                            <img src="../solarflare/assets/images/adaptor.png" width="20px" />
-                            <span class="adaptorName"> {{adaptor.name}} </span>
+                            <div class="adaptor-link cursor-pointer" clrVerticalNavLink>
+                                <img [src]="isProd ? '../solarflare/assets/images/adaptor-40x40.png' : 'assets/images/adaptor-40x40.png'" width="20px" /> {{adaptor.name}}
+                            </div>
                             <clr-vertical-nav-group-children>
-                                <a clrVerticalNavLink *ngFor="let nic of adaptor.children">
-                                    <img src="../solarflare/assets/images/port.png" width="15px" /> {{nic.name}}
-                                </a>
+                                <div class="nic-link cursor-pointer" clrVerticalNavLink *ngFor="let nic of adaptor.children">
+                                    <img [src]="isProd ? '../solarflare/assets/images/port-40x40.png' : 'assets/images/port-40x40.png'" width="15px" /> {{nic.name}}
+                                </div>
                             </clr-vertical-nav-group-children>
                         </clr-vertical-nav-group>
                     </div>
