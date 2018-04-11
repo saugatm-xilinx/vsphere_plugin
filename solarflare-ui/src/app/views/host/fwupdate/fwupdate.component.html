@@ -280,7 +280,7 @@
         <h6 [hidden]="!statusUpdate">Note: Firmware update may take some time ...</h6>
 
         <div *ngFor="let output of status.custom.output; let i = index">
-            <h6>{{i+1}}. {{output.name}} :</h6>
+            <h6>{{i+1}}. {{output.name}} </h6>
             <div *ngIf="output.controller !== null ">
                 <span *ngIf="output.controller.state === 'Success' && output.controller.to ">
                     Controller Firmware: v{{output.controller.from}} updated to v{{output.controller.to}}
