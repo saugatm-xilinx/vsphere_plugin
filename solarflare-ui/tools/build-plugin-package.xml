@@ -1,4 +1,4 @@
-<project name="build-plugin-package" default="build" >
+<project name="build-plugin-package" default="build" xmlns:if="ant:if" xmlns:unless="ant:unless">
    <description>
       - When called without argument this script builds a standard plugin package folder,
         using solarflare-ui and solarflare-service, with this structure:
@@ -16,7 +16,7 @@
       - When called with "-DnoJava" the plugin package is build without any java service.
    </description>
 
-   <property environment="env"/>
+    <property environment="env"/>
    <property name="VSPHERE_SDK_HOME" value="${env.VSPHERE_SDK_HOME}"/>
    <property name="BUILD_DIR" value="${basedir}/../target"/>
    <property name="SERVICE_DIR" value="${basedir}/../../solarflare-service"/>
@@ -27,21 +27,32 @@
    
    <!-- custome defind property -->
    <property name="BUILD_PRIFIX" value="solarflare" />
-   <property name="VERSION" value="1.110.0"/>
    <property name="BUILD_ZIP_DIR" value="${basedir}/../../installer/dist/Tomcat_Server/webapps" />
    <property name="PLUGIN_REGISTRATION" value="${basedir}/../../PluginRegistration"/>
    <property name="P_GOLES" value="clean install" />
+   <property name="installVim25" value="install:install-file -Dfile=${basedir}/../../PluginRegistration/lib/vim25.jar -DgroupId=com.vmware -DartifactId=vim25 -Dversion=1.0.0 -Dpackaging=jar" />
    <property name="PLUGIN_PATH" value="solarflare-vcp" />
    <property name="CLASSES" value="${SERVICE_DIR}/target/classes" />
    <property name="FIRMWARE_JAR" value="${FIRMWARE_TOOL_DIR}/target/firmware-packaging-tool.jar" />
    <property name="FIRMWARE_COPY_TO" value="${basedir}/../../installer/dist/Tomcat_Server/webapps/firmware"/>
-	<target name="firmware">
-		<input message="Enter firmware binary file directory path :" addproperty="DEFAULT_FIRMWARE_PATH"/>
-	</target>
-   <target name="build" depends="firmware, buildCheck, buildUiWar, buildServiceJar, build-firmware-packaging-tool, run_utility, createPluginPackageDir,
-         createPluginProxyPackageDir, createPluginNoJavaPackageDir, mvnWindowsSetup, mvnUnixSetup, runMvnGoals,copyPluginPackageDir, copyRegistrationWar">
+   <property name="SOLARFLARE_SERVICE_JAR" value="${SERVICE_DIR}/target/solarflare-service.jar" />
+   <property name="SOLARFLARE_UI_WAR" value="${BUILD_DIR}/solarflare-ui.war" />
+   <property name="LINUX_INSTALLER_PATH" value="${basedir}/../../installer/Linux/source/" />
+   <target name="build" depends="isFirmware, firmware, buildCheck, buildUiWar, buildServiceJar, build-firmware-packaging-tool, run_utility, run_firmware_utility, createPluginPackageDir, createPluginProxyPackageDir, createPluginNoJavaPackageDir, windowsSetup, unixSetup, signJar, signServiceJarAndWar, runMvnGoals, copyPluginPackageDir, copyBuildPackageToLinuxInstaller, copyRegistrationWar, copyFirmwareMetadata">
       <echo level="info">*** You must restart the Virgo server to use the new plugin package! ***</echo>
    </target>
+   <!-- Take input from user for generating firmware binary metadata file -->
+   <target name="isFirmware">
+        <input message="Enter Solarflare VCP build version:" addproperty="VERSION" />
+	    <input  message="Would you like to generate firmware binary metadata file? " defaultvalue="n" validargs="y,n" addproperty="yes.or.no" />
+        <condition property="yes.is.true">
+             <equals arg1="${yes.or.no}" arg2="y"/>
+        </condition>
+	</target>   
+	<target name="firmware" if="yes.is.true">
+		<input message="Enter Firmware binary file directory path (if not provided then it take path from env. variable 'FIRMWARE_PATH'):" addproperty="DEFAULT_FIRMWARE_PATH"/>
+	</target>
+	
    <target name="buildCheck">
       <condition property="NORMAL_BUILD">
          <and>
@@ -62,7 +73,7 @@
    <target name="build-firmware-packaging-tool" if="${NORMAL_BUILD}">
       <ant antfile="${FIRMWARE_TOOL_DIR}/build.xml" dir="${FIRMWARE_TOOL_DIR}" inheritAll="false"/>
    </target>
-   
+   <!-- Run Utility for edit plugin-package.xml -->
    <target name="run_utility">
 		<java classname="com.solarflare.vcp.helper.XMLUtility" fork="true" failonerror="yes">
 			<arg value="${VERSION}"/>
@@ -71,6 +82,9 @@
 				<pathelement path="${CLASSES}"/>
 			</classpath>
 		</java>
+   </target>
+   <!-- Run Utility for create firmware metadat file -->
+   <target name="run_firmware_utility" if="yes.is.true">
 		<java classname="com.solarflare.firmware.Runner" fork="true" failonerror="yes">
            <arg value="${DEFAULT_FIRMWARE_PATH}"/>
 			<classpath>
@@ -80,18 +94,15 @@
    </target>
    <!-- Edit plugin package before copy-->
 	
-   <target name="createPluginPackageDir" if="${NORMAL_BUILD}" depends="run_utility">
+	<target name="createPluginPackageDir" if="${NORMAL_BUILD}" depends="run_utility">
       <mkdir dir="${BUILD_DIR}/solarflare" />
       <mkdir dir="${BUILD_DIR}/solarflare/plugins" />
       <copy todir="${BUILD_DIR}/solarflare" file="./plugin-package.xml"/>
-      <copy todir="${BUILD_DIR}/solarflare/plugins" file="${BUILD_DIR}/solarflare-ui.war"/>
-      <copy todir="${BUILD_DIR}/solarflare/plugins" file="${SERVICE_DIR}/target/solarflare-service.jar"/>
       <!-- gson-2.3.1.jar is a 3rd party lib used by the service bundle -->
       <copy todir="${BUILD_DIR}/solarflare/plugins" file="${VSPHERE_SDK_HOME}/libs/gson-2.3.1.jar"/>
       <copy todir="${BUILD_DIR}/solarflare/plugins" file="${VSPHERE_SDK_HOME}/libs/vim25.jar"/>
       <copy todir="${BUILD_DIR}/solarflare/plugins" file="${SERVICE_DIR}/libs/sblim-cim-client2-2.1.1.jar"/>
-	  
-   </target>
+	</target>
 
    <target name="createPluginProxyPackageDir" if="${USE_HTTP_PROXY}"
            depends="http-proxy-servlet-check, http-proxy-servlet-warn">
@@ -125,25 +136,64 @@ TO THIS /tools FOLDER."/>
 	<condition property="is_unix">
         <os family="unix"/>
     </condition>
-	<target name="mvnWindowsSetup" if="is_windows">
-		<property name="mvn.executable" value="cmd" />
-		<property name="mvn.args" value="/c" />
+	<target name="windowsSetup" if="is_windows">
+		<property name="executable" value="cmd" />
+		<property name="args" value="/c" />
 	</target>
-	<target name="mvnUnixSetup" if="is_unix">
-		<property name="mvn.executable" value="sh" />
-		<property name="mvn.args" value="-c" />
+	<target name="unixSetup" if="is_unix">
+		<property name="executable" value="sh" />
+		<property name="args" value="-c" />
 	</target>
+	<target name="signJar" >
+	  <input  message="Would you like to sign Solarflare jar/war?" defaultvalue="n" validargs="y,n" addproperty="y.or.n" />
+        <condition property="y.is.true">
+             <equals arg1="${y.or.n}" arg2="y"/>
+        </condition>
+	</target>
+	<!-- Execute command for signed service jar and service ui war-->
+	<target name="signServiceJarAndWar" depends="windowsSetup, unixSetup" if="y.is.true">	
+		<input message="Enter keystore certificate file(pfx) path:" addproperty="PFX_FILE_PATH"/>
+		<input message="Enter keystore certificate password:" addproperty="KEYSTORE_PWD">
+		    <handler classname="org.apache.tools.ant.input.SecureInputHandler" />
+		</input>
+		<exec executable="${executable}" dir="${basedir}">
+			<arg line="${args} 'keytool -list -v -storetype pkcs12 -keystore ${PFX_FILE_PATH} -storepass ${KEYSTORE_PWD}'"/>	
+		</exec>
+		<input message="Enter alias name:" addproperty="ALIAS_NAME"/>
+		<input message="Enter Timestamp URL:" addproperty="TIMESTAMP_URL"/>
+		<condition property="timestamp.is.blank">
+             <equals arg1="${TIMESTAMP_URL}" arg2=""/>
+        </condition>
+		<exec executable="${executable}" dir="${basedir}">
+			<arg line="${args} 'jarsigner -storetype pkcs12  -keystore ${PFX_FILE_PATH} ${SOLARFLARE_SERVICE_JAR} -storepass ${KEYSTORE_PWD} ${ALIAS_NAME}'"  if:true="${timestamp.is.blank}"/>
+			<arg line="${args} 'jarsigner -storetype pkcs12  -keystore ${PFX_FILE_PATH} ${SOLARFLARE_SERVICE_JAR} -tsa ${TIMESTAMP_URL} -storepass ${KEYSTORE_PWD} ${ALIAS_NAME}'" unless:true="${timestamp.is.blank}"/>
+		</exec>
+		<!-- Copy solarflare-service.jar file to destination directory -->
+		<copy todir="${BUILD_DIR}/solarflare/plugins" file="${SERVICE_DIR}/target/solarflare-service.jar"/>
+		<exec executable="${executable}" dir="${basedir}">
+			<arg line="${args} 'jarsigner -storetype pkcs12  -keystore ${PFX_FILE_PATH} ${SOLARFLARE_UI_WAR} -storepass ${KEYSTORE_PWD} ${ALIAS_NAME}'" if:true="${timestamp.is.blank}"/>	
+			<arg line="${args} 'jarsigner -storetype pkcs12  -keystore ${PFX_FILE_PATH} ${SOLARFLARE_UI_WAR} -tsa ${TIMESTAMP_URL} -storepass ${KEYSTORE_PWD} ${ALIAS_NAME}'" unless:true="${timestamp.is.blank}"/>	
+		</exec>
+		<!-- Copy solarflare-service.war file to destination directory -->
+		<copy todir="${BUILD_DIR}/solarflare/plugins" file="${SOLARFLARE_UI_WAR}"/>
+	</target>
+		
 	<!-- Before build modify property file content of version and host ip-->
 	<propertyfile file="${PLUGIN_REGISTRATION}/src/main/webapp/WEB-INF/registerPlugin.properties">
 		<entry key="pluginPath" value="${PLUGIN_PATH}/${BUILD_PRIFIX}-${VERSION}.zip" />
 		<entry key="version" value="${VERSION}" />
 	</propertyfile>
-	<target name="runMvnGoals" depends="mvnWindowsSetup, mvnUnixSetup">
-		<exec dir="${PLUGIN_REGISTRATION}" executable="${mvn.executable}" >
-			<arg line="${mvn.args} 'mvn ${P_GOLES}'" />
+	
+	<target name="runMvnGoals" depends="windowsSetup, unixSetup">
+	    <!-- install vim25 -->
+		<exec dir="${basedir}" executable="${executable}" >
+			<arg line="${args} 'mvn ${installVim25}'" />
+		</exec>
+		<exec dir="${PLUGIN_REGISTRATION}" executable="${executable}" >
+			<arg line="${args} 'mvn ${P_GOLES}'" />
 		</exec>
 	</target>
-   <target name="copyPluginPackageDir">
+    <target name="copyPluginPackageDir">
       <delete dir="${VSPHERE_SDK_HOME}/vsphere-ui/plugin-packages/solarflare" quiet="true"/>
 	  <delete dir="${BUILD_ZIP_DIR}/solarflare-vcp" quiet="true" />
 	  <mkdir dir="${BUILD_ZIP_DIR}"/>
@@ -151,16 +201,23 @@ TO THIS /tools FOLDER."/>
          <fileset dir="${BUILD_DIR}/solarflare"/>
       </copy>
 	  <zip  destfile="${BUILD_ZIP_DIR}/solarflare-vcp/${BUILD_PRIFIX}-${VERSION}.zip" basedir="${BUILD_DIR}/solarflare"/>
-   </target>
-  
+    </target>
 	<target name="copyRegistrationWar" description="Copy war file in plugin dist directory">
 		<delete dir="${BUILD_ZIP_DIR}/plugin-registration.war" quiet="true"/>
 		<copy todir="${BUILD_ZIP_DIR}/" file="${PLUGIN_REGISTRATION}/target/plugin-registration.war"/>
-		<copy todir="${FIRMWARE_COPY_TO}">
+	</target>
+	<target name="copyBuildPackageToLinuxInstaller" >
+		 <delete dir="${LINUX_INSTALLER_PATH}/vcp" quiet="true" />
+		 <mkdir dir="${LINUX_INSTALLER_PATH}/vcp/solarflare-vcp" />
+		 <copy todir="${LINUX_INSTALLER_PATH}/vcp" file="${PLUGIN_REGISTRATION}/target/plugin-registration.war"/>
+		 <copy todir="${LINUX_INSTALLER_PATH}/vcp/solarflare-vcp" file="${BUILD_ZIP_DIR}/solarflare-vcp/${BUILD_PRIFIX}-${VERSION}.zip" />
+	</target>
+	<!-- copy only if yes.is.true -->
+	<target name="copyFirmwareMetadata" if="yes.is.true">
+	   <copy todir="${FIRMWARE_COPY_TO}" >
 			<fileset dir="${DEFAULT_FIRMWARE_PATH}">
-			<include name="**/*.*"/>
-      </fileset>
+				<include name="**/*.*"/>
+			</fileset>
 		</copy>
 	</target>
-
 </project>
