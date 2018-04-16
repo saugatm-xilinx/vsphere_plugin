@@ -17,7 +17,8 @@ public class SfOptionString {
 	String debugMask;
 
 	private static final String DEFAULT_NET_Q_COUNT = "8";
-	private static final String DEFAULT_RSS_Q_COUNT = "4";
+	//VSPPLUG-282 : changed default value of RSS to 1
+	private static final String DEFAULT_RSS_Q_COUNT = "1";
 	private static final String DEFAULT_VX_LAN_OFFLOAD = "1";
 	private static final String DEFAULT_DEBUG_MASK = "0x00";
 
