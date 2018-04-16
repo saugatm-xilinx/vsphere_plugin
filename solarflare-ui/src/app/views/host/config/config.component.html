@@ -1,15 +1,15 @@
 <clr-modal [clrModalSize]="'md'" [(clrModalOpen)]="submitted">
     <h3 class="modal-title">Confirm Restart</h3>
     <div class="modal-body">
-        <h6>Driver needs to be restarted to see the effect of the changes</h6>
+        <h6>The host needs to be rebooted to see the effect of the changes.</h6>
     </div>
     <div class="modal-footer">
         <button class="btn btn-outline" type="button"
-                (click)="submitted = false">Cancel
+                (click)="submitted = false">OK
         </button>
-        <button class="btn btn-primary" type="button"
+        <!-- <button class="btn btn-primary" type="button"
                 (click)="hostConfig.get('restart').setValue(true);onSubmit(hostConfig.value)">Restart
-        </button>
+        </button> -->
     </div>
 </clr-modal>
 

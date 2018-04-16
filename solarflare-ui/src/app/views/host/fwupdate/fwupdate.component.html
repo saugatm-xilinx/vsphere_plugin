@@ -1,5 +1,5 @@
 <clr-modal [clrModalSize]="'lg'" [(clrModalOpen)]="latestUpdateModal" [clrModalClosable]="false" [clrModalStaticBackdrop]="true">
-    <h3 class="modal-title">Latest Update</h3>
+    <h3 class="modal-title">Update</h3>
     <div class="modal-body">
 
         <div class="alert alert-app-level alert-danger" style="margin-bottom:24px" *ngIf="button.latestErr">
@@ -31,15 +31,15 @@
                 <th colspan="2" class="table-border-right">Controller Version</th>
                 <th colspan="2" class="table-border-right">Boot ROM Version</th>
                 <th colspan="2" class="table-border-right">UEFI ROM Version</th>
-                <th>Latest Version Available</th>
+                <th>Available Update Different</th>
             </tr>
             <tr>
                 <th class="table-border-right">Current</th>
-                <th class="table-border-right" style="color:#781DA0;">Latest</th>
+                <th class="table-border-right" style="color:#781DA0;">Available</th>
                 <th class="table-border-right">Current</th>
-                <th class="table-border-right" style="color:#781DA0;">Latest</th>
+                <th class="table-border-right" style="color:#781DA0;">Available</th>
                 <th class="table-border-right">Current</th>
-                <th style="color:#781DA0;" class="table-border-right">Latest</th>
+                <th style="color:#781DA0;" class="table-border-right">Available</th>
                 <th></th>
             </tr>
             <tr *ngFor="let ad of selectedAdapters">
@@ -79,7 +79,7 @@
         <br/>
         <div>
             <input type="checkbox" id="filter" [(ngModel)]="latestUpdateAdapterFilter" [disabled]="disableLatestUpdateAdapterFilter()">
-            <label for="filter">Add adapters for which latest version(s) is not available</label>
+            <label for="filter">Add adapters for which available version(s) is same</label>
         </div>
 
         <div style="text-align: right; height: 30px;">
