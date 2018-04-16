@@ -4,12 +4,12 @@
         <h6>The host needs to be rebooted to see the effect of the changes.</h6>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-outline" type="button"
-                (click)="submitted = false">OK
-        </button>
-        <!-- <button class="btn btn-primary" type="button"
-                (click)="hostConfig.get('restart').setValue(true);onSubmit(hostConfig.value)">Restart
+        <!-- <button class="btn btn-outline" type="button"
+                (click)="submitted = false">Cancel
         </button> -->
+        <button class="btn btn-primary" type="button"
+                (click)="hostConfig.get('restart').setValue(true);onSubmit(hostConfig.value)">OK
+        </button>
     </div>
 </clr-modal>
 
