@@ -195,7 +195,7 @@
             &nbsp; Please select firmware file
         </p>
 
-        <form style="min-height: 72px;" [formGroup]="customUploadUrl" *ngIf="customSelectUrl">
+        <form style="min-height: 72px;" [formGroup]="customUploadUrl" *ngIf="customSelectUrl"  (ngSubmit)="onSubmitUrl()">
             <section class="form-block">
                 <div class="form-group row">
                     <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
@@ -228,7 +228,7 @@
             </section>
         </form>
 
-        <form [formGroup]="customUploadFile" *ngIf="!customSelectUrl">
+        <form [formGroup]="customUploadFile" *ngIf="!customSelectUrl" (ngSubmit)="onSubmitFile()">
             <section class="form-block">
                 <div class="form-group row">
                     <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
@@ -251,8 +251,6 @@
                 </div>
             </section>
         </form>
-
-
     </div>
     <div class="modal-footer" *ngIf="customSelectUrl">
         <button class="btn btn-outline" type="button" (click)="closeAndResetModal()">Cancel</button>
