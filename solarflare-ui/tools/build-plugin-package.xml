@@ -38,7 +38,7 @@
    <property name="SOLARFLARE_SERVICE_JAR" value="${SERVICE_DIR}/target/solarflare-service.jar" />
    <property name="SOLARFLARE_UI_WAR" value="${BUILD_DIR}/solarflare-ui.war" />
    <property name="LINUX_INSTALLER_PATH" value="${basedir}/../../installer/Linux/source/" />
-   <target name="build" depends="isFirmware, firmware, buildCheck, buildUiWar, buildServiceJar, build-firmware-packaging-tool, run_utility, run_firmware_utility, createPluginPackageDir, createPluginProxyPackageDir, createPluginNoJavaPackageDir, windowsSetup, unixSetup, signJar, signServiceJarAndWar, runMvnGoals, copyPluginPackageDir, copyBuildPackageToLinuxInstaller, copyRegistrationWar, copyFirmwareMetadata">
+   <target name="build" depends="isFirmware, firmware, buildCheck, buildUiWar, buildServiceJar, build-firmware-packaging-tool, run_utility, run_firmware_utility, createPluginPackageDir, createPluginProxyPackageDir, createPluginNoJavaPackageDir, windowsSetup, unixSetup, editRegisterProperty, signJar, signServiceJarAndWar, runMvnGoals, copyPluginPackageDir, copyBuildPackageToLinuxInstaller, copyRegistrationWar, copyFirmwareMetadata">
       <echo level="info">*** You must restart the Virgo server to use the new plugin package! ***</echo>
    </target>
    <!-- Take input from user for generating firmware binary metadata file -->
@@ -168,21 +168,23 @@ TO THIS /tools FOLDER."/>
 			<arg line="${args} 'jarsigner -storetype pkcs12  -keystore ${PFX_FILE_PATH} ${SOLARFLARE_SERVICE_JAR} -storepass ${KEYSTORE_PWD} ${ALIAS_NAME}'"  if:true="${timestamp.is.blank}"/>
 			<arg line="${args} 'jarsigner -storetype pkcs12  -keystore ${PFX_FILE_PATH} ${SOLARFLARE_SERVICE_JAR} -tsa ${TIMESTAMP_URL} -storepass ${KEYSTORE_PWD} ${ALIAS_NAME}'" unless:true="${timestamp.is.blank}"/>
 		</exec>
-		<!-- Copy solarflare-service.jar file to destination directory -->
-		<copy todir="${BUILD_DIR}/solarflare/plugins" file="${SERVICE_DIR}/target/solarflare-service.jar"/>
+		
 		<exec executable="${executable}" dir="${basedir}">
 			<arg line="${args} 'jarsigner -storetype pkcs12  -keystore ${PFX_FILE_PATH} ${SOLARFLARE_UI_WAR} -storepass ${KEYSTORE_PWD} ${ALIAS_NAME}'" if:true="${timestamp.is.blank}"/>	
 			<arg line="${args} 'jarsigner -storetype pkcs12  -keystore ${PFX_FILE_PATH} ${SOLARFLARE_UI_WAR} -tsa ${TIMESTAMP_URL} -storepass ${KEYSTORE_PWD} ${ALIAS_NAME}'" unless:true="${timestamp.is.blank}"/>	
 		</exec>
-		<!-- Copy solarflare-service.war file to destination directory -->
-		<copy todir="${BUILD_DIR}/solarflare/plugins" file="${SOLARFLARE_UI_WAR}"/>
+		
 	</target>
 		
+	
 	<!-- Before build modify property file content of version and host ip-->
+	<target name = "editRegisterProperty">
 	<propertyfile file="${PLUGIN_REGISTRATION}/src/main/webapp/WEB-INF/registerPlugin.properties">
 		<entry key="pluginPath" value="${PLUGIN_PATH}/${BUILD_PRIFIX}-${VERSION}.zip" />
 		<entry key="version" value="${VERSION}" />
 	</propertyfile>
+	</target>
+	
 	
 	<target name="runMvnGoals" depends="windowsSetup, unixSetup">
 	    <!-- install vim25 -->
@@ -197,6 +199,10 @@ TO THIS /tools FOLDER."/>
       <delete dir="${VSPHERE_SDK_HOME}/vsphere-ui/plugin-packages/solarflare" quiet="true"/>
 	  <delete dir="${BUILD_ZIP_DIR}/solarflare-vcp" quiet="true" />
 	  <mkdir dir="${BUILD_ZIP_DIR}"/>
+	  <!-- Copy solarflare-service.jar file to destination directory -->
+	  <copy todir="${BUILD_DIR}/solarflare/plugins" file="${SERVICE_DIR}/target/solarflare-service.jar"/>		
+	  <!-- Copy solarflare-service.war file to destination directory -->
+	  <copy todir="${BUILD_DIR}/solarflare/plugins" file="${SOLARFLARE_UI_WAR}"/>
       <copy todir="${VSPHERE_SDK_HOME}/vsphere-ui/plugin-packages/solarflare">
          <fileset dir="${BUILD_DIR}/solarflare"/>
       </copy>
@@ -207,10 +213,10 @@ TO THIS /tools FOLDER."/>
 		<copy todir="${BUILD_ZIP_DIR}/" file="${PLUGIN_REGISTRATION}/target/plugin-registration.war"/>
 	</target>
 	<target name="copyBuildPackageToLinuxInstaller" >
-		 <delete dir="${LINUX_INSTALLER_PATH}/vcp" quiet="true" />
-		 <mkdir dir="${LINUX_INSTALLER_PATH}/vcp/solarflare-vcp" />
-		 <copy todir="${LINUX_INSTALLER_PATH}/vcp" file="${PLUGIN_REGISTRATION}/target/plugin-registration.war"/>
-		 <copy todir="${LINUX_INSTALLER_PATH}/vcp/solarflare-vcp" file="${BUILD_ZIP_DIR}/solarflare-vcp/${BUILD_PRIFIX}-${VERSION}.zip" />
+		<delete dir="${LINUX_INSTALLER_PATH}/vcp" quiet="true" />
+	    <mkdir dir="${LINUX_INSTALLER_PATH}/vcp/solarflare-vcp" />
+        <copy todir="${LINUX_INSTALLER_PATH}/vcp" file="${PLUGIN_REGISTRATION}/target/plugin-registration.war"/>
+		<copy todir="${LINUX_INSTALLER_PATH}/vcp/solarflare-vcp" file="${BUILD_ZIP_DIR}/solarflare-vcp/${BUILD_PRIFIX}-${VERSION}.zip" />
 	</target>
 	<!-- copy only if yes.is.true -->
 	<target name="copyFirmwareMetadata" if="yes.is.true">
