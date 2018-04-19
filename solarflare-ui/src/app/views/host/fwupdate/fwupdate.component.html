@@ -44,7 +44,7 @@
             </tr>
             <tr *ngFor="let ad of selectedAdapters">
                 <td>{{ad.name}}</td>
-                <td>{{ad.versionController}}</td>
+                <td>v{{ad.versionController}}</td>
                 <td>
                     <b style="color:#781DA0;" *ngIf="ad.latestVersion.controller !== null">
                         {{ad.latestVersion.controller}}
@@ -53,7 +53,7 @@
                         NA
                     </b>
                 </td>
-                <td>{{ad.versionBootROM}}</td>
+                <td>v{{ad.versionBootROM}}</td>
                 <td>
                     <b style="color:#781DA0;" *ngIf="ad.latestVersion.bootROM !== null">
                         {{ad.latestVersion.bootROM}}
@@ -62,7 +62,7 @@
                         NA
                     </b>
                 </td>
-                <td>{{ad.versionUEFIROM}}</td>
+                <td>v{{ad.versionUEFIROM}}</td>
                 <td>
                     <b style="color:#781DA0;" *ngIf="ad.latestVersion.uefi !== null">
                         {{ad.latestVersion.uefi}}
