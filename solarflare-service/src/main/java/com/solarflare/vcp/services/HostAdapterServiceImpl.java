@@ -19,6 +19,7 @@ import com.solarflare.vcp.cim.CIMHost;
 import com.solarflare.vcp.cim.SfCIMClientService;
 import com.solarflare.vcp.cim.SfCIMService;
 import com.solarflare.vcp.exception.SfInvalidRequestException;
+import com.solarflare.vcp.helper.FtpUrlProcessor;
 import com.solarflare.vcp.helper.MetadataHelper;
 import com.solarflare.vcp.helper.SFBase64;
 import com.solarflare.vcp.model.Adapter;
@@ -242,6 +243,15 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		logger.info("Solarflare:: customUpdateFirmwareFromURL");
 		String taskID = null;
 		try {
+			//encode special characters in user name and password for ftp and sftp url
+			if(fwImagePath != null && !fwImagePath.isEmpty()){
+				if(fwImagePath.indexOf("ftp") == 0 || 
+				   fwImagePath.indexOf("FTP") == 0 ||
+				   fwImagePath.indexOf("sftp") == 0 ||
+				   fwImagePath.indexOf("SFTP") == 0){
+					fwImagePath = FtpUrlProcessor.getEncodedURL(fwImagePath);
+				}
+			}
 			URL fwImageURL = new URL(fwImagePath);
 			SfCIMService cimService = getCIMService(hostId);
 			boolean readComplete = true;
