@@ -36,6 +36,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
               },
               err => {
                   console.error(err);
+                  if(err.status == 401){
+                    window.location.reload()
+                  }
                   this.getOverviewErr = true;
               }
           );

@@ -70,6 +70,9 @@ export class FwupdateComponent implements OnInit {
                 },
                 err => {
                     console.error(err);
+                    if(err.status == 401){
+                        window.location.reload()
+                    }
                     this.gettingAdapterList = false;
                     this.getAdapterListErr = true;
                 }
@@ -180,6 +183,9 @@ export class FwupdateComponent implements OnInit {
                 },
                 err => {
                     console.error(err);
+                    if(err.status == 401){
+                        window.location.reload()
+                    }
                     this.button.latest = false;
                     this.button.latestErr = true;
                 }

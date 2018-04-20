@@ -101,6 +101,9 @@ export class ConfigComponent implements OnInit {
                 },
                 err => {
                     console.error(err);
+                    if(err.status == 401){
+                        window.location.reload()
+                    }
                     this.refreshButtonDisabled = false
                     this.err.getConfiguration = true;
                 }

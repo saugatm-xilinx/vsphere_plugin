@@ -43,6 +43,9 @@ export class StatisticsComponent implements OnInit, OnDestroy {
           this.hasError = false;
         },
         err => {
+          if(err.status == 401){
+            window.location.reload()
+          }
           this.isLoading = false;
           this.hasError = true;
         }

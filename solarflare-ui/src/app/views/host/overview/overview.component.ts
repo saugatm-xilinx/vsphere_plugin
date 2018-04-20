@@ -44,6 +44,9 @@ export class OverviewComponent implements OnInit {
                 },
                 err => {
                     console.error(err);
+                    if(err.status == 401){
+                        window.location.reload()
+                    }
                     this.refreshButtonDisable = false
                     this.getOverviewErr = true;
                 }
