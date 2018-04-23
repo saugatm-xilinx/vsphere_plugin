@@ -595,10 +595,12 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			for (VMNIC nic : adp.getChildren()) {
 				if (nic.getId().equals(nicId)) {
 					nicResponse = new VMNICResponse();
-					nicResponse.setDeviceId(adp.getDeviceId());
-					nicResponse.setSubSystemDeviceId(adp.getSubSystemDeviceId());
-					nicResponse.setVendorId(adp.getVendorId());
-					nicResponse.setSubSystemVendorId(adp.getSubSystemVendorId());
+					// VCPPLUG-281 :: Hex values for deviceId,subSystem
+					// deviceId,vendorId and subSystem vendorId
+					nicResponse.setDeviceId(Integer.parseInt(adp.getDeviceId(), 16) + "");
+					nicResponse.setSubSystemDeviceId(Integer.parseInt(adp.getSubSystemDeviceId(), 16) + "");
+					nicResponse.setVendorId(Integer.parseInt(adp.getVendorId(), 16) + "");
+					nicResponse.setSubSystemVendorId(Integer.parseInt(adp.getSubSystemVendorId(), 16) + "");
 					nicResponse.setDriverName(nic.getDriverName());
 					nicResponse.setLinkStatus(nic.getStatus());
 					nicResponse.setPortSpeed(nic.getPortSpeed());
@@ -625,7 +627,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		ManagedObjectReference perfManager = sfVimService.getSession().getServiceContent().getPerfManager();
 		Map<String, PerfCounterInfo> nicStatPerfIdMap = sfVimService.getNicStatPerfCounters(perfManager,
 				AdapterNicStatistics.performanceCounter);
-		
+
 		List<PerfEntityMetricBase> retrievedStats = sfVimService.retriveStats(perfManager, nicStatPerfIdMap, hostId,
 				nicId);
 		Map<Integer, Integer> nicStatPerfVal = sfVimService.processNicStats(retrievedStats, nicStatPerfIdMap);
@@ -649,7 +651,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			if (counterInfo != null) {
 				int statValue = nicStatPerfVal.get(counterInfo.getKey());
 				String unitInfo = counterInfo.getUnitInfo().getKey();
-				if("number".equalsIgnoreCase(unitInfo)){
+				if ("number".equalsIgnoreCase(unitInfo)) {
 					unitInfo = "";
 				}
 				switch (perfCounter) {
@@ -695,5 +697,5 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		timer.stop();
 		return nicStats;
 	}
-	
+
 }
