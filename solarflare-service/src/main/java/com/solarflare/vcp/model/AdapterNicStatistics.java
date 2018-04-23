@@ -16,20 +16,11 @@ public class AdapterNicStatistics {
 	String multicastPacketsReceived;
 	String broadcastPacketsSent;
 	String totalReceiveError;
-	String receiveLengthErrors;
-	String receiveOverErrors;
-	String receiveCRCErrors;
-	String reveiveFrameErrors;
-	String reveiveFIFOErrors;
-	String receiveMissedErrors;
-	String totalTransmitErrors;
-	String transmitAbortedErrors;
-	String transmitCarrierErrors;
-	String transmitFIFOErrors;
 	String multicastPacketsSent;
 	String broadcastPacketsReceived;
+	String totalTransmitErrors;
 	
-
+	
 	public static List<String> performanceCounter = new ArrayList<>();
 	static{
 		performanceCounter.add("net.packetsRx.SUMMATION");
@@ -127,65 +118,12 @@ public class AdapterNicStatistics {
 	public void setTotalReceiveError(String totalReceiveError) {
 		this.totalReceiveError = totalReceiveError;
 	}
-	public String getReceiveLengthErrors() {
-		return receiveLengthErrors;
-	}
-	public void setReceiveLengthErrors(String receiveLengthErrors) {
-		this.receiveLengthErrors = receiveLengthErrors;
-	}
-	public String getReceiveOverErrors() {
-		return receiveOverErrors;
-	}
-	public void setReceiveOverErrors(String receiveOverErrors) {
-		this.receiveOverErrors = receiveOverErrors;
-	}
-	public String getReceiveCRCErrors() {
-		return receiveCRCErrors;
-	}
-	public void setReceiveCRCErrors(String receiveCRCErrors) {
-		this.receiveCRCErrors = receiveCRCErrors;
-	}
-	public String getReveiveFrameErrors() {
-		return reveiveFrameErrors;
-	}
-	public void setReveiveFrameErrors(String reveiveFrameErrors) {
-		this.reveiveFrameErrors = reveiveFrameErrors;
-	}
-	public String getReveiveFIFOErrors() {
-		return reveiveFIFOErrors;
-	}
-	public void setReveiveFIFOErrors(String reveiveFIFOErrors) {
-		this.reveiveFIFOErrors = reveiveFIFOErrors;
-	}
-	public String getReceiveMissedErrors() {
-		return receiveMissedErrors;
-	}
-	public void setReceiveMissedErrors(String receiveMissedErrors) {
-		this.receiveMissedErrors = receiveMissedErrors;
-	}
+	
 	public String getTotalTransmitErrors() {
 		return totalTransmitErrors;
 	}
 	public void setTotalTransmitErrors(String totalTransmitErrors) {
 		this.totalTransmitErrors = totalTransmitErrors;
-	}
-	public String getTransmitAbortedErrors() {
-		return transmitAbortedErrors;
-	}
-	public void setTransmitAbortedErrors(String transmitAbortedErrors) {
-		this.transmitAbortedErrors = transmitAbortedErrors;
-	}
-	public String getTransmitCarrierErrors() {
-		return transmitCarrierErrors;
-	}
-	public void setTransmitCarrierErrors(String transmitCarrierErrors) {
-		this.transmitCarrierErrors = transmitCarrierErrors;
-	}
-	public String getTransmitFIFOErrors() {
-		return transmitFIFOErrors;
-	}
-	public void setTransmitFIFOErrors(String transmitFIFOErrors) {
-		this.transmitFIFOErrors = transmitFIFOErrors;
 	}
 	@Override
 	public String toString() {
@@ -194,13 +132,8 @@ public class AdapterNicStatistics {
 				+ bytesReceived + ", bytesSent=" + bytesSent + ", receivePacketsDropped=" + receivePacketsDropped
 				+ ", transmitPacketsDropped=" + transmitPacketsDropped + ", multicastPacketsReceived="
 				+ multicastPacketsReceived + ", broadcastPacketsSent=" + broadcastPacketsSent + ", totalReceiveError="
-				+ totalReceiveError + ", receiveLengthErrors=" + receiveLengthErrors + ", receiveOverErrors="
-				+ receiveOverErrors + ", receiveCRCErrors=" + receiveCRCErrors + ", reveiveFrameErrors="
-				+ reveiveFrameErrors + ", reveiveFIFOErrors=" + reveiveFIFOErrors + ", receiveMissedErrors="
-				+ receiveMissedErrors + ", totalTransmitErrors=" + totalTransmitErrors + ", transmitAbortedErrors="
-				+ transmitAbortedErrors + ", transmitCarrierErrors=" + transmitCarrierErrors + ", transmitFIFOErrors="
-				+ transmitFIFOErrors + "]";
+				+ totalReceiveError + ", multicastPacketsSent=" + multicastPacketsSent + ", broadcastPacketsReceived="
+				+ broadcastPacketsReceived + ", totalTransmitErrors=" + totalTransmitErrors + "]";
 	}
 
-	
 }
