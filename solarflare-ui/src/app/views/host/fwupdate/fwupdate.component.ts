@@ -157,7 +157,7 @@ export class FwupdateComponent implements OnInit {
                 },
                 err => {
                     if(err.status == 401){
-                        window.location.reload()
+                        // window.location.reload()
                     }
                     this.refreshButtonDisabled = false;
                     const error = err.json();
@@ -322,7 +322,7 @@ export class FwupdateComponent implements OnInit {
                     this.customUpdateErrorMessage = error ? error.message : null;
                     console.error(err);
                     if(err.status == 401){
-                        window.location.reload()
+                        // window.location.reload()
                     }
                     this.button.latest = false;
                     this.button.latestErr = true;

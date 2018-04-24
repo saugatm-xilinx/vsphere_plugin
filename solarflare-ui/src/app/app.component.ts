@@ -60,7 +60,7 @@ export class AppComponent implements OnInit {
                 err => {
                     console.error(err);
                     if(err.status == 401){
-                        window.location.reload()
+                        // window.location.reload()
                     }
                     this.getHostsErr = true;
                 }
@@ -87,7 +87,7 @@ export class AppComponent implements OnInit {
                     err => {
                         console.error(err);
                         if(err.status == 401){
-                            window.location.reload()
+                            // window.location.reload()
                         }
                         this.getHostsErr = true;
                     }
