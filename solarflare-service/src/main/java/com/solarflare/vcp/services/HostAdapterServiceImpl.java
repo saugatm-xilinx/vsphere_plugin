@@ -597,10 +597,10 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 					nicResponse = new VMNICResponse();
 					// VCPPLUG-281 :: Hex values for deviceId,subSystem
 					// deviceId,vendorId and subSystem vendorId
-					nicResponse.setDeviceId(Integer.parseInt(adp.getDeviceId(), 16) + "");
-					nicResponse.setSubSystemDeviceId(Integer.parseInt(adp.getSubSystemDeviceId(), 16) + "");
-					nicResponse.setVendorId(Integer.parseInt(adp.getVendorId(), 16) + "");
-					nicResponse.setSubSystemVendorId(Integer.parseInt(adp.getSubSystemVendorId(), 16) + "");
+					nicResponse.setDeviceId(Integer.toHexString(Integer.parseInt(adp.getDeviceId())));
+					nicResponse.setSubSystemDeviceId(Integer.toHexString(Integer.parseInt(adp.getSubSystemDeviceId())));
+					nicResponse.setVendorId(Integer.toHexString(Integer.parseInt(adp.getVendorId())));
+					nicResponse.setSubSystemVendorId(Integer.toHexString(Integer.parseInt(adp.getSubSystemVendorId())));
 					nicResponse.setDriverName(nic.getDriverName());
 					nicResponse.setLinkStatus(nic.getStatus());
 					nicResponse.setPortSpeed(nic.getPortSpeed());
