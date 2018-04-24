@@ -142,17 +142,8 @@ public class DummayService implements HostAdapterService {
 		  stat.setMulticastPacketsReceived("0");
 		  stat.setBroadcastPacketsSent("0");  
 		  stat.setTotalReceiveError("0");
-		  stat.setReceiveLengthErrors("0");
-		  stat.setReceiveOverErrors("0");
-		  stat.setReceiveCRCErrors("0");
-		  stat.setReveiveFrameErrors("0");
-		  stat.setReveiveFIFOErrors("0");
-		  stat.setReceiveMissedErrors("0");
 		  stat.setTotalReceiveError("0");
 		  stat.setTotalTransmitErrors("0");
-		  stat.setTransmitAbortedErrors("0");
-		  stat.setTransmitCarrierErrors("0");
-		  stat.setTransmitFIFOErrors("0");
 		  stat.setMulticastPacketsReceived("0");
 		  stat.setBroadcastPacketsSent("0");
 		  return stat;
