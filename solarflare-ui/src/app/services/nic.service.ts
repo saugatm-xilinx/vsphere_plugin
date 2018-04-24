@@ -118,6 +118,8 @@ export class NicService {
 
     private nicStatsDataMapper(res) {
         return [
+            { name: 'Time Period From', value: res['timePeriod_from'] || '' },
+            { name: 'Time Period To', value: res['timePeriod_to'] || '' },
             { name: 'Packets received', value: res['packetsReceived'] || '' },
             { name: 'Packets sent', value: res['packetsSent'] || '' },
             { name: 'Bytes received', value: res['bytesReceived'] || '' },
@@ -129,16 +131,7 @@ export class NicService {
             { name: 'Multicast packets sent', value: res['multicastPacketsSent'] || '' },
             { name: 'Broadcast packets sent', value: res['broadcastPacketsSent'] || '' },
             { name: 'Total receive errors', value: res['totalReceiveError'] || '' },
-            { name: 'Receive length errors', value: res['receiveLengthErrors'] || '' },
-            { name: 'Receive over errors', value: res['receiveOverErrors'] || '' },
-            { name: 'Receive CRC errors', value: res['receiveCRCErrors'] || '' },
-            { name: 'Receive frame errors', value: res['reveiveFrameErrors'] || '' },
-            { name: 'Receive FIFO errors', value: res['reveiveFIFOErrors'] || '' },
-            { name: 'Receive missed errors', value: res['receiveMissedErrors'] || '' },
-            { name: 'Total transmit errors', value: res['totalTransmitErrors'] || '' },
-            { name: 'Transmit aborted errors', value: res['transmitAbortedErrors'] || '' },
-            { name: 'Transmit carrier errors', value: res['transmitCarrierErrors'] || '' },
-            { name: 'Transmit FIFO errors', value: res['transmitFIFOErrors'] || '' }
+            { name: 'Total transmit errors', value: res['totalTransmitErrors'] || '' }
         ];
     }
 }
