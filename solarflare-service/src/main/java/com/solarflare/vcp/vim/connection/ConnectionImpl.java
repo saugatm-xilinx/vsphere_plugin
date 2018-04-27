@@ -175,13 +175,15 @@ public class ConnectionImpl implements Connection {
 				// if logoin() method is not used to connect for unit test then
 				// throw error
 				if (serviceContent == null)
-					throw new ConnectionException("User Session is not valid. Can not make a connection to vCenter.");
+					throw new ConnectionException("User Session is invalid or timedout. Please try re-login!");
 			}
 		} else {
 			// if logoin() method is not used to connect for unit test then
 			// throw error
-			if (serviceContent == null)
-				throw new ConnectionException("UserSessionService is null. Can not connect to Center.");
+			if (serviceContent == null){
+				logger.error("UserSessionService is null. Can not connect to Center.");
+				throw new ConnectionException("User Session is invalid or timedout. Please try re-login!");
+			}
 		}
 		return this;
 
