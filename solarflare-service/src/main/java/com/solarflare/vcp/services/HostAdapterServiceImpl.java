@@ -4,15 +4,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.cim.CIMInstance;
-import javax.cim.CIMObjectPath;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.sblim.cimclient.internal.util.MOF;
 
 import com.solarflare.vcp.cim.CIMConstants;
 import com.solarflare.vcp.cim.CIMHost;
@@ -24,7 +23,6 @@ import com.solarflare.vcp.helper.MetadataHelper;
 import com.solarflare.vcp.helper.SFBase64;
 import com.solarflare.vcp.model.Adapter;
 import com.solarflare.vcp.model.AdapterOverview;
-import com.solarflare.vcp.model.AdapterTask;
 import com.solarflare.vcp.model.FileHeader;
 import com.solarflare.vcp.model.FirmwareType;
 import com.solarflare.vcp.model.FirmwareVersion;
@@ -34,9 +32,7 @@ import com.solarflare.vcp.model.HostConfiguration;
 import com.solarflare.vcp.model.NicBootParamInfo;
 import com.solarflare.vcp.model.SfFirmware;
 import com.solarflare.vcp.model.SfOptionString;
-import com.solarflare.vcp.model.Status;
 import com.solarflare.vcp.model.TaskInfo;
-import com.solarflare.vcp.model.TaskState;
 import com.solarflare.vcp.model.UpdateRequest;
 import com.solarflare.vcp.security.ASN1Parser;
 import com.solarflare.vcp.vim.SfVimService;
@@ -46,7 +42,6 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 	private static final Log logger = LogFactory.getLog(HostAdapterServiceImpl.class);
 
 	private SfVimService sfVimService;
-	private String SFC9220_deviceID = "2563";
 	private int threadPoolSize;
 
 	public int getThreadPoolSize() {
@@ -102,42 +97,70 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 	public String updateFirmwareToLatest(List<Adapter> adapterList, String hostId) throws Exception {
 
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Update - updateFirmwareToLatest");
-		String taskID = null;
 		logger.info("Solarflare:: updateFirmwareToLatest");
+		String taskID = null;
+
+		List<FwType> firmwareTypeList = new ArrayList<>();
+		firmwareTypeList.add(FwType.CONTROLLER);
+		firmwareTypeList.add(FwType.BOOTROM);
+		firmwareTypeList.add(FwType.UEFIROM);
+
 		try {
 			TaskInfo taskInfo = createTask(hostId);
 			taskID = taskInfo.getTaskid();
 
-			// TODO : Review Comment : Try Caching cimHost to check performance
 			SfCIMService cimService = getCIMService(hostId);
 
-			UpdateRequestProcessor requestProcessor = UpdateRequestProcessor.getInstance();
+			// UpdateRequestProcessor requestProcessor =
+			// UpdateRequestProcessor.getInstance();
 
-			for (Adapter adapter : adapterList) {
-				if (isValidated(adapter, taskInfo)) {
+			CIMInstance fwCInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_MCFW_NAME);
+			CIMInstance fwBInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_BOOTROM_NAME);
+			CIMInstance fwUInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
+			CIMInstance fwInstance = null;
+			// This map will group all the adapters with same type and subType
+			// together with their firmware file path
+			Map<URL, List<Adapter>> updateAdapterList = new LinkedHashMap<>();
+			for (FwType fwType : firmwareTypeList) {
+				for (Adapter adapter : adapterList) {
+					switch (fwType) {
+					case CONTROLLER:
+						// If no latest version is available for adapter then
+						// skip.
+						if (adapter.getLatestVersion() == null
+								|| adapter.getLatestVersion().getController().equals("0.0.0.0")) {
+							continue;
+						}
+						fwInstance = fwCInstance;
+						break;
+					case BOOTROM:
+						// If no latest version is available for adapter then
+						// skip.
+						if (adapter.getLatestVersion() == null
+								|| adapter.getLatestVersion().getBootROM().equals("0.0.0.0")) {
+							continue;
+						}
+						fwInstance = fwBInstance;
+						break;
+					case UEFIROM:
+						// If no latest version is available for adapter then
+						// skip.
+						if (adapter.getLatestVersion() == null
+								|| adapter.getLatestVersion().getUefi().equals("0.0.0.0")) {
+							continue;
+						}
+						fwInstance = fwUInstance;
+						break;
+					}
 
-					// update controller
-					logger.debug("Updating Controller of adapter " + adapter.getName());
-					URL fWImageURL = null; // for latest update this is null
-					CIMInstance fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_MCFW_NAME);
-					UpdateRequest updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.CONTROLLER,
-							fWImageURL, fwInstance);
-					requestProcessor.addUpdateRequest(updateRequest);
-
-					logger.debug("Updating BootROM of adapter " + adapter.getName());
-					fWImageURL = null; // for latest update this is null
-					fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_BOOTROM_NAME);
-					updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.BOOTROM, fWImageURL,
-							fwInstance);
-					requestProcessor.addUpdateRequest(updateRequest);
-
-					logger.debug("Updating UEFI ROM of adapter " + adapter.getName());
-					fWImageURL = null; // for latest update this is null
-					fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
-					updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.UEFIROM, fWImageURL,
-							fwInstance);
-					requestProcessor.addUpdateRequest(updateRequest);
-
+					CIMInstance nicInstance = cimService.getNICCardInstance(adapter.getChildren().get(0).getName());
+					URL imageUrl = getImageURL(fwInstance, nicInstance, cimService, fwType, adapter);
+					addToMap(updateAdapterList, imageUrl, adapter);
+				}
+				for (URL fwImageURL : updateAdapterList.keySet()) {
+					boolean readComplete = true;
+					byte[] fileData = cimService.readData(fwImageURL, readComplete);
+					updateFirmware(adapterList, fileData, cimService, fwInstance, fwType, taskInfo);
 				}
 			}
 		} catch (Exception e) {
@@ -146,6 +169,15 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		}
 		timer.stop();
 		return taskID;
+	}
+
+	private void addToMap(Map<URL, List<Adapter>> updateAdapterList, URL imageUrl, Adapter adapter) {
+		List<Adapter> adapterList = updateAdapterList.get(imageUrl);
+		if (adapterList == null) {
+			adapterList = new ArrayList<>();
+		}
+		adapterList.add(adapter);
+		updateAdapterList.put(imageUrl, adapterList);
 	}
 
 	@Override
@@ -158,9 +190,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 
 			TaskInfo taskInfo = createTask(hostId);
 			taskID = taskInfo.getTaskid();
-
-			URL fwImageURL = null;
-
+			
 			SfCIMService cimService = getCIMService(hostId);
 
 			byte[] dataBytes = base64Data.getBytes();
@@ -196,29 +226,17 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			boolean isValid = isFwFileValid(adapterList, header, fwInstance, cimService);
 			if (isValid) {
 				if (fwInstance != null) {
-
-					String tempFile = cimService.startFwImageSend(fwInstance);
-
-					sendDataInChunks(cimService, fwInstance, tempFile, decodedDataBytes);
-
-					fwImageURL = new URL("file:/" + tempFile);
-
-					UpdateRequestProcessor requestProcessor = UpdateRequestProcessor.getInstance();
-					UpdateRequest updateRequest = null;
+					FwType fwType = null;
 					if (controller) {
-						updateRequest = createUpdateRequestForCustom(cimService, taskInfo, FwType.CONTROLLER,
-								fwImageURL);
+						fwType = FwType.CONTROLLER;
 					}
 					if (bootrom) {
-						updateRequest = createUpdateRequestForCustom(cimService, taskInfo, FwType.BOOTROM, fwImageURL);
+						fwType = FwType.BOOTROM;
 					}
 					if (uefirom) {
-						updateRequest = createUpdateRequestForCustom(cimService, taskInfo, FwType.UEFIROM, fwImageURL);
+						fwType = FwType.UEFIROM;
 					}
-
-					updateRequest.setCustom(true); // temp file is created
-					updateRequest.setTempFilePath(tempFile);
-					requestProcessor.addUpdateRequest(updateRequest, adapterList);
+					updateFirmware(adapterList, decodedDataBytes, cimService, fwInstance, fwType, taskInfo);
 
 				} else {
 					String errMsg = "Fail to get CIM Firmware Instance";
@@ -236,6 +254,24 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		return taskID;
 	}
 
+	private void updateFirmware(List<Adapter> adapterList, byte[] decodedDataBytes, SfCIMService cimService,
+			CIMInstance fwInstance, FwType fwType, TaskInfo taskInfo) throws Exception {
+		String tempFile = cimService.startFwImageSend(fwInstance);
+
+		sendDataInChunks(cimService, fwInstance, tempFile, decodedDataBytes);
+
+		URL fwImageURL = new URL("file:/" + tempFile);
+
+		UpdateRequestProcessor requestProcessor = UpdateRequestProcessor.getInstance();
+		UpdateRequest updateRequest = null;
+
+		updateRequest = createUpdateRequestForCustom(cimService, taskInfo, fwType, fwImageURL);
+
+		updateRequest.setCustom(true); // temp file is created
+		updateRequest.setTempFilePath(tempFile);
+		requestProcessor.addUpdateRequest(updateRequest, adapterList);
+	}
+
 	@Override
 	public String customUpdateFirmwareFromURL(List<Adapter> adapterList, String hostId, String fwImagePath)
 			throws Exception {
@@ -243,12 +279,11 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		logger.info("Solarflare:: customUpdateFirmwareFromURL");
 		String taskID = null;
 		try {
-			//encode special characters in user name and password for ftp and sftp url
-			if(fwImagePath != null && !fwImagePath.isEmpty()){
-				if(fwImagePath.indexOf("ftp") == 0 || 
-				   fwImagePath.indexOf("FTP") == 0 ||
-				   fwImagePath.indexOf("sftp") == 0 ||
-				   fwImagePath.indexOf("SFTP") == 0){
+			// encode special characters in user name and password for ftp and
+			// sftp url
+			if (fwImagePath != null && !fwImagePath.isEmpty()) {
+				if (fwImagePath.indexOf("ftp") == 0 || fwImagePath.indexOf("FTP") == 0
+						|| fwImagePath.indexOf("sftp") == 0 || fwImagePath.indexOf("SFTP") == 0) {
 					fwImagePath = FtpUrlProcessor.getEncodedURL(fwImagePath);
 				}
 			}
@@ -267,7 +302,6 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		timer.stop();
 		return taskID;
 
-
 	}
 
 	@Override
@@ -278,7 +312,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			adapters = sfVimService.getHostAdapters(hostId);
 			SfCIMService cimService = getCIMService(hostId);
 			Map<String, CIMInstance> nics = cimService.getEthernatePortInstanceMap();
-			
+
 			for (Adapter adapter : adapters) {
 				setFirmwareVersions(adapter, cimService, nics);
 			}
@@ -359,37 +393,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		cimService.getProperty();
 		return cimService;
 	}
-
-	private UpdateRequest createUpdateRequest(Adapter adapter, SfCIMService cimService, TaskInfo taskInfo,
-			FwType fwType, URL fwImageURL, CIMInstance fwInstance) throws Exception {
-		String adapterId = adapter.getId();
-		AdapterTask aTask = getAdapterTask(taskInfo, adapterId);
-
-		CIMInstance nicInstance = cimService.getNICCardInstance(adapter.getChildren().get(0).getName());
-		// Check for controller version
-		Status status = new Status(TaskState.Queued, null, fwType);
-		if (FwType.CONTROLLER.equals(fwType)) {
-			aTask.setController(status);
-		} else if (FwType.BOOTROM.equals(fwType)) {
-			aTask.setBootROM(status);
-		} else if (FwType.UEFIROM.equals(fwType)) {
-			aTask.setUefiROM(status);
-		}
-		if (fwImageURL == null) {
-			fwImageURL = getImageURL(fwInstance, nicInstance, cimService, fwType, adapter);
-		}
-		UpdateRequest updateRequest = new UpdateRequest();
-		updateRequest.setAdapterId(adapterId);
-		updateRequest.setFwInstance(fwInstance.getObjectPath());
-		updateRequest.setNicInstance(new CIMObjectPath(MOF.objectHandle(nicInstance.getObjectPath(), false, true)));
-		updateRequest.setFwImagePath(fwImageURL);
-		updateRequest.setCimService(cimService);
-		updateRequest.setTaskId(taskInfo.getTaskid());
-		updateRequest.setFwType(fwType);
-
-		return updateRequest;
-	}
-
+	
 	private UpdateRequest createUpdateRequestForCustom(SfCIMService cimService, TaskInfo taskInfo, FwType fwType,
 			URL fwImageURL) throws Exception {
 
@@ -402,27 +406,13 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		return updateRequest;
 	}
 
-	private AdapterTask getAdapterTask(TaskInfo taskInfo, String adapterId) {
-		List<AdapterTask> tasks = taskInfo.getAdapterTasks();
-		// At this point, this can be null
-		if (tasks != null && !tasks.isEmpty())
-			for (AdapterTask aTask : tasks)
-				if (aTask.getAdapterId().equals(adapterId)) {
-					return aTask;
-				}
-		// task is not created yet, create a new task
-		AdapterTask aTask = new AdapterTask();
-		aTask.setAdapterId(adapterId);
-		taskInfo.add(aTask);
-		return aTask;
-	}
-
-	private URL getImageURL(CIMInstance fw_inst, CIMInstance nicInstance, SfCIMService cimService, FwType fwType, Adapter adapter)
-			throws Exception {
+	private URL getImageURL(CIMInstance fw_inst, CIMInstance nicInstance, SfCIMService cimService, FwType fwType,
+			Adapter adapter) throws Exception {
 
 		URL pluginURL = new URL(sfVimService.getPluginURL(CIMConstants.PLUGIN_KEY));
 		String filePath = null;
-		SfFirmware file = MetadataHelper.getMetaDataForAdapter(pluginURL, cimService, fw_inst, nicInstance, fwType,adapter);
+		SfFirmware file = MetadataHelper.getMetaDataForAdapter(pluginURL, cimService, fw_inst, nicInstance, fwType,
+				adapter);
 		if (file != null) {
 			filePath = file.getPath();
 		}
@@ -453,10 +443,11 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		logger.info("Solarflare::Sending data in chunks is complete");
 	}
 
-	private void setFirmwareVersions(Adapter adapter, SfCIMService cimService, Map<String, CIMInstance> nics) throws Exception {
+	private void setFirmwareVersions(Adapter adapter, SfCIMService cimService, Map<String, CIMInstance> nics)
+			throws Exception {
 		logger.info("Solarflare:: setFirmwareVersions for adapter : " + adapter.getName());
 		String deviceId = adapter.getChildren().get(0).getName();
-		Map<String, String> versions = cimService.getAdapterVersions(deviceId,nics);
+		Map<String, String> versions = cimService.getAdapterVersions(deviceId, nics);
 
 		String controllerVersion = versions.get(CIMConstants.CONTROLLER_VERSION);
 		String bootROMVersion = versions.get(CIMConstants.BOOT_ROM_VERSION);
@@ -473,7 +464,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		URL pluginURL = new URL(sfVimService.getPluginURL(CIMConstants.PLUGIN_KEY));
 
 		String latestControllerVersion = cimService.getLatestFWImageVersion(pluginURL, cimService, fwInstance,
-				niCimInstance, FwType.CONTROLLER,adapter);
+				niCimInstance, FwType.CONTROLLER, adapter);
 
 		FirmwareVersion frmVesion = new FirmwareVersion();
 
@@ -482,14 +473,14 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		// Get version from image binary for BootRom
 		CIMInstance bootROMInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_BOOTROM_NAME);
 		String latestBootROMVersion = cimService.getLatestFWImageVersion(pluginURL, cimService, bootROMInstance,
-				niCimInstance, FwType.BOOTROM,adapter);
+				niCimInstance, FwType.BOOTROM, adapter);
 
 		frmVesion.setBootROM(latestBootROMVersion);
 
 		// Get version from image binary for BootRom
 		CIMInstance uefiROMInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
 		String latestUefiROMVersion = cimService.getLatestFWImageVersion(pluginURL, cimService, uefiROMInstance,
-				niCimInstance, FwType.UEFIROM,adapter);
+				niCimInstance, FwType.UEFIROM, adapter);
 		frmVesion.setUefi(latestUefiROMVersion);
 
 		// Put dummy latest versions for Firmware family
@@ -497,22 +488,6 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 														// latest for now
 
 		adapter.setLatestVersion(frmVesion);
-	}
-
-	private boolean isValidated(Adapter adapter, TaskInfo taskInfo) {
-		// TODO : Need to refactor/cleanup
-		if (SFC9220_deviceID.equals(adapter.getDeviceId())) {
-			String adapterId = adapter.getId();
-			AdapterTask aTask = getAdapterTask(taskInfo, adapterId);
-
-			Status status = new Status(TaskState.Error, "Adapter Type Not Supported", FwType.CONTROLLER);
-			// aTask.setController(status);
-
-			status = new Status(TaskState.Error, "Adapter Type Not Supported", FwType.BOOTROM);
-			// aTask.setBootROM(status);
-			return true;
-		}
-		return true;
 	}
 
 	@Override
