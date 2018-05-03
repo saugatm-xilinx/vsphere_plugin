@@ -1,18 +1,18 @@
-<!-- <clr-modal [clrModalSize]="'lg'" [(clrModalOpen)]="helpModalOpen">
-    <h3 class="modal-title">Help for host overview</h3>
+<clr-modal [clrModalSize]="'lg'" [(clrModalOpen)]="helpModalOpen">
+    <h3 class="modal-title">Help</h3>
     <div class="modal-body">
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et 
-            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip 
-            ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore 
-            eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia 
-            deserunt mollit anim id est laborum.
+        <p>The Solarflare vSphere Clinet Plugin (VCP) supports configuration and 
+            management of Solarflare adapters.
+        </p>
+        <p>
+            <strong>Solarflare VCP version : </strong>1.0.0 dummy
         </p>
     </div>
     <div class="modal-footer">
         <button class="btn btn-outline" type="button" (click)="helpModalOpen = false">OK
         </button>
     </div>
-</clr-modal> -->
+</clr-modal>
 <div class="row">
     <div class="col-md-12">
         <div style="padding:20px;" class="container-fluid">
@@ -20,12 +20,11 @@
             <div style="text-align: right;">
                 <div class="btn-group">
                     <button class="btn" [disabled]="refreshButtonDisable" (click)="hostDetail = {};getHostDetail()">Refresh</button>
-                    <button class="btn btn-info">Help</button>
+                    <button class="btn btn-info" (click)="helpModalOpen = true">Help</button>
                 </div>
             </div>
         </div>
     </div>
-
     <div class="col-md-12">
         <div style="text-align: center">
             <span class="spinner spinner-lg" *ngIf="(hostDetail|json) === '{}' && !getOverviewErr ">

@@ -1,3 +1,35 @@
+<clr-modal [clrModalSize]="'lg'" [(clrModalOpen)]="helpModalOpen">
+    <h3 class="modal-title">Help</h3>
+    <div class="modal-body">
+        <div>Firmware update will program (upgrade or downgrade) a 
+            firmware image on the selected adapters. The firmware image can be any of the following:
+        </div>
+        <ul class="list">
+            <li>The available firmware version - packaged along with the plugin installer.</li>
+            <li>A custom version installed from a firmware image (.dat) file copied to the host on which browser is running.</li>
+            <li>A custom version installed from a URL.</li>
+        </ul>
+        <div><strong>Available Firmware:</strong></div>
+        <div>Select adapter(s) by ticking the corresponding check box(es) and then select 
+            the UPDATE button.
+        </div>
+        <div><strong>Custom Update:</strong></div>
+        <div>Select adapter(s) by ticking the corresponding check box(es) and then select 
+            the CUSTOM UPDATE button. Firmware can be installed from a file on the local 
+            host or from a remote server identified by URL.
+        </div>
+        <div><strong>NOTE:</strong></div>
+        <div>Firmware can also be upgraded using the sfupdate_esxi utility from a remote 
+            host to connect the CIM Provider on the local ESXi host. For more information 
+            about the CIM Provider and sfupdate_esxi utility, please refer to the 
+            Solarflare Server User Guide (SF-103837-CD, VMware section).
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-outline" type="button" (click)="helpModalOpen = false">OK
+        </button>
+    </div>
+</clr-modal>
 <clr-modal [clrModalSize]="'lg'" [(clrModalOpen)]="latestUpdateModal" [clrModalClosable]="false" [clrModalStaticBackdrop]="true">
     <h3 class="modal-title">Update</h3>
     <div class="modal-body">
@@ -416,7 +448,7 @@
             <div style="text-align: right;">
                 <div class="btn-group">
                     <button class="btn" (click)="refreshAdapterList()" [disabled]="refreshButtonDisabled">Refresh</button>
-                    <button class="btn btn-info">Help</button>
+                    <button class="btn btn-info" (click)="helpModalOpen = true">Help</button>
                 </div>
             </div>
         </div>

@@ -195,11 +195,11 @@ export class FwupdateComponent implements OnInit {
         let updatable = 0, invalid = 0;
         const filterdAdapters = [];
         this.selectedAdapters.forEach((value, index) => {
-            if (value.latestVersion.controller !== value.versionController.split(' ')[0]) {
+            if (value.latestVersion.controller !== "v" + value.versionController.split(' ')[0]) {
                 updatable++;
-            } else if (value.latestVersion.bootROM !== value.versionBootROM) {
+            } else if (value.latestVersion.bootROM !== "v" + value.versionBootROM) {
                 updatable++;
-            } else if (value.latestVersion.uefi !== value.versionUEFIROM) {
+            } else if (value.latestVersion.uefi !== "v" + value.versionUEFIROM) {
                 updatable++;
             } else {
                 invalid++;
@@ -208,11 +208,11 @@ export class FwupdateComponent implements OnInit {
 
         if (remove === 'remove') {
             this.selectedAdapters.forEach((value, index) => {
-                if (value.latestVersion.controller !== value.versionController.split(' ')[0]) {
+                if (value.latestVersion.controller !== "v" + value.versionController.split(' ')[0]) {
                     filterdAdapters.push(value);
-                } else if (value.latestVersion.bootROM !== value.versionBootROM) {
+                } else if (value.latestVersion.bootROM !== "v" + value.versionBootROM) {
                     filterdAdapters.push(value);
-                } else if (value.latestVersion.uefi !== value.versionUEFIROM) {
+                } else if (value.latestVersion.uefi !== "v" + value.versionUEFIROM) {
                     filterdAdapters.push(value);
                 }
             });
