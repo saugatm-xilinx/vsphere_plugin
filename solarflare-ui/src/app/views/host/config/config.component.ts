@@ -17,6 +17,7 @@ export class ConfigComponent implements OnInit {
     public isProd = environment.production
     public params = {};
     public refreshButtonDisabled;
+    public helpModalOpen = false;
     hostConfig: FormGroup;
     public configDefault = {
         "netQueue": { "netQueueCount": 8, "rss": 4, "maxNumpCPU": false },

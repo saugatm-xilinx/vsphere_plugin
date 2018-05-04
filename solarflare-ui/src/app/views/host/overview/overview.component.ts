@@ -16,6 +16,7 @@ export class OverviewComponent implements OnInit {
     public params = {};
     public hostDetail = {};
     public getOverviewErr = false;
+    public helpModalOpen = false;
     public refreshButtonDisable;
     public pluginVer = APP_CONFIG.version;
 

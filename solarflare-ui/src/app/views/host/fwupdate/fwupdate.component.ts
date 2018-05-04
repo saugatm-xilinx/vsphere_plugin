@@ -25,6 +25,7 @@ export class FwupdateComponent implements OnInit {
     public latestUpdateModal = false;
     public customUpdateModal = false;
     public params = {};
+    public helpModalOpen = false;
     public adapterList = [];
     public refreshButtonDisabled;
     public button = {

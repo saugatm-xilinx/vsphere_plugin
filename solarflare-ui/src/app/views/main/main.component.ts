@@ -14,6 +14,7 @@ import { UserSettingService } from "../../shared/user-settings.service";
 // [removable-chassis-code]
 import { Chassis } from "../../services/chassis/chassis.model";
 import { ChassisService } from "../../services/chassis/chassis.service";
+import { environment } from 'environments/environment';
 // [end-chassis-code]
 
 @Component({
@@ -29,6 +30,7 @@ export class MainComponent implements OnInit, OnDestroy {
    @Input() echoModalOpened = false;
    private echoSubscription: Subscription;
    private refreshSubscription: Subscription;
+   isProd = environment.production;
 
    // [removable-chassis-code]
    refreshChassisList$ = new Subject();
