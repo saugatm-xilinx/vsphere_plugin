@@ -44,7 +44,7 @@ echo.
 
 echo Building: setup.msi
 
-mkdir -p ../build
+mkdir "../build"
 
 echo.
 echo - Harvesting...
