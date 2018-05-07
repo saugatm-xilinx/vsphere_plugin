@@ -4,27 +4,27 @@
 <app-header *ngIf="gs.showDevUI()" ></app-header>
 
 
-
-<div class="row">
-    <div class="container-fluid margin-top">
-        <div class="col-md-12">
-            <img [src]="isProd ? '../solarflare/assets/images/sf-logo.png' : 'assets/images/sf-logo.png'" height="90px">
-        </div>
-    </div>
-    <div class="row margin-top">
-        <div class="col-xs-6" style="text-align: right;">
-            <img [src]="isProd ? '../solarflare/assets/images/Emerald-002-no-background.png' : 'assets/images/Emerald-002-no-background.png'" width="60%">
-        </div>
-        <div class="col-xs-6">
-            <img [src]="isProd ? '../solarflare/assets/images/Emerald-003-no-background.png' : 'assets/images/Emerald-003-no-background.png'" width="60%">
-        </div>
-    </div>
-    <p style="font-size: large;text-align: center;">
-        The Solarflare vSphere Client Plugin (VCP) supports configuration and management of Solarflare adapters. 
-        Select a host on the left pane to display configuration menus.
-    </p>
+<div>
+	<div class="row">
+		<div class="container-fluid margin-top">
+			<div class="col-md-12">
+				<img [src]="isProd ? '../solarflare/assets/images/sf-logo.png' : 'assets/images/sf-logo.png'" height="90px">
+			</div>
+		</div>
+	</div>
+	<div class="row margin-top">
+		<div class="col-xs-6" style="text-align: right;">
+			<img [src]="isProd ? '../solarflare/assets/images/Emerald-002-no-background.png' : 'assets/images/Emerald-002-no-background.png'" width="60%">
+		</div>
+		<div class="col-xs-6">
+			<img [src]="isProd ? '../solarflare/assets/images/Emerald-003-no-background.png' : 'assets/images/Emerald-003-no-background.png'" width="60%">
+		</div>
+	</div>
+	<p style="font-size: large;text-align: center;">
+		The Solarflare vSphere Client Plugin (VCP) supports configuration and management of Solarflare adapters. 
+		Select a host on the left pane to display configuration menus.
+	</p>
 </div>
-
 
 <!-- ---------------------------- Main view content -------------------------------- -->
 
