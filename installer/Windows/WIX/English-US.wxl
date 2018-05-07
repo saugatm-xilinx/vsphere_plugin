@@ -329,10 +329,10 @@
 <String Id="PrepareDlg_Title" Overridable="yes">Setup - [App_Name]</String>
 <String Id="ProgressDlgProgressBar" Overridable="yes">Progress done</String>
 <String Id="ProgressDlgStatusLabel" Overridable="yes">Status:</String>
-<String Id="ProgressDlgTextChanging" Overridable="yes">Please wait while [App_Name] is changed.</String>
+<String Id="ProgressDlgTextChanging" Overridable="yes">Please wait while [App_Name] is being changed.</String>
 <String Id="ProgressDlgTextInstalling" Overridable="yes">Please wait while [App_Name] is being installed.</String>
-<String Id="ProgressDlgTextRemoving" Overridable="yes">Please wait while [App_Name] is removed.</String>
-<String Id="ProgressDlgTextRepairing" Overridable="yes">Please wait while [App_Name] is repaired.</String>
+<String Id="ProgressDlgTextRemoving" Overridable="yes">Please wait while [App_Name] is being removed.</String>
+<String Id="ProgressDlgTextRepairing" Overridable="yes">Please wait while [App_Name] is being repaired.</String>
 <String Id="ProgressDlgTitleChanging" Overridable="yes">{\UI_Font_Title}Changing [App_Name]</String>
 <String Id="ProgressDlgTitleInstalling" Overridable="yes">{\UI_Font_Title}Installing [App_Name]</String>
 <String Id="ProgressDlgTitleRemoving" Overridable="yes">{\UI_Font_Title}Removing [App_Name]</String>
