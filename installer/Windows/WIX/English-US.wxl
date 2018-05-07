@@ -330,7 +330,7 @@
 <String Id="ProgressDlgProgressBar" Overridable="yes">Progress done</String>
 <String Id="ProgressDlgStatusLabel" Overridable="yes">Status:</String>
 <String Id="ProgressDlgTextChanging" Overridable="yes">Please wait while [App_Name] is changed.</String>
-<String Id="ProgressDlgTextInstalling" Overridable="yes">Please wait while [App_Name] is installed.</String>
+<String Id="ProgressDlgTextInstalling" Overridable="yes">Please wait while [App_Name] is being installed.</String>
 <String Id="ProgressDlgTextRemoving" Overridable="yes">Please wait while [App_Name] is removed.</String>
 <String Id="ProgressDlgTextRepairing" Overridable="yes">Please wait while [App_Name] is repaired.</String>
 <String Id="ProgressDlgTitleChanging" Overridable="yes">{\UI_Font_Title}Changing [App_Name]</String>
