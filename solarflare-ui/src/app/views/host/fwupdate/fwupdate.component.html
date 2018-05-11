@@ -1,5 +1,37 @@
+<clr-modal [clrModalSize]="'lg'" [(clrModalOpen)]="helpModalOpen">
+    <h3 class="modal-title">Help</h3>
+    <div class="modal-body">
+        <div>The firmware update will program (upgrade or downgrade) a firmware image on the selected adapters. 
+            The firmware image can be any of the following:
+        </div>
+        <ul class="list">
+            <li>The available firmware version - packaged along with the plugin installer.</li>
+            <li>A custom version installed from a firmware image (.dat) file copied to the host on which browser is running.</li>
+            <li>A custom version installed from a URL.</li>
+        </ul>
+        <div><strong>Available Firmware:</strong></div>
+        <div>Select adapter(s) by ticking the corresponding check box(es) and then select 
+            the UPDATE button.
+        </div>
+        <div><strong>Custom Update:</strong></div>
+        <div>Select adapter(s) by ticking the corresponding check box(es) and then select 
+            the CUSTOM UPDATE button. Firmware can be installed from a file on the local 
+            host or from a remote server identified by URL.
+        </div>
+        <div><strong>NOTE:</strong></div>
+        <div>Firmware can also be upgraded using the sfupdate_esxi utility from a remote 
+            host to connect the CIM Provider on the local ESXi host. For more information 
+            about the CIM Provider and sfupdate_esxi utility, please refer to the 
+            Solarflare Server User Guide (SF-103837-CD, VMware section).
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-outline" type="button" (click)="helpModalOpen = false">OK
+        </button>
+    </div>
+</clr-modal>
 <clr-modal [clrModalSize]="'lg'" [(clrModalOpen)]="latestUpdateModal" [clrModalClosable]="false" [clrModalStaticBackdrop]="true">
-    <h3 class="modal-title">Latest Update</h3>
+    <h3 class="modal-title">Update</h3>
     <div class="modal-body">
 
         <div class="alert alert-app-level alert-danger" style="margin-bottom:24px" *ngIf="button.latestErr">
@@ -31,20 +63,20 @@
                 <th colspan="2" class="table-border-right">Controller Version</th>
                 <th colspan="2" class="table-border-right">Boot ROM Version</th>
                 <th colspan="2" class="table-border-right">UEFI ROM Version</th>
-                <th>Latest Version Available</th>
+                <th>Available Update Different</th>
             </tr>
             <tr>
                 <th class="table-border-right">Current</th>
-                <th class="table-border-right" style="color:#781DA0;">Latest</th>
+                <th class="table-border-right" style="color:#781DA0;">Available</th>
                 <th class="table-border-right">Current</th>
-                <th class="table-border-right" style="color:#781DA0;">Latest</th>
+                <th class="table-border-right" style="color:#781DA0;">Available</th>
                 <th class="table-border-right">Current</th>
-                <th style="color:#781DA0;" class="table-border-right">Latest</th>
+                <th style="color:#781DA0;" class="table-border-right">Available</th>
                 <th></th>
             </tr>
             <tr *ngFor="let ad of selectedAdapters">
                 <td>{{ad.name}}</td>
-                <td>{{ad.versionController}}</td>
+                <td>v{{ad.versionController}}</td>
                 <td>
                     <b style="color:#781DA0;" *ngIf="ad.latestVersion.controller !== null">
                         {{ad.latestVersion.controller}}
@@ -53,7 +85,7 @@
                         NA
                     </b>
                 </td>
-                <td>{{ad.versionBootROM}}</td>
+                <td>v{{ad.versionBootROM}}</td>
                 <td>
                     <b style="color:#781DA0;" *ngIf="ad.latestVersion.bootROM !== null">
                         {{ad.latestVersion.bootROM}}
@@ -62,7 +94,7 @@
                         NA
                     </b>
                 </td>
-                <td>{{ad.versionUEFIROM}}</td>
+                <td>v{{ad.versionUEFIROM}}</td>
                 <td>
                     <b style="color:#781DA0;" *ngIf="ad.latestVersion.uefi !== null">
                         {{ad.latestVersion.uefi}}
@@ -79,7 +111,7 @@
         <br/>
         <div>
             <input type="checkbox" id="filter" [(ngModel)]="latestUpdateAdapterFilter" [disabled]="disableLatestUpdateAdapterFilter()">
-            <label for="filter">Add adapters for which latest version(s) is not available</label>
+            <label for="filter">Add adapters for which available version(s) is same</label>
         </div>
 
         <div style="text-align: right; height: 30px;">
@@ -195,7 +227,7 @@
             &nbsp; Please select firmware file
         </p>
 
-        <form style="min-height: 72px;" [formGroup]="customUploadUrl" *ngIf="customSelectUrl">
+        <form style="min-height: 72px;" [formGroup]="customUploadUrl" *ngIf="customSelectUrl"  (ngSubmit)="onSubmitUrl()">
             <section class="form-block">
                 <div class="form-group row">
                     <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
@@ -228,7 +260,7 @@
             </section>
         </form>
 
-        <form [formGroup]="customUploadFile" *ngIf="!customSelectUrl">
+        <form [formGroup]="customUploadFile" *ngIf="!customSelectUrl" (ngSubmit)="onSubmitFile()">
             <section class="form-block">
                 <div class="form-group row">
                     <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
@@ -251,8 +283,6 @@
                 </div>
             </section>
         </form>
-
-
     </div>
     <div class="modal-footer" *ngIf="customSelectUrl">
         <button class="btn btn-outline" type="button" (click)="closeAndResetModal()">Cancel</button>
@@ -280,7 +310,7 @@
         <h6 [hidden]="!statusUpdate">Note: Firmware update may take some time ...</h6>
 
         <div *ngFor="let output of status.custom.output; let i = index">
-            <h6>{{i+1}}. {{output.name}} :</h6>
+            <h6>{{i+1}}. {{output.name}} </h6>
             <div *ngIf="output.controller !== null ">
                 <span *ngIf="output.controller.state === 'Success' && output.controller.to ">
                     Controller Firmware: v{{output.controller.from}} updated to v{{output.controller.to}}
@@ -418,7 +448,7 @@
             <div style="text-align: right;">
                 <div class="btn-group">
                     <button class="btn" (click)="refreshAdapterList()" [disabled]="refreshButtonDisabled">Refresh</button>
-                    <button class="btn btn-info">Help</button>
+                    <button class="btn btn-info" (click)="helpModalOpen = true">Help</button>
                 </div>
             </div>
         </div>

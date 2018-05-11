@@ -49,9 +49,9 @@ public class MetadataHelper {
 			CIMInstance nicInstance, FwType fwType, Adapter adapter)
 			throws MalformedURLException, RuntimeFaultFaultMsg, Exception {
 		logger.info("getMetaDataForAdapter called for input params pluginURL : " + pluginURL + " FwType : " + fwType);
- 
-		setTypeNSubType(cimService,sfFWInstance,nicInstance,fwType,adapter);
-		
+
+		setTypeNSubType(cimService, sfFWInstance, nicInstance, fwType, adapter);
+
 		int currentType = 0;
 		int currentSubType = 0;
 
@@ -66,10 +66,11 @@ public class MetadataHelper {
 			currentType = adapter.getUefiROMType();
 			currentSubType = adapter.getUefiROMSubType();
 		}
-		
+
 		if (metadata == null) {
 			// TODO : check for https certificate warning
-			URL metaDataFilePath = new URL("http", pluginURL.getHost(), CIMConstants.METADATA_PATH);
+			URL metaDataFilePath = new URL(pluginURL.getProtocol(), pluginURL.getHost(), pluginURL.getPort(),
+					CIMConstants.METADATA_PATH);
 			logger.info("Solarfalre:: getting metadata from " + metaDataFilePath);
 			metadata = getMetadata(metaDataFilePath);
 		}
@@ -96,7 +97,7 @@ public class MetadataHelper {
 
 	private static void setTypeNSubType(SfCIMService cimService, CIMInstance sfFWInstance, CIMInstance nicInstance,
 			FwType fwType, Adapter adapter) {
-		
+
 		int currentType = 0;
 		int currentSubType = 0;
 
@@ -118,7 +119,7 @@ public class MetadataHelper {
 
 			currentType = Integer.parseInt(params.isEmpty() ? "0" : params.get(CIMConstants.TYPE));
 			currentSubType = Integer.parseInt(params.isEmpty() ? "0" : params.get(CIMConstants.SUB_TYPE));
-			
+
 			// Store type and subType in adapter
 			if (fwType.equals(FwType.CONTROLLER)) {
 				adapter.setControllerType(currentType);
@@ -130,20 +131,21 @@ public class MetadataHelper {
 				adapter.setUefiROMType(currentType);
 				adapter.setUefiROMSubType(currentSubType);
 			}
-			
+
 		} else {
 			logger.info("Solarflare:: Read supported type and sub type from adapter object");
 		}
 	}
 
-	private static byte[] readData(URL toDownload, boolean readComplete) {
+	private static byte[] readData(URL toDownload, boolean readComplete) throws IOException {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
+		InputStream stream = null;
+		byte[] data = null;
 		try {
 			byte[] chunk = new byte[1000];
 			int bytesRead;
 			if (toDownload != null) {
-				InputStream stream = toDownload.openStream();
+				stream = toDownload.openStream();
 				if (readComplete) {
 					while ((bytesRead = stream.read(chunk)) > 0) {
 						outputStream.write(chunk, 0, bytesRead);
@@ -152,11 +154,17 @@ public class MetadataHelper {
 					bytesRead = stream.read(chunk);
 					outputStream.write(chunk, 0, bytesRead);
 				}
+				data = outputStream.toByteArray();
 			}
 		} catch (IOException e) {
 			logger.error("Error in reading file : " + toDownload);
+		} finally {
+			if (stream != null) {
+				stream.close();
+			}
+			outputStream.close();
 		}
-		return outputStream.toByteArray();
+		return data;
 	}
 
 	public static boolean validateURL(URL url) throws Exception {

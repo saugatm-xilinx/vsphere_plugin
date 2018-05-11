@@ -19,8 +19,8 @@ export class AppMainService {
         } else {
             url = this.rootUrl + '/ui/solarflare/rest/services/hosts/';
         }
-        const cacheControlHeaders = this.gs.getCacheControlHeaders()
-        return this.http.get(url, cacheControlHeaders)
+        const headers = this.gs.getCacheControlHeaders()
+        return this.http.get(url, headers)
             .map((response: Response) => {
                 return response.json();
             });

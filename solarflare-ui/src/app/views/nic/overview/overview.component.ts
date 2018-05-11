@@ -62,6 +62,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
           this.nicDetail = data;
         },
         err => {
+          if(err.status == 401){
+            // window.location.reload()
+          }
           this.isLoading = false;
           this.hasError = true;
         }

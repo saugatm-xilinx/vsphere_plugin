@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.Net;
 using System.IO;
 using Microsoft.Win32;
+using System.Net.NetworkInformation;
 
 namespace CustomActions
 {
@@ -62,14 +63,14 @@ namespace CustomActions
 
         [CustomAction]
         public static ActionResult Get_HostName(Session session)
-        {
-            //First get the hostname of local machine.
-            String strHostName = Dns.GetHostName();
-
-            // Assign Hostname to the property ""HOSTNAME_IPADDRESS"
-            session["HOSTNAME_IPADDRESS"] = strHostName;
-            session.Log("Got the Hostname successfully.\n");
-            return ActionResult.Success;
+        {                    
+            // Get the host entry of current machine
+            string hostName = Dns.GetHostEntry("").HostName;
+         
+            // Assign fully qualified name to the property "HOSTNAME_IPADDRESS"
+            session["HOSTNAME_IPADDRESS"] = hostName;
+            session.Log("Got the Hostname OR FQDN :: " + hostName);
+            return ActionResult.Success;          
         }
 
 

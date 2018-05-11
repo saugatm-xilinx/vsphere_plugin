@@ -40,7 +40,6 @@ import com.vmware.vim25.PhysicalNic;
 import com.vmware.vim25.RuntimeFaultFaultMsg;
 import com.vmware.vim25.SoftwarePackage;
 import com.vmware.vise.security.ClientSessionEndListener;
-import com.vmware.vise.usersession.ServerInfo;
 import com.vmware.vise.usersession.UserSessionService;
 
 public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientSessionEndListener {
@@ -381,31 +380,6 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 			return;
 		}
 		logger.info(LOG_KEY + "afterPropertiesSet: UserSession= " + userSessionService.getUserSession());
-		if (userSessionService.getUserSession() != null) {
-			logger.info(LOG_KEY + "afterPropertiesSet: clientId= " + userSessionService.getUserSession().clientId);
-			logger.info(LOG_KEY + "afterPropertiesSet: userName= " + userSessionService.getUserSession().userName);
-			ServerInfo[] servers = userSessionService.getUserSession().serversInfo;
-			if (servers != null) {
-				logger.info(LOG_KEY + "afterPropertiesSet: servers length = " + servers.length);
-				logger.info(LOG_KEY + "afterPropertiesSet: server name = " + servers[0].name);
-				logger.info(LOG_KEY + "afterPropertiesSet: server serviceGuid = " + servers[0].serviceGuid);
-				logger.info(LOG_KEY + "afterPropertiesSet: server serviceUrl = " + servers[0].serviceUrl);
-				logger.info(LOG_KEY + "afterPropertiesSet: server sessionCookie = " + servers[0].sessionCookie);
-				logger.info(LOG_KEY + "afterPropertiesSet: server sessionKey = " + servers[0].sessionKey);
-			} else {
-				logger.error(LOG_KEY + "afterPropertiesSet: servers= Null");
-			}
-
-		} else {
-			logger.error(LOG_KEY + "afterPropertiesSet: UserSession= null");
-		}
-
-		try {
-			// Initialize the connection as it is time taking process.
-			connection.connect(userSessionService, true);
-		} catch (Exception e) {
-			logger.error(LOG_KEY, e);
-		}
 	}
 
 	public ManagedObjectReference getHostKernelModuleSystem(String hostId) throws Exception {

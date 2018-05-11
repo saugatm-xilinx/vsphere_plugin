@@ -25,6 +25,7 @@ export class FwupdateComponent implements OnInit {
     public latestUpdateModal = false;
     public customUpdateModal = false;
     public params = {};
+    public helpModalOpen = false;
     public adapterList = [];
     public refreshButtonDisabled;
     public button = {
@@ -156,6 +157,9 @@ export class FwupdateComponent implements OnInit {
                     this.updateStatus(data);
                 },
                 err => {
+                    if(err.status == 401){
+                        // window.location.reload()
+                    }
                     this.refreshButtonDisabled = false;
                     const error = err.json();
                     this.fetchDataErrorMessage = error ? error.message : null;
@@ -192,11 +196,11 @@ export class FwupdateComponent implements OnInit {
         let updatable = 0, invalid = 0;
         const filterdAdapters = [];
         this.selectedAdapters.forEach((value, index) => {
-            if (value.latestVersion.controller !== value.versionController.split(' ')[0]) {
+            if (!value.latestVersion.controller.includes(value.versionController.split(' ')[0])) {
                 updatable++;
-            } else if (value.latestVersion.bootROM !== value.versionBootROM) {
+            } else if (!value.latestVersion.bootROM.includes(value.versionBootROM)) {
                 updatable++;
-            } else if (value.latestVersion.uefi !== value.versionUEFIROM) {
+            } else if (!value.latestVersion.uefi.includes(value.versionUEFIROM)) {
                 updatable++;
             } else {
                 invalid++;
@@ -205,11 +209,11 @@ export class FwupdateComponent implements OnInit {
 
         if (remove === 'remove') {
             this.selectedAdapters.forEach((value, index) => {
-                if (value.latestVersion.controller !== value.versionController.split(' ')[0]) {
+                if (!value.latestVersion.controller.includes(value.versionController.split(' ')[0])) {
                     filterdAdapters.push(value);
-                } else if (value.latestVersion.bootROM !== value.versionBootROM) {
+                } else if (!value.latestVersion.bootROM.includes(value.versionBootROM)) {
                     filterdAdapters.push(value);
-                } else if (value.latestVersion.uefi !== value.versionUEFIROM) {
+                } else if (!value.latestVersion.uefi.includes(value.versionUEFIROM)) {
                     filterdAdapters.push(value);
                 }
             });
@@ -318,6 +322,9 @@ export class FwupdateComponent implements OnInit {
                     const error = err.json();
                     this.customUpdateErrorMessage = error ? error.message : null;
                     console.error(err);
+                    if(err.status == 401){
+                        // window.location.reload()
+                    }
                     this.button.latest = false;
                     this.button.latestErr = true;
                 }

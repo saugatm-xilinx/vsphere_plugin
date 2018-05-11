@@ -1,14 +1,44 @@
-<clr-modal [clrModalSize]="'md'" [(clrModalOpen)]="submitted">
-    <h3 class="modal-title">Confirm Restart</h3>
+<clr-modal [clrModalSize]="'lg'" [(clrModalOpen)]="helpModalOpen">
+    <h3 class="modal-title">Help</h3>
     <div class="modal-body">
-        <h6>Driver needs to be restarted to see the effect of the changes</h6>
+        <div>This page identifies current values for the Solarflare adapter driver module parameters.</div>
+        <ul class="list">
+            <li>NetQCount enables the number of VMware NetQueues.
+                <ul class="list">
+                    <li><strong>min</strong> : 1&nbsp;&nbsp;&nbsp;&nbsp;<strong>max</strong> : 15&nbsp;&nbsp;&nbsp;&nbsp;<strong>default</strong> : 8</li>
+                </ul>
+            </li>
+            <li>RSS enables Receive Side Scaling number of receive queues.
+                <ul class="list">
+                        <li><strong>min</strong> : 1&nbsp;&nbsp;&nbsp;&nbsp;<strong>max</strong> : 4&nbsp;&nbsp;&nbsp;&nbsp;<strong>default</strong> : 1 (RSS disabled)</li>
+                </ul>
+            </li>
+            <li>VXLAN Offload - enable/disable VXLAN offload to the adapter.</li>
+            <li>DEBUGGING mask - set/unset driver debug features.</li>
+        </ul>
+        <p>The APPLY button will apply the selected adapter settings. The RESTORE button will 
+            remove any changes made and restore to the original settings.
+        </p>
+        <p>For more information about driver module parameters, please refer to the 
+            Solarflare Server Adapter User Guide (SF-103837-CD).
+        </p>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-outline" type="button"
-                (click)="submitted = false">Cancel
+        <button class="btn btn-outline" type="button" (click)="helpModalOpen = false">OK
         </button>
+    </div>
+</clr-modal>
+<clr-modal [clrModalSize]="'md'" [(clrModalOpen)]="submitted">
+    <h3 class="modal-title">NOTE</h3>
+    <div class="modal-body">
+        <h6>The host needs to be rebooted to see the effect of the changes.</h6>
+    </div>
+    <div class="modal-footer">
+        <!-- <button class="btn btn-outline" type="button"
+                (click)="submitted = false">Cancel
+        </button> -->
         <button class="btn btn-primary" type="button"
-                (click)="hostConfig.get('restart').setValue(true);onSubmit(hostConfig.value)">Restart
+                (click)="hostConfig.get('restart').setValue(true);onSubmit(hostConfig.value)">OK
         </button>
     </div>
 </clr-modal>
@@ -22,7 +52,11 @@
             <div style="text-align: right;">
                 <div class="btn-group">
                     <button class="btn" (click)="getConfiguration()" [disabled]="refreshButtonDisabled">Refresh</button>
+<<<<<<< working copy
                     <button class="btn btn-info">Help</button>
+=======
+                    <button class="btn btn-info" (click)="helpModalOpen = true">Help</button>
+>>>>>>> merge rev
                 </div>
             </div>
         </div>
@@ -109,8 +143,8 @@
                                        style="width: 40px;text-align: center;"
                                        *ngIf="btn.netQueue.rss"
                                        type="number"
-                                       autocomplete="off"
                                        (blur)="btn.netQueue.rss = false;"
+                                       autocomplete="off"
                                        [attr.disabled]="hostConfig.get('netQueue').get('maxNumpCPU').value?'true':null">
                             </div>
                         </div>

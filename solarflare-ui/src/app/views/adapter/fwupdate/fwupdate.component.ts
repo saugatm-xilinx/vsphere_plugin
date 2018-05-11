@@ -77,6 +77,9 @@ export class FwupdateComponent implements OnInit {
                 err => {
                     console.error(err);
                     this.refreshButtonDisabled = false
+                    if(err.status == 401){
+                        // window.location.reload()
+                    }
                     this.gettingAdapterList = false;
                     this.getAdapterListErr = true;
                 }
@@ -192,6 +195,9 @@ export class FwupdateComponent implements OnInit {
                     console.error(err);
                     const error = err.json();
                     this.errText = error ? error.message : null;
+                    if(err.status == 401){
+                        // window.location.reload()
+                    }
                     this.button.latest = false;
                     this.button.latestErr = true;
                 }

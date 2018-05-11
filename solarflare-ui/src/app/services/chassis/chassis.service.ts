@@ -90,9 +90,7 @@ export class ChassisService {
       if (this.gs.useLiveData()) {
          // Use rest/data/properties/[objectId]?properties=... to get data from the Java service
          const url = this.buildDataUrl(objectId, APP_CONFIG.chassisProperties);
-         const headers = {
-            ...this.gs.getHttpHeaders(), ...this.gs.getCacheControlHeaders()
-         }
+         const headers = { ...this.gs.getHttpHeaders(), ...this.gs.getCacheControlHeaders() }
 
          return this.http.get(url, headers)
             .map(function (response) {

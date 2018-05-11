@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
+import { APP_CONFIG } from "../../../shared/app-config";
 import { GlobalsService } from "../../../shared/globals.service";
 import { HostsService } from "../../../services/hosts.service";
 import { environment } from "environments/environment"
@@ -15,7 +16,9 @@ export class OverviewComponent implements OnInit {
     public params = {};
     public hostDetail = {};
     public getOverviewErr = false;
+    public helpModalOpen = false;
     public refreshButtonDisable;
+    public pluginVer = APP_CONFIG.version;
 
     constructor(private activatedRoute: ActivatedRoute,
         public gs: GlobalsService,
@@ -44,6 +47,9 @@ export class OverviewComponent implements OnInit {
                 },
                 err => {
                     console.error(err);
+                    if(err.status == 401){
+                        // window.location.reload()
+                    }
                     this.refreshButtonDisable = false
                     this.getOverviewErr = true;
                 }

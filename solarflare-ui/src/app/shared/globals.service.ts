@@ -230,8 +230,8 @@ export class GlobalsService {
    }
    getCacheControlHeaders(): any {
       return { headers: new Headers({
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache'
+            "Cache-Control": "no-cache",
+            "Pragma": "no-cache"
       }) };
    }
 }

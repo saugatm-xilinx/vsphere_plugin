@@ -331,12 +331,11 @@ public class SfCIMService {
 	}
 
 	/**
-	 * 
 	 * @param filePath
 	 * @return Get version from file header
 	 * @throws URISyntaxException
 	 */
-	public String getVersionFromBinaryFile(URL filePath) throws URISyntaxException {
+	public String getVersionFromBinaryFile(URL filePath) throws URISyntaxException, IOException{
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: getVersionFromBinaryFile");
 		byte[] bytes = null;
 		String versionString = "";
@@ -352,15 +351,16 @@ public class SfCIMService {
 		return versionString;
 	}
 
-	public byte[] readData(URL toDownload, boolean readComplete) {
+	public byte[] readData(URL toDownload, boolean readComplete) throws IOException {
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare :: readData");
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
+		InputStream stream = null;
+		byte[] data = null;
 		try {
 			if (toDownload != null) {
 				byte[] chunk = new byte[1000];
 				int bytesRead;
-				InputStream stream = toDownload.openStream();
+				stream = toDownload.openStream();
 				if (readComplete) {
 					while ((bytesRead = stream.read(chunk)) > 0) {
 						outputStream.write(chunk, 0, bytesRead);
@@ -369,19 +369,24 @@ public class SfCIMService {
 					bytesRead = stream.read(chunk);
 					outputStream.write(chunk, 0, bytesRead);
 				}
+				data = outputStream.toByteArray();
 			} else {
 				logger.error("URL is null");
 			}
-
 		} catch (IOException e) {
+			timer.stop();
 			return null;
+		} finally {
+			if (stream != null) {
+				stream.close();
+			}
+			outputStream.close();
 		}
 		timer.stop();
-		return outputStream.toByteArray();
+		return data;
 	}
 
 	/**
-	 * 
 	 * @param fwInst
 	 * @param nicInstance
 	 * @param header

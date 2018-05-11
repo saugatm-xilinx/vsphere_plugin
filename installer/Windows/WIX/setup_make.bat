@@ -2,11 +2,8 @@
 
 set nameOfWxiFile=EnvironmentVars.wxi
 
-if %1.==. (
-    set PathToFile=..\..\dist\
-	set ProductVersion=1.0.0.0
-	goto done
-)
+set PathToFile=..\..\dist\
+set ProductVersion=1.0.0.0
 
 :loop
 if [%1] equ [] goto done
@@ -47,7 +44,7 @@ echo.
 
 echo Building: setup.msi
 
-mkdir -p ../build
+mkdir "../build"
 
 echo.
 echo - Harvesting...

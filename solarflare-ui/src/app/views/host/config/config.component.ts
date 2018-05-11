@@ -17,6 +17,10 @@ export class ConfigComponent implements OnInit {
     public isProd = environment.production
     public params = {};
     public refreshButtonDisabled;
+<<<<<<< working copy
+=======
+    public helpModalOpen = false;
+>>>>>>> merge rev
     hostConfig: FormGroup;
     public configDefault = {
         "netQueue": { "netQueueCount": 8, "rss": 4, "maxNumpCPU": false },
@@ -101,6 +105,9 @@ export class ConfigComponent implements OnInit {
                 },
                 err => {
                     console.error(err);
+                    if(err.status == 401){
+                        // window.location.reload()
+                    }
                     this.refreshButtonDisabled = false
                     this.err.getConfiguration = true;
                 }

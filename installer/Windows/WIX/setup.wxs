@@ -4,7 +4,7 @@
 <?include EnvironmentVars.wxi?>
 
 <Product Id="$(var.ProductCode)" Name="$(var.Add_RemoveProductName)" Version="$(var.ProductVersion)" Manufacturer="$(var.ProductManufacturer)" UpgradeCode="$(var.ProductUpgradeCode)" Language="1033">
-	<Package Id="*" InstallerVersion="200" Description="$(var.PackageDescription)" Comments="$(var.PackageComments)" Platform="x64" InstallPrivileges="elevated" Languages="1033" Compressed="yes"/>
+	<Package Id="*" InstallerVersion="500" Description="$(var.PackageDescription)" Comments="$(var.PackageComments)" Platform="x64" InstallPrivileges="elevated" Languages="1033" Compressed="yes"/>
 	
 	<InstallExecuteSequence>
 		<Custom Action="HostName_IPAddress_Validation" Before="InstallFiles">NOT Installed</Custom>
@@ -29,11 +29,15 @@
 	<AdminUISequence/>
 	<AdvertiseExecuteSequence/>
 	<Media Id="1" DiskPrompt="Disk 1" Cabinet="setup.cab" EmbedCab="yes" CompressionLevel="mszip"/>
-	
+		
+	<Property Id="JAVA_CURRENT_VERSION">
+		<RegistrySearch Id="JRE_CURRENT_VERSION_REGSEARCH1" Root="HKLM" Key="SOFTWARE\JavaSoft\Java Runtime Environment" Name="CurrentVersion" Type="raw" Win64="yes" />
+		<RegistrySearch Id="JRE_CURRENT_VERSION_REGSEARCH2" Root="HKLM" Key="SOFTWARE\JavaSoft\JRE" Name="CurrentVersion" Type="raw" Win64="yes" />	
+	</Property>
 	<Property Id="INSTALLDIR" Secure="yes">
 		<RegistrySearch Id="InstallDirectorySearch" Type="raw" Root="HKLM" Key="Software\$(var.ProductManufacturer)\$(var.AppName)" Name="InstallDir" Win64="yes"/>
 	</Property>
-	<Property Id="BROWSER_CHECKBOX_PROPERTY" Secure="yes"/>
+	<Property Id="BROWSER_CHECKBOX_PROPERTY" Secure="yes" Value="1"/>
 	<Property Id="BROWSER" Secure="yes" Admin="yes"/>
 	<Property Id="HOSTNAME_IPADDRESS" Secure="yes" Admin="yes"/>
 	<Property Id="HOSTNAME_IPADDRESS_VALID" Secure="yes" Admin="yes"/>
@@ -53,7 +57,15 @@
 	<Property Id="MSIFACTUSERPROFILE" Value="ALLUSERS"/>
 	<Property Id="MSIFACT_INSTALLDIR" Value="INSTALLDIR"/>
 	<Property Id="PIDTemplate" Value="&lt;####-####-####-####&gt;"/>
-
+	<Property Id="CRLF" Value="&#xD;&#xA;"/>
+	
+	<Condition Message="Java Runtime Environment (64 Bit) is not installed or outdated. Setup will ended now. Please try again later after install Oracle JRE 1.8 or later.[CRLF][CRLF]Also set JRE_HOME environment variable to its respective path.">
+		<![CDATA[Installed OR (JAVA_CURRENT_VERSION >= "1.8")]]>
+	</Condition>
+	<Condition Message="Please make sure that JRE_HOME environment variable for Oracle JRE 1.8 or later (64 Bit) is set to its respective path correctly.">
+		<![CDATA[%JRE_HOME OR %JAVA_HOME]]>
+	</Condition>
+	
 	<Feature Id="bin" Title="bin" Level="1" Description="bin folder" Absent="allow" AllowAdvertise="no" TypicalDefault="install" Display="collapse" InstallDefault="local">
 		<ComponentRef Id="bootstrap.jar"/>
 		<ComponentRef Id="catalina.bat"/>
@@ -66,6 +78,7 @@
 		<ComponentRef Id="daemon.sh"/>
 		<ComponentRef Id="digest.bat"/>
 		<ComponentRef Id="digest.sh"/>
+		<ComponentRef Id="registryValueSearch.vbs"/>
 		<ComponentRef Id="service.bat"/>
 		<ComponentRef Id="setclasspath.bat"/>
 		<ComponentRef Id="setclasspath.sh"/>
@@ -278,6 +291,13 @@
 	<DirectoryRef Id="bin">
 		<Component Id="digest.sh" Guid="CA891910-DA30-4815-B3C2-ABB63622F9B2">
 			<File Id="digest.sh" Name="digest.sh" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\digest.sh"/>
+		</Component>
+	</DirectoryRef>
+</Fragment>
+<Fragment>
+	<DirectoryRef Id="bin">
+		<Component Id="registryValueSearch.vbs" Guid="7E994C75-5595-42C6-902D-D92D0601DC70">
+			<File Id="registryValueSearch.vbs" Name="registryValueSearch.vbs" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\registryValueSearch.vbs"/>
 		</Component>
 	</DirectoryRef>
 </Fragment>
