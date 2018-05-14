@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -109,42 +110,71 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 	public String updateFirmwareToLatest(List<Adapter> adapterList, String hostId) throws Exception {
 
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Update - updateFirmwareToLatest");
-		String taskID = null;
 		logger.info("Solarflare:: updateFirmwareToLatest");
+		String taskID = null;
+
+		List<FwType> firmwareTypeList = new ArrayList<>();
+		firmwareTypeList.add(FwType.CONTROLLER);
+		firmwareTypeList.add(FwType.BOOTROM);
+		firmwareTypeList.add(FwType.UEFIROM);
+
 		try {
 			TaskInfo taskInfo = createTask(hostId);
 			taskID = taskInfo.getTaskid();
 
-			// TODO : Review Comment : Try Caching cimHost to check performance
 			SfCIMService cimService = getCIMService(hostId);
 
-			UpdateRequestProcessor requestProcessor = UpdateRequestProcessor.getInstance();
+			CIMInstance fwCInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_MCFW_NAME);
+			CIMInstance fwBInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_BOOTROM_NAME);
+			CIMInstance fwUInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
+			CIMInstance fwInstance = null;
+			
+			for (FwType fwType : firmwareTypeList) {
+				// This map will group all the adapters with same type and subType
+				// together with their firmware file path
+				Map<URL, List<Adapter>> updateAdapterList = new LinkedHashMap<>();
+				for (Adapter adapter : adapterList) {
+					switch (fwType) {
+					case CONTROLLER:
+						// If no latest version is available for adapter then
+						// skip.
+						if (adapter.getLatestVersion() == null
+								|| adapter.getLatestVersion().getController().equals("0.0.0.0")) {
+							continue;
+						}
+						fwInstance = fwCInstance;
+						break;
+					case BOOTROM:
+						// If no latest version is available for adapter then
+						// skip.
+						if (adapter.getLatestVersion() == null
+								|| adapter.getLatestVersion().getBootROM().equals("0.0.0.0")) {
+							continue;
+						}
+						fwInstance = fwBInstance;
+						break;
+					case UEFIROM:
+						// If no latest version is available for adapter then
+						// skip.
+						if (adapter.getLatestVersion() == null
+								|| adapter.getLatestVersion().getUefi().equals("0.0.0.0")) {
+							continue;
+						}
+						fwInstance = fwUInstance;
+						break;
+					}
 
-			for (Adapter adapter : adapterList) {
-				
-					// update controller
-					logger.debug("Updating Controller of adapter " + adapter.getName());
-					URL fWImageURL = null; // for latest update this is null
-					CIMInstance fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_MCFW_NAME);
-					UpdateRequest updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.CONTROLLER,
-							fWImageURL, fwInstance);
-					requestProcessor.addUpdateRequest(updateRequest);
-
-					logger.debug("Updating BootROM of adapter " + adapter.getName());
-					fWImageURL = null; // for latest update this is null
-					fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_BOOTROM_NAME);
-					updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.BOOTROM, fWImageURL,
-							fwInstance);
-					requestProcessor.addUpdateRequest(updateRequest);
-
-					logger.debug("Updating UEFI ROM of adapter " + adapter.getName());
-					fWImageURL = null; // for latest update this is null
-					fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
-					updateRequest = createUpdateRequest(adapter, cimService, taskInfo, FwType.UEFIROM, fWImageURL,
-							fwInstance);
-					requestProcessor.addUpdateRequest(updateRequest);
-
+					CIMInstance nicInstance = cimService.getNICCardInstance(adapter.getChildren().get(0).getName());
+					URL imageUrl = getImageURL(fwInstance, nicInstance, cimService, fwType, adapter);
+					addToMap(updateAdapterList, imageUrl, adapter);
+				}
+				for (URL fwImageURL : updateAdapterList.keySet()) {
+					boolean readComplete = true;
+					byte[] fileData = cimService.readData(fwImageURL, readComplete);
+					updateFirmware(updateAdapterList.get(fwImageURL), fileData, cimService, fwInstance, fwType, taskInfo);
+				}	
 			}
+			
 		} catch (Exception e) {
 			timer.stop();
 			throw e;
@@ -153,6 +183,14 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		return taskID;
 	}
 
+	private void addToMap(Map<URL, List<Adapter>> updateAdapterList, URL imageUrl, Adapter adapter) {
+		List<Adapter> adapterList = updateAdapterList.get(imageUrl);
+		if (adapterList == null) {
+			adapterList = new ArrayList<>();
+		}
+		adapterList.add(adapter);
+		updateAdapterList.put(imageUrl, adapterList);
+	}
 	@Override
 	public String customUpdateFirmwareFromLocal(List<Adapter> adapterList, String hostId, String base64Data)
 			throws Exception {
