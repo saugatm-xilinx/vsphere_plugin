@@ -83,10 +83,6 @@
 			</classpath>
 		</java>
    </target>
-<<<<<<< working copy
-=======
-   <!-- Run Utility for create firmware metadat file -->
->>>>>>> merge rev
    <target name="run_firmware_utility" if="yes.is.true">
 		<java classname="com.solarflare.firmware.Runner" fork="true" failonerror="yes">
            <arg value="${DEFAULT_FIRMWARE_PATH}"/>
