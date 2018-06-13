@@ -1,12 +1,12 @@
 <clr-tabs>
   <clr-tab>
-    <button (click)="redirect('overview')" clrTabLink id="overview">Overview</button>
+    <button routerLink="overview" routerLinkActive="active" clrTabLink id="overview">Overview</button>
     <clr-tab-content id="overview" *clrIfActive="true">
     </clr-tab-content>
   </clr-tab>
   <clr-tab>
-    <button (click)="redirect('statistics')" id="statistics" clrTabLink>Statistics</button>
-    <clr-tab-content id="fwupdate" *clrIfActive>
+    <button routerLink="statistics" routerLinkActive="active" clrTabLink id="statistics">Statistics</button>
+    <clr-tab-content id="statistics" *clrIfActive>
     </clr-tab-content>
   </clr-tab>
   <!-- <clr-tab>
