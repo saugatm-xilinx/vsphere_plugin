@@ -16,6 +16,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
     public adapterDetail = { adapterName: '', portNumber: '', serialNumber: '' };
     adapterName = '';
     public getOverviewErr = false;
+    public helpModalOpen = false;
     public refreshButtonDisabled
 
     constructor(private activatedRoute: ActivatedRoute,

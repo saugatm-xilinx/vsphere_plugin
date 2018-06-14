@@ -17,6 +17,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   hasError = false;
   isLoading = true;
   isFirstTimeLoading = true;
+  public helpModalOpen = false;
   routeChangeSubscription: Subscription;
 
   constructor(private activatedRoute: ActivatedRoute, private route: Router, private nicSvc: NicService) { }

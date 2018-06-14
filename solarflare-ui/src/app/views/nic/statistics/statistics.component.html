@@ -1,3 +1,15 @@
+<clr-modal [clrModalSize]="'lg'" [(clrModalOpen)]="helpModalOpen">
+	<h3 class="modal-title">Help</h3>
+	<div class="modal-body">
+		<p>
+			Interface statistics are displayed on this page.
+		</p>
+	</div>
+	<div class="modal-footer">
+	    <button class="btn btn-outline" type="button" (click)="helpModalOpen = false">OK
+		</button>
+	</div>
+</clr-modal>
 <div class="nic-stats">
   <div class="row">
     <div class="col-md-12">
@@ -8,7 +20,7 @@
         <div>
           <div class="btn-group">
             <button class="btn" (click)="getStatDetail()" [disabled]="isLoading">Refresh</button>
-            <button class="btn btn-info">Help</button>
+            <button class="btn btn-info" (click)="helpModalOpen = true">Help</button>
           </div>
         </div>
       </div>

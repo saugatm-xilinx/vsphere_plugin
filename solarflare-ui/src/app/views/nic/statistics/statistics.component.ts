@@ -16,7 +16,7 @@ export class StatisticsComponent implements OnInit, OnDestroy {
   isLoading = false;
   routeChangeSubscription: Subscription;
   statisticTableData: any;
-
+  public helpModalOpen = false;
   constructor(private activatedRoute: ActivatedRoute, private nicSvc: NicService) { }
 
   ngOnInit() {

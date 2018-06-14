@@ -1,3 +1,16 @@
+<clr-modal [clrModalSize]="'lg'" [(clrModalOpen)]="helpModalOpen">
+	<h3 class="modal-title">Help</h3>
+	<div class="modal-body">
+		<p>
+			Solarflare Adapter serial number and other adapter details are shown.
+		</p>
+	</div>
+	<div class="modal-footer">
+	    <button class="btn btn-outline" type="button" (click)="helpModalOpen = false">OK
+		</button>
+	</div>
+</clr-modal>
+
 <div class="row">
 
     <div class="col-md-12">
@@ -7,7 +20,7 @@
             <div style="text-align: right;">
                 <div class="btn-group">
                     <button class="btn" (click)="refresh()" [disabled]="refreshButtonDisabled">Refresh</button>
-                    <button class="btn btn-info">Help</button>
+					<button class="btn btn-info" (click)="helpModalOpen = true">Help</button>
                 </div>
             </div>
         </div>

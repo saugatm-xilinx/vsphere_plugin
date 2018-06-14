@@ -21,6 +21,7 @@ export class FwupdateComponent implements OnInit {
     public getAdapterListErr = false;
     public latestUpdateModal = false;
     public customUpdateModal = false;
+    public helpModalOpen = false;
     public errText = ""
     public button = {
         latest: false,
