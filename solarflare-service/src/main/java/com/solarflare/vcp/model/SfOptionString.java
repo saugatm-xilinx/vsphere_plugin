@@ -16,7 +16,7 @@ public class SfOptionString {
 	String debugMask;
 
 	private static final String DEFAULT_NET_Q_COUNT = "8";
-	//VSPPLUG-282 : changed default value of RSS to 1
+	// VSPPLUG-282 : changed default value of RSS to 1
 	private static final String DEFAULT_RSS_Q_COUNT = "1";
 	private static final String DEFAULT_VX_LAN_OFFLOAD = "1";
 	private static final String DEFAULT_DEBUG_MASK = "0x00";
@@ -164,6 +164,7 @@ public class SfOptionString {
 
 	/**
 	 * Returns HostConfiguration object corresponding to given option string
+	 * 
 	 * @param optionString
 	 * @return
 	 * @throws Exception
@@ -197,15 +198,17 @@ public class SfOptionString {
 		logger.info("Solarflare:: getSfOptionString");
 		SfOptionString sfOptionString = new SfOptionString();
 		Field[] fields = this.getClass().getDeclaredFields();
-
-		String options[] = optionString.split("\\s+"); 
-		for (String opt : options) {
-			String optNValue[] = opt.split("=");
-			String fieldName = optNValue[0];
-			String fieldValue = optNValue[1];
-			for (Field field : fields) {
-				if (field.getName().equals(fieldName)) {
-					field.set(sfOptionString, fieldValue);
+		//VCPPLUG-336 - Added null check
+		if (optionString != null && !optionString.isEmpty()) {
+			String options[] = optionString.split("\\s+");
+			for (String opt : options) {
+				String optNValue[] = opt.split("=");
+				String fieldName = optNValue[0];
+				String fieldValue = optNValue[1];
+				for (Field field : fields) {
+					if (field.getName().equals(fieldName)) {
+						field.set(sfOptionString, fieldValue);
+					}
 				}
 			}
 		}
