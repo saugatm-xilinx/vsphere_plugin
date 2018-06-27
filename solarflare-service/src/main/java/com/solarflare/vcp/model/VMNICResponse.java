@@ -48,13 +48,13 @@ public class VMNICResponse {
 		return vendorId;
 	}
 	public void setVendorId(String vendorId) {
-		this.vendorId = vendorId;
+		this.vendorId = hexFormatter(vendorId,4);
 	}
 	public String getSubSystemVendorId() {
 		return subSystemVendorId;
 	}
 	public void setSubSystemVendorId(String subSystemVendorId) {
-		this.subSystemVendorId = subSystemVendorId;
+		this.subSystemVendorId = hexFormatter(subSystemVendorId,4);
 	}
 	public String getDriverVersion() {
 		return driverVersion;
