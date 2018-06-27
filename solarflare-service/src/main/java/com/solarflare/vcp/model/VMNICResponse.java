@@ -42,7 +42,7 @@ public class VMNICResponse {
 		return subSystemDeviceId;
 	}
 	public void setSubSystemDeviceId(String subSystemDeviceId) {
-		this.subSystemDeviceId = subSystemDeviceId;
+		this.subSystemDeviceId = hexFormatter(subSystemDeviceId,4);
 	}
 	public String getVendorId() {
 		return vendorId;

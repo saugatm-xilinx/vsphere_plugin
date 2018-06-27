@@ -289,7 +289,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 					adapter.setName(pciDevice.getDeviceName());
 					adapter.setId(id);
 					adapter.setDeviceId(Short.toString(pciDevice.getDeviceId()));
-					adapter.setSubSystemDeviceId(Short.toString(pciDevice.getSubDeviceId()));
+					adapter.setSubSystemDeviceId(Integer.toHexString(Short.toUnsignedInt(pciDevice.getSubDeviceId())));
 					adapter.setVendorId(Short.toString(pciDevice.getVendorId()));
 					adapter.setSubSystemVendorId(Short.toString(pciDevice.getSubVendorId()));
 					// adapter.setDriverName(sfPhysicalNics.get(0).getDriver());

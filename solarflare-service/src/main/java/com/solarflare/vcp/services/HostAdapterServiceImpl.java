@@ -607,7 +607,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 					// VCPPLUG-281 :: Hex values for deviceId,subSystem
 					// deviceId,vendorId and subSystem vendorId
 					nicResponse.setDeviceId(Integer.toHexString(Integer.parseInt(adp.getDeviceId())));
-					nicResponse.setSubSystemDeviceId(Integer.toHexString(Integer.parseInt(adp.getSubSystemDeviceId())));
+					nicResponse.setSubSystemDeviceId((adp.getSubSystemDeviceId()));
 					nicResponse.setVendorId(Integer.toHexString(Integer.parseInt(adp.getVendorId())));
 					nicResponse.setSubSystemVendorId(Integer.toHexString(Integer.parseInt(adp.getSubSystemVendorId())));
 					nicResponse.setDriverName(nic.getDriverName());
