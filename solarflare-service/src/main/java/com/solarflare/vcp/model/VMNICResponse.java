@@ -1,21 +1,31 @@
 package com.solarflare.vcp.model;
 
+
 public class VMNICResponse {
 
-	private String type = "VMNICResponse";
-
+    private String type = "VMNICResponse";
     private String deviceId;
-	private String subSystemDeviceId;
-	private String vendorId;
-	private String subSystemVendorId;
+    private String subSystemDeviceId;
+    private String vendorId;
+    private String subSystemVendorId;
     private String driverVersion;
-    private String driverName;    
-	private String macAddress;
+    private String driverName;
+    private String macAddress;
     private String linkStatus;
     private String portSpeed;
     private String interfaceName;
     private String pciFunction;
     private String pciBusNumber;
+
+    private static String hexFormatter(String variable, int hexLength)
+    {
+        int i = 0;
+        String hexSymbol = "0x";
+	for (i=variable.length(); i<hexLength;i++)
+	    hexSymbol = hexSymbol.concat("0");
+	return hexSymbol.concat(variable);
+    }
+
 	public String getType() {
 		return type;
 	}
@@ -26,7 +36,7 @@ public class VMNICResponse {
 		return deviceId;
 	}
 	public void setDeviceId(String deviceId) {
-		this.deviceId = deviceId;
+		this.deviceId = hexFormatter(deviceId,4);
 	}
 	public String getSubSystemDeviceId() {
 		return subSystemDeviceId;
