@@ -16,6 +16,7 @@ public class VMNICResponse {
     private String interfaceName;
     private String pciFunction;
     private String pciBusNumber;
+    private String pciId;
 
     private static String hexFormatter(String variable, int hexLength)
     {
@@ -104,13 +105,19 @@ public class VMNICResponse {
 	public void setPciBusNumber(String pciBusNumber) {
 		this.pciBusNumber = pciBusNumber;
 	}
+	public String getPciId() {
+		return pciId;
+	}
+	public void setPciId(String pciId) {
+		this.pciId = pciId;
+	}
 	@Override
 	public String toString() {
 		return "VMNICResponse [type=" + type + ", deviceId=" + deviceId + ", subSystemDeviceId=" + subSystemDeviceId
 				+ ", vendorId=" + vendorId + ", subSystemVendorId=" + subSystemVendorId + ", driverVersion="
 				+ driverVersion + ", driverName=" + driverName + ", macAddress=" + macAddress + ", linkStatus="
 				+ linkStatus + ", portSpeed=" + portSpeed + ", interfaceName=" + interfaceName + ", pciFunction="
-				+ pciFunction + ", pciBusNumber=" + pciBusNumber + "]";
+				+ pciFunction + ", pciBusNumber=" + pciBusNumber + ", pciId=" + pciId + "]";
 	}
     
     

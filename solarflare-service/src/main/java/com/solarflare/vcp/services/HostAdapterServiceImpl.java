@@ -616,6 +616,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 					nicResponse.setMacAddress(nic.getMacAddress());
 					nicResponse.setInterfaceName(nic.getInterfaceName());
 					nicResponse.setPciBusNumber(nic.getPciBusNumber());
+					nicResponse.setPciId(nic.getPciId());
 					nicResponse.setPciFunction(nic.getPciFunction());
 					nicResponse.setDriverVersion(sfVimService.getDriverVersion(hostId));
 					isFound = true;
