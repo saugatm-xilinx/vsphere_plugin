@@ -28,7 +28,7 @@ export const APP_CONFIG: AppConfig = {
 
    // Version number displayed in the top right corner of the app-header component.
    // Initially it is the version of plugin-seed itself, you may change it to your own plugin version.
-   version: "1.2.0.0001",
+   version: "1.2.0.0002",
 
    // List of properties for the Host monitor view
    hostProperties: ["name", "overallStatus", "hardware.systemInfo.model", "vm"],
