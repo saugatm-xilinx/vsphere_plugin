@@ -42,6 +42,9 @@
             <pathelement path="${VSPHERE_SDK_HOME}/libs/gson-2.3.1.jar"/>
          	<pathelement path="${VSPHERE_SDK_HOME}/libs/vim25.jar"/>
          	<pathelement path="../libs/sblim-cim-client2-2.1.1.jar"/>
+			<pathelement path="../libs/spring-beans-4.3.9.RELEASE.jar"/>
+			<pathelement path="../libs/spring-core-4.3.9.RELEASE.jar"/>
+			<pathelement path="../libs/spring-web-4.3.9.RELEASE.jar"/>
          </classpath>
       </javac>
    </target>
