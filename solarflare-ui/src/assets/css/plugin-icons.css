@@ -16,7 +16,7 @@
  * Follow the SDK doc or other samples for the correct attributes based on the type of icon.
  */
 .com_solarflare_vcp-pluginIcon {
-    background: url("../images/sflogo_sm.png");
+    background: url("../images/SF-logo-32x32.png") no-repeat center;
     width: 100%;
     height: 32px;
     display: inline-block;
