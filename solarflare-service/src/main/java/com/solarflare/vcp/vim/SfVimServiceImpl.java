@@ -547,13 +547,18 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 
 		return nicStatPerfValue;
 	}
-	
+
 	int getSum(String[] values){
 		int sum = 0;
 		for(String strVal : values){
 			int value = Integer.parseInt(strVal);
-			sum += value;
+                        /*
+                         * Check Added for bypassing first entry
+                         * which is Initialized as -1 by vmware till rollover.
+                         */
+                        if (value != -1)
+			    sum += value;
 		}
 		return sum;
-	}	
+	}
 }
