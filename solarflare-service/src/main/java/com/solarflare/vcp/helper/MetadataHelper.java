@@ -182,17 +182,17 @@ public class MetadataHelper {
 			logger.error("Solaflare :: Invalid host. {} is a loopback address." + url.getHost());
 			throw new Exception("Loopback address can not be used.");
 		}
-		// ping host
-		if (!address.isReachable(5000)) {
+
+		// Validate if metadata file is present at server
+		HttpURLConnection connection;
+		try {
+			connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod("GET");
+			connection.connect();
+		} catch(Exception e) {         
 			logger.error("Solaflare ::  unreachable " + url.getHost());
 			throw new Exception(url.getHost() + " is NOT reachable! Please verify if the server is accessible.");
 		}
-
-		// Validate if metadata file is present at server
-		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-		connection.setRequestMethod("GET");
-		connection.connect();
-
 		int code = connection.getResponseCode();
 		if (code == 404) {
 			logger.error("Solaflare ::  FirmwareMetadata.json file not found on server " + url.getHost());
