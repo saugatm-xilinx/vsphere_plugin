@@ -12,36 +12,32 @@ shift /1
 goto loop
 
 :checkParam
-if "%1" equ "-cert" goto A
-if "%1" equ "-passwd" goto B
-if "%1" equ "-tsu" goto C
-if "%1" equ "-alias" goto D
+
+if "%1" equ "-jdkpath" goto A
+if "%1" equ "-tsu" goto B
+if "%1" equ "-label" goto C
 
 echo Incorrect Parameter
 goto paramError
 
 :A
     shift /1
-    set PathToCACerticate=%1
+    set JDKPath=%1
     goto next
 
 :B
     shift /1
-    set CertificatePassword=%1
+    set TimeStampURL=%1
     goto next
 
 :C
     shift /1
-    set TimeStampURL=%1
-    goto next
-
-:D
-    shift /1
-    set AliasName=%1
+    set LabelId=%1
     goto next
 	
 :done
 
+set ProviderClassParam=sun.security.pkcs11.SunPKCS11
 set currentDirectory="%CD%"
 set outDirName=..\..\dist\Tomcat_Server\webapps\solarflare-vcp\
 
@@ -79,13 +75,10 @@ echo.
 echo - Signing JAR and WAR files...
 echo.
 
-keytool -list -keystore "%PathToCACerticate%" -storepass %CertificatePassword%
+%JDKPath%\jarsigner -keystore NONE -storetype PKCS11 -tsa %TimeStampURL% -providerClass %ProviderClassParam% -providerArg %JDKPath%\eToken.cfg "%PathToJARFile%" %LabelId%
 if ERRORLEVEL 1 goto error2
 
-jarsigner -keystore "%PathToCACerticate%" -tsa %TimeStampURL% -storepass %CertificatePassword% "%PathToJARFile%" %AliasName%
-if ERRORLEVEL 1 goto error2
-
-jarsigner -keystore "%PathToCACerticate%" -tsa %TimeStampURL% -storepass %CertificatePassword% "%PathToWARFile%" %AliasName%
+%JDKPath%\jarsigner -keystore NONE -storetype PKCS11 -tsa %TimeStampURL% -providerClass %ProviderClassParam% -providerArg %JDKPath%\eToken.cfg "%PathToWARFile%" %LabelId%
 if ERRORLEVEL 1 goto error2
 
 goto end2

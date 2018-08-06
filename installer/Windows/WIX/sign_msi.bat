@@ -1,5 +1,7 @@
 @echo off
 
+set PRODUCT_DESC="Solarflare VCSA Web Plugin"
+
 :loop
 if [%1] equ [] goto done
 set param=%1
@@ -12,8 +14,8 @@ shift /1
 goto loop
 
 :checkParam
-if "%1" equ "-cert" goto A
-if "%1" equ "-passwd" goto B
+if "%1" equ "-jdkpath" goto A
+if "%1" equ "-sha1" goto B
 if "%1" equ "-tsu" goto C
 if "%1" equ "-v" goto D
 if "%1" equ "-sign" goto E
@@ -23,12 +25,12 @@ goto paramError
 
 :A
     shift /1
-    set PathToCACerticate=%1
+    set JDKPath=%1
     goto next
 
 :B
     shift /1
-    set CertificatePassword=%1
+    set SHA1Fingerprint=%1
     goto next
 
 :C
@@ -52,7 +54,9 @@ echo.
 echo - Signing msi ...
 echo.
 
-%SignToolPath%\signtool.exe sign /f "%PathToCACerticate%" /p %CertificatePassword% /t %TimeStampURL% "..\build\Solarflare_VCP_%ProductVersion%_Installer.msi"
+%SignToolPath%\signtool.exe sign  /tr %TimeStampURL% /d %PRODUCT_DESC% /sha1 %SHA1Fingerprint% /fd sha256  /td sha256 "..\build\Solarflare_VCP_%ProductVersion%_Installer.msi"
+
+
 if ERRORLEVEL 1 goto error
 
 goto end
