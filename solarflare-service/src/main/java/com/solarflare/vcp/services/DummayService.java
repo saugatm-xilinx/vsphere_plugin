@@ -107,7 +107,7 @@ public class DummayService implements HostAdapterService {
 		
 		AdapterOverview overview = new AdapterOverview();
 		overview.setSerialNumber("231231231231");
-		overview.setPortNumber("SFNsdsdssd");
+		overview.setPartNumber("SFNsdsdssd");
 		return overview;
 	}
 	

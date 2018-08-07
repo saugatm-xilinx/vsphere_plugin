@@ -29,7 +29,7 @@
 
     <div class="col-md-12">
         <div style="text-align: center">
-            <span class="spinner spinner-lg" *ngIf="!adapterDetail?.portNumber && !getOverviewErr ">
+            <span class="spinner spinner-lg" *ngIf="!adapterDetail?.partNumber && !getOverviewErr ">
                 Loading..
             </span>
             <span class="text-danger" *ngIf="getOverviewErr">
@@ -38,7 +38,7 @@
                 Error occurred while fetching data</span>
         </div>
 
-        <div class="row" *ngIf="adapterDetail?.portNumber">
+        <div class="row" *ngIf="adapterDetail?.partNumber">
             <div class="container">
                 <div style="padding: 40px;">
 
@@ -48,15 +48,15 @@
                                 Adapter Name
                             </td>
                             <td>
-                                {{adapterDetail.adapterName}}
+								{{adapterDetail.adapterName}}
                             </td>
                         </tr>
                         <tr>
                             <td class="adaptercol1">
-                                Port Number
+                                Part Number
                             </td>
                             <td>
-                                {{adapterDetail.portNumber}}
+                                {{adapterDetail.partNumber}}
                             </td>
                         </tr>
                         <tr>

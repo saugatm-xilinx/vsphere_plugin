@@ -9,15 +9,15 @@ public class AdapterOverview implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	private String type= "AdapterOverview";
-	private String portNumber;
+	private String partNumber;
 	private String serialNumber;
 	
 	
-	public String getPortNumber() {
-		return portNumber;
+	public String getPartNumber() {
+		return partNumber;
 	}
-	public void setPortNumber(String portNumber) {
-		this.portNumber = portNumber;
+	public void setPartNumber(String partNumber) {
+		this.partNumber = partNumber;
 	}
 	public String getSerialNumber() {
 		return serialNumber;
@@ -28,7 +28,7 @@ public class AdapterOverview implements Serializable{
 	
 	@Override
 	public String toString() {
-		return "AdapterOverview [type=" + type + ", portNumber=" + portNumber + ", serialNumber=" + serialNumber + "]";
+		return "AdapterOverview [type=" + type + ", partNumber=" + partNumber + ", serialNumber=" + serialNumber + "]";
 	}
 	
 	

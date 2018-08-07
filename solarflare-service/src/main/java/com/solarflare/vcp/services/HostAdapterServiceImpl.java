@@ -583,7 +583,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			String key = entry.getKey();
 
 			if (NicProperty.PartNumber.toString().equals(key)) {
-				adpOverview.setPortNumber(entry.getValue());
+				adpOverview.setPartNumber(entry.getValue());
 
 			} else if (NicProperty.SerialNumber.toString().equals(key)) {
 				adpOverview.setSerialNumber(entry.getValue());

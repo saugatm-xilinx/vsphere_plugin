@@ -208,14 +208,14 @@ export class HostsService {
     }
 
     getAdapterOverviewDetail(hostId, nicId) {
-        const overviewDetail = { adapterName: '', portNumber: '', serialNumber: '' }
+        const overviewDetail = { adapterName: '', partNumber: '', serialNumber: '' }
         const adapterResult = this.hosts.forEach(host => {
             if (String(host.id) === String(hostId)) {
                 host.children.forEach(adapter => {
                     adapter.children.forEach(nic => {
                         if (String(nic.id) === String(nicId)) {
                             overviewDetail.adapterName = adapter.name;
-                            overviewDetail.portNumber = adapter.portNumber;
+                            overviewDetail.partNumber = adapter.partNumber;
                             overviewDetail.serialNumber = adapter.serialNumber;
                         }
                     });
@@ -231,7 +231,7 @@ export class HostsService {
                 host.children.forEach(adapter => {
                     adapter.children.forEach(nic => {
                         if (String(nic.id) === String(nicId)) {
-                            adapter.portNumber = detail.portNumber;
+                            adapter.partNumber = detail.partNumber;
                             adapter.serialNumber = detail.serialNumber
                         }
                     });

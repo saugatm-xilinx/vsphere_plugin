@@ -13,7 +13,7 @@ import { environment } from "environments/environment"
 export class OverviewComponent implements OnInit, OnDestroy {
     public isProd = environment.production
     public params = {};
-    public adapterDetail = { adapterName: '', portNumber: '', serialNumber: '' };
+    public adapterDetail = { adapterName: '', partNumber: '', serialNumber: '' };
     adapterName = '';
     public getOverviewErr = false;
     public helpModalOpen = false;
@@ -57,7 +57,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
     }
 
     refresh() {
-        this.adapterDetail = { adapterName: '', portNumber: '', serialNumber: '' }
+        this.adapterDetail = { adapterName: '', partNumber: '', serialNumber: '' }
         this.adapterDetails()
     }
 
