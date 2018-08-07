@@ -663,6 +663,8 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 				String unitInfo = counterInfo.getUnitInfo().getKey();
 				if ("number".equalsIgnoreCase(unitInfo)) {
 					unitInfo = "";
+				} else if ("kiloBytesPerSecond".equals(unitInfo)) {
+					unitInfo = "KBps";
 				}
 				switch (perfCounter) {
 				case "net.packetsRx.SUMMATION":
