@@ -2,6 +2,7 @@ package com.solarflare.vcp.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class AdapterNicStatistics {
 	
@@ -20,6 +21,12 @@ public class AdapterNicStatistics {
 	String broadcastPacketsReceived;
 	String totalTransmitErrors;
 	
+	private static String  modifyTimeStamp(String inputData)
+	{
+		StringTokenizer token = new StringTokenizer(inputData,"To");
+		String outputData = token.nextToken() + " " + token.nextToken().replace("Z","");
+		return outputData;
+	}
 	
 	public static List<String> performanceCounter = new ArrayList<>();
 	static{
@@ -40,13 +47,13 @@ public class AdapterNicStatistics {
 		return timePeriod_from;
 	}
 	public void setTimePeriod_from(String timePeriod_from) {
-		this.timePeriod_from = timePeriod_from;
+		this.timePeriod_from = modifyTimeStamp(timePeriod_from);
 	}
 	public String getTimePeriod_to() {
 		return timePeriod_to;
 	}
 	public void setTimePeriod_to(String timePeriod_to) {
-		this.timePeriod_to = timePeriod_to;
+		this.timePeriod_to = modifyTimeStamp(timePeriod_to);
 	}
 	
 	
