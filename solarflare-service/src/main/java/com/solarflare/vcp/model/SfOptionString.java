@@ -128,7 +128,7 @@ public class SfOptionString {
 			validNetQueue = new NetQueue();
 		}
 		int netQCount = validNetQueue.getNetQueueCount();
-		if (1 > netQCount || netQCount > 16) {
+		if (1 > netQCount || netQCount > 15) {
 			netQCount = Integer.parseInt(DEFAULT_NET_Q_COUNT);
 			validNetQueue.setNetQueueCount(netQCount);
 		}
