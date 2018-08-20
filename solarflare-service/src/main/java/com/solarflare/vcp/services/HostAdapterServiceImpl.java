@@ -499,7 +499,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		if (file != null) {
 			filePath = file.getPath();
 		}
-		URL fwImageURL = new URL("http", pluginURL.getHost(), filePath);
+		URL fwImageURL = new URL("https", pluginURL.getHost(),pluginURL.getPort(),filePath);
 
 		return fwImageURL;
 	}
@@ -507,23 +507,28 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 	private void sendDataInChunks(SfCIMService cimService, CIMInstance fwInstance, String tempFile,
 			byte[] decodedDataBytes) {
 		// Send/write this data totemp file on host
-		logger.info("Solarflare::Sending data in chunks");
-		SFBase64 sfBase64 = new SFBase64();
-		int chunkSize = 100000;
-		int index;
-		for (index = 0; index < decodedDataBytes.length; index += chunkSize) {
-			if (index + chunkSize > decodedDataBytes.length) {
-				chunkSize = decodedDataBytes.length - index;
+		try {
+			logger.info("Solarflare::Sending data in chunks "+  tempFile);
+			SFBase64 sfBase64 = new SFBase64();
+			int chunkSize = 100000;
+			int index;
+			for (index = 0; index < decodedDataBytes.length; index += chunkSize) {
+				if (index + chunkSize > decodedDataBytes.length) {
+					chunkSize = decodedDataBytes.length - index;
+				}
+				byte[] temp = Arrays.copyOfRange(decodedDataBytes, index, index + chunkSize);
+				int encodeSize = sfBase64.base64_enc_size(chunkSize);
+				byte[] encoded = new byte[encodeSize];
+				// using SFBase64 to encode data
+				encoded = sfBase64.base64_encode(temp, chunkSize);
+				cimService.sendFWImageData(fwInstance, new String(encoded), tempFile);
 			}
-			byte[] temp = Arrays.copyOfRange(decodedDataBytes, index, index + chunkSize);
-			int encodeSize = sfBase64.base64_enc_size(chunkSize);
-			byte[] encoded = new byte[encodeSize];
-			// using SFBase64 to encode data
-			encoded = sfBase64.base64_encode(temp, chunkSize);
-			cimService.sendFWImageData(fwInstance, new String(encoded), tempFile);
+			logger.info("Solarflare::Sending data in chunks is complete");
 		}
-
-		logger.info("Solarflare::Sending data in chunks is complete");
+		catch(Exception e)
+		{
+			logger.error("Excpetion: "+ e.toString());
+		}
 	}
 
 	private void setFirmwareVersions(Adapter adapter, SfCIMService cimService, Map<String, CIMInstance> nics)

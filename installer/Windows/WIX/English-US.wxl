@@ -257,7 +257,10 @@
 <String Id="GetHostIPDlg_Title" Overridable="yes">{\UI_Font_Title}Hostname or IP Address</String>
 <String Id="GetHostIPDlg_Description" Overridable="yes">Configuring Hostname or IP address for plugin.</String>
 <String Id="GetHostIPDlg_Description1" Overridable="yes">Enter the Hostname or IP address of your machine which can be accessed from vCenter server. </String>
-<String Id="GetHostIPDlg_Description2" Overridable="yes">Hostname or IP Address: </String>
+<String Id="GetHostIPDlg_Description2" Overridable="yes">Fully Qualified Hostname or IP Address: </String>
+<String Id="GetHostIPDlg_PortDescription" Overridable="yes">HTTP Port Number: </String>
+<String Id="GetHostIPDlg_SecurePortDescription" Overridable="yes">HTTPS Port Number: </String>
+<String Id="GetHostIPDlg_PortChangeDescrition" Overridable="yes">Enusre both HTTP and HTPPS ports are allowed through firewall.</String>
 <String Id="InstallDirDlgBrowse" Overridable="yes">&amp;Browse...</String>
 <String Id="InstallDirDlgDescription" Overridable="yes">Where should [App_Name] be installed ?</String>
 <String Id="InstallDirDlgDescription1" Overridable="yes">Setup will install [App_Name] into the following folder.</String>

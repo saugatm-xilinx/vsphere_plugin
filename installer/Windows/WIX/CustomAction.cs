@@ -10,6 +10,35 @@ namespace CustomActions
 {
     public class CustomActions
     {
+        static String Http_port_str = "80";
+        static String Https_port_str = "8443";
+        private static bool CheckPort(int portNumber)
+        {
+            bool isAvailable = true;
+            IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+            TcpConnectionInformation[] tcpConnInfoArray = ipGlobalProperties.GetActiveTcpConnections();
+            IPEndPoint[] ipEndPointArray = ipGlobalProperties.GetActiveTcpListeners();
+            foreach (TcpConnectionInformation tcpi in tcpConnInfoArray)
+            {
+                if (tcpi.LocalEndPoint.Port == portNumber)
+                {
+                    isAvailable = false;
+                    break;
+                }
+            }
+            if (isAvailable)
+            {
+                foreach (IPEndPoint ip in ipEndPointArray)
+                {
+                    if (ip.Port == portNumber)
+                    {
+                        isAvailable = false;
+                        break;
+                    }
+                }
+            }
+            return isAvailable;
+        }
 
         [CustomAction]
         public static ActionResult Get_DefaultBrowser(Session session)
@@ -63,14 +92,16 @@ namespace CustomActions
 
         [CustomAction]
         public static ActionResult Get_HostName(Session session)
-        {                    
+        {
             // Get the host entry of current machine
             string hostName = Dns.GetHostEntry("").HostName;
-         
+
             // Assign fully qualified name to the property "HOSTNAME_IPADDRESS"
             session["HOSTNAME_IPADDRESS"] = hostName;
+            session["HTTP_PORT"] = Http_port_str;
+            session["HTTP_SECURE_PORT"] = Https_port_str;
             session.Log("Got the Hostname OR FQDN :: " + hostName);
-            return ActionResult.Success;          
+            return ActionResult.Success;
         }
 
 
@@ -78,7 +109,10 @@ namespace CustomActions
         public static ActionResult Validate_HostName_IPAddress(Session session)
         {
             string HostName_IPAddress = session["HOSTNAME_IPADDRESS"];
-
+            string HTTP_PORT = session["HTTP_PORT"];
+            string HTTPS_PORT = session["HTTP_SECURE_PORT"];
+            int http_port_val = 0;
+            int https_port_val = 0;
             try
             {
                 // check if "HostName_IPAddress" is an empty string
@@ -86,19 +120,137 @@ namespace CustomActions
                 {
                     session["HOSTNAME_IPADDRESS_VALID"] = string.Empty;
                     MessageBox.Show(
-                        "Please enter Hostname or IP Address",
+                        "Please enter fully qualified Hostname or IP Address",
                         "Setup",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
                     session.Log("This is not a valid Hostname or IP Address");
                     return ActionResult.Success;
                 }
-                else
+                else if (HostName_IPAddress.Contains(" "))
                 {
-                    session["HOSTNAME_IPADDRESS_VALID"] = "1";
-                    session.Log("This is a valid Hostname or IP Address");
+                    session["HOSTNAME_IPADDRESS_VALID"] = string.Empty;
+                    MessageBox.Show(
+                        "No Spaces allowed in Hostname or IP Address",
+                        "Setup",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    session.Log("No Spaces allowed in Hostname or IP Address");
                     return ActionResult.Success;
                 }
+                else if (HTTP_PORT == String.Empty)
+                {
+                    session["HOSTNAME_IPADDRESS_VALID"] = string.Empty;
+                    MessageBox.Show(
+                        "Please enter HTTP Port number",
+                        "Setup",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    session.Log("This is not a valid HTTP Port number");
+                    return ActionResult.Success;
+                }
+                else if (HTTPS_PORT == String.Empty)
+                {
+                    session["HOSTNAME_IPADDRESS_VALID"] = string.Empty;
+                    MessageBox.Show(
+                        "Please enter HTTPS port number",
+                        "Setup",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    session.Log("This is not a valid HTTPS Port number");
+                    return ActionResult.Success;
+                }
+                else if (HTTP_PORT.Contains(" "))
+                {
+                    session["HOSTNAME_IPADDRESS_VALID"] = string.Empty;
+                    MessageBox.Show(
+                        "HTTP Port number cannot have spaces",
+                        "Setup",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    session.Log("HTTP Port Number cannot have spaces");
+                    return ActionResult.Success;
+                }
+                else if (HTTPS_PORT.Contains(" "))
+                {
+                    session["HOSTNAME_IPADDRESS_VALID"] = string.Empty;
+                    MessageBox.Show(
+                        "HTTPS Port number cannot have spaces",
+                        "Setup",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    session.Log("HTTPS Port Number cannot have spaces");
+                    return ActionResult.Success;
+                }
+                else if (!int.TryParse(HTTP_PORT, out http_port_val))
+                {
+                    session["HOSTNAME_IPADDRESS_VALID"] = string.Empty;
+                    MessageBox.Show(
+                        "Please enter valid HTTP port number",
+                        "Setup",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    session.Log("Integer value of HTTP Port cannot be determined");
+                    return ActionResult.Success;
+                }
+                else if (!int.TryParse(HTTPS_PORT, out https_port_val))
+                {
+                    session["HOSTNAME_IPADDRESS_VALID"] = string.Empty;
+                    MessageBox.Show(
+                        "Please enter valid HTTPS port number",
+                        "Setup",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    session.Log("Integer value of HTTPS Port cannot be determined");
+                    return ActionResult.Success;
+                }
+                if (http_port_val == https_port_val)
+                {
+                    session["HOSTNAME_IPADDRESS_VALID"] = string.Empty;
+                    MessageBox.Show(
+                        "HTTP & HTTPS port numbers cannot be same. Please enter again",
+                        "Setup",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    session.Log("HTTP & HTTPS port numbers are same");
+                    return ActionResult.Success;
+                }
+                if (http_port_val <= 0 || http_port_val > 65535  || https_port_val <= 0 || https_port_val > 65535)
+                {
+                    session["HOSTNAME_IPADDRESS_VALID"] = string.Empty;
+                    MessageBox.Show(
+                        "Port numbers must be in the range of 1 to 65535 ",
+                        "Setup",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    session.Log("Incorrect port number");
+                    return ActionResult.Success;
+                }
+                if (!CheckPort(http_port_val))
+                {
+                    session["HOSTNAME_IPADDRESS_VALID"] = string.Empty;
+                    MessageBox.Show(
+                        "HTTP Port in use. Please enter another HTTP port number",
+                        "Setup",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    session.Log("HTTP port in use");
+                    return ActionResult.Success;
+                }
+                if (!CheckPort(https_port_val))
+                {
+                    session["HOSTNAME_IPADDRESS_VALID"] = string.Empty;
+                    MessageBox.Show(
+                        "HTTPS Port in use. Please enter another HTTPS port number",
+                        "Setup",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    session.Log("HTTPS port in use");
+                    return ActionResult.Success;
+                }
+                session["HOSTNAME_IPADDRESS_VALID"] = "1";
+                session.Log("This is a valid Hostname or IP Address and HTTP/HTTPS port numbers");
+                return ActionResult.Success;
             }
             catch (Exception ex)
             {
@@ -114,7 +266,7 @@ namespace CustomActions
             string InstallFolder = session.CustomActionData["INSTALLDIR"];
             string file = InstallFolder + "Tomcat_Server\\webapps\\plugin-registration\\WEB-INF\\registerPlugin.properties";
 
-            for (int i = 1; i <= 60; i = i + 1)
+            for (int i = 1; i <= 60; i++)
             {
                 if (File.Exists(file))
                 {
@@ -130,9 +282,10 @@ namespace CustomActions
                 {
                     string rows = File.ReadAllText(file);
                     string HostName_IPAddress = session.CustomActionData["HOSTNAME_IPADDRESS"];
-
+                    string Https_Port = session.CustomActionData["HTTPS_PORT"];
                     // Replacing 'localhost' with the given 'HostName_IPAddress'
                     rows = rows.Replace("localhost", HostName_IPAddress);
+                    rows = rows.Replace("pluginPort=8443", "pluginPort=" + Https_Port);
                     File.WriteAllText(file, rows);
                     session.Log("registerPlugin.properties file updated successfully");
                     return ActionResult.Success;
@@ -140,6 +293,57 @@ namespace CustomActions
                 else
                 {
                     session.Log("registerPlugin.properties file doesn't exist");
+                    return ActionResult.Failure;
+                }
+            }
+            catch (Exception ex)
+            {
+                session.Log("Exception while modifying properties file : " + ex.Message);
+                return ActionResult.Failure;
+            }
+        }
+
+        [CustomAction]
+        public static ActionResult Modify_ServerConfigFile(Session session)
+        {
+            string http_port = session.CustomActionData["HTTP_PORT"];
+            string https_port = session.CustomActionData["HTTPS_PORT"];
+
+            if (http_port.Equals(Http_port_str) && https_port.Equals(Https_port_str))
+            {
+                //Nothing to do
+                session.Log("No Change in default port numbers");
+                return ActionResult.Success;
+
+            }
+            string InstallFolder = session.CustomActionData["INSTALLDIR"];
+            string file = InstallFolder + "Tomcat_Server\\conf\\server.xml";
+
+            for (int i = 1; i <= 60; i++)
+            {
+                if (File.Exists(file))
+                {
+                    session.Log("Tomcat\\conf\\server.xml file found");
+                    break;
+                }
+                System.Threading.Thread.Sleep(500);
+            }
+
+            try
+            {
+                if (File.Exists(file))
+                {
+                    string rows = File.ReadAllText(file);
+                    rows = rows.Replace("Connector port=\"80\"", "Connector port=\""+http_port+"\"" );
+                    rows = rows.Replace("redirectPort=\"8443\"", "redirectPort =\""+https_port+"\"");
+                    rows = rows.Replace("Connector port=\"8443\"", "Connector port=\"" + https_port + "\"");
+                    File.WriteAllText(file, rows);
+                    session.Log("Tomcat\\conf\\server.xml file updated successfully");
+                    return ActionResult.Success;
+                }
+                else
+                {
+                    session.Log("Tomcat\\conf\\server.xml file doesn't exist");
                     return ActionResult.Failure;
                 }
             }

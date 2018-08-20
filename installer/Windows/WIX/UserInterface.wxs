@@ -532,18 +532,30 @@
 	<Fragment>
         <UI>
             <Dialog Id="GetHostIPDlg" Width="370" Height="270" Title="!(loc.GetHostIPDlg)">
-                <Control Id="Control_1" Text="!(loc.versionStringOnEachDialogPage)" Type="Text" X="15" Y="248" Width="85" Height="12"/>													
-				<Control Id="Control_2" Property="HOSTNAME_IPADDRESS" Type="Edit" X="148" Y="110" Width="95" Height="17" Default="yes">					
+                <Control Id="Control_1" Text="!(loc.versionStringOnEachDialogPage)" Type="Text" X="15" Y="248" Width="85" Height="12"/>
+				<Control Id="Control_2" Property="HOSTNAME_IPADDRESS" Type="Edit" X="148" Y="110" Width="95" Height="17" Default="yes">
 				</Control>
+
 				<Control Id="Label" Type="Text" X="40" Y="111" Width="95" Height="25" NoPrefix="yes" Text="!(loc.GetHostIPDlg_Description2)" />
 				<Control Id="Description1" Type="Text" X="20" Y="70" Width="330" Height="25" NoPrefix="yes" Text="!(loc.GetHostIPDlg_Description1)" />
-				
+
+				<Control Id="Control_3" Property="HTTP_PORT" Type="Edit" X="148" Y="140" Width="95" Height="17" Default="yes">
+				</Control>
+				<Control Id="Label_port" Type="Text" X="40" Y="141" Width="95" Height="25" NoPrefix="yes" Text="!(loc.GetHostIPDlg_PortDescription)" />
+
+				<Control Id="Control_4" Property="HTTP_SECURE_PORT" Type="Edit" X="148" Y="170" Width="95" Height="17" Default="yes">
+					<Publish Property="CUSTOMURL" Value=" https://localhost:[HTTP_SECURE_PORT]/plugin-registration/registration.html">1</Publish>
+				</Control>
+				<Control Id="Label_SPort" Type="Text" X="40" Y="171" Width="95" Height="25" NoPrefix="yes" Text="!(loc.GetHostIPDlg_SecurePortDescription)" />
+
+				<Control Id="Description_port_change" Text="!(loc.GetHostIPDlg_PortChangeDescrition)" Type="Text" X="15" Y="211" Width="370" Height="12"/>
+
 				<Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.UIButtonNext)">
 					<Publish Event="DoAction" Value="HostName_IPAddress_Validation">1</Publish>
-					<Publish Event="NewDialog" Value="VerifyReadyDlgInstall">(HOSTNAME_IPADDRESS_VALID = "1")</Publish>                
+					<Publish Event="NewDialog" Value="VerifyReadyDlgInstall">(HOSTNAME_IPADDRESS_VALID = "1")</Publish>
                 </Control>
 				<Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.UIButtonBack)">
-                	<Publish Event="NewDialog" Value="InstallDirDlg"></Publish>
+        				<Publish Event="NewDialog" Value="InstallDirDlg"></Publish>
                  </Control>
 				<Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.UIButtonCancel)">
                     <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
