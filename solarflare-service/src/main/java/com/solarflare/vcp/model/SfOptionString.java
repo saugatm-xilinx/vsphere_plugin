@@ -13,12 +13,14 @@ public class SfOptionString {
 	String netQCount;
 	String rssQCount;
 	String vxlanOffload;
+	String geneveOffload;
 	String debugMask;
 
 	private static final String DEFAULT_NET_Q_COUNT = "8";
 	// VSPPLUG-282 : changed default value of RSS to 1
 	private static final String DEFAULT_RSS_Q_COUNT = "1";
 	private static final String DEFAULT_VX_LAN_OFFLOAD = "1";
+	private static final String DEFAULT_GENEVE_OFFLOAD = "1";
 	private static final String DEFAULT_DEBUG_MASK = "0x00";
 
 	public SfOptionString() {
@@ -26,6 +28,7 @@ public class SfOptionString {
 		this.rssQCount = DEFAULT_RSS_Q_COUNT;
 		this.vxlanOffload = DEFAULT_VX_LAN_OFFLOAD;
 		this.debugMask = DEFAULT_DEBUG_MASK;
+		this.geneveOffload = DEFAULT_GENEVE_OFFLOAD;
 	}
 
 	public String getNetQCount() {
@@ -52,6 +55,15 @@ public class SfOptionString {
 		this.vxlanOffload = vxlanOffload;
 	}
 
+
+	public String getGeneveOffload() {
+		return geneveOffload;
+	}
+
+	public void setGeneveload(String geneveOffload) {
+		this.geneveOffload = geneveOffload;
+	}
+
 	public String getDebugMask() {
 		return debugMask;
 	}
@@ -62,8 +74,8 @@ public class SfOptionString {
 
 	@Override
 	public String toString() {
-		return "netQCount=" + netQCount + " rssQCount=" + rssQCount + " vxlanOffload=" + vxlanOffload + " debugMask="
-				+ debugMask;
+		return "netQCount=" + netQCount + " rssQCount=" + rssQCount + " vxlanOffload=" + vxlanOffload
+			    +" geneveOffload=" + geneveOffload + " debugMask=" + debugMask;
 	}
 
 	/**
@@ -83,11 +95,13 @@ public class SfOptionString {
 			int netQCount = validHostConfigObj.getNetQueue().getNetQueueCount();
 			int rssQCount = validHostConfigObj.getNetQueue().getRss();
 			boolean vxLANOffload = validHostConfigObj.getOverlay().isVxlanOffloadEnable();
+			boolean geneveOffloadv_val = validHostConfigObj.getOverlay().isGeneveOffloadEnable();
 			int debug = validHostConfigObj.getDebuggingMask().getDebugMask();
 
 			optionString.netQCount = Integer.toString(netQCount);
 			optionString.rssQCount = Integer.toString(rssQCount);
 			optionString.vxlanOffload = vxLANOffload ? "1" : "0";
+			optionString.geneveOffload = geneveOffloadv_val ? "1" : "0";
 			optionString.debugMask = "0x" + Integer.toHexString(debug);
 		} else {
 			logger.error("Input param - Host Configuration object is null");
@@ -148,6 +162,7 @@ public class SfOptionString {
 		if (validOverlay == null) {
 			validOverlay = new Overlay();
 			validOverlay.setVxlanOffloadEnable(true); // Default is true;
+			validOverlay.setGeneveOffloadEnable(true);
 		}
 		return validOverlay;
 	}
@@ -182,6 +197,7 @@ public class SfOptionString {
 
 		Overlay overlay = new Overlay();
 		overlay.setVxlanOffloadEnable(sfOptionString.getVxlanOffload().equals("1") ? true : false);
+		overlay.setGeneveOffloadEnable(sfOptionString.getGeneveOffload().equals("1") ? true : false);
 
 		Debugging debug = new Debugging();
 		debug = debug.decodeDebugMask(Integer.decode(sfOptionString.getDebugMask()));

@@ -137,7 +137,7 @@ export class ConfigComponent implements OnInit {
             }),
             overlay: new FormGroup({
                 vxlanOffloadEnable: new FormControl({ value: true, disabled: false }, Validators.required),
-                geneveOffloadEnable: new FormControl({ value: true, disabled: true }, Validators.required)
+                geneveOffloadEnable: new FormControl({ value: true, disabled: false }, Validators.required)
             }),
             restart: new FormControl('')
         })
