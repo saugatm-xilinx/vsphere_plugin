@@ -23,6 +23,8 @@ public class SfVimServiceHelper {
 	public static final String VENDOR_SOLARFLARE = "Solarflare";
 	public static final String SLF = "SLF";
 	public static final String CIM = "cim";
+	public static final String SFVMKCLI = "sfvmkcli";
+	public static final String DRIVERSTR = "sfvmk";
 	public static final String SFC = "SFC";
 	public static final short SOLARFLARE_VENDOR_ID = 6436;
 	public static final short DEVICE_ID_SUPPORTED = 2563;
@@ -41,7 +43,7 @@ public class SfVimServiceHelper {
 		logger.info("getDriverVersion() called");
 		for (SoftwarePackage softwarePackage : softwarePackages) {
 			List<String> vendors = Arrays.asList(new String[] { SFC, SLF, VENDOR_SOLARFLARE });
-			if (vendors.contains(softwarePackage.getVendor()) && (softwarePackage.getName().contains("net") || softwarePackage.getName().contains("sfvmk"))) {
+			if (vendors.contains(softwarePackage.getVendor()) && softwarePackage.getName().contentEquals(DRIVERSTR)) {
 				return softwarePackage.getVersion();
 			}
 		}
@@ -53,6 +55,17 @@ public class SfVimServiceHelper {
 		for (SoftwarePackage softwarePackage : softwarePackages) {
 			List<String> vendors = Arrays.asList(new String[] { SFC, SLF, VENDOR_SOLARFLARE });
 			if (vendors.contains(softwarePackage.getVendor()) && softwarePackage.getName().contains(CIM)) {
+				return softwarePackage.getVersion();
+			}
+		}
+		return null;
+	}
+
+	public static String getsfvmkCliVersion(List<SoftwarePackage> softwarePackages) {
+		logger.info("getsfvmkCliVersion() called");
+		for (SoftwarePackage softwarePackage : softwarePackages) {
+			List<String> vendors = Arrays.asList(new String[] { SFC, SLF, VENDOR_SOLARFLARE });
+			if (vendors.contains(softwarePackage.getVendor()) && softwarePackage.getName().contains(SFVMKCLI)) {
 				return softwarePackage.getVersion();
 			}
 		}

@@ -18,6 +18,7 @@ public class Host implements Serializable
     private int portCount;
     private String driverVersion;
     private String cimProviderVersion;
+    private String sfvmkCliVersion;
 
     public List<Adapter> getChildren()
     {
@@ -110,11 +111,21 @@ public class Host implements Serializable
         this.cimProviderVersion = cimProviderVersion;
     }
 
+    public String getSfvmkCliVersion()
+    {
+        return sfvmkCliVersion;
+    }
+
+    public void setSfvmkCliVersion(String sfvmkCliVersion)
+    {
+        this.sfvmkCliVersion = sfvmkCliVersion;
+    }
+
 	@Override
 	public String toString() {
 		return "Host [type=" + type + ", id=" + id + ", name=" + name + ", children=" + children + ", adapterCount="
 				+ adapterCount + ", portCount=" + portCount + ", driverVersion=" + driverVersion
-				+ ", cimProviderVersion=" + cimProviderVersion + "]";
+				+ ", cimProviderVersion=" + cimProviderVersion + ", sfvmkCliVersion=" + sfvmkCliVersion + "]";
 	}
 
     

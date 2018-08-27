@@ -147,7 +147,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 		List<SoftwarePackage> softwarePackage = _conn.getVimPort().fetchSoftwarePackages(imageConfigManager);
 		host.setCimProviderVersion(SfVimServiceHelper.getCimProviderVersion(softwarePackage));
 		host.setDriverVersion(SfVimServiceHelper.getDriverVersion(softwarePackage));
-
+		host.setSfvmkCliVersion(SfVimServiceHelper.getsfvmkCliVersion(softwarePackage));
 		timer.stop();
 		logger.debug(LOG_KEY + "getHostSummary() returned: " + host);
 		return host;
@@ -334,7 +334,7 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 
 	@Override
 	public CIMHost getCIMHost(String hostId) throws Exception {
-		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getCIMHost");
+	        SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getCIMHost");
 		CIMHost cimHost = null;
 
 		cimHost = cimHostCache.get(hostId);

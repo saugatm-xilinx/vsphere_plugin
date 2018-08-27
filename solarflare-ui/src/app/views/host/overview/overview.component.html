@@ -41,7 +41,7 @@
 
                     <table class="host-overview">
                         <tr>
-                            <td rowspan="4">
+                            <td rowspan="5">
                                 <img [src]="isProd ? '../solarflare/assets/images/host.png' : 'assets/images/host.png'" width="160px">
                             </td>
                             <td>Adapters <span class="pull-right">({{hostDetail.adapterCount}})</span></td>
@@ -66,6 +66,10 @@
                         <tr>
                             <td >CIM Provider Version</td>
                             <td colspan="2">{{hostDetail.cimProviderVersion}}</td>
+                        </tr>
+                        <tr>
+                            <td >sfvmk CLI Version</td>
+                            <td colspan="2">{{hostDetail.sfvmkCliVersion}}</td>
                         </tr>
                         <tr>
                             <td colspan="4" class="text-center"><h3>{{hostDetail.name}}</h3></td>
