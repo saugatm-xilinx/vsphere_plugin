@@ -1,0 +1,110 @@
+#!/bin/sh
+
+#######
+# Script to do the following -
+# Update the Version number for vsphere_plugin
+# Checkin the updated version files.
+# Tags->repository with the new tag.
+
+
+args="$@"
+repo=vsphere_plugin
+
+err () { echo "$*" 1>&2; }
+fail () { err "$@"; exit 1; }
+msg () { echo "$*" 2>&1; }
+
+# Usage
+usage () {
+    msg "Usage: tagplugin  <desired new tag>"
+    msg "  desired new tag: The tag with which vsphere_plugin repo shall be tagged"
+    msg "      tag format: vX.X.X.X"
+    msg "  Note: tagplugin will check if the tag exists and returns failure if present"
+    exit 1
+}
+
+hgcommit () {
+    local msg=$1
+    msg "Committing with message- $msg"
+    hg --noninteractive commit  -m "$msg"
+}
+
+hgtag() {
+    msg "Repo ${repo} tag ${tagparam}"
+    hg --noninteractive tag ${tagparam}
+}
+
+
+hgpush () {
+    msg "Push back ${repo} changes"
+    hg --noninteractive push || fail "hg push failed"
+}
+
+sanitychecks () {
+    # Check no local changes
+    lines=$(hg --noninteractive status |  grep -v "^?" | wc -l)
+    [ "${lines}" = 0 ] || fail "Repo ${repo} has local changes. Aborting"
+
+    # Check no outgoing commits
+    hg --noninteractive outgoing | egrep '^no changes found' > /dev/null || \
+       fail "Repo ${repo} has outgoing changes"
+
+   # Check no applied mqueue patches - without needing mqueue extension
+    hg --noninteractive tags | grep qparent && \
+        fail "Repo ${repo} has mqueue patches applied. Aborting" || true
+}
+
+checktagexists() {
+    msg "Checking if tag exists .."
+    hg tags | grep "^$tagparam" >/dev/null 2>&1
+}
+
+file_check() {
+    local filename=$1
+    if [ ! -e $filename ]; then
+        fail "File $filename not found"
+     else
+        if [ ! -w $filename ]; then
+            fail "File $filename does not have write permissions"
+        fi
+    fi
+}
+
+update_app_config() {
+    msg "Changing app-config.ts version"
+    sed -i "s/version: \".*/version: \"$tagvalue\",/g" $app_config_file
+}
+
+update_make_all() {
+    msg "Changing make_all.bat version"
+    sed -i "s/set ProductVersion=.*/set ProductVersion=$tagvalue/g" $make_all_file
+}
+
+tag_vsphere_plugin() {
+    hgtag
+    hgpush
+}
+
+if [ $# -lt 1 ]; then
+    err "No arguments supplied"
+    usage
+fi
+tagparam="$1"
+if [[ $tagparam =~ v([0-9]+).([0-9]+).([0-9]+).([0-9]+) ]]; then
+    tagvalue=$(echo = "$tagparam" | cut -d 'v' -f 2)
+else
+    err "Incorrect Tag Format"
+    usage
+fi
+sanitychecks
+checktagexists &&
+     fail "Tag already exists"
+app_config_file=../solarflare-ui/src/app/shared/app-config.ts
+make_all_file=../installer/Windows/WIX/make_all.bat
+file_check $app_config_file
+file_check $make_all_file
+update_app_config
+update_make_all
+# All commits are made against task 81528 for tracking
+hgcommit  "bug81528: Updating version number to $tagvalue"
+tag_vsphere_plugin

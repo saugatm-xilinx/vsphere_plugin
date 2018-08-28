@@ -22,14 +22,14 @@
 	
 	Other Variables which are set are -
 	TimeStampURL="http://timestamp.globalsign.com/scripts/timestamp.dll"
-	ProductVersion=1.2.0.0002 ---> This shall be updated for every release
+	ProductVersion=X.X.X.X ---> This shall be updated for every release
 7.  The make_all.bat script calls three different scripts with the above arguments -
 7.a sign_jar_war.bat - Signs the jar/war file.
 7.b setup_make.bat - Creates the Windows installer.
 7.3 sign_msi.bat - Signs the installer.
 
 8.  Execute the make_all.bat in command prompt in administrtor mode.
-9`  The output msi file is created in Windows\build subfolder.
+9.  The output msi file is created in Windows\build subfolder.
 
 Debugging -
 1. Please ensure all Paths are set correctly.

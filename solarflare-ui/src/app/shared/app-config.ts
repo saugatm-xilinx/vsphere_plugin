@@ -27,7 +27,7 @@ export const APP_CONFIG: AppConfig = {
    packageName: "com.solarflare.vcp",
 
    // Version number displayed in the top right corner of the app-header component.
-   // Initially it is the version of plugin-seed itself, you may change it to your own plugin version.
+   // This version number is changed by scripts/tagplugin script.
    version: "1.2.0.1000",
 
    // List of properties for the Host monitor view
