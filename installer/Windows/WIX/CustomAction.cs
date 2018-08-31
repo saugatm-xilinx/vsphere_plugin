@@ -40,6 +40,60 @@ namespace CustomActions
             return isAvailable;
         }
 
+        private static bool validateHostNameIPAddress(string name, out string hostVal, out bool pingFail)
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            hostVal = host.HostName;
+            pingFail = false;
+
+            UriHostNameType uritype = Uri.CheckHostName(name);
+            switch (uritype)
+            {
+                case UriHostNameType.Basic:
+                case UriHostNameType.Unknown:
+                    break;
+                case UriHostNameType.Dns:
+                    {
+                        if (string.Equals(host.HostName, name, StringComparison.OrdinalIgnoreCase))
+                            return true;
+                        else if (name.Length > host.HostName.Length)
+                        {
+                            if (name.StartsWith(host.HostName,StringComparison.OrdinalIgnoreCase) && (name[host.HostName.Length] == '.'))
+                            {
+                                try
+                                {
+                                    Ping pinger = new Ping();
+                                    PingReply reply = pinger.Send(name);
+                                    if (reply.Status == IPStatus.Success)
+                                        return true;
+                                    else
+                                        pingFail = true;
+                                }
+                                catch (PingException pe)
+                                {
+                                    // PingException Happens in case of Unknown Host
+                                    pingFail = true;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case UriHostNameType.IPv4:
+                case UriHostNameType.IPv6:
+                    {
+                        foreach (var ip in host.AddressList)
+                        {
+                            if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork ||
+                                ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+                                if (ip.ToString() == name)
+                                    return true;
+                        }
+                    }
+                    break;
+            }
+            return false;
+        }
+
         [CustomAction]
         public static ActionResult Get_DefaultBrowser(Session session)
         {
@@ -113,6 +167,8 @@ namespace CustomActions
             string HTTPS_PORT = session["HTTP_SECURE_PORT"];
             int http_port_val = 0;
             int https_port_val = 0;
+            string hostVal ;
+            bool pingFail = false;
             try
             {
                 // check if "HostName_IPAddress" is an empty string
@@ -136,6 +192,22 @@ namespace CustomActions
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
                     session.Log("No Spaces allowed in Hostname or IP Address");
+                    return ActionResult.Success;
+                }
+                else if (!validateHostNameIPAddress(HostName_IPAddress, out hostVal, out pingFail))
+                {
+                    string statusMsg;
+                    if (pingFail)
+                        statusMsg = "Ping Failed for host: " + HostName_IPAddress;
+                    else
+                        statusMsg = HostName_IPAddress + " not a valid name for host: " + hostVal;
+                    session["HOSTNAME_IPADDRESS_VALID"] = string.Empty;
+                    MessageBox.Show(
+                        statusMsg,
+                        "Setup",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    session.Log("Hostname/IP Address invalid. Not found on host.");
                     return ActionResult.Success;
                 }
                 else if (HTTP_PORT == String.Empty)
