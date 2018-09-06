@@ -12,6 +12,11 @@ namespace CustomActions
     {
         static String Http_port_str = "80";
         static String Https_port_str = "8443";
+        enum HostType
+        {
+            DNS_TYPE,
+            IP_TYPE
+        };
         private static bool CheckPort(int portNumber)
         {
             bool isAvailable = true;
@@ -40,11 +45,12 @@ namespace CustomActions
             return isAvailable;
         }
 
-        private static bool validateHostNameIPAddress(string name, out string hostVal, out bool pingFail)
+        private static bool validateHostNameIPAddress(string name, out string hostVal, out bool pingFail, out HostType hostType)
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
             hostVal = host.HostName;
             pingFail = false;
+            hostType = HostType.DNS_TYPE;
 
             UriHostNameType uritype = Uri.CheckHostName(name);
             switch (uritype)
@@ -81,6 +87,7 @@ namespace CustomActions
                 case UriHostNameType.IPv4:
                 case UriHostNameType.IPv6:
                     {
+                        hostType = HostType.IP_TYPE;
                         foreach (var ip in host.AddressList)
                         {
                             if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork ||
@@ -194,13 +201,19 @@ namespace CustomActions
                     session.Log("No Spaces allowed in Hostname or IP Address");
                     return ActionResult.Success;
                 }
-                else if (!validateHostNameIPAddress(HostName_IPAddress, out hostVal, out pingFail))
+                else if (!validateHostNameIPAddress(HostName_IPAddress, out hostVal, out pingFail, out HostType hostType))
                 {
                     string statusMsg;
-                    if (pingFail)
-                        statusMsg = "Ping Failed for host: " + HostName_IPAddress;
+                    string hostTypeStr = "";
+                    if (hostType == HostType.DNS_TYPE)
+                        hostTypeStr = "host name";
                     else
-                        statusMsg = HostName_IPAddress + " not a valid name for host: " + hostVal;
+                        hostTypeStr = "IP Address";
+
+                    if (pingFail)
+                        statusMsg = "Ping Failed for "+  hostTypeStr +" " + HostName_IPAddress;
+                    else
+                        statusMsg = HostName_IPAddress + " is not a valid " +  hostTypeStr + " for " + hostVal;
                     session["HOSTNAME_IPADDRESS_VALID"] = string.Empty;
                     MessageBox.Show(
                         statusMsg,
