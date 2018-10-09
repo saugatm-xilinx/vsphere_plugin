@@ -384,10 +384,12 @@
             <Dialog Id="ExitDialog" Width="370" Height="270" Title="!(loc.ExitDialog_Title)">
 				<Control Id="Control_1" Text="!(loc.versionStringOnEachDialogPage)" Type="Text" X="15" Y="248" Width="85" Height="12"/>
 				<Control Id="Bitmap" Type="Bitmap" X="0" Y="0" Width="124" Height="234" TabSkip="no" Text="ExitDlg_SideBanner" />
-				<Control Id="BrowserCheckBox" Type="CheckBox" X="135" Y="148" Width="220" Height="10" Property="BROWSER_CHECKBOX_PROPERTY" CheckBoxValue="1" Text="!(loc.ExitDialogCheckBoxDescription)"/>
+				<Control Id="BrowserCheckBox" Type="CheckBox" X="135" Y="148" Width="220" Height="10" Property="BROWSER_CHECKBOX_PROPERTY" CheckBoxValue="1" Text="!(loc.ExitDialogCheckBoxDescription)">
+					<Condition Action="hide">Installed</Condition>
+				</Control>
 				<Control Id="Finish" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Cancel="yes" Text="!(loc.UIButtonFinish)">
                 	<Publish Event="EndDialog" Value="Return" >1</Publish>
-					<Publish Event="DoAction" Value="LaunchBrowser">(BROWSER_CHECKBOX_PROPERTY="1")</Publish>
+					<Publish Event="DoAction" Value="LaunchBrowser">NOT Installed AND (BROWSER_CHECKBOX_PROPERTY="1")</Publish>
 				</Control>
 				<Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
 				<Control Id="Description1" Type="Text" X="135" Y="50" Width="220" Height="10" Transparent="yes" NoPrefix="yes" Text="!(loc.ExitDialogDescription1)" >

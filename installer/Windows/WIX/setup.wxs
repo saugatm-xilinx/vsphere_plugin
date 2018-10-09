@@ -21,7 +21,6 @@
 		<Custom Action="ServerStopRollback" Before="ServerStop">Installed</Custom>
 		<Custom Action="ServerUninstall" Before="RemoveRegistryValues">Installed AND (REMOVE="ALL")</Custom>
 		<Custom Action="ServerUninstallRollback" Before="ServerUninstall">Installed AND (REMOVE="ALL")</Custom>
-		<Custom Action="LaunchBrowser" After="InstallFinalize">Installed AND (BROWSER_CHECKBOX_PROPERTY="1")</Custom>
 	</InstallExecuteSequence>
 	<AdminExecuteSequence/>
 	<InstallUISequence>
