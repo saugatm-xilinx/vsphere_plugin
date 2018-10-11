@@ -388,7 +388,7 @@
 					<Condition Action="hide">Installed</Condition>
 				</Control>
 				<Control Id="Finish" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Cancel="yes" Text="!(loc.UIButtonFinish)">
-                	<Publish Event="EndDialog" Value="Return" >1</Publish>
+					<Publish Event="EndDialog" Value="Return" >1</Publish>
 					<Publish Event="DoAction" Value="LaunchBrowser">NOT Installed AND (BROWSER_CHECKBOX_PROPERTY="1")</Publish>
 				</Control>
 				<Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
