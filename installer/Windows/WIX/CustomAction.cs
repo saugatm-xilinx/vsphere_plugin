@@ -12,6 +12,7 @@ namespace CustomActions
     {
         static String Http_port_str = "80";
         static String Https_port_str = "8443";
+        static int Tomcat_def_shutdown_port_num = 8005;
         enum HostType
         {
             DNS_TYPE,
@@ -393,8 +394,8 @@ namespace CustomActions
         {
             string http_port = session.CustomActionData["HTTP_PORT"];
             string https_port = session.CustomActionData["HTTPS_PORT"];
-
-            if (http_port.Equals(Http_port_str) && https_port.Equals(Https_port_str))
+            int tomcat_shutdown_port_num = Tomcat_def_shutdown_port_num;
+            if (http_port.Equals(Http_port_str) && https_port.Equals(Https_port_str) && CheckPort(tomcat_shutdown_port_num))
             {
                 //Nothing to do
                 session.Log("No Change in default port numbers");
@@ -416,9 +417,27 @@ namespace CustomActions
 
             try
             {
+                if (!CheckPort(tomcat_shutdown_port_num))
+                {
+                    bool portFound = false;
+                    for (; tomcat_shutdown_port_num < 65535; tomcat_shutdown_port_num ++)
+                    {
+                        if (CheckPort(tomcat_shutdown_port_num))
+                        {
+                            portFound = true;
+                            break;
+                        }
+                    }
+                    if (!portFound)
+                    {
+                        session.Log("No free port found for Tomcat shutdown from " + Tomcat_def_shutdown_port_num + " to " + 65535);
+                        return ActionResult.Failure;
+                    }
+                }
                 if (File.Exists(file))
                 {
                     string rows = File.ReadAllText(file);
+                    rows = rows.Replace("Server port=\"8005\"", "Server port=\"" + tomcat_shutdown_port_num + "\"");
                     rows = rows.Replace("Connector port=\"80\"", "Connector port=\""+http_port+"\"" );
                     rows = rows.Replace("redirectPort=\"8443\"", "redirectPort =\""+https_port+"\"");
                     rows = rows.Replace("Connector port=\"8443\"", "Connector port=\"" + https_port + "\"");

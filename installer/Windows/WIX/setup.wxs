@@ -92,7 +92,7 @@
 		<ComponentRef Id="startup.bat"/>
 		<ComponentRef Id="startup.sh"/>
 		<ComponentRef Id="tcnative_1.dll"/>
-		<ComponentRef Id="tomcat9.exe"/>
+		<ComponentRef Id="solarflareVCSAPlugin.exe"/>
 		<ComponentRef Id="tomcat9w.exe"/>
 		<ComponentRef Id="tomcat_juli.jar"/>
 		<ComponentRef Id="tomcat_native.tar.gz"/>
@@ -181,11 +181,11 @@
 
 	<SetProperty Id="ServerInstall" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\service.bat&quot; install" Sequence="execute" Before="ServerInstall" />
 	<SetProperty Id="ServerInstallRollback" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\service.bat&quot; remove" Sequence="execute" Before="ServerInstallRollback" />
-	<SetProperty Id="ServerStart" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\tomcat9.exe&quot; start" Sequence="execute" Before="ServerStart" />
-	<SetProperty Id="ServerStartRollback" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\tomcat9.exe&quot; stop" Sequence="execute" Before="ServerStartRollback" />
-	<SetProperty Id="ServiceStartAuto" Value="&quot;[WindowsFolder]system32\sc.exe&quot; config Tomcat9 start= auto" Sequence="execute" Before="ServiceStartAuto" />
-	<SetProperty Id="ServerStop" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\tomcat9.exe&quot; stop" Sequence="execute" Before="ServerStop" />
-	<SetProperty Id="ServerStopRollback" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\tomcat9.exe&quot; start" Sequence="execute" Before="ServerStopRollback" />
+	<SetProperty Id="ServerStart" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\solarflareVCSAPlugin.exe&quot; start" Sequence="execute" Before="ServerStart" />
+	<SetProperty Id="ServerStartRollback" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\solarflareVCSAPlugin.exe&quot; stop" Sequence="execute" Before="ServerStartRollback" />
+	<SetProperty Id="ServiceStartAuto" Value="&quot;[WindowsFolder]system32\sc.exe&quot; config SolarflareVCSAPlugin start= auto" Sequence="execute" Before="ServiceStartAuto" />
+	<SetProperty Id="ServerStop" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\solarflareVCSAPlugin.exe&quot; stop" Sequence="execute" Before="ServerStop" />
+	<SetProperty Id="ServerStopRollback" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\solarflareVCSAPlugin.exe&quot; start" Sequence="execute" Before="ServerStopRollback" />
 	<SetProperty Id="ServerUninstall" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\service.bat&quot; remove" Sequence="execute" Before="ServerUninstall" />
 	<SetProperty Id="ServerUninstallRollback" Value="&quot;[INSTALLDIR]\$(var.ServerName)\bin\service.bat&quot; install" Sequence="execute" Before="ServerUninstallRollback" />
 	
@@ -367,8 +367,8 @@
 </Fragment>
 <Fragment>
 	<DirectoryRef Id="bin">
-		<Component Id="tomcat9.exe" Guid="7698E8FF-5308-4F90-BBC9-44B5D829378B">
-			<File Id="tomcat9.exe" Name="tomcat9.exe" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\tomcat9.exe"/>
+		<Component Id="solarflareVCSAPlugin.exe" Guid="7698E8FF-5308-4F90-BBC9-44B5D829378B">
+			<File Id="solarflareVCSAPlugin.exe" Name="solarflareVCSAPlugin.exe" DiskId="1" KeyPath="yes" Source="$(var.PathToFile)\$(var.ServerName)\bin\solarflareVCSAPlugin.exe"/>
 		</Component>
 	</DirectoryRef>
 </Fragment>

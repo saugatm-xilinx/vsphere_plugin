@@ -44,13 +44,13 @@ rem Guess CATALINA_HOME if not defined
 set "CURRENT_DIR=%cd%"
 if not "%CATALINA_HOME%" == "" goto gotHome
 set "CATALINA_HOME=%cd%"
-if exist "%CATALINA_HOME%\bin\tomcat9.exe" goto okHome
+if exist "%CATALINA_HOME%\bin\solarflareVCSAPlugin.exe" goto okHome
 rem CD to the upper dir
 cd ..
 set "CATALINA_HOME=%cd%"
 :gotHome
-if exist "%CATALINA_HOME%\bin\tomcat9.exe" goto okHome
-echo The tomcat9.exe was not found...
+if exist "%CATALINA_HOME%\bin\solarflareVCSAPlugin.exe" goto okHome
+echo The solarflareVCSAPlugin.exe was not found...
 echo The CATALINA_HOME environment variable is not defined correctly.
 echo This environment variable is needed to run this program
 goto end
@@ -82,11 +82,11 @@ if not "%CATALINA_BASE%" == "" goto gotBase
 set "CATALINA_BASE=%CATALINA_HOME%"
 :gotBase
 
-set "EXECUTABLE=%CATALINA_HOME%\bin\tomcat9.exe"
+set "EXECUTABLE=%CATALINA_HOME%\bin\solarflareVCSAPlugin.exe"
 
 rem Set default Service name
-set SERVICE_NAME=Tomcat9
-set DISPLAYNAME=Apache Tomcat 9.0 %SERVICE_NAME%
+set SERVICE_NAME=SolarflareVCSAPlugin
+set DISPLAYNAME=Solarflare Web Plugin %SERVICE_NAME%
 
 if "x%1x" == "xx" goto displayUsage
 set SERVICE_CMD=%1
@@ -96,7 +96,7 @@ if "x%1x" == "xx" goto checkServiceCmd
 if "x%1x" == "x/userx" goto runAsUser
 if "x%1x" == "x--userx" goto runAsUser
 set SERVICE_NAME=%1
-set DISPLAYNAME=Apache Tomcat 9.0 %1
+set DISPLAYNAME=Solarflare Web Plugin %1
 shift
 if "x%1x" == "xx" goto checkServiceCmd
 goto checkUser
