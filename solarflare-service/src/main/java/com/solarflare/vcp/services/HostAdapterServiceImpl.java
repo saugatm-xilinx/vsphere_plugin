@@ -45,7 +45,9 @@ import com.solarflare.vcp.model.VMNIC;
 import com.solarflare.vcp.model.VMNICResponse;
 import com.solarflare.vcp.security.ASN1Parser;
 import com.solarflare.vcp.vim.SfVimService;
+import com.solarflare.vcp.vim.SfVimServiceImpl;
 import com.solarflare.vcp.vim.SimpleTimeCounter;
+import com.solarflare.vcp.vim.connection.ConnectionImpl;
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.PerfCounterInfo;
 import com.vmware.vim25.PerfEntityMetricBase;
@@ -428,9 +430,8 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 
 	private SfCIMService getCIMService(String hostId) throws Exception {
 		CIMHost cimHost = sfVimService.getCIMHost(hostId);
+		cimHost.setHostId(hostId);
 		SfCIMService cimService = new SfCIMService(new SfCIMClientService(cimHost));
-		// Call some CIM method for increasing session validity to 15 min
-		cimService.getProperty();
 		return cimService;
 	}
 

@@ -44,7 +44,6 @@ public class CustomUpdateRequestThread implements Runnable {
 
 	public void run() {
 		logger.info("Solarflare:: CustomUpdateRequestThread run method started. ");
-		logger.debug("Solarflare:: updateRequest in thread : " + updateRequest);
 		SfCIMService cimService = updateRequest.getCimService();
 
 		for (Adapter adapter : adapterList) {
@@ -56,22 +55,22 @@ public class CustomUpdateRequestThread implements Runnable {
 
 				CIMObjectPath nicInstance = updateRequest.getNicInstance();
 				URL fwImagePath = updateRequest.getFwImagePath();
+				cimService.renewCimSession();
 				cimService.updateFirmwareFromURL(fwInstance, nicInstance, fwImagePath);
 
 				setTaskState(TaskState.Success, null);
 
-			} catch (Exception e) {
-				String errorMsg = "Update request failed! Error : " + e.getMessage();
-				logger.error(errorMsg);
-				setTaskState(TaskState.Error, errorMsg);
-			}
+		        } catch (Exception e) {
+			        String errorMsg = "Update request failed! Error : " + e.getMessage();
+			        logger.error(errorMsg);
+			      setTaskState(TaskState.Error, errorMsg);
+		       }
 
 		}
 
 		// if temp file is created then remove it.
 		boolean status = cimService.removeFwImage(updateRequest.getFwInstance(), updateRequest.getTempFilePath());
 		logger.debug("Temp file : " + updateRequest.getTempFilePath() + " removed: " + status);
-
 	}
 
 	private void setTaskState(TaskState taskState, String error) {

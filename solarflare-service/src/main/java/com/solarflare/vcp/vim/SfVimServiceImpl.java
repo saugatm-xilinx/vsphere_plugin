@@ -18,6 +18,7 @@ import com.solarflare.vcp.model.Adapter;
 import com.solarflare.vcp.model.Host;
 import com.solarflare.vcp.model.VMNIC;
 import com.solarflare.vcp.vim.connection.Connection;
+import com.solarflare.vcp.vim.connection.ConnectionImpl;
 import com.solarflare.vcp.vim.helpers.GetMOREF;
 import com.solarflare.vcp.vim.helpers.SfVimServiceHelper;
 import com.vmware.vim25.ArrayOfHostPciDevice;
@@ -337,22 +338,14 @@ public class SfVimServiceImpl implements SfVimService, InitializingBean, ClientS
 	        SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Get - getCIMHost");
 		CIMHost cimHost = null;
 
-		cimHost = cimHostCache.get(hostId);
-		/*
-		 * if(cimHost!=null){ logger.info(LOG_KEY +
-		 * "Returning CIM Host object from cache for host : " + hostId); return
-		 * cimHost; }
-		 */
-
 		logger.info(LOG_KEY + "Getting CIM ticket object for host : " + hostId);
 		Connection _conn = getSession();
 		HostServiceTicket ticket = _conn.getVimPort()
 				.acquireCimServicesTicket(getManagedObjectReference("HostSystem", hostId));
 		String url = CIM_SCHEME + ticket.getHost() + ":" + ticket.getPort() + "/";
-		timer.stop();
 		cimHost = new CIMHostSession(url, ticket.getSessionId());
-		// Add cimHost to cache
-		cimHostCache.put(hostId, cimHost);
+		cimHost.setClientId(((ConnectionImpl)_conn).getClientId());
+		timer.stop();
 		return cimHost;
 	}
 

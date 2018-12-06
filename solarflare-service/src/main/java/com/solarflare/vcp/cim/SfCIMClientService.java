@@ -15,18 +15,18 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.solarflare.vcp.vim.SimpleTimeCounter;
+import com.solarflare.vcp.vim.connection.Connection;
+import com.solarflare.vcp.vim.connection.ConnectionImpl;
+import com.vmware.vim25.HostServiceTicket;
+import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.RuntimeFaultFaultMsg;
 
 public class SfCIMClientService {
 
-	private WBEMClient cimClient;
 	private CIMHost cimHost;
 
 	public WBEMClient getCimClient() {
-		return cimClient;
-	}
-
-	public void setCimClient(WBEMClient cimClient) {
-		this.cimClient = cimClient;
+		return getClient(null);
 	}
 
 	public CIMHost getCimHost() {
@@ -39,7 +39,6 @@ public class SfCIMClientService {
 
 	public SfCIMClientService(CIMHost cimHost) {
 		this.cimHost = cimHost;
-		this.cimClient = getClient(null);
 	}
 	
 	private static final Log logger = LogFactory.getLog(SfCIMClientService.class);
@@ -119,6 +118,21 @@ public class SfCIMClientService {
 		public char[] getUserPassword() {
 			return longPassword.toCharArray(); // use our long password instead
 		}
+	}
+
+	public void renewSessionId() throws Exception {
+		String clientId = cimHost.getClientId();
+		Connection conn = ConnectionImpl.getConnectionByClientId(clientId);
+		HostServiceTicket ticket = conn.getVimPort()
+				.acquireCimServicesTicket(getManagedObjectReference("HostSystem", cimHost.getHostId()));
+		((CIMHostSession)cimHost).setSessionId(ticket.getSessionId());
+	}
+
+	private ManagedObjectReference getManagedObjectReference(String type, String value) {
+		ManagedObjectReference managedObjectReference = new ManagedObjectReference();
+		managedObjectReference.setType(type);
+		managedObjectReference.setValue(value);
+		return managedObjectReference;
 	}
 
 }

@@ -347,4 +347,29 @@ public class ConnectionImpl implements Connection {
 		return "ConnectionImpl [url=" + url + ", username=" + username + ", ignoreCert=" + ignoreCert + ", sessionCookie=" + sessionCookie + ", sessionKey=" + sessionKey + ", clientId=" + clientId + "]";
 	}
 
+	public static Connection getConnectionByClientId(String clientId) {
+		// this is used to login method
+		ConnectionImpl conn = lookupSessionByClientId(clientId);
+		if (conn == null) {
+			// Throw error
+			throw new ConnectionException("Session expired for given client id: " + clientId);
+		} else {
+			logger.info(LOG_KEY + "'getConnectionByClientId()' :: session found for client id: " + clientId);
+			try {
+				if (!conn.isConnected()) {
+					logger.info(LOG_KEY + "connecting to " + conn.getURL().toString() + " using user session's cookie: "
+							+ conn.getSessionCookie());
+					conn._connect();
+					logger.info(LOG_KEY + "Connected.");
+				}
+				return conn;
+			} catch (Exception e) {
+				Throwable cause = (e.getCause() != null) ? e.getCause() : e;
+				logger.error(LOG_KEY + "connect() failed. " + e.getMessage());
+				throw new ConnectionException("failed to connect: " + e.getMessage() + " : " + cause.getMessage(),
+						cause);
+			}
+		}
+
+	}
 }

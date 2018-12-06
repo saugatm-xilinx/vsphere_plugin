@@ -937,5 +937,9 @@ public class SfCIMService {
 		}
 		return nicInfo;
 	}
-	
+
+	public void renewCimSession() throws Exception{
+		cimClientService.renewSessionId();
+	}
+
 }

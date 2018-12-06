@@ -4,6 +4,8 @@ public abstract class CIMHost
 {
 
     private String _url = null;
+    private String hostId;
+    private String clientId;
 
     public CIMHost()
     {
@@ -26,5 +28,21 @@ public abstract class CIMHost
     }
 
     public abstract boolean isValid();
+
+    public String getHostId() {
+		return hostId;
+	}
+
+    public void setHostId(String hostId) {
+        this.hostId = hostId;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
 
 }
