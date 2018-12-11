@@ -316,7 +316,7 @@
                     Controller Firmware: v{{output.controller.from}} updated to v{{output.controller.to}}
                 </span>
                 <span *ngIf="output.controller.state === 'Success' && !output.controller.to ">
-                    Controller Firmware: Firmware update in progress {{dots}}
+                    Controller Firmware: Update completed.
                 </span>
                 <span *ngIf="output.controller.state === 'Error'">
                     Controller Firmware: Error occurred while updating v{{output.controller.from}}
@@ -333,8 +333,8 @@
                 <span *ngIf="output.bootRom.state === 'Success' && output.bootRom.to ">
                     BootROM Firmware: v{{output.bootRom.from}} updated to v{{output.bootRom.to}}
                 </span>
-                <span *ngIf="output.bootRom.state === 'Success' && !output.bootRom.to ">
-                    BootROM Firmware: Firmware update in progress {{dots}}
+               <span *ngIf="output.bootRom.state === 'Success' && !output.bootRom.to ">
+                    BootROM Firmware: Update completed.
                 </span>
                 <span *ngIf="output.bootRom.state === 'Error'">
                     BootROM Firmware: Error occurred while updating v{{output.bootRom.from}}
@@ -352,7 +352,7 @@
                     UEFIROM Firmware: v{{output.uefiRom.from}} updated to v{{output.uefiRom.to}}
                 </span>
                 <span *ngIf="output.uefiRom.state === 'Success' && !output.uefiRom.to ">
-                    UEFIROM Firmware: Firmware update in progress {{dots}}
+                    UEFIROM Firmware: Update completed.
                 </span>
                 <span *ngIf="output.uefiRom.state === 'Error'">
                     UEFIROM Firmware: Error occurred while updating v{{output.uefiRom.from}}

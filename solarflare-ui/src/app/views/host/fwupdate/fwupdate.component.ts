@@ -21,6 +21,7 @@ import { environment } from "environments/environment"
     styleUrls: ['./fwupdate.component.scss']
 })
 export class FwupdateComponent implements OnInit {
+    public supportedFirmwaeVariants = 3;
     public isProd = environment.production
     public latestUpdateModal = false;
     public customUpdateModal = false;
@@ -314,7 +315,6 @@ export class FwupdateComponent implements OnInit {
                     this.status.selectedAdapters = this.selectedAdapters;
                     this.getLatestUpdateStatus(this.selectedAdapters, data.taskId);
 
-                    this.getAdapterList();
                     this.button.latest = false;
                     this.button.latestErr = false;
                 },
@@ -383,7 +383,7 @@ export class FwupdateComponent implements OnInit {
                     this.status.selectedAdapters = this.selectedAdapters;
                     this.getCustomUpdateStatus(this.selectedAdapters, data.taskId);
 
-                    // this.getAdapterList();
+                    //this.getAdapterList();
                     this.button.custom = false;
                     this.button.customErr = false;
                     this.clearFile();
@@ -427,7 +427,7 @@ export class FwupdateComponent implements OnInit {
                     this.status.selectedAdapters = this.selectedAdapters;
                     this.getCustomUpdateStatus(this.selectedAdapters, data.taskId);
 
-                    // this.getAdapterList();
+                    //this.getAdapterList();
                     this.button.custom = false;
                     this.button.customErr = false;
                     this.customUploadUrl.get('url').setValue('');
@@ -486,6 +486,7 @@ export class FwupdateComponent implements OnInit {
                 if (this.status.status === true) {
                     this.status.status = false;
                     this.processStatusLatest(data, adapters);
+                    this.getAdapterList();
                     this.statusUpdate = false;
                     obs.unsubscribe();
                 } else {
@@ -494,7 +495,7 @@ export class FwupdateComponent implements OnInit {
             },
                 err => {
                     console.log(err);
-                });
+               });
     }
 
     updateStatusOutput(a) {
@@ -518,9 +519,16 @@ export class FwupdateComponent implements OnInit {
                     current++;
                 }
             }
-
-            if (total !== 0 && (this.status[a].output.length === (j + 1)) && total === current) {
-                this.status.status = true;
+            if (total !== 0 && (this.status[a].output.length === j + 1) && total === current) {
+                if ( a === "latest") {
+                   if (total ===  this.status[a].output.length * this.supportedFirmwaeVariants) {
+                    this.status.status = true;
+                   }
+                }else {
+                    if (total ===  this.status[a].output.length ) {
+                        this.status.status = true;
+                    }
+                }
             }
         });
     }
