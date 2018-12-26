@@ -390,12 +390,12 @@
                     Controller Firmware: v{{output.controller.from}} updated to {{output.controller.to}}
                 </span>
                 <span *ngIf="output.controller.state === 'Error'">
-                    Controller Firmware: Error occurred while updating v{{output.controller.from}} to v{{output.controller.to}}
+                    Controller Firmware: Error occurred while updating v{{output.controller.from}} to {{output.controller.to}}
                     <i style="color: red;" *ngIf="output.controller.message !== null">
                         <br/>{{output.controller.message}}</i>
                 </span>
                 <span *ngIf="output.controller.state === 'Queued' || output.controller.state === 'Running'">
-                    Controller Firmware: v{{output.controller.from}} updating to v{{output.controller.to}}
+                    Controller Firmware: v{{output.controller.from}} updating to {{output.controller.to}}
                 </span>
                 <br/>
             </div>
@@ -404,12 +404,12 @@
                     BootROM Firmware: v{{output.bootRom.from}} updated to {{output.bootRom.to}}
                 </span>
                 <span *ngIf="output.bootRom.state === 'Error'">
-                    BootROM Firmware: Error occurred while updating v{{output.bootRom.from}} to v{{output.bootRom.to}}
+                    BootROM Firmware: Error occurred while updating v{{output.bootRom.from}} to {{output.bootRom.to}}
                     <i style="color: red;" *ngIf="output.bootRom.message !== null">
                         <br/>{{output.bootRom.message}}</i>
                 </span>
                 <span *ngIf="output.bootRom.state === 'Queued' || output.bootRom.state === 'Running'">
-                    BootROM Firmware: v{{output.bootRom.from}} updating to v{{output.bootRom.to}}
+                    BootROM Firmware: v{{output.bootRom.from}} updating to {{output.bootRom.to}}
                 </span>
                 <br/>
             </div>
