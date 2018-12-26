@@ -43,29 +43,27 @@ public class CustomUpdateRequestThread implements Runnable {
 	}
 
 	public void run() {
-		logger.info("Solarflare:: CustomUpdateRequestThread run method started. ");
 		SfCIMService cimService = updateRequest.getCimService();
+		try {
+                        // sleep added so that the calling HTTP thread can return
+                        // task Id to user
+			Thread.sleep(1000);
+                        for (Adapter adapter : adapterList) {
+			    updateRequestForAdapter(adapter);
+			    CIMObjectPath fwInstance = updateRequest.getFwInstance();
+			    setTaskState(TaskState.Running, null);
 
-		for (Adapter adapter : adapterList) {
+			    CIMObjectPath nicInstance = updateRequest.getNicInstance();
+			    URL fwImagePath = updateRequest.getFwImagePath();
+			    cimService.renewCimSession();
+			    cimService.updateFirmwareFromURL(fwInstance, nicInstance, fwImagePath);
 
-			try {
-				updateRequestForAdapter(adapter);
-				CIMObjectPath fwInstance = updateRequest.getFwInstance();
-				setTaskState(TaskState.Running, null);
-
-				CIMObjectPath nicInstance = updateRequest.getNicInstance();
-				URL fwImagePath = updateRequest.getFwImagePath();
-				cimService.renewCimSession();
-				cimService.updateFirmwareFromURL(fwInstance, nicInstance, fwImagePath);
-
-				setTaskState(TaskState.Success, null);
-
-		        } catch (Exception e) {
-			        String errorMsg = "Update request failed! Error : " + e.getMessage();
-			        logger.error(errorMsg);
-			      setTaskState(TaskState.Error, errorMsg);
-		       }
-
+			    setTaskState(TaskState.Success, null);
+		        }
+		} catch (Exception e) {
+	                String errorMsg = "Update request failed! Error : " + e.getMessage();
+			logger.error(errorMsg);
+			setTaskState(TaskState.Error, errorMsg);
 		}
 
 		// if temp file is created then remove it.

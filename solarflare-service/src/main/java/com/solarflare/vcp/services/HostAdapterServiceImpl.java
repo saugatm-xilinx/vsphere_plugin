@@ -108,13 +108,53 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		return host;
 	}
 
+	private class imageUpdateDetails {
+		List<Adapter> adapterList = new ArrayList<>();
+		private String fileName;
+
+		private void addAdapter(Adapter adapter) {
+			adapterList.add(adapter);
+		}
+
+		private List<Adapter> getAdapterList() {
+			return adapterList;
+		}
+
+		private void setFileName(String name) {
+			fileName = name;
+		}
+
+		private String getFileName() {
+			return fileName;
+		}
+	}
+
+	private class latestUpdate {
+		// This map will group all the adapters with same type and subType
+		// together with their firmware file path
+		private Map<URL, imageUpdateDetails> updateAdapterMap;
+		private FwType fwType;
+
+		latestUpdate(FwType type) {
+			fwType = type;
+			updateAdapterMap = new LinkedHashMap<>();
+		}
+
+		private void setFileName(URL url, String name) {
+			updateAdapterMap.get(url).setFileName(name);
+		}
+
+		private String getFileName(URL url) {
+			return updateAdapterMap.get(url).getFileName();
+		}
+	}
+
 	@Override
 	public String updateFirmwareToLatest(List<Adapter> adapterList, String hostId) throws Exception {
 
 		SimpleTimeCounter timer = new SimpleTimeCounter("Solarflare:: Update - updateFirmwareToLatest");
-		logger.info("Solarflare:: updateFirmwareToLatest");
 		String taskID = null;
-
+                List <latestUpdate> latestUpdateObjList = new ArrayList<>();
 		List<FwType> firmwareTypeList = new ArrayList<>();
 		firmwareTypeList.add(FwType.CONTROLLER);
 		firmwareTypeList.add(FwType.BOOTROM);
@@ -130,11 +170,11 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			CIMInstance fwBInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_BOOTROM_NAME);
 			CIMInstance fwUInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
 			CIMInstance fwInstance = null;
-			
+
 			for (FwType fwType : firmwareTypeList) {
-				// This map will group all the adapters with same type and subType
-				// together with their firmware file path
-				Map<URL, List<Adapter>> updateAdapterList = new LinkedHashMap<>();
+                                // Object to hold the update details of all adapters
+                                // for the current firmware type
+				latestUpdate updateObj = new latestUpdate(fwType);
 				for (Adapter adapter : adapterList) {
 					switch (fwType) {
 					case CONTROLLER:
@@ -168,15 +208,23 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 
 					CIMInstance nicInstance = cimService.getNICCardInstance(adapter.getChildren().get(0).getName());
 					URL imageUrl = getImageURL(fwInstance, nicInstance, cimService, fwType, adapter);
-					addToMap(updateAdapterList, imageUrl, adapter);
+					addToMap(updateObj.updateAdapterMap, imageUrl, adapter);
 				}
-				for (URL fwImageURL : updateAdapterList.keySet()) {
+				for (URL fwImageURL : updateObj.updateAdapterMap.keySet()) {
 					boolean readComplete = true;
 					byte[] fileData = cimService.readData(fwImageURL, readComplete);
-					updateFirmware(updateAdapterList.get(fwImageURL), fileData, cimService, fwInstance, fwType, taskInfo);
-				}	
+					updateObj.setFileName(fwImageURL, sendFirmwaretoHost(fileData, cimService, fwInstance, fwType));
+				}
+				latestUpdateObjList.add(updateObj);
 			}
-			
+
+			for (latestUpdate updateObj : latestUpdateObjList) {
+				for (URL fwImageURL : updateObj.updateAdapterMap.keySet()) {
+					updateLatestFirmware(updateObj.updateAdapterMap.get(fwImageURL).getAdapterList(),
+							             cimService, updateObj.getFileName(fwImageURL),
+							             updateObj.fwType, taskInfo);
+				}
+			}
 		} catch (Exception e) {
 			timer.stop();
 			throw e;
@@ -185,13 +233,55 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		return taskID;
 	}
 
-	private void addToMap(Map<URL, List<Adapter>> updateAdapterList, URL imageUrl, Adapter adapter) {
-		List<Adapter> adapterList = updateAdapterList.get(imageUrl);
-		if (adapterList == null) {
-			adapterList = new ArrayList<>();
+	private void updateLatestFirmware(List<Adapter> adapterList, SfCIMService cimService,
+			String tempFile, FwType fwType, TaskInfo taskInfo) throws Exception {
+
+		URL fwImageURL = new URL("file:/" + tempFile);
+
+		UpdateRequestProcessor requestProcessor = UpdateRequestProcessor.getInstance();
+		UpdateRequest updateRequest = null;
+
+		updateRequest = createUpdateRequestForCustom(cimService, taskInfo, fwType, fwImageURL);
+
+		updateRequest.setCustom(true); // temp file is created
+		updateRequest.setTempFilePath(tempFile);
+		requestProcessor.addUpdateRequest(updateRequest, adapterList);
+	}
+
+	private String sendFirmwaretoHost( byte[] decodedDataBytes, SfCIMService cimService,
+			CIMInstance fwInstance, FwType fwType) throws Exception {
+		try {
+
+		    String tempFile = cimService.startFwImageSend(fwInstance);
+
+		    if (fwInstance == null) {
+			    switch (fwType) {
+			    case CONTROLLER:
+				    fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_MCFW_NAME);
+				    break;
+			    case BOOTROM:
+				    fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_BOOTROM_NAME);
+				    break;
+			    case UEFIROM:
+				    fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
+				    break;
+			    }
+		    }
+		    sendDataInChunks(cimService, fwInstance, tempFile, decodedDataBytes);
+		    return tempFile;
 		}
-		adapterList.add(adapter);
-		updateAdapterList.put(imageUrl, adapterList);
+		catch (Exception e) {
+			logger.error("Exception in sendFirmwaretoHost "+ e.getMessage());
+			throw e;
+		}
+	}
+
+	private void addToMap(Map<URL, imageUpdateDetails> updateAdapterList, URL imageUrl, Adapter adapter) {
+		imageUpdateDetails updateDetails = updateAdapterList.get(imageUrl);
+		if (updateDetails == null)
+			updateDetails = new imageUpdateDetails();
+		updateDetails.addAdapter(adapter);
+		updateAdapterList.put(imageUrl, updateDetails);
 	}
 	@Override
 	public String customUpdateFirmwareFromLocal(List<Adapter> adapterList, String hostId, String base64Data)
@@ -380,7 +470,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 						adapter);
 			} else {
 				throw new SfInvalidRequestException(
-						"Invalid firmware file. Not valid for either Controler, BootROM or UEFI ROM.");
+						"Invalid firmware file.");
 			}
 		}
 		return isValid;
