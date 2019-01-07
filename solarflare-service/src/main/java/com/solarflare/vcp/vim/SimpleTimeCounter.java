@@ -11,6 +11,7 @@ public class SimpleTimeCounter {
 	private static Log log = LogFactory.getLog(SimpleTimeCounter.class);
 	private String name;
 	private long startTime;
+	public static final boolean debugFlag = false;
 
 	/**
 	 * Creates and starts the counter Side affect: the start time is printed to
@@ -45,11 +46,13 @@ public class SimpleTimeCounter {
 	 *            the log
 	 */
 	public long start(String name) {
-		this.name = name;
-		startTime = System.currentTimeMillis();
-		// TODO: change to debug level.
-		log.info("TIMER STARTED: " + name);
-		return startTime;
+		if (debugFlag) {
+		    this.name = name;
+		    startTime = System.currentTimeMillis();
+		    log.info("TIMER STARTED: " + name);
+		    return startTime;
+		}
+		return 0;
 	}
 
 	/**
@@ -57,11 +60,13 @@ public class SimpleTimeCounter {
 	 * start is printed to the log
 	 */
 	public long stop() {
-		long stopTime = System.currentTimeMillis();
-		long timeTaken = stopTime - startTime;
-		// TODO: change to debug level.
-		log.info("TIMER STOPPED: " + name);
-		log.info("TIME TAKEN: " + name + ": " + (timeTaken / 1000.0));
-		return timeTaken;
+		if (debugFlag) {
+		    long stopTime = System.currentTimeMillis();
+		    long timeTaken = stopTime - startTime;
+		    log.info("TIMER STOPPED: " + name);
+		    log.info("TIME TAKEN: " + name + ": " + (timeTaken / 1000.0));
+		    return timeTaken;
+		}
+		return 0;
 	}
 }
