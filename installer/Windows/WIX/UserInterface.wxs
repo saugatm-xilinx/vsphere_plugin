@@ -197,30 +197,26 @@
         <UI>
             <Dialog Id="MaintenanceTypeDlgNoChange" Width="370" Height="270" Title="!(loc.MaintenanceTypeDlg_Title)">
 				<Control Id="Control_1" Text="!(loc.versionStringOnEachDialogPage)" Type="Text" X="15" Y="248" Width="85" Height="12"/>
-                <Control Id="ChangeButton" Type="PushButton" X="40" Y="65" Width="80" Height="17" Disabled="yes" ToolTip="!(loc.MaintenanceTypeDlgChangeButtonTooltip)" Text="!(loc.MaintenanceTypeDlgChangeButton)">
-                </Control>
-                <Control Id="ChangeDisabledText" Type="Text" X="60" Y="85" Width="280" Height="20" Text="!(loc.MaintenanceTypeDlgChangeDisabledText)">
-                </Control>
                 <Control Id="RepairButton" Type="PushButton" X="40" Y="118" Width="80" Height="17" ToolTip="!(loc.MaintenanceTypeDlgRepairButtonTooltip)" Text="!(loc.MaintenanceTypeDlgRepairButton)">
                     <Publish Property="MSIFACTUI_InstallMode" Value="Repair">1</Publish>
                     <Publish Event="NewDialog" Value="MaintenanceVerifyReadyDlgNoChange">1</Publish>
-                    <Condition Action="disable">ARPNOREPAIR</Condition>
+                    <Condition Action="hide">ARPNOREPAIR</Condition>
                 </Control>
                 <Control Id="RepairText" Type="Text" X="60" Y="138" Width="280" Height="30" Text="!(loc.MaintenanceTypeDlgRepairText)">
                     <Condition Action="hide">ARPNOREPAIR</Condition>
                 </Control>
                 <Control Id="RepairDisabledText" Type="Text" X="60" Y="138" Width="280" Height="30" Text="!(loc.MaintenanceTypeDlgRepairDisabledText)" Hidden="yes">
-                    <Condition Action="show">ARPNOREPAIR</Condition>
+                    <Condition Action="hide">ARPNOREPAIR</Condition>
                 </Control>
-                <Control Id="RemoveButton" Type="PushButton" X="40" Y="171" Width="80" Height="17" ToolTip="!(loc.MaintenanceTypeDlgRemoveButtonTooltip)" Text="!(loc.MaintenanceTypeDlgRemoveButton)">
+                <Control Id="RemoveButton" Type="PushButton" X="40" Y="65" Width="80" Height="17" ToolTip="!(loc.MaintenanceTypeDlgRemoveButtonTooltip)" Text="!(loc.MaintenanceTypeDlgRemoveButton)">
                     <Publish Property="MSIFACTUI_InstallMode" Value="Remove">1</Publish>
                     <Publish Event="NewDialog" Value="MaintenanceVerifyReadyDlgNoChange">1</Publish>
                     <Condition Action="disable">ARPNOREMOVE</Condition>
                 </Control>
-                <Control Id="RemoveText" Type="Text" X="60" Y="191" Width="280" Height="20" Text="!(loc.MaintenanceTypeDlgRemoveText)">
+                <Control Id="RemoveText" Type="Text" X="60" Y="85" Width="280" Height="20" Text="!(loc.MaintenanceTypeDlgRemoveText)">
                     <Condition Action="hide">ARPNOREMOVE</Condition>
                 </Control>
-                <Control Id="RemoveDisabledText" Type="Text" X="60" Y="191" Width="280" Height="20" Text="!(loc.MaintenanceTypeDlgRemoveDisabledText)" Hidden="yes">
+                <Control Id="RemoveDisabledText" Type="Text" X="40" Y="191" Width="280" Height="20" Text="!(loc.MaintenanceTypeDlgRemoveDisabledText)" Hidden="yes">
                     <Condition Action="show">ARPNOREMOVE</Condition>
                 </Control>
                 <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.UIButtonBack)">
@@ -234,7 +230,7 @@
                 <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
                 <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
                 <Control Id="Title" Type="Text" X="15" Y="6" Width="240" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.MaintenanceTypeDlgTitle)" />
-                <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="20" Transparent="yes" NoPrefix="yes" Text="!(loc.MaintenanceTypeDlgDescription)" />
+                <Control Id="Description" Type="Text" X="15" Y="23" Width="280" Height="20" Transparent="yes" NoPrefix="yes" Text="!(loc.MaintenanceTypeDlgDescription)" />
             </Dialog>
         </UI>
     </Fragment>
