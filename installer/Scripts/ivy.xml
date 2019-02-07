@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:e="http://ant.apache.org/ivy/extra" xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+  <info organisation="solarflare" module="vcp-plugin" branch="default" revision="v0.1.0.133" status="development" publication="20171103095931" e:user="bsingh"/>
+
+  <configurations>
+    <conf name="default"/>
+  </configurations>
+
+  <publications>
+    <artifact name="installer" ext="zip" type="zip"/>
+  </publications>
+
+  <!-- No dependencies -->
+  <dependencies/>
+</ivy-module>
