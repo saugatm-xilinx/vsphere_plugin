@@ -40,9 +40,9 @@ IF %argC% == 0 echo No arguments provided...do build-plugin-package.bat help
 @set publish="publish"
 @IF %1% == publish (
    @echo "Publishing files on ivy........."
-   wget -q http://source.uk.solarflarecom.com/hg/incoming/esxi_sfc/rawfile/firmware_vib/fetch_image.c
-   wget -q http://source.uk.solarflarecom.com/hg/incoming/esxi_sfc/rawfile/firmware_vib/fetch_image.h
-   wget -q http://source.uk.solarflarecom.com/hg/incoming/esxi_sfc/rawfile/firmware_vib/fetch_firmware_image.py
+   wget -q http://source.uk.solarflarecom.com/hg/incoming/esxi_sfc/rawfile/default/firmware_vib/fetch_image.c
+   wget -q http://source.uk.solarflarecom.com/hg/incoming/esxi_sfc/rawfile/default/firmware_vib/fetch_image.h
+   wget -q http://source.uk.solarflarecom.com/hg/incoming/esxi_sfc/rawfile/default/firmware_vib/fetch_firmware_image.py
    gcc -shared fetch_image.h -o libfetch_image.dll fetch_image.c
    python fetch_firmware_image.py ../../installer/dist/Tomcat_Server/webapps/ %5 %2 %4
    plink -ssh -l %2 -pw %3 chisel.uk.solarflarecom.com "mkdir firmware_publish;chmod -R 777 firmware_publish"
