@@ -253,6 +253,8 @@ public class SfCIMService {
 						versions.put(CIMConstants.BOOT_ROM_VERSION, versionString);
 					} else if (CIMConstants.DESC_UEFI_ROM.equals(description)) {
 						versions.put(CIMConstants.UEFI_ROM_VERSION, versionString);
+					}  else if (CIMConstants.DESC_SUCFW.equals(description)) {
+						versions.put(CIMConstants.SUCFW_VERSION, versionString);
 					}
 				}
 			} else {
@@ -411,6 +413,9 @@ public class SfCIMService {
 		} else if (fwType.equals(FwType.UEFIROM)) {
 			currentType = adapter.getUefiROMType();
 			currentSubType = adapter.getUefiROMSubType();
+		} else if (fwType.equals(FwType.SUCFW)) {
+			currentType = adapter.getSucfwType();
+			currentSubType = adapter.getSucfwSubType();
 		}
 
 		if (currentType == 0 || currentSubType == 0) {

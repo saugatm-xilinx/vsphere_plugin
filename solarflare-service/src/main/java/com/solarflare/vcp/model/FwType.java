@@ -1,5 +1,5 @@
 package com.solarflare.vcp.model;
 
 public enum FwType {
-	 UEFIROM, CONTROLLER, BOOTROM
+	 UEFIROM, CONTROLLER, BOOTROM, SUCFW
 }

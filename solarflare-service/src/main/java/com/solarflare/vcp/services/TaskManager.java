@@ -65,6 +65,9 @@ public class TaskManager {
 				adapterTask.setUefiROM(status);
 			}
 
+			if (FwType.SUCFW.equals(status.getFirmwareType())) {
+				adapterTask.setSucfw(status);
+			}
 		}
 
 		log.debug("AdapterTask after update: " + adapterTask);
@@ -142,6 +145,12 @@ public class TaskManager {
 
 			Status UEFIStatus = aTask.getUefiROM();
 			isTaskDone = isTaskDone(UEFIStatus);
+			if (!isTaskDone) {
+				break;
+			}
+
+			Status sucfwStatus = aTask.getSucfw();
+			isTaskDone = isTaskDone(sucfwStatus);
 			if (!isTaskDone) {
 				break;
 			}

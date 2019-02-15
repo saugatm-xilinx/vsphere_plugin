@@ -159,6 +159,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		firmwareTypeList.add(FwType.CONTROLLER);
 		firmwareTypeList.add(FwType.BOOTROM);
 		firmwareTypeList.add(FwType.UEFIROM);
+		firmwareTypeList.add(FwType.SUCFW);
 
 		try {
 			TaskInfo taskInfo = createTask(hostId);
@@ -169,6 +170,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			CIMInstance fwCInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_MCFW_NAME);
 			CIMInstance fwBInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_BOOTROM_NAME);
 			CIMInstance fwUInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
+			CIMInstance fwSInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_SUCFW_NAME);
 			CIMInstance fwInstance = null;
 
 			for (FwType fwType : firmwareTypeList) {
@@ -204,8 +206,17 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 						}
 						fwInstance = fwUInstance;
 						break;
-					}
 
+				        case SUCFW:
+                                                // If no latest version is available for adapter then
+                                                // skip.
+                                                if (adapter.getLatestVersion() == null
+                                                                || adapter.getLatestVersion().getSucfw().equals("0.0.0.0")) {
+                                                        continue;
+                                                }
+                                                fwInstance = fwSInstance;
+                                                break;
+				        }
 					CIMInstance nicInstance = cimService.getNICCardInstance(adapter.getChildren().get(0).getName());
 					URL imageUrl = getImageURL(fwInstance, nicInstance, cimService, fwType, adapter);
 					addToMap(updateObj.updateAdapterMap, imageUrl, adapter);
@@ -265,6 +276,9 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			    case UEFIROM:
 				    fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
 				    break;
+			    case SUCFW:
+				    fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_SUCFW_NAME);
+				    break;
 			    }
 		    }
 		    sendDataInChunks(cimService, fwInstance, tempFile, decodedDataBytes);
@@ -309,6 +323,7 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			boolean controller = false;
 			boolean bootrom = false;
 			boolean uefirom = false;
+			boolean sucfw = false;
 			CIMInstance fwInstance = null;
 			if (FirmwareType.FIRMWARE_TYPE_MCFW.ordinal() == header.getType()) {
 				logger.debug("Solarflare:: Updating Controller");
@@ -324,6 +339,11 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 				logger.debug("Solarflare:: Updating UEFI ROM");
 				fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
 				uefirom = true;
+			} else if (FirmwareType.FIRMWARE_TYPE_MUMFW.ordinal() == header.getType()) {
+				// Get SUC FW SF_SoftwareInstallationService instance
+				logger.debug("Solarflare:: Updating SUCFW");
+				fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_SUCFW_NAME);
+				sucfw = true;
 			}
 
 			boolean isValid = isFwFileValid(adapterList, header, fwInstance, cimService);
@@ -338,6 +358,9 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 					}
 					if (uefirom) {
 						fwType = FwType.UEFIROM;
+					}
+					if (sucfw) {
+						fwType = FwType.SUCFW;
 					}
 					updateFirmware(adapterList, decodedDataBytes, cimService, fwInstance, fwType, taskInfo);
 
@@ -371,6 +394,9 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 				break;
 			case UEFIROM:
 				fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
+				break;
+			case SUCFW:
+				fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_SUCFW_NAME);
 				break;
 			}
 		}
@@ -468,7 +494,10 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			} else if (FirmwareType.FIRMWARE_TYPE_UEFIROM.ordinal() == header.getType()) {
 				isValid = cimService.isCustomFWImageCompatible(fwInstance, nicInstance, header, FwType.UEFIROM,
 						adapter);
-			} else {
+			} else if (FirmwareType.FIRMWARE_TYPE_MUMFW.ordinal() == header.getType()) {
+				isValid = cimService.isCustomFWImageCompatible(fwInstance, nicInstance, header, FwType.SUCFW,
+						adapter);
+			}  else {
 				throw new SfInvalidRequestException(
 						"Invalid firmware file.");
 			}
@@ -539,6 +568,8 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 			aTask.setBootROM(status);
 		} else if (FwType.UEFIROM.equals(fwType)) {
 			aTask.setUefiROM(status);
+		} else if (FwType.SUCFW.equals(fwType)) {
+			aTask.setSucfw(status);
 		}
 		if (fwImageURL == null) {
 			fwImageURL = getImageURL(fwInstance, nicInstance, cimService, fwType, adapter);
@@ -632,10 +663,12 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 		String bootROMVersion = versions.get(CIMConstants.BOOT_ROM_VERSION);
 		String firmwareVersion = versions.get(CIMConstants.FIRMARE_VERSION);
 		String UEFIROMVersion = versions.get(CIMConstants.UEFI_ROM_VERSION);
+		String sucfwVersion = versions.get(CIMConstants.SUCFW_VERSION);
 		adapter.setVersionController(controllerVersion);
 		adapter.setVersionBootROM(bootROMVersion);
 		adapter.setVersionFirmware(firmwareVersion);
 		adapter.setVersionUEFIROM(UEFIROMVersion);
+		adapter.setVersionSUCFW(sucfwVersion);
 
 		// Get version from image binary for controller
 		CIMInstance fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_MCFW_NAME);
@@ -656,11 +689,18 @@ public class HostAdapterServiceImpl implements HostAdapterService {
 
 		frmVesion.setBootROM(latestBootROMVersion);
 
-		// Get version from image binary for BootRom
+		// Get version from image binary for UEFIROM
 		CIMInstance uefiROMInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
 		String latestUefiROMVersion = cimService.getLatestFWImageVersion(pluginURL, cimService, uefiROMInstance,
 				niCimInstance, FwType.UEFIROM, adapter);
 		frmVesion.setUefi(latestUefiROMVersion);
+
+		// Get version from image binary for SUCFW
+		CIMInstance sucfwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_SUCFW_NAME);
+		String latestSUCFWVersion = cimService.getLatestFWImageVersion(pluginURL, cimService, sucfwInstance,
+				niCimInstance, FwType.SUCFW, adapter);
+		frmVesion.setSucfw(latestSUCFWVersion);
+
 
 		// Put dummy latest versions for Firmware family
 		frmVesion.setFirmewareFamily(firmwareVersion); // setting current as

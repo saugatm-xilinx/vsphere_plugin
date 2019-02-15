@@ -6,7 +6,16 @@ public class AdapterTask {
 	private Status bootROM;
 	private Status controller;
 	private Status uefiROM;
+	private Status sucfw;
 	
+	public Status getSucfw() {
+		return sucfw;
+	}
+
+	public void setSucfw(Status sucfw) {
+		this.sucfw = sucfw;
+	}
+
 	public String getAdapterId() {
 		return adapterId;
 	}
@@ -42,7 +51,7 @@ public class AdapterTask {
 	@Override
 	public String toString() {
 		return "AdapterTask [adapterId=" + adapterId + ", bootROM=" + bootROM + ", controller=" + controller
-				+ ", uefiROM=" + uefiROM + "]";
+				+ ", uefiROM=" + uefiROM + ", sucfw=" + sucfw + "]";
 	}
 
 	

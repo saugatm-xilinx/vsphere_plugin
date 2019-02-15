@@ -65,6 +65,9 @@ public class MetadataHelper {
 		} else if (fwType.equals(FwType.UEFIROM)) {
 			currentType = adapter.getUefiROMType();
 			currentSubType = adapter.getUefiROMSubType();
+		} else if (fwType.equals(FwType.SUCFW)) {
+			currentType = adapter.getSucfwType();
+			currentSubType = adapter.getSucfwSubType();
 		}
 
 		if (metadata == null) {
@@ -111,6 +114,9 @@ public class MetadataHelper {
 		} else if (fwType.equals(FwType.UEFIROM)) {
 			currentType = adapter.getUefiROMType();
 			currentSubType = adapter.getUefiROMSubType();
+		} else if (fwType.equals(FwType.SUCFW)) {
+			currentType = adapter.getSucfwType();
+			currentSubType = adapter.getSucfwSubType();
 		}
 
 		if (currentType == 0 || currentSubType == 0) {
@@ -130,6 +136,9 @@ public class MetadataHelper {
 			} else if (fwType.equals(FwType.UEFIROM)) {
 				adapter.setUefiROMType(currentType);
 				adapter.setUefiROMSubType(currentSubType);
+			} else if (fwType.equals(FwType.SUCFW)) {
+				adapter.setSucfwType(currentType);
+				adapter.setSucfwSubType(currentSubType);
 			}
 
 		} else {
@@ -219,6 +228,10 @@ public class MetadataHelper {
 			int subType = Integer.parseInt(file.getSubtype());
 			files.put(type + "," + subType, file);
 		}
-
+		for (SfFirmware file : metadata.getSucfw().getFiles()) {
+			int type = Integer.parseInt(file.getType());
+			int subType = Integer.parseInt(file.getSubtype());
+			files.put(type + "," + subType, file);
+		}
 	}
 }

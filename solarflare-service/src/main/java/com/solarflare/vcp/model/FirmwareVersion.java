@@ -12,6 +12,7 @@ public class FirmwareVersion implements Serializable {
 	private String controller;
 	private String bootROM;
 	private String uefi;
+	private String sucfw;
 	private String firmewareFamily;
 
 	public String getController() {
@@ -36,6 +37,14 @@ public class FirmwareVersion implements Serializable {
 
 	public void setUefi(String uefi) {
 		this.uefi = uefi;
+	}
+
+	public String getSucfw() {
+		return sucfw;
+	}
+
+	public void setSucfw(String sucfw) {
+		this.sucfw = sucfw;
 	}
 
 	public String getFirmewareFamily() {

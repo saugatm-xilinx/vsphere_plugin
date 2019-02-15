@@ -15,6 +15,7 @@ public class Adapter implements Serializable {
 	private String versionBootROM;
 	private String versionUEFIROM;
 	private String versionFirmware;
+	private String versionSUCFW;
 	private FirmwareVersion latestVersion;
 	List<VMNIC> children;
 	private String deviceId;
@@ -28,7 +29,25 @@ public class Adapter implements Serializable {
 	private int bootROMSubType;
 	private int uefiROMType;
 	private int uefiROMSubType;
+	private int sucfwType;
+	private int sucfwSubType;
     
+	public int getSucfwType() {
+		return sucfwType;
+	}
+
+	public void setSucfwType(int sucfwType) {
+		this.sucfwType = sucfwType;
+	}
+
+	public int getSucfwSubType() {
+		return sucfwSubType;
+	}
+
+	public void setSucfwSubType(int sucfwSubType) {
+		this.sucfwSubType = sucfwSubType;
+	}
+
 	public int getControllerType() {
 		return controllerType;
 	}
@@ -141,6 +160,14 @@ public class Adapter implements Serializable {
 		this.versionUEFIROM = versionUEFIROM;
 	}
 
+	public String getVersionSUCFW() {
+		return versionSUCFW;
+	}
+
+	public void setVersionSUCFW(String versionSUCFW) {
+		this.versionSUCFW = versionSUCFW;
+	}
+
 	public String getType() {
 		return type;
 	}
@@ -189,7 +216,8 @@ public class Adapter implements Serializable {
 				+ deviceId + ", subSystemDeviceId=" + subSystemDeviceId + ", vendorId=" + vendorId
 				+ ", subSystemVendorId=" + subSystemVendorId + ", controllerType=" + controllerType
 				+ ", controllerSubType=" + controllerSubType + ", bootROMType=" + bootROMType + ", bootROMSubType="
-				+ bootROMSubType + ", uefiROMType=" + uefiROMType + ", uefiROMSubType=" + uefiROMSubType + "]";
+				+ bootROMSubType + ", uefiROMType=" + uefiROMType + ", uefiROMSubType=" + uefiROMSubType
+				+ ", sucfwType=" + sucfwType + ", sucfwSubType=" +  sucfwSubType +"]";
 	}
 
 	

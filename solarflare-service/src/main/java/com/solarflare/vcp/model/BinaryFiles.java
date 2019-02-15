@@ -11,6 +11,15 @@ public class BinaryFiles implements Serializable {
 	private Controller controller;
 	private BootROM bootROM;
 	private UEFIROM uefiROM;
+	private SUCFW sucfw;
+
+	public SUCFW getSucfw() {
+		return sucfw;
+	}
+
+	public void setSucfw(SUCFW sucfw) {
+		this.sucfw = sucfw;
+	}
 
 	public UEFIROM getUefiROM() {
 		return uefiROM;
@@ -38,7 +47,8 @@ public class BinaryFiles implements Serializable {
 
 	@Override
 	public String toString() {
-		return "BinaryFiles [controller=" + controller + ", bootROM=" + bootROM + ", uefiROM=" + uefiROM + "]";
+		return "BinaryFiles [controller=" + controller + ", bootROM=" + bootROM + ", uefiROM=" + uefiROM +
+				", sucfw=" + sucfw +"]";
 	}
 
 	

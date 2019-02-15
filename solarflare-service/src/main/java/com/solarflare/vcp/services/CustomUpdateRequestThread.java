@@ -115,7 +115,10 @@ public class CustomUpdateRequestThread implements Runnable {
 		} else if (FwType.UEFIROM.equals(fwType)) {
 			aTask.setUefiROM(status);
 			fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_UEFI_NAME);
-		}
+		} else if (FwType.SUCFW.equals(fwType)) {
+				aTask.setSucfw(status);
+				fwInstance = cimService.getSoftwareInstallationInstance(CIMConstants.SVC_SUCFW_NAME);
+			}
 		updateRequest.setAdapterId(adapterId);
 		updateRequest.setFwInstance(fwInstance.getObjectPath());
 		updateRequest.setNicInstance(new CIMObjectPath(MOF.objectHandle(nicInstance.getObjectPath(), false, true)));
