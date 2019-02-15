@@ -41,7 +41,7 @@
                         <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
                     </div>
                     <div class="alert-text" style="width:80%">
-                        Request Failed
+                            Request Failed
                     </div>
                     <div class="alert-actions">
                         <button class="btn alert-action" [disabled]="button.latest"
@@ -57,37 +57,51 @@
 
         <table class="table">
             <tr>
-                <th rowspan="2" class="table-border-right"
-                    style="vertical-align: middle;">
-                    Adapter Name
-                </th>
-                <th colspan="2" class="table-border-right">Controller Version</th>
-                <th colspan="2" class="table-border-right">Boot ROM Version</th>
-                <th colspan="2">UEFI ROM Version</th>
-                <th>Available Update Different</th>
-            </tr>
-            <tr>
-                <th class="table-border-right">Current</th>
-                <th class="table-border-right" style="color:#781DA0;">Available</th>
-                <th class="table-border-right">Current</th>
-                <th class="table-border-right" style="color:#781DA0;">Available</th>
-                <th class="table-border-right">Current</th>
-                <th style="color:#781DA0;" class="table-border-right">Available</th>
-                <th></th>
+                <th class="table-border-right"
+                    style="color:blue">Firmware Types</th>
+                <th class="table-border-right">Controller </th>
+                <th class="table-border-right">Boot ROM </th>
+                <th class="table-border-right">UEFI ROM </th>
+                <th class="table-border-right">SUCFW </th>
             </tr>
             <tr *ngFor="let ad of adapters">
-                <td>{{ad.name}}</td>
-                <td>v{{ad.versionController}}</td>
-                <td>
+                <td class="table-border-right"
+                    style="text-align: middle;
+                            vertical-align: middle;">
+                    Adapter Name
+                </td>
+                <td colspan="4"
+                class="table-border-right"
+                style="text-align: middle;"
+                >{{ad.name}}</td>
+            </tr>
+            <tr *ngFor="let ad of adapters">
+                <td class="table-border-right">Current</td>
+                <td class="table-border-right">v{{ad.versionController}}</td>
+                <td class="table-border-right">v{{ad.versionBootROM}}</td>
+                <td class="table-border-right">v{{ad.versionUEFIROM}}</td>
+                <td class="table-border-right">
+                    <div *ngIf="ad.versionSUCFW === '0.0.0.0' else tab_adap_curr_na_sucfw ">
+                        NA
+                    </div>
+                    <div>
+                    <ng-template #tab_adap_curr_na_sucfw>v{{ad.versionSUCFW}}</ng-template>
+                    </div>
+                </td>
+
+            </tr>
+            <tr *ngFor="let ad of adapters">
+                <td class="table-border-right">Available</td>
+                <td class="table-border-right">
                     <b style="color:#781DA0;" *ngIf="ad.latestVersion.controller !== null">
                         {{ad.latestVersion.controller}}
                     </b>
-                    <b *ngIf="ad.latestVersion.controller === null">
+                    <b *ngIf="ad.latestVersion.controller === null" >
                         NA
                     </b>
                 </td>
-                <td>v{{ad.versionBootROM}}</td>
-                <td>
+
+                <td class="table-border-right">
                     <b style="color:#781DA0;" *ngIf="ad.latestVersion.bootROM !== null">
                         {{ad.latestVersion.bootROM}}
                     </b>
@@ -95,17 +109,23 @@
                         NA
                     </b>
                 </td>
-                <td>v{{ad.versionUEFIROM}}</td>
-                <td>
+
+                <td class="table-border-right">
                     <b style="color:#781DA0;" *ngIf="ad.latestVersion.uefi !== null">
                         {{ad.latestVersion.uefi}}
                     </b>
                     <b *ngIf="ad.latestVersion.uefi === null">
-                        NA
+                            NA
                     </b>
                 </td>
-                <td>
-                    {{isLatestAvailable(ad)}}
+                <td class="table-border-right">
+                    <b style="color:#781DA0;" *ngIf="ad.latestVersion.sucfw !== null
+                                                     && ad.latestVersion.sucfw !== '0.0.0.0';  else tab_adap_aval_na_sucfw">
+                        {{ad.latestVersion.sucfw}}
+                    </b>
+                    <b>
+                        <ng-template #tab_adap_aval_na_sucfw>NA</ng-template>
+                    </b>
                 </td>
             </tr>
         </table>
@@ -329,6 +349,22 @@
                 <br/>
             </div>
 
+            <div *ngIf="output.sucfw !== null">
+                    <span *ngIf="output.sucfw.state === 'Success' && output.sucfw.to ">
+                    SUCFW Firmware: v{{output.sucfw.from}} updated to {{output.sucfw.to}}
+                </span>
+                    <span *ngIf="output.sucfw.state === 'Success' && !output.sucfw.to ">
+                    SUCFW Firmware: Firmware update in progress {{dots}}
+                </span>
+                    <span *ngIf="output.sucfw.state === 'Error'">
+                    SUCFW Firmware: Error occurred while updating v{{output.sucfw.from}}
+                    <i style="color: red;" *ngIf="output.sucfw.message !== null"><br/>{{output.sucfw.message}}</i>
+                </span>
+                    <span *ngIf="output.sucfw.state === 'Queued' || output.sucfw.state === 'Running'">
+                    SUCFW Firmware: Firmware update in progress {{dots}}
+                </span>
+                    <br/>
+            </div>
 
             <span *ngIf="output.uefiRom === null && output.bootRom === null && output.controller === null">
                 Update is in progress.. Please wait...<br/>
@@ -389,7 +425,19 @@
             </span>
                 <br/>
             </div>
-
+            <div *ngIf="output.sucfw !== null">
+                <span *ngIf="output.sucfw.state === 'Success'">
+                    SUCFW Firmware: v{{output.sucfw.from}} updated to {{output.sucfw.to}}
+                </span>
+                <span *ngIf="output.sucfw.state === 'Error'">
+                    SUCFW Firmware: Error occurred while updating v{{output.sucfw.from}} to {{output.sucfw.to}}
+                    <i style="color: red;" *ngIf="output.sucfw.message !== null"><br/>{{output.sucfw.message}}</i>
+                </span>
+                <span *ngIf="output.sucfw.state === 'Queued' || output.sucfw.state === 'Running'">
+                    SUCFW Firmware: v{{output.sucfw.from}} updating to {{output.sucfw.to}}
+                </span>
+                    <br/>
+            </div>
 
             <span *ngIf="output.uefiRom === null && output.bootRom === null && output.controller === null">
                 Update is in progress.. Please wait...
@@ -460,11 +508,31 @@
                     <td>v{{adapter.versionUEFIROM}}</td>
                     <td>{{adapter.latestVersion.uefi}}</td>
                 </tr>
+                <tr>
+                    <td>SUCFW Version</td>
+                    <td>
+                        <div *ngIf="adapter.versionSUCFW !== '0.0.0.0' else ad_fu_curr_na_sucfw">
+                            v{{adapter.versionSUCFW}}
+                        </div>
+                        <div>
+                            <ng-template #ad_fu_curr_na_sucfw>NA</ng-template>
+                        </div>
+                    </td>
+                    <td>
+                        <div *ngIf="adapter.latestVersion.sucfw !== '0.0.0.0' else ad_fu_aval_na_sucfw">
+                                {{adapter.latestVersion.sucfw}}
+                        </div>
+                        <div>
+                            <ng-template #ad_fu_aval_na_sucfw>NA</ng-template>
+                        </div>
+                    </td>
+                </tr>
                 </tbody>
             </table>
+            <br/>
             <div class="col-md-12" style="text-align: center;">
                 <button class="btn"
-                        (click)="latestUpdateModal = true"
+                        (click)="latestUpdateModal = true;"
                         [disabled]="gettingAdapterList">
                     Update
                 </button>

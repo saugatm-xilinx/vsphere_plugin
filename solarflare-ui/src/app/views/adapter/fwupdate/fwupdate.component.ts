@@ -157,6 +157,9 @@ export class FwupdateComponent implements OnInit {
                         if (op.uefiRom !== null) {
                             this.status.custom.output[i].uefiRom.to = adapter.versionUEFIROM;
                         }
+                        if (op.sucfw !== null) {
+                            this.status.custom.output[i].sucfw.to = adapter.versionSUCFW;
+                        }
                     }
                 })
             });
@@ -170,6 +173,8 @@ export class FwupdateComponent implements OnInit {
         } else if (!ad.latestVersion.bootROM.includes(ad.versionBootROM)) {
             return "Yes";
         } else if (!ad.latestVersion.uefi.includes(ad.versionUEFIROM)) {
+            return "Yes";
+        } else if (!ad.latestVersion.sucfw.includes(ad.versionSUCFW)) {
             return "Yes";
         } else {
             return "No";
@@ -392,6 +397,12 @@ export class FwupdateComponent implements OnInit {
                     current++;
                 }
             }
+            if (i['sucfw'] !== null) {
+                total++;
+                if (i['sucfw']['state'] === 'Success' || i['sucfw']['state'] === 'Error') {
+                    current++;
+                }
+            }
 
             if (total !== 0 && (this.status[a].output.length === (j + 1)) && total === current) {
                 this.status.status = true;
@@ -410,7 +421,8 @@ export class FwupdateComponent implements OnInit {
                 name: adapter.name,
                 bootRom: null,
                 controller: null,
-                uefiRom: null
+                uefiRom: null,
+                sucfw: null
             };
             if (status && status.adapterTasks && status.adapterTasks.length > 0) {
                 status.adapterTasks.forEach((task, i) => {
@@ -432,6 +444,12 @@ export class FwupdateComponent implements OnInit {
                             this.status.latest.output[index].uefiRom = FwupdateComponent.returnStatusOutput(br);
                             this.status.latest.output[index].uefiRom.from = adapter.versionUEFIROM;
                             this.status.latest.output[index].uefiRom.to = adapter.latestVersion.uefi;
+                        }
+                        if (task['sucfw'] !== null) {
+                            const br = task['sucfw'];
+                            this.status.latest.output[index].sucfw = FwupdateComponent.returnStatusOutput(br);
+                            this.status.latest.output[index].sucfw.from = adapter.versionSUCFW;
+                            this.status.latest.output[index].sucfw.to = adapter.latestVersion.sucfw;
                         }
                     }
                 });
@@ -475,7 +493,8 @@ export class FwupdateComponent implements OnInit {
                 name: adapter.name,
                 bootRom: null,
                 controller: null,
-                uefiRom: null
+                uefiRom: null,
+                sucfw: null
             };
             if (status && status.adapterTasks && status.adapterTasks.length > 0) {
                 status.adapterTasks.forEach((task, i) => {
@@ -494,6 +513,11 @@ export class FwupdateComponent implements OnInit {
                             const br = task['uefiROM'];
                             this.status.custom.output[index].uefiRom = FwupdateComponent.returnStatusOutput(br);
                             this.status.custom.output[index].uefiRom.from = adapter.versionUEFIROM;
+                        }
+                        if (task['sucfw'] !== null) {
+                            const br = task['sucfw'];
+                            this.status.custom.output[index].sucfw = FwupdateComponent.returnStatusOutput(br);
+                            this.status.custom.output[index].sucfw.from = adapter.versionSUCFW;
                         }
                     }
                 });
