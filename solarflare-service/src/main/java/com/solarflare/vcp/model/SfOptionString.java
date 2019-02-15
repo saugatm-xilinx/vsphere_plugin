@@ -15,6 +15,7 @@ public class SfOptionString {
 	String vxlanOffload;
 	String geneveOffload;
 	String debugMask;
+	String evqType;
 
 	private static final String DEFAULT_NET_Q_COUNT = "8";
 	// VSPPLUG-282 : changed default value of RSS to 1
@@ -22,6 +23,7 @@ public class SfOptionString {
 	private static final String DEFAULT_VX_LAN_OFFLOAD = "1";
 	private static final String DEFAULT_GENEVE_OFFLOAD = "1";
 	private static final String DEFAULT_DEBUG_MASK = "0x00";
+	private static final String DEFAULT_EVQ_TYPE = "0";
 
 	public SfOptionString() {
 		this.netQCount = DEFAULT_NET_Q_COUNT;
@@ -29,6 +31,7 @@ public class SfOptionString {
 		this.vxlanOffload = DEFAULT_VX_LAN_OFFLOAD;
 		this.debugMask = DEFAULT_DEBUG_MASK;
 		this.geneveOffload = DEFAULT_GENEVE_OFFLOAD;
+		this.evqType = DEFAULT_EVQ_TYPE;
 	}
 
 	public String getNetQCount() {
@@ -72,10 +75,18 @@ public class SfOptionString {
 		this.debugMask = debugMask;
 	}
 
+	public String getEvqType() {
+		return evqType;
+	}
+
+	public void setEvqType(String evqType) {
+		this.evqType = evqType;
+	}
+
 	@Override
 	public String toString() {
 		return "netQCount=" + netQCount + " rssQCount=" + rssQCount + " vxlanOffload=" + vxlanOffload
-			    +" geneveOffload=" + geneveOffload + " debugMask=" + debugMask;
+			    +" geneveOffload=" + geneveOffload + " debugMask=" + debugMask + " evqType=" + evqType;
 	}
 
 	/**
@@ -97,12 +108,14 @@ public class SfOptionString {
 			boolean vxLANOffload = validHostConfigObj.getOverlay().isVxlanOffloadEnable();
 			boolean geneveOffloadv_val = validHostConfigObj.getOverlay().isGeneveOffloadEnable();
 			int debug = validHostConfigObj.getDebuggingMask().getDebugMask();
+			int evqTypeVal = validHostConfigObj.getEvqType().getEvqTypeVal();
 
 			optionString.netQCount = Integer.toString(netQCount);
 			optionString.rssQCount = Integer.toString(rssQCount);
 			optionString.vxlanOffload = vxLANOffload ? "1" : "0";
 			optionString.geneveOffload = geneveOffloadv_val ? "1" : "0";
 			optionString.debugMask = "0x" + Integer.toHexString(debug);
+			optionString.evqType = Integer.toString(evqTypeVal);
 		} else {
 			logger.error("Input param - Host Configuration object is null");
 		}
@@ -131,7 +144,26 @@ public class SfOptionString {
 		Debugging debug = validHostConfig.getDebuggingMask();
 		validHostConfig.setDebuggingMask(getValidDebugging(debug));
 
+		//Get Valid EvqType
+		EvqType evqType = validHostConfig.getEvqType();
+		validHostConfig.setEvqType(getValidEvqType(evqType));
+
 		return validHostConfig;
+	}
+
+	private EvqType getValidEvqType(EvqType evqType)
+	{
+		logger.info("Solarflare:: getValidEvqType");
+		EvqType validEvqType = evqType;
+		if (validEvqType == null) {
+			validEvqType = new EvqType();
+		}
+		int evqTypeVal = validEvqType.getEvqTypeVal();
+		if (evqTypeVal < 0 || evqTypeVal > 2) {
+			evqTypeVal = Integer.parseInt(DEFAULT_EVQ_TYPE);
+			validEvqType.setEvqTypeVal(evqTypeVal);
+		}
+		return validEvqType;
 	}
 
 	private NetQueue getValidNetQueue(NetQueue netQueue) {
@@ -202,9 +234,13 @@ public class SfOptionString {
 		Debugging debug = new Debugging();
 		debug = debug.decodeDebugMask(Integer.decode(sfOptionString.getDebugMask()));
 
+		EvqType evqtype = new EvqType();
+		evqtype.setEvqTypeVal(Integer.parseInt(sfOptionString.getEvqType()));
+
 		hostConfigObj.setNetQueue(netQueue);
 		hostConfigObj.setOverlay(overlay);
 		hostConfigObj.setDebuggingMask(debug);
+		hostConfigObj.setEvqType(evqtype);
 
 		timer.stop();
 		return hostConfigObj;

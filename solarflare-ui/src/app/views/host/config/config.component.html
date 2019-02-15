@@ -13,8 +13,14 @@
                         <li><strong>min</strong> : 1&nbsp;&nbsp;&nbsp;&nbsp;<strong>max</strong> : 4&nbsp;&nbsp;&nbsp;&nbsp;<strong>default</strong> : 1 (RSS disabled)</li>
                 </ul>
             </li>
-            <li>VXLAN Offload - enable/disable VXLAN offload to the adapter.</li>
             <li>DEBUGGING mask - set/unset driver debug features.</li>
+            <li>VXLAN Offload - enable/disable VXLAN offload to the adapter.</li>
+            <li>GENEVE Offload - enable/disable GENEVE offload to the adapter.</li>
+            <li>EVQ Type - set the Event Queue Type
+                <ul class="list">
+                    <li><strong>Auto</strong> : 0&nbsp;&nbsp;&nbsp;&nbsp;<strong>Throughput (default)</strong> : 1&nbsp;&nbsp;&nbsp;&nbsp;<strong>Low Latency</strong> : 2 </li>
+                </ul>
+            </li>
         </ul>
         <p>The APPLY button will apply the selected adapter settings. The RESTORE button will 
             remove any changes made and restore to the original settings.
@@ -270,6 +276,46 @@
                                            name="geneveOffloadEnable" [value]="false" id="geneveOffloadDisable">
                                     <label for="geneveOffloadDisable">Disable</label>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+			<section class="form-block">
+                <label>EVQ Type</label>
+                <div formGroupName="evqType">
+					<div class="form-group row" style="min-height: 30px; ">
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                            <label for="evqTypeVal" style="padding-top: 12px;">EVQ Type</label>
+                            <div style="font-size: 0.76em;"> Set the event queue type</div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                            <label for="evqTypeVal"
+                                   aria-haspopup="true"
+                                   role="tooltip"
+                                   class="tooltip tooltip-validation tooltip-sm"
+                                   [class.invalid]="hostConfig.get('evqType').get('evqTypeVal').invalid
+                                                    && (hostConfig.get('evqType').get('evqTypeVal').dirty ||
+                                                    hostConfig.get('evqType').get('evqTypeVal').touched)"
+                                   [class.tooltipConfig]="hostConfig.get('evqType').get('evqTypeVal').invalid
+                                                          && (hostConfig.get('evqType').get('evqTypeVal').dirty ||
+                                                          hostConfig.get('evqType').get('evqTypeVal').touched)">
+                                <span class="tooltip-content">
+                                    EVQ Type value required
+                                </span>
+                            </label>
+                            <div class="btn-group">
+                                <button class="btn" id="evqTypeValbtn" (click)="btn.evqType = true;"
+                                    *ngIf="!btn.evqType">
+                                    {{hostConfig.get('evqType').get('evqTypeVal').value}}
+                                </button>
+                                <input formControlName="evqTypeVal" id="evqTypeVal"
+                                    style="width: 40px;text-align: center;"
+                                    *ngIf="btn.evqType"
+                                    (blur)="btn.evqType = false;"
+                                    type="number"
+                                    autocomplete="off"
+                                >
                             </div>
                         </div>
                     </div>

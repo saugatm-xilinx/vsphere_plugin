@@ -9,7 +9,18 @@ public class HostConfiguration implements Serializable {
 	private NetQueue netQueue;
 	private Debugging debuggingMask;
 	private Overlay overlay;
+	private EvqType evqType;
 	private boolean restart;
+
+	public EvqType getEvqType()
+	{
+		return evqType;
+	}
+
+	public void setEvqType(EvqType evqType)
+	{
+	    this.evqType = evqType;
+	}
 
 	public boolean isRestart() {
 		return restart;
@@ -46,7 +57,7 @@ public class HostConfiguration implements Serializable {
 	@Override
 	public String toString() {
 		return "HostConfiguration [netQueue=" + netQueue + ", debuggingMask=" + debuggingMask + ", overlay=" + overlay
-				+ ", restart=" + restart + "]";
+				+ ", restart=" + restart + ", evqType=" + evqType + "]";
 	}
 
 		

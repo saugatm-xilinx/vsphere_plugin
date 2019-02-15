@@ -38,6 +38,7 @@ export class ConfigComponent implements OnInit {
             "mcdi": false
         },
         "overlay": { "vxlanOffloadEnable": true, "geneveOffloadEnable": true },
+        "evqType": { "evqTypeVal": 1 },
         "restart": false
     };
     public config: any = {};
@@ -51,7 +52,8 @@ export class ConfigComponent implements OnInit {
             rss: false,
         },
         restore: false,
-        configDefault: false
+        configDefault: false,
+        evqType: false
     };
     public submitted = false;
 
@@ -83,7 +85,8 @@ export class ConfigComponent implements OnInit {
                 rss: false,
             },
             restore: false,
-            configDefault: false
+            configDefault: false,
+            evqType: false
         }
     }
 
@@ -139,6 +142,9 @@ export class ConfigComponent implements OnInit {
                 vxlanOffloadEnable: new FormControl({ value: true, disabled: false }, Validators.required),
                 geneveOffloadEnable: new FormControl({ value: true, disabled: false }, Validators.required)
             }),
+            evqType: new FormGroup({
+                evqTypeVal: new FormControl('', [Validators.required, Validators.min(0)]),
+            }),
             restart: new FormControl('')
         })
     }
@@ -186,6 +192,7 @@ export class ConfigComponent implements OnInit {
         //         "mcdi": false
         //     },
         //     "overlay": { "vxlanOffloadEnable": true, "geneveOffloadEnable": true },
+        //     "evqType": { "evqTypeVal": 1 },
         //     "restart": false
         // };
         if(this.config.netQueue.netQueueCount !== this.hostConfig.get('netQueue').get('netQueueCount').value){
@@ -240,6 +247,9 @@ export class ConfigComponent implements OnInit {
             return false;
         }
         if(this.config.overlay.geneveOffloadEnable !== this.hostConfig.get('overlay').get('geneveOffloadEnable').value){
+            return false;
+        }
+        if(this.config.evqType.evqTypeVal !== this.hostConfig.get('evqType').get('evqTypeVal').value){
             return false;
         }
         return true;
