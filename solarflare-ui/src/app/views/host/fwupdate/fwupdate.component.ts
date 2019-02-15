@@ -21,7 +21,7 @@ import { environment } from "environments/environment"
     styleUrls: ['./fwupdate.component.scss']
 })
 export class FwupdateComponent implements OnInit {
-    public supportedFirmwaeVariants = 3;
+    public supportedFirmwaeVariants = 4;
     public isProd = environment.production
     public latestUpdateModal = false;
     public customUpdateModal = false;
@@ -39,6 +39,7 @@ export class FwupdateComponent implements OnInit {
         latest: true,
         custom: true
     };
+    public tableHeaders= ["Firmware", "Controller", "Bootrom", "UEFIROM", "SUCFW"];
     public selectedAdapters = [];
     public validateLatestUpdateModal = false;
     public validateCustomUpdateModal = false;
@@ -186,6 +187,9 @@ export class FwupdateComponent implements OnInit {
                         if (op.uefiRom !== null) {
                             this.status.custom.output[i].uefiRom.to = adapter.versionUEFIROM;
                         }
+                        if (op.sucfw !== null) {
+                            this.status.custom.output[i].sucfw.to = adapter.versionSUCFW;
+                        }
                     }
                 })
             });
@@ -203,6 +207,8 @@ export class FwupdateComponent implements OnInit {
                 updatable++;
             } else if (!value.latestVersion.uefi.includes(value.versionUEFIROM)) {
                 updatable++;
+            } else if (!value.latestVersion.sucfw.includes(value.versionSUCFW)) {
+                updatable++;
             } else {
                 invalid++;
             }
@@ -215,6 +221,8 @@ export class FwupdateComponent implements OnInit {
                 } else if (!value.latestVersion.bootROM.includes(value.versionBootROM)) {
                     filterdAdapters.push(value);
                 } else if (!value.latestVersion.uefi.includes(value.versionUEFIROM)) {
+                    filterdAdapters.push(value);
+                } else if (!value.latestVersion.sucfw.includes(value.versionSUCFW)) {
                     filterdAdapters.push(value);
                 }
             });
@@ -274,6 +282,8 @@ export class FwupdateComponent implements OnInit {
         } else if (!ad.latestVersion.bootROM.includes(ad.versionBootROM)) {
             return "Yes";
         } else if (!ad.latestVersion.uefi.includes(ad.versionUEFIROM)) {
+            return "Yes";
+        } else if (!ad.latestVersion.sucfw.includes(ad.versionSUCFW)) {
             return "Yes";
         } else {
             return "No";
@@ -500,6 +510,7 @@ export class FwupdateComponent implements OnInit {
 
     updateStatusOutput(a) {
         let total = 0, current = 0;
+        let nullCount = 0;
         this.status[a].output.forEach((i, j) => {
             if (i['controller'] !== null) {
                 total++;
@@ -519,9 +530,17 @@ export class FwupdateComponent implements OnInit {
                     current++;
                 }
             }
+            if (i['sucfw'] !== null) {
+                total++;
+                if (i['sucfw']['state'] === 'Success' || i['sucfw']['state'] === 'Error') {
+                    current++;
+                }
+            }else {
+                nullCount++;
+            }
             if (total !== 0 && (this.status[a].output.length === j + 1) && total === current) {
                 if ( a === "latest") {
-                   if (total ===  this.status[a].output.length * this.supportedFirmwaeVariants) {
+                   if (total ===  ((this.status[a].output.length * this.supportedFirmwaeVariants) - nullCount)) {
                     this.status.status = true;
                    }
                 }else {
@@ -546,7 +565,8 @@ export class FwupdateComponent implements OnInit {
                 name: adapter.name,
                 bootRom: null,
                 controller: null,
-                uefiRom: null
+                uefiRom: null,
+                sucfw: null
             };
             if (status && status.adapterTasks && status.adapterTasks.length > 0) {
                 status.adapterTasks.forEach((task, i) => {
@@ -568,6 +588,12 @@ export class FwupdateComponent implements OnInit {
                             this.status.latest.output[index].uefiRom = FwupdateComponent.returnStatusOutput(br);
                             this.status.latest.output[index].uefiRom.from = adapter.versionUEFIROM;
                             this.status.latest.output[index].uefiRom.to = adapter.latestVersion.uefi;
+                        }
+                        if (task['sucfw'] !== null) {
+                            const br = task['sucfw'];
+                            this.status.latest.output[index].sucfw = FwupdateComponent.returnStatusOutput(br);
+                            this.status.latest.output[index].sucfw.from = adapter.versionSUCFW;
+                            this.status.latest.output[index].sucfw.to = adapter.latestVersion.sucfw;
                         }
                     }
                 });
@@ -611,7 +637,8 @@ export class FwupdateComponent implements OnInit {
                 name: adapter.name,
                 bootRom: null,
                 controller: null,
-                uefiRom: null
+                uefiRom: null,
+                sucfw: null
             };
             if (status && status.adapterTasks && status.adapterTasks.length > 0) {
                 status.adapterTasks.forEach((task, i) => {
@@ -630,6 +657,11 @@ export class FwupdateComponent implements OnInit {
                             const br = task['uefiROM'];
                             this.status.custom.output[index].uefiRom = FwupdateComponent.returnStatusOutput(br);
                             this.status.custom.output[index].uefiRom.from = adapter.versionUEFIROM;
+                        }
+                        if (task['sucfw'] !== null) {
+                            const br = task['sucfw'];
+                            this.status.custom.output[index].sucfw = FwupdateComponent.returnStatusOutput(br);
+                            this.status.custom.output[index].sucfw.from = adapter.versionSUCFW;
                         }
                     }
                 });

@@ -57,57 +57,78 @@
 
         <table class="table">
             <tr>
-                <th rowspan="2" class="table-border-right" style="vertical-align: middle;">
-                    Adapter Name
-                </th>
-                <th colspan="2" class="table-border-right">Controller Version</th>
-                <th colspan="2" class="table-border-right">Boot ROM Version</th>
-                <th colspan="2" class="table-border-right">UEFI ROM Version</th>
-                <th>Available Update Different</th>
-            </tr>
-            <tr>
-                <th class="table-border-right">Current</th>
-                <th class="table-border-right" style="color:#781DA0;">Available</th>
-                <th class="table-border-right">Current</th>
-                <th class="table-border-right" style="color:#781DA0;">Available</th>
-                <th class="table-border-right">Current</th>
-                <th style="color:#781DA0;" class="table-border-right">Available</th>
-                <th></th>
-            </tr>
-            <tr *ngFor="let ad of selectedAdapters">
-                <td>{{ad.name}}</td>
-                <td>v{{ad.versionController}}</td>
-                <td>
-                    <b style="color:#781DA0;" *ngIf="ad.latestVersion.controller !== null">
-                        {{ad.latestVersion.controller}}
-                    </b>
-                    <b *ngIf="ad.latestVersion.controller === null">
-                        NA
-                    </b>
-                </td>
-                <td>v{{ad.versionBootROM}}</td>
-                <td>
-                    <b style="color:#781DA0;" *ngIf="ad.latestVersion.bootROM !== null">
-                        {{ad.latestVersion.bootROM}}
-                    </b>
-                    <b *ngIf="ad.latestVersion.bootROM === null">
-                        NA
-                    </b>
-                </td>
-                <td>v{{ad.versionUEFIROM}}</td>
-                <td>
-                    <b style="color:#781DA0;" *ngIf="ad.latestVersion.uefi !== null">
-                        {{ad.latestVersion.uefi}}
-                    </b>
-                    <b *ngIf="ad.latestVersion.uefi === null">
-                        NA
-                    </b>
-                </td>
-                <td>
-                    {{isLatestAvailable(ad)}}
+                <td class="table-border"
+                    style="color:blue"
+                         *ngFor="let hd of tableHeaders">{{hd}}
                 </td>
             </tr>
+            <tbody *ngFor="let ad of selectedAdapters">
+                <tr >
+                    <td class="table-border">
+                        Adapter Name
+                    </td>
+                    <td colspan="4"
+                        class="table-border">
+                        {{ad.name}}
+                    </td>
+                </tr>
+                 <tr>
+                        <td class="table-border">Current</td>
+                        <td class="table-border">v{{ad.versionController}}</td>
+                        <td class="table-border">v{{ad.versionBootROM}}</td>
+                        <td class="table-border">v{{ad.versionUEFIROM}}</td>
+                        <td class="table-border">
+                            <div *ngIf="ad.versionSUCFW === '0.0.0.0' else tab_host_curr_na_sucfw ">
+                                                    NA
+                            </div>
+                            <div>
+                                <ng-template #tab_host_curr_na_sucfw>v{{ad.versionSUCFW}}</ng-template>
+                            </div>
+                        </td>
+                </tr>
+                <tr>
+                    <td class="table-border">Available</td>
+                    <td class="table-border">
+                        <b style="color:#781DA0;" *ngIf="ad.latestVersion.controller !== null">
+                            {{ad.latestVersion.controller}}
+                        </b>
+                        <b *ngIf="ad.latestVersion.controller === null" >
+                            NA
+                        </b>
+                    </td>
+                    <td class="table-border">
+                        <b style="color:#781DA0;" *ngIf="ad.latestVersion.bootROM !== null">
+                            {{ad.latestVersion.bootROM}}
+                        </b>
+                        <b *ngIf="ad.latestVersion.bootROM === null">
+                            NA
+                        </b>
+                    </td>
+                    <td class="table-border">
+                            <b style="color:#781DA0;" *ngIf="ad.latestVersion.uefi !== null">
+                                {{ad.latestVersion.uefi}}
+                            </b>
+                            <b *ngIf="ad.latestVersion.uefi === null">
+                                NA
+                            </b>
+                    </td>
+                    <td class="table-border">
+                            <b style="color:#781DA0;" *ngIf="ad.latestVersion.sucfw !== null
+                                                               && ad.latestVersion.sucfw !== '0.0.0.0';  else tab_host_aval_na_sucfw">
+                                {{ad.latestVersion.sucfw}}
+                            </b>
+                            <b>
+                                <ng-template #tab_host_aval_na_sucfw>NA</ng-template>
+                            </b>
+                    </td>
+                </tr>
+            </tbody>
         </table>
+
+
+
+
+
         <br/>
         <div>
             <input type="checkbox" id="filter" [(ngModel)]="latestUpdateAdapterFilter" [disabled]="disableLatestUpdateAdapterFilter()">
@@ -141,6 +162,7 @@
             <clr-dg-column>Controller Version</clr-dg-column>
             <clr-dg-column>Boot ROM Version</clr-dg-column>
             <clr-dg-column>UEFI ROM Version</clr-dg-column>
+            <clr-dg-column>SUCFW Version</clr-dg-column>
 
             <clr-dg-column>Later Version Available</clr-dg-column>
 
@@ -149,6 +171,7 @@
                 <clr-dg-cell>{{ad.versionController}}</clr-dg-cell>
                 <clr-dg-cell>{{ad.versionBootROM}}</clr-dg-cell>
                 <clr-dg-cell>{{ad.versionUEFIROM}}</clr-dg-cell>
+                <clr-dg-cell>{{ad.versionSUCFW}}</clr-dg-cell>
                 <clr-dg-cell>
                     <span *ngIf="!ad.laterVersionAvailable">
                         <b style="font-size: large">No</b>
@@ -365,8 +388,25 @@
                 <br/>
             </div>
 
+            <div *ngIf="output.sucfw !== null">
+                    <span *ngIf="output.sucfw.state === 'Success' && output.sucfw.to ">
+                        SUCFW Firmware: v{{output.sucfw.from}} updated to v{{output.sucfw.to}}
+                    </span>
+                    <span *ngIf="output.sucfw.state === 'Success' && !output.sucfw.to ">
+                        SUCFW Firmware: Update completed.
+                    </span>
+                    <span *ngIf="output.sucfw.state === 'Error'">
+                        SUCFW Firmware: Error occurred while updating v{{output.sucfw.from}}
+                        <i style="color: red;" *ngIf="output.sucfw.message !== null">
+                            <br/>{{output.sucfw.message}}</i>
+                    </span>
+                    <span *ngIf="output.sucfw.state === 'Queued' || output.sucfw.state === 'Running'">
+                        SUCFW Firmware: Firmware update in progress {{dots}}
+                    </span>
+                    <br/>
+            </div>
 
-            <span *ngIf="output.uefiRom === null && output.bootRom === null && output.controller === null">
+            <span *ngIf="output.uefiRom === null && output.bootRom === null && output.controller === null && output.sucfw === null">
                 Update is in progress.. Please wait...
                 <br/>
             </span>
@@ -427,8 +467,22 @@
                 </span>
                 <br/>
             </div>
+            <div *ngIf="output.sucfw !== null">
+                    <span *ngIf="output.sucfw.state === 'Success'">
+                        SUCFW Firmware: v{{output.sucfw.from}} updated to {{output.sucfw.to}}
+                    </span>
+                    <span *ngIf="output.sucfw.state === 'Error'">
+                        SUCFW Firmware: Error occurred while updating v{{output.sucfw.from}} to {{output.sucfw.to}}
+                        <i style="color: red;" *ngIf="output.sucfw.message !== null">
+                            <br/>{{output.sucfw.message}}</i>
+                    </span>
+                    <span *ngIf="output.sucfw.state === 'Queued' || output.sucfw.state === 'Running'">
+                        SUCFW Firmware: v{{output.sucfw.from}} updating to {{output.sucfw.to}}
+                    </span>
+                    <br/>
+            </div>
 
-            <span *ngIf="output.uefiRom === null && output.bootRom === null && output.controller === null">
+            <span *ngIf="output.uefiRom === null && output.bootRom === null && output.controller === null && output.sucfw === null">
                 Update is in progress.. Please wait...
             </span>
 
@@ -478,6 +532,7 @@
             <clr-dg-column>Controller Version</clr-dg-column>
             <clr-dg-column>Boot ROM Version</clr-dg-column>
             <clr-dg-column>UEFI ROM Version</clr-dg-column>
+            <clr-dg-column>SUCFW Version</clr-dg-column>
 
             <clr-dg-row *clrDgItems="let ad of adapterList; let i = index" [clrDgItem]="ad">
                 <clr-dg-cell>
@@ -491,6 +546,14 @@
                 </clr-dg-cell>
                 <clr-dg-cell>
                     {{ad.versionUEFIROM}}
+                </clr-dg-cell>
+                <clr-dg-cell>
+                    <div *ngIf="ad.versionSUCFW !== '0.0.0.0' else host_fu_curr_na_sucfw">
+                        {{ad.versionSUCFW}}
+                    </div>
+                    <div>
+                        <ng-template #host_fu_curr_na_sucfw>NA</ng-template>
+                    </div>
                 </clr-dg-cell>
             </clr-dg-row>
             <clr-dg-footer>{{adapterList.length}} Adapters</clr-dg-footer>
