@@ -69,7 +69,11 @@
                         </tr>
                         <tr>
                             <td >sfvmk CLI Version</td>
-                            <td colspan="2">{{hostDetail.sfvmkCliVersion}}</td>
+                            <td colspan="2">
+                                <div *ngIf="!hostDetail.sfvmkCliVersion; else sfvmkCliVer">
+                                    Not Installed </div>
+                                    <ng-template #sfvmkCliVer>{{hostDetail.sfvmkCliVersion}}</ng-template>
+                            </td>
                         </tr>
                         <tr>
                             <td colspan="4" class="text-center"><h3>{{hostDetail.name}}</h3></td>
