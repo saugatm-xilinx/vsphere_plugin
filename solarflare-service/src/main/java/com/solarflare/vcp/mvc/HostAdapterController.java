@@ -107,7 +107,7 @@ public class HostAdapterController {
 		List<Adapter> adapter = gson.fromJson(adapterList, listType);
 		String taskId = hostAdapterService.updateFirmwareToLatest(adapter, hostId);
 		String response = createTaskRequestId(taskId);
-		logger.debug("Solarflare:: updateCustomWithBinary response: " + response);
+		logger.debug("Solarflare:: updateFirmwareToLatest response: " + response);
 		timer.stop();
 		return response;
 

@@ -849,18 +849,6 @@ public class SfCIMService {
 	}
 
 	/**
-	 * This method is used to create session with CIM client
-	 */
-	public void getProperty() {
-		WBEMClient client = getCIMClient();
-		try {
-			String property = client.getProperty("CIM-XML");
-		} catch (Exception e) {
-
-		}
-	}
-
-	/**
 	 * Return Part Number for given deviceID
 	 * 
 	 * @param deviceId
