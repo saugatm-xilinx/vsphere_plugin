@@ -48,22 +48,27 @@ public class CustomUpdateRequestThread implements Runnable {
                         // sleep added so that the calling HTTP thread can return
                         // task Id to user
 			Thread.sleep(1000);
-                        for (Adapter adapter : adapterList) {
-			    updateRequestForAdapter(adapter);
-			    CIMObjectPath fwInstance = updateRequest.getFwInstance();
-			    setTaskState(TaskState.Running, null);
+                } catch (InterruptedException e1) {
+                        String errorMsg = "Thread Sleep failed! Error : " + e1.getMessage() + ":"+ e1.getStackTrace();
+                        logger.error(errorMsg);
+                }
+                for (Adapter adapter : adapterList) {
+		        try {
+			        updateRequestForAdapter(adapter);
+			        CIMObjectPath fwInstance = updateRequest.getFwInstance();
+			        setTaskState(TaskState.Running, null);
 
-			    CIMObjectPath nicInstance = updateRequest.getNicInstance();
-			    URL fwImagePath = updateRequest.getFwImagePath();
-			    cimService.renewCimSession();
-			    cimService.updateFirmwareFromURL(fwInstance, nicInstance, fwImagePath);
+			        CIMObjectPath nicInstance = updateRequest.getNicInstance();
+			        URL fwImagePath = updateRequest.getFwImagePath();
+			        cimService.renewCimSession();
+			        cimService.updateFirmwareFromURL(fwInstance, nicInstance, fwImagePath);
 
-			    setTaskState(TaskState.Success, null);
+			        setTaskState(TaskState.Success, null);
+		        } catch (Exception e) {
+	                        String errorMsg = "Update request failed! Error : " + e.getMessage();
+			        logger.error(errorMsg);
+			        setTaskState(TaskState.Error, errorMsg);
 		        }
-		} catch (Exception e) {
-	                String errorMsg = "Update request failed! Error : " + e.getMessage();
-			logger.error(errorMsg);
-			setTaskState(TaskState.Error, errorMsg);
 		}
 
 		// if temp file is created then remove it.
