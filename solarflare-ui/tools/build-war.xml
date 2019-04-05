@@ -10,7 +10,6 @@
 
    <!-- SDK home folders should be set in environment variables -->
    <property environment="env"/>
-   <property name="FLEX_HOME" value="${env.FLEX_HOME}"/>
    <property name="VSPHERE_SDK_HOME" value="${env.VSPHERE_SDK_HOME}"/>
 
    <property name="BUILD_DIR" value="${basedir}/../target"/>
@@ -51,19 +50,6 @@
    <condition property="BUNDLE-CONTEXT.XML" value="" else="bundle-context.xml">
       <istrue value="${DEFAULT_BUILD}"/>
    </condition>
-
-   <!-- Import the definition of mxmlc-macro -->
-   <import file="${VSPHERE_SDK_HOME}/resources/flex-macros.xml"/>
-
-   <!-- Check SDK setup -->
-   <target name="check-sdk">
-      <available file="${FLEX_HOME}/frameworks/libs/player/11.5/playerglobal.swc" property="flex-sdk-ok"/>
-      <fail unless="flex-sdk-ok" message="Flex SDK setup incomplete!
-${line.separator} Cannot find file ${FLEX_HOME}/frameworks/libs/player/11.5/playerglobal.swc
-${line.separator} This file is required to compile for Flash Player 11.5 and must be added to your setup
-${line.separator} Download http://fpdownload.macromedia.com/get/flashplayer/installers/archive/playerglobal/playerglobal11_5.swc
-${line.separator} Then rename it playerglobal.swc and move it to ${FLEX_HOME}/frameworks/libs/player/11.5/" />
-   </target>
 
    <!-- clean the generated build files -->
    <target name="init">
@@ -125,28 +111,18 @@ ${line.separator} Then rename it playerglobal.swc and move it to ${FLEX_HOME}/fr
    <!-- Compile separate bundle resource files ${PROJECT_NAME}-{locale}.swf.
         This file name must match the name declared in plugin.xml <resource> tag.
    -->
-   <target name="compile-resources" depends="check-sdk">
+   <target name="compile-resources">
       <property file="${BUILD_DIR}/bundles.properties"/>
 
       <!-- default US version -->
       <copy file="${WEBAPP_DIR}/locales/${BUNDLE_NAME}_en_US.properties"
             tofile="${WEBAPP_DIR}/locales/${BUNDLE_NAME}.properties"/>
-      <mxmlc-macro>
-         <arg line="-locale=en_US" />
-         <arg line="-source-path+=${SRC_DIR}/webapp/locales"/>
-         <arg line="-output=${WEBAPP_DIR}/locales/${PROJECT_NAME}-en_US.swf"/>
-         <arg line="-include-resource-bundles ${BUNDLE_NAME}" />
-      </mxmlc-macro>
+
 
       <!-- French version -->
       <copy file="${WEBAPP_DIR}/locales/${BUNDLE_NAME}_fr_FR.properties"
             tofile="${WEBAPP_DIR}/locales/${BUNDLE_NAME}.properties"/>
-      <mxmlc-macro>
-         <arg line="-locale=fr_FR" />
-         <arg line="-source-path+=${SRC_DIR}/webapp/locales"/>
-         <arg line="-output=${WEBAPP_DIR}/locales/${PROJECT_NAME}-fr_FR.swf"/>
-         <arg line="-include-resource-bundles ${BUNDLE_NAME}" />
-      </mxmlc-macro>
+
 
       <delete file="${WEBAPP_DIR}/locales/${BUNDLE_NAME}.properties"/>
 

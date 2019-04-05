@@ -17,13 +17,10 @@ This generated plugin uses a new tech stack and development process:
 - Install Angular-CLI by following [these instructions](https://github.com/angular/angular-cli#installation). [command:  npm install -g @angular/cli]
    
 
-## 1. To build the project you need to create two environment variables FLEX_HOME and VSPHERE_SDK_HOME.
+## 1. To build the project you need to create an environment variable VSPHERE_SDK_HOME.
 	
-	a.) VSPHERE_SDK_HOME : Path to sdk directory where you downloaded and unzipped the sdk files.
+	VSPHERE_SDK_HOME : Path to sdk directory where you downloaded and unzipped the sdk files.
 		(Ex. D:\VMware\SDK\html-client-sdk)
-	
-	b.) FLEX_HOME: Path to flex_sdk_4.6.0.23201_vmw in sdk directory
-		(Ex. D:\VMware\SDK\html-client-sdk\resources\flex_sdk_4.6.0.23201_vmw)
 	
 ## 2. Clone repo from http://code.sfguest.lan/source/vsphere_plugin on your local machine. Select branch for ex. P2.
 	Make sure any directory name doesn't have any space in checkout path. (Directory like 'solarflare vcp' gives error while building the project due to space in directory name.) 
