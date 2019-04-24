@@ -23,7 +23,7 @@ public class SFBase64 {
     {
     	// TODO : Review Comment : Check for null input
         return (src_size / 3 + (src_size % 3 > 0 ? 1 : 0)) * 4 +
-               ((3 - src_size % 3) % 3) + 1;
+               ((3 - src_size % 3) % 3);
     }
     
   ///
@@ -73,7 +73,6 @@ public class SFBase64 {
         for (j = 0; j < (3 - src_size % 3) % 3; j++)
             dst[4 * i + j] = '=';
 
-        dst[4 * i + j] = '\0';
         return dst;
     }
 }
