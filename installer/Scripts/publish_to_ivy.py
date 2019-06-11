@@ -44,7 +44,12 @@ def main():
         root_node = tree.getroot()
         if options.file_name is None:
             options.file_name = 'installer.zip'
-        lhs,rhs = options.file_name.split(".")
+        name = os.path.splitext(os.path.basename(options.file_name))
+        if (name[1] == '.msi'):
+            rhs = 'msi'
+            lhs = name[0]
+        elif (name[1] == '.zip'):
+            rhs = 'zip'
         if ((rhs == 'zip') or
             (rhs == 'msi')):
             for child in root_node:
