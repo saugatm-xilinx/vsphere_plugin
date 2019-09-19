@@ -28,7 +28,7 @@ export const APP_CONFIG: AppConfig = {
 
    // Version number displayed in the top right corner of the app-header component.
    // This version number is changed by scripts/tagplugin script.
-   version: "1.2.0.1010",
+   version: "1.2.0.1011",
 
    // List of properties for the Host monitor view
    hostProperties: ["name", "overallStatus", "hardware.systemInfo.model", "vm"],
